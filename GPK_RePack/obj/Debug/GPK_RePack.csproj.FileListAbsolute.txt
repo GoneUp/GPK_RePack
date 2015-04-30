@@ -1,0 +1,2 @@
+C:\Users\Henry\AppData\Local\Temporary Projects\GPK_RePack\bin\Debug\GPK_RePack.exe.config
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\bin\Debug\GPK_RePack.exe.config
