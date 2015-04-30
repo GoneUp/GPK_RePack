@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace GPK_RePack.Class
 {
-    class GpkImportList
+    class GpkGeneration
     {
+        public int ExportCount, NameCount;
+        public int NetObjectCount;
+
     }
 }

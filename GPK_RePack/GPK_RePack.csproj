@@ -45,11 +45,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class\GpkDependList.cs" />
-    <Compile Include="Class\GpkExportList.cs" />
+    <Compile Include="Class\GpkExport.cs" />
+    <Compile Include="Class\GpkGeneration.cs" />
     <Compile Include="Class\GpkHeader.cs" />
-    <Compile Include="Class\GpkImportList.cs" />
-    <Compile Include="Class\GpkNameList.cs" />
+    <Compile Include="Class\GpkImport.cs" />
+    <Compile Include="Class\GpkObject.cs" />
     <Compile Include="Class\GpkPackage.cs" />
+    <Compile Include="Class\GpkProperty.cs" />
+    <Compile Include="Class\GpkString.cs" />
     <Compile Include="GUI.cs">
       <SubType>Form</SubType>
     </Compile>

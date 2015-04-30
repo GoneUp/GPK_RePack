@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace GPK_RePack.Class
 {
-    class GpkExportList
+    class GpkString
     {
+        public string name;
+        public long flags;
     }
 }

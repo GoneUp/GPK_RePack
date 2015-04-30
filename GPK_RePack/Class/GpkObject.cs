@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace GPK_RePack.Class
 {
-    class GpkNameList
+    class GpkObject
     {
+        
+
     }
 }
