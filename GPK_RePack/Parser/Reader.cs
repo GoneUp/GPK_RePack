@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GPK_RePack.Class;
+using GPK_RePack.Class.Prop;
 using NLog;
 using NLog.Fluent;
 
@@ -144,17 +145,144 @@ namespace GPK_RePack.Parser
 
         private void ReadImports(BinaryReader reader, GpkPackage package)
         {
+            logger.Info("Reading Imports....");
+            reader.BaseStream.Seek(package.Header.ImportOffset, SeekOrigin.Begin);
 
+            for (int i = 0; i < package.Header.ImportCount; i++)
+            {
+                GpkImport import = new GpkImport();
+                long package_class_index = reader.ReadInt64();
+                long class_index = reader.ReadInt64();
+                import.PackageRef = reader.ReadInt32();
+                long object_index = reader.ReadInt32();
+                reader.ReadInt32();
+
+                import.ClassPackage = package.NameList[package_class_index].name;
+                import.Class = package.NameList[class_index].name;
+                import.Object = package.NameList[object_index].name;
+
+
+
+                package.ImportList.Add(i, import);
+
+                logger.Info("Import {0}: ClassPackage {1}, Class: {2}, Object: {3}", i, import.ClassPackage, import.Class, import.Object);
+            }
         }
 
         private void ReadExports(BinaryReader reader, GpkPackage package)
         {
+            logger.Info("Reading Exports....");
+            reader.BaseStream.Seek(package.Header.ExportOffset, SeekOrigin.Begin);
 
+            for (int i = 0; i < package.Header.ExportCount; i++)
+            {
+                GpkExport export = new GpkExport();
+                export.ClassIndex = reader.ReadInt32();
+                export.SuperIndex = reader.ReadInt32();
+                export.PackageIndex = reader.ReadInt32();
+
+                long nameIndex = reader.ReadInt64();
+                export.Name = package.NameList[nameIndex].name;
+
+                export.Unk1 = reader.ReadInt64();
+                export.Unk2 = reader.ReadInt32();
+
+                export.SerialSize = reader.ReadInt32();
+
+                if (export.SerialSize > 0)
+                {
+                    export.SerialOffset = reader.ReadInt32();
+                }
+                else
+                {
+                    logger.Trace(1);
+                }
+
+                if (export.ClassIndex < 0)
+                {
+                    export.ClassIndex = ((export.ClassIndex * -1) - 1); 
+                    export.ClassName = package.ImportList[export.ClassIndex].Object;
+                }
+               
+
+                package.ExportList.Add(i, export);
+
+                logger.Info("Export {0}: Class: {1}, Name: {2}, Size: {3}, Offset {4}", i, export.ClassName, export.Name, export.SerialSize, export.SerialOffset);
+            }
         }
 
         private void ReadExportData(BinaryReader reader, GpkPackage package)
         {
+            logger.Info("Reading ExportsData....");
 
+
+            foreach (GpkExport export in package.ExportList.Values)
+            {
+                reader.BaseStream.Seek(export.SerialOffset + 4, SeekOrigin.Begin);
+
+                //Props
+                while (true)
+                {
+                    GpkBaseProperty baseProp = new GpkBaseProperty();
+
+                    baseProp.NameIndex = reader.ReadInt64();
+                    baseProp.Name = package.NameList[baseProp.NameIndex].name;
+
+                    if (baseProp.Name == "none") break;
+
+                    baseProp.type = (PropertyTypes)reader.ReadInt64();
+
+                    switch (baseProp.type)
+                    {
+                        case PropertyTypes.BoolProp:
+                            GpkBoolProperty tmpBool = (GpkBoolProperty)baseProp;
+                            tmpBool.unk = reader.ReadInt64();
+                            tmpBool.value = Convert.ToBoolean(reader.ReadInt32());
+                            export.Properties.Add(tmpBool);
+                            break;
+
+                        case PropertyTypes.IntProp:
+                            GpkIntProperty tmpInt = (GpkIntProperty)baseProp;
+                            tmpInt.unk = reader.ReadInt64();
+                            tmpInt.value = reader.ReadInt32();
+
+                            export.Properties.Add(tmpInt);
+                            break;
+
+                        case PropertyTypes.NameProp:
+                            GpkNameProperty tmpName = (GpkNameProperty)baseProp;
+                            tmpName.unk = reader.ReadInt64();
+                            long index = reader.ReadInt64();
+                            tmpName.value = package.NameList[index].name;
+
+                            export.Properties.Add(tmpName);
+                            break;
+
+                        case PropertyTypes.StringProp:
+                            GpkStringProperty tmpString = (GpkStringProperty)baseProp;
+                            tmpString.unk = reader.ReadInt64();
+                            tmpString.length = reader.ReadInt64();
+                            tmpString.value = ASCIIEncoding.ASCII.GetString(reader.ReadBytes((int)tmpString.length));
+
+                            export.Properties.Add(tmpString);
+                            break;
+
+                        case PropertyTypes.ArrayProp:
+                            GpkArrayProperty tmpArray = (GpkArrayProperty)baseProp;
+                            tmpArray.length = reader.ReadInt64();
+                            tmpArray.data = new byte[tmpArray.length];
+                            tmpArray.data = reader.ReadBytes((int)tmpArray.length);
+
+                            export.Properties.Add(tmpArray);
+                            break;
+                    }
+                }
+
+
+                //data
+
+                //logger.Info("Export {0}: Class: {1}, Name: {2}, Size: {3}, Offset {4}", i, export.ClassName, export.Name, export.SerialSize, export.SerialOffset);
+            }
         }
     }
 }

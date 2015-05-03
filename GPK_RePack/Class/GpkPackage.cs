@@ -10,18 +10,18 @@ namespace GPK_RePack.Class
     {
         public GpkHeader Header;
 
-        public Dictionary<int, GpkString> NameList;
-        public List<GpkImport> ImportList;
-        public List<GpkExport> ExportList;
+        public Dictionary<long, GpkString> NameList;
+        public Dictionary<long, GpkImport> ImportList;
+        public Dictionary<long, GpkExport> ExportList;
         public GpkDependList DependList;
 
         public GpkPackage()
         {
             Header = new GpkHeader();
 
-            NameList = new Dictionary<int, GpkString>();
-            ImportList = new List<GpkImport>();
-            ExportList = new List<GpkExport>();
+            NameList = new Dictionary<long, GpkString>();
+            ImportList = new Dictionary<long, GpkImport>();
+            ExportList = new Dictionary<long, GpkExport>();
         }
     }
 }
