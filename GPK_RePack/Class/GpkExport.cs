@@ -22,5 +22,6 @@ namespace GPK_RePack.Class
         public int SerialOffset;
 
         //28 byte byte padding? + 4 vor letztem
+
     }
 }

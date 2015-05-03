@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.boxLog = new System.Windows.Forms.ListBox();
             this.treeMain = new System.Windows.Forms.TreeView();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.mainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,25 +38,20 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.boxButtons = new System.Windows.Forms.GroupBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.boxLog = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // boxLog
-            // 
-            this.boxLog.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.boxLog.FormattingEnabled = true;
-            this.boxLog.Location = new System.Drawing.Point(0, 489);
-            this.boxLog.Name = "boxLog";
-            this.boxLog.Size = new System.Drawing.Size(754, 95);
-            this.boxLog.TabIndex = 0;
             // 
             // treeMain
             // 
-            this.treeMain.Dock = System.Windows.Forms.DockStyle.Left;
-            this.treeMain.Location = new System.Drawing.Point(0, 24);
+            this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeMain.Location = new System.Drawing.Point(0, 0);
             this.treeMain.Name = "treeMain";
-            this.treeMain.Size = new System.Drawing.Size(278, 465);
+            this.treeMain.Size = new System.Drawing.Size(219, 490);
             this.treeMain.TabIndex = 1;
             // 
             // menuStrip1
@@ -110,19 +104,20 @@
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(278, 24);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.tabControl1.Location = new System.Drawing.Point(219, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(476, 465);
+            this.tabControl1.Size = new System.Drawing.Size(535, 490);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.boxButtons);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(468, 439);
+            this.tabPage1.Size = new System.Drawing.Size(527, 464);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -130,29 +125,49 @@
             // boxButtons
             // 
             this.boxButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.boxButtons.Location = new System.Drawing.Point(278, 402);
+            this.boxButtons.Location = new System.Drawing.Point(3, 374);
             this.boxButtons.Name = "boxButtons";
-            this.boxButtons.Size = new System.Drawing.Size(476, 87);
+            this.boxButtons.Size = new System.Drawing.Size(521, 87);
             this.boxButtons.TabIndex = 4;
             this.boxButtons.TabStop = false;
             this.boxButtons.Text = "Commands";
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.treeMain);
+            this.panel1.Controls.Add(this.tabControl1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 24);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(754, 490);
+            this.panel1.TabIndex = 4;
+            // 
+            // boxLog
+            // 
+            this.boxLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.boxLog.Location = new System.Drawing.Point(0, 514);
+            this.boxLog.Multiline = true;
+            this.boxLog.Name = "boxLog";
+            this.boxLog.Size = new System.Drawing.Size(754, 70);
+            this.boxLog.TabIndex = 5;
             // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(754, 584);
-            this.Controls.Add(this.boxButtons);
-            this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.treeMain);
-            this.Controls.Add(this.boxLog);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.boxLog);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GUI";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.GUI_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -160,7 +175,6 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox boxLog;
         private System.Windows.Forms.TreeView treeMain;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem mainToolStripMenuItem;
@@ -171,6 +185,8 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.GroupBox boxButtons;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TextBox boxLog;
     }
 }
 

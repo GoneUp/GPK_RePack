@@ -23,7 +23,7 @@ namespace GPK_RePack.Class
         public int ImportCount, ImportOffset;
         public int DependsOffset;
         
-        public byte[] FGUID;
+        public byte[] FGUID = new byte[16];
 
         public List<GpkGeneration> Genrations = new List<GpkGeneration>();
 
