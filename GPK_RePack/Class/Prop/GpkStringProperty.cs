@@ -5,6 +5,16 @@
         public long unk;
         public long length;
         public string value;
+
+        public GpkStringProperty()
+        {
+            
+        }
+        public GpkStringProperty(GpkBaseProperty bp)
+        {
+            Name = bp.Name;
+            type = bp.type;
+        }
     }
 
 }

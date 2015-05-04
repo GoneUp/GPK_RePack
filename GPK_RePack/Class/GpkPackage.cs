@@ -8,6 +8,8 @@ namespace GPK_RePack.Class
 {
     class GpkPackage
     {
+        public string Filename;
+
         public GpkHeader Header;
 
         public Dictionary<long, GpkString> NameList;

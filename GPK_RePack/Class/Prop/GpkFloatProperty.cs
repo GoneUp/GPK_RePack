@@ -1,15 +1,15 @@
 ﻿namespace GPK_RePack.Class.Prop
 {
-    class GpkBoolProperty : GpkBaseProperty
+    class GpkFloatProperty : GpkBaseProperty
     {
         public long unk;
-        public bool value;
+        public float value;
 
-        public GpkBoolProperty()
+        public GpkFloatProperty()
         {
 
         }
-        public GpkBoolProperty(GpkBaseProperty bp)
+        public GpkFloatProperty(GpkBaseProperty bp)
         {
             Name = bp.Name;
             type = bp.type;

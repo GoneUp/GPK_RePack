@@ -2,18 +2,10 @@
 {
     class GpkBaseProperty
     {
-        public long NameIndex;
-        public string Name;
+        public string Name; //long index
 
-        public PropertyTypes type; //long
-    }
+        public long type; //long
 
-    enum PropertyTypes
-    {
-        IntProp = 28,
-        NameProp = 4,
-        StringProp = 45,
-        BoolProp = 1,
-        ArrayProp = 0
+        public object value;
     }
 }

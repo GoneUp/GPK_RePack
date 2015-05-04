@@ -61,6 +61,9 @@
     <Compile Include="Class\Prop\GpkNameProperty.cs" />
     <Compile Include="Class\Prop\GpkStringProperty.cs" />
     <Compile Include="Class\Prop\GpkArrayProperty.cs" />
+    <Compile Include="Class\Prop\GpkObjectProperty.cs" />
+    <Compile Include="Class\Prop\GpkFloatProperty.cs" />
+    <Compile Include="Class\Prop\GpkGUIDProperty.cs" />
     <Compile Include="GUI.cs">
       <SubType>Form</SubType>
     </Compile>

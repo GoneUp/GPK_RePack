@@ -1,15 +1,16 @@
 ﻿namespace GPK_RePack.Class.Prop
 {
-    class GpkArrayProperty : GpkBaseProperty
+    class GpkGUIDProperty : GpkBaseProperty
     {
         public long length;
+        public long unk;
         public byte[] value;
 
-        public GpkArrayProperty()
+        public GpkGUIDProperty()
         {
 
         }
-        public GpkArrayProperty(GpkBaseProperty bp)
+        public GpkGUIDProperty(GpkBaseProperty bp)
         {
             Name = bp.Name;
             type = bp.type;

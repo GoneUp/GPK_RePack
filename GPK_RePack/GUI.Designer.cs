@@ -51,7 +51,7 @@
             this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeMain.Location = new System.Drawing.Point(0, 0);
             this.treeMain.Name = "treeMain";
-            this.treeMain.Size = new System.Drawing.Size(219, 490);
+            this.treeMain.Size = new System.Drawing.Size(344, 507);
             this.treeMain.TabIndex = 1;
             // 
             // menuStrip1
@@ -60,7 +60,7 @@
             this.mainToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(754, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(879, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -78,26 +78,26 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(100, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -105,10 +105,10 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tabControl1.Location = new System.Drawing.Point(219, 0);
+            this.tabControl1.Location = new System.Drawing.Point(344, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(535, 490);
+            this.tabControl1.Size = new System.Drawing.Size(535, 507);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -117,15 +117,15 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(527, 464);
+            this.tabPage1.Size = new System.Drawing.Size(527, 481);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.Text = "Info";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // boxButtons
             // 
             this.boxButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.boxButtons.Location = new System.Drawing.Point(3, 374);
+            this.boxButtons.Location = new System.Drawing.Point(3, 391);
             this.boxButtons.Name = "boxButtons";
             this.boxButtons.Size = new System.Drawing.Size(521, 87);
             this.boxButtons.TabIndex = 4;
@@ -139,29 +139,32 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(754, 490);
+            this.panel1.Size = new System.Drawing.Size(879, 507);
             this.panel1.TabIndex = 4;
             // 
             // boxLog
             // 
             this.boxLog.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.boxLog.Location = new System.Drawing.Point(0, 514);
+            this.boxLog.Location = new System.Drawing.Point(0, 531);
             this.boxLog.Multiline = true;
             this.boxLog.Name = "boxLog";
-            this.boxLog.Size = new System.Drawing.Size(754, 70);
+            this.boxLog.ReadOnly = true;
+            this.boxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.boxLog.Size = new System.Drawing.Size(879, 145);
             this.boxLog.TabIndex = 5;
+            this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
             // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(754, 584);
+            this.ClientSize = new System.Drawing.Size(879, 676);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.boxLog);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GUI";
-            this.Text = "Form1";
+            this.Text = "Terahelper 0.0 - by GoneUp ";
             this.Load += new System.EventHandler(this.GUI_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

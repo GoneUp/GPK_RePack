@@ -16,21 +16,22 @@ namespace GPK_RePack.Class
         public string Name;
 
         public long Unk1;
-        public int Unk2;
+        public long Unk2;
 
         public int SerialSize;
         public int SerialOffset;
 
+        public byte[] padding_unk = new byte[28];
         //28 byte byte padding? + 4 vor letztem
 
-        public List<GpkBaseProperty> Properties;
+        public List<object> Properties;
         public byte[] data;
 
         public string ClassName;
 
         public GpkExport()
         {
-            Properties = new List<GpkBaseProperty>();
+            Properties = new List<object>();
         }
 
     }
