@@ -25,9 +25,6 @@ namespace GPK_RePack.Class
         //28 byte byte padding? + 4 vor letztem
 
         public List<object> Properties;
-
-        public long data_start;
-        public byte[] data_padding;
         public byte[] data;
 
         public string ClassName;

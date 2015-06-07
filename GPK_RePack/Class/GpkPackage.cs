@@ -9,7 +9,6 @@ namespace GPK_RePack.Class
     class GpkPackage
     {
         public string Filename;
-        public string Path;
 
         public GpkHeader Header;
 
