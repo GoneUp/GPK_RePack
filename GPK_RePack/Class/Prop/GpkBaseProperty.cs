@@ -4,7 +4,7 @@
     {
         public string Name; //long index
 
-        public long type; //long
+        public string type; //long index
 
         public object value;
     }
