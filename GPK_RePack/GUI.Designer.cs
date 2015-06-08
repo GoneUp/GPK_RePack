@@ -40,9 +40,15 @@
             this.boxButtons = new System.Windows.Forms.GroupBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.boxLog = new System.Windows.Forms.TextBox();
+            this.boxInfo = new System.Windows.Forms.TextBox();
+            this.btnDelete = new System.Windows.Forms.Button();
+            this.btnExport = new System.Windows.Forms.Button();
+            this.btnReplace = new System.Windows.Forms.Button();
+            this.replaceSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.boxButtons.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,6 +59,7 @@
             this.treeMain.Name = "treeMain";
             this.treeMain.Size = new System.Drawing.Size(344, 507);
             this.treeMain.TabIndex = 1;
+            this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
             // 
             // menuStrip1
             // 
@@ -68,6 +75,7 @@
             // 
             this.mainToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
+            this.replaceSaveToolStripMenuItem,
             this.saveToolStripMenuItem,
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
@@ -84,9 +92,10 @@
             // 
             // saveToolStripMenuItem
             // 
+            this.saveToolStripMenuItem.Enabled = false;
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Text = "Full Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
@@ -113,6 +122,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.boxInfo);
             this.tabPage1.Controls.Add(this.boxButtons);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
@@ -124,7 +134,11 @@
             // 
             // boxButtons
             // 
+            this.boxButtons.Controls.Add(this.btnReplace);
+            this.boxButtons.Controls.Add(this.btnExport);
+            this.boxButtons.Controls.Add(this.btnDelete);
             this.boxButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.boxButtons.Enabled = false;
             this.boxButtons.Location = new System.Drawing.Point(3, 391);
             this.boxButtons.Name = "boxButtons";
             this.boxButtons.Size = new System.Drawing.Size(521, 87);
@@ -154,6 +168,51 @@
             this.boxLog.TabIndex = 5;
             this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
             // 
+            // boxInfo
+            // 
+            this.boxInfo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.boxInfo.Location = new System.Drawing.Point(3, 3);
+            this.boxInfo.Multiline = true;
+            this.boxInfo.Name = "boxInfo";
+            this.boxInfo.Size = new System.Drawing.Size(521, 388);
+            this.boxInfo.TabIndex = 5;
+            // 
+            // btnDelete
+            // 
+            this.btnDelete.Location = new System.Drawing.Point(92, 38);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(75, 23);
+            this.btnDelete.TabIndex = 0;
+            this.btnDelete.Text = "Delete";
+            this.btnDelete.UseVisualStyleBackColor = true;
+            // 
+            // btnExport
+            // 
+            this.btnExport.Location = new System.Drawing.Point(173, 38);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(102, 23);
+            this.btnExport.TabIndex = 1;
+            this.btnExport.Text = "Export Raw Data";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            // 
+            // btnReplace
+            // 
+            this.btnReplace.Location = new System.Drawing.Point(281, 38);
+            this.btnReplace.Name = "btnReplace";
+            this.btnReplace.Size = new System.Drawing.Size(208, 23);
+            this.btnReplace.TabIndex = 2;
+            this.btnReplace.Text = "Replace Raw Data (size must match!)";
+            this.btnReplace.UseVisualStyleBackColor = true;
+            this.btnReplace.Click += new System.EventHandler(this.btnReplace_Click);
+            // 
+            // replaceSaveToolStripMenuItem
+            // 
+            this.replaceSaveToolStripMenuItem.Name = "replaceSaveToolStripMenuItem";
+            this.replaceSaveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.replaceSaveToolStripMenuItem.Text = "Replace Save";
+            this.replaceSaveToolStripMenuItem.Click += new System.EventHandler(this.replaceSaveToolStripMenuItem_Click);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -164,12 +223,14 @@
             this.Controls.Add(this.boxLog);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GUI";
-            this.Text = "Terahelper 0.0 - by GoneUp ";
+            this.Text = "Terahelper 0.1 - by GoneUp ";
             this.Load += new System.EventHandler(this.GUI_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.boxButtons.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -190,6 +251,11 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox boxLog;
+        private System.Windows.Forms.TextBox boxInfo;
+        private System.Windows.Forms.Button btnReplace;
+        private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.Button btnDelete;
+        private System.Windows.Forms.ToolStripMenuItem replaceSaveToolStripMenuItem;
     }
 }
 

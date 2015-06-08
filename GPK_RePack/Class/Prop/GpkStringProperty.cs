@@ -6,6 +6,8 @@
         public long length;
         public string value;
 
+        public bool IsUnicode = false;
+
         public GpkStringProperty()
         {
             

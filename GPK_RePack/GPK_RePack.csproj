@@ -73,6 +73,7 @@
     <Compile Include="Parser\Reader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Saver\Save.cs" />
     <EmbeddedResource Include="GUI.resx">
       <DependentUpon>GUI.cs</DependentUpon>
     </EmbeddedResource>
@@ -107,7 +108,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Editor\" />
-    <Folder Include="Saver\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
