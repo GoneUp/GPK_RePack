@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GPK_RePack</RootNamespace>
-    <AssemblyName>GPK_RePack</AssemblyName>
+    <AssemblyName>Terahelper</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -64,6 +64,8 @@
     <Compile Include="Class\Prop\GpkObjectProperty.cs" />
     <Compile Include="Class\Prop\GpkFloatProperty.cs" />
     <Compile Include="Class\Prop\GpkGUIDProperty.cs" />
+    <Compile Include="Class\Prop\GpkStructProperty.cs" />
+    <Compile Include="Class\Prop\GpkByteProperty.cs" />
     <Compile Include="GUI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,9 +88,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>

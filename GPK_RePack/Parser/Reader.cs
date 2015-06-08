@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -10,37 +11,53 @@ using GPK_RePack.Class;
 using GPK_RePack.Class.Prop;
 using NLog;
 using NLog.Fluent;
+using NLog.LayoutRenderers;
 
 namespace GPK_RePack.Parser
 {
     class Reader
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+        public int progress;
+        public int totalobjects;
 
         public GpkPackage ReadGpk(string path)
         {
-            logger.Info("Reading: " + path);
-
-            GpkPackage package = new GpkPackage();
-
-            using (BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read)))
+            try
             {
-                package.Filename = Path.GetFileName(path);
-                package.Path = path;
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                logger.Info("Reading: " + path);
+                progress = 0;
 
-                ReadHeader(reader, package);
-                ReadNames(reader, package);
-                ReadImports(reader, package);
-                ReadExports(reader, package);
-                ReadExportData(reader, package);
+                GpkPackage package = new GpkPackage();
 
-                reader.Close();
-                reader.Dispose();
+                using (BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read)))
+                {
+                    package.Filename = Path.GetFileName(path);
+                    package.Path = path;
+
+                    ReadHeader(reader, package);
+                    ReadNames(reader, package);
+                    ReadImports(reader, package);
+                    ReadExports(reader, package);
+                    ReadExportData(reader, package);
+
+                    reader.Close();
+                    reader.Dispose();
+                }
+
+                watch.Stop();
+                logger.Info("Reading of {0} complete, took {1}ms!", path, watch.ElapsedMilliseconds);
+
+                return package;
+            }
+            catch (Exception ex)
+            {
+                logger.FatalException("Parse failure! " + ex, ex);
             }
 
-            logger.Info("Reading of {0} complete!", path);
-
-            return package;
+            return null;
         }
 
         private void ReadHeader(BinaryReader reader, GpkPackage package)
@@ -83,6 +100,8 @@ namespace GPK_RePack.Parser
             logger.Info("ImportOffset " + package.Header.ImportOffset);
 
             logger.Info("DependsOffset " + package.Header.DependsOffset);
+
+            totalobjects = package.Header.NameCount + package.Header.ExportCount * 2 + package.Header.ImportCount; //Export & ExportData = *2
 
             package.Header.FGUID = reader.ReadBytes(16);
             logger.Info("FGUID " + package.Header.FGUID);
@@ -150,6 +169,7 @@ namespace GPK_RePack.Parser
                 package.NameList.Add(i, tmpString);
 
                 logger.Debug("Name {0}: {1}", i, tmpString.name);
+                progress++;
             }
 
         }
@@ -166,16 +186,16 @@ namespace GPK_RePack.Parser
                 long class_index = reader.ReadInt64();
                 import.PackageRef = reader.ReadInt32();
                 long object_index = reader.ReadInt32();
-                reader.ReadInt32();
+                import.Unk = reader.ReadInt32();
 
                 import.ClassPackage = package.NameList[package_class_index].name;
                 import.Class = package.NameList[class_index].name;
                 import.Object = package.NameList[object_index].name;
 
-
-
                 package.ImportList.Add(i, import);
+
                 logger.Debug("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.Class, import.Object);
+                progress++;
             }
         }
 
@@ -191,6 +211,8 @@ namespace GPK_RePack.Parser
                 export.SuperIndex = reader.ReadInt32();
                 export.PackageIndex = reader.ReadInt32();
 
+                export.ClassName = GetObject(export.ClassIndex, package);
+
                 long nameIndex = reader.ReadInt32();
                 export.Name = package.NameList[nameIndex].name;
 
@@ -203,23 +225,13 @@ namespace GPK_RePack.Parser
                 {
                     export.SerialOffset = reader.ReadInt32();
                 }
-                else
-                {
-                    logger.Trace(1);
-                }
-
-                if (export.ClassIndex < 0)
-                {
-                    export.ClassIndex = ((export.ClassIndex * -1) - 1);
-                    export.ClassName = package.ImportList[export.ClassIndex].Object;
-                }
 
                 export.padding_unk = reader.ReadBytes(28);
 
                 package.ExportList.Add(i, export);
 
                 logger.Debug("Export {0}: Class: {1}, Name: {2}, Data_Size: {3}, Data_Offset {4}, Export_offset {5}", i, export.ClassName, export.Name, export.SerialSize, export.SerialOffset, reader.BaseStream.Position);
-
+                progress++;
             }
         }
 
@@ -234,15 +246,23 @@ namespace GPK_RePack.Parser
 
                 //int objectindex (netindex)
 
-                int netindex = reader.ReadInt32();
+                export.netIndex = reader.ReadInt32();
 
                 //dirty hack until we find the begin 
+                long namePosStart = reader.BaseStream.Position;
                 while (true)
                 {
                     long test_nameindex = reader.ReadInt64();
                     if (package.NameList.ContainsKey(test_nameindex))
                     {
-                        reader.BaseStream.Seek(reader.BaseStream.Position - 8, SeekOrigin.Begin);
+                        long name_start = reader.BaseStream.Position - 8;
+                        long name_padding_count = name_start - (namePosStart);
+                        reader.BaseStream.Seek(namePosStart, SeekOrigin.Begin);
+
+                        export.property_padding = new byte[name_padding_count];
+                        export.property_padding = reader.ReadBytes((int)name_padding_count);
+
+                        //reader.BaseStream.Seek(name_start, SeekOrigin.Begin);
                         break;
                     }
 
@@ -250,7 +270,8 @@ namespace GPK_RePack.Parser
                 }
                 //bad style :(
                 //logger.Info("First {0} Skip {1}", first, reader.BaseStream.Position - export.SerialOffset);
-                //Props   
+                //Props  
+
                 try
                 {
                     while (true)
@@ -289,7 +310,7 @@ namespace GPK_RePack.Parser
                 }
 
                 //data
-
+                progress++;
             }
         }
         private Boolean ReadPropertyDetails(BinaryReader reader, GpkPackage package, GpkExport export)
@@ -297,49 +318,50 @@ namespace GPK_RePack.Parser
             GpkBaseProperty baseProp = new GpkBaseProperty();
 
             long nameindex = reader.ReadInt64();
-           
+
 
             if (!package.NameList.ContainsKey(nameindex))
             {
-                logger.Info("name not found");
+                logger.Info("name not found " + nameindex);
             }
 
             baseProp.Name = package.NameList[nameindex].name;
-            if (baseProp.Name.ToLower() == "none") return false; 
-            
+            if (baseProp.Name.ToLower() == "none") return false;
+
             long typeindex = reader.ReadInt64();
             if (!package.NameList.ContainsKey(typeindex))
             {
-                logger.Info("type not found");
+                logger.Info("type not found " + typeindex);
             }
             baseProp.type = package.NameList[typeindex].name;
 
             switch (baseProp.type)
             {
                 case "StructProperty":
-                /* GpkArrayProperty tmpStruct = new GpkArrayProperty(baseProp);
-                 long structname = reader.ReadInt64();
-                 long structtype = reader.ReadInt64();
-                 string tmpStrucName = package.NameList[structname].name;
-                 string tmpType = package.NameList[structtype].name;
-                 switch (tmpStrucName)
+                    GpkStructProperty tmpStruct = new GpkStructProperty(baseProp);
+                    tmpStruct.length = reader.ReadInt64();
+                    long structtype = reader.ReadInt64();
+                    tmpStruct.innerType = package.NameList[structtype].name;
+                    tmpStruct.value = new byte[tmpStruct.length];
+                    tmpStruct.value = reader.ReadBytes((int)tmpStruct.length);
+                    /*
+
+                 switch (tmpStruct.innerType)
                  {
                      case "lol":
                          break;
                      default:
-                         logger.Trace("fu");
+                         logger.Debug(string.Format(
+                            "Unknown Struct Property Type {0}, Position {1}, Prop_Name {2}, Export_Name {3}, Strcut Len {4}, Strcut Type {5}",
+                            baseProp.type, reader.BaseStream.Position, baseProp.Name, export.Name, structlength, tmpStructType));
                          break;
                  }
                         
+                    */
+                    export.Properties.Add(tmpStruct);
+                    break;
 
-                 tmpStruct.value = new byte[tmpStruct.length];
-                 tmpStruct.value = reader.ReadBytes((int)tmpStruct.length);
-                   
-                    
 
-                 export.Properties.Add(tmpStruct);
-                 break; 
-                 */
                 case "ArrayProperty":
                     GpkArrayProperty tmpArray = new GpkArrayProperty(baseProp);
                     tmpArray.length = reader.ReadInt64();
@@ -366,12 +388,30 @@ namespace GPK_RePack.Parser
                     export.Properties.Add(tmpBool);
                     break;
 
-                case "NameProperty":
                 case "ByteProperty":
+                    GpkByteProperty tmpByte = new GpkByteProperty(baseProp);
+                    tmpByte.size = reader.ReadInt32();
+                    tmpByte.arrayIndex = reader.ReadInt32();
+
+                    if (tmpByte.size == 8)
+                    {
+                        long byteIndex = reader.ReadInt64();
+                        tmpByte.nameValue = package.NameList[byteIndex].name;
+                    }
+                    else
+                    {
+                        tmpByte.byteValue = reader.ReadByte();
+                    }
+
+                    export.Properties.Add(tmpByte);
+                    break;
+
+                case "NameProperty":
                     GpkNameProperty tmpName = new GpkNameProperty(baseProp);
                     tmpName.unk = reader.ReadInt64();
-                    long index = reader.ReadInt64();
+                    long index = reader.ReadInt32();
                     tmpName.value = package.NameList[index].name;
+                    tmpName.padding = reader.ReadInt32();
 
                     export.Properties.Add(tmpName);
                     break;
@@ -384,6 +424,13 @@ namespace GPK_RePack.Parser
                     export.Properties.Add(tmpInt);
                     break;
 
+                case "FloatProperty":
+                    GpkFloatProperty tmpFloat = new GpkFloatProperty(baseProp);
+                    tmpFloat.unk = reader.ReadInt64();
+                    tmpFloat.value = reader.ReadSingle();
+
+                    export.Properties.Add(tmpFloat);
+                    break;
 
                 case "StrProperty":
                     GpkStringProperty tmpString = new GpkStringProperty(baseProp);
@@ -408,30 +455,13 @@ namespace GPK_RePack.Parser
                     GpkObjectProperty tmpObj = new GpkObjectProperty(baseProp);
                     tmpObj.unk = reader.ReadInt64(); //4
                     tmpObj.value = reader.ReadInt32();
+                    tmpObj.ClassName = GetObject(tmpObj.value, package);
 
-                    if (tmpObj.value < 0)
-                    {
-                        tmpObj.ClassName = package.ImportList[((tmpObj.value * -1) - 1)].Object;
-                    }
-                    else if (tmpObj.value > 0)
-                    {
-                        tmpObj.ClassName = package.ExportList[tmpObj.value].Name;
-                    }
-                    else if (tmpObj.value == 0)
-                    {
-                        tmpObj.ClassName = null;
-                    }
 
                     export.Properties.Add(tmpObj);
                     break;
 
-                case "FloatProperty":
-                    GpkFloatProperty tmpFloat = new GpkFloatProperty(baseProp);
-                    tmpFloat.unk = reader.ReadInt64();
-                    tmpFloat.value = reader.ReadSingle();
 
-                    export.Properties.Add(tmpFloat);
-                    break;
                 default:
                     throw new Exception(
                         string.Format(
@@ -443,11 +473,29 @@ namespace GPK_RePack.Parser
 
             }
 
-            logger.Trace(String.Format("Property Type {0}, Position after {1}, Prop_Name {2}, Export_Name {3}",
-                            baseProp.type, reader.BaseStream.Position, baseProp.Name, export.Name));
+            //logger.Trace(String.Format("Property Type {0}, Position after {1}, Prop_Name {2}, Export_Name {3}", baseProp.type, reader.BaseStream.Position, baseProp.Name, export.Name));
 
             return true;
         }
+
+        private string GetObject(int index, GpkPackage package)
+        {
+            if (index < 0)
+            {
+                return package.ImportList[((index * -1) - 1)].Object;
+            }
+            if (index > 0)
+            {
+                return package.ExportList[index - 1].Name;
+            }
+            if (index == 0)
+            {
+                return "none";
+            }
+
+            throw new Exception(string.Format("Object {0} not found!", index));
+        }
+
         private string ReadString(BinaryReader reader, int length)
         {
             string text = ASCIIEncoding.ASCII.GetString(reader.ReadBytes(length - 1));

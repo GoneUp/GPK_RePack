@@ -20,10 +20,13 @@ namespace GPK_RePack.Class
 
         public int SerialSize;
         public int SerialOffset;
+        public long SerialOffsetPosition;
 
+        public int netIndex;
         public byte[] padding_unk = new byte[28];
         //28 byte byte padding? + 4 vor letztem
 
+        public byte[] property_padding;
         public List<object> Properties;
 
         public long data_start;

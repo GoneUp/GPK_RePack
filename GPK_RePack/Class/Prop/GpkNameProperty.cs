@@ -4,6 +4,7 @@
     {
         public long unk;
         public string value; //long index
+        public int padding;
 
         public GpkNameProperty()
         {
@@ -13,6 +14,11 @@
         {
             Name = bp.Name;
             type = bp.type;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Name: {0} Type: {1} Value: {2}", Name, type, value);
         }
     }
 

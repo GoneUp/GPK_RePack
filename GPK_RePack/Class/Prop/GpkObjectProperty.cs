@@ -3,7 +3,7 @@
     class GpkObjectProperty : GpkBaseProperty
     {
         public long unk;
-        public long value; //long index
+        public int value; //long index
         public string ClassName;
 
         public GpkObjectProperty()
@@ -14,6 +14,11 @@
         {
             Name = bp.Name;
             type = bp.type;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Name: {0} Type: {1} Value: {2}", Name, type, ClassName);
         }
     }
 

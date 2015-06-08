@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="i:\programme\visual studio 2012\team tools\static analysis tools\fxcop\Xml\CodeAnalysisReport.xsl"?>
+<FxCopReport Version="11.0">
+ <Targets>
+  <Target Name="I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe">
+   <Modules>
+    <Module Name="terahelper.exe">
+     <Namespaces>
+      <Namespace Name="GPK_RePack">
+       <Types>
+        <Type Name="GUI" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btnExport_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="Objekte nicht mehrmals verwerfen" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2015-06-08 21:26:12Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="i:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack" File="GUI.cs" Line="270">Das Objekt "'save.OpenFile()'" kann mehrere Male in der 'GUI.btnExport_Click(object, EventArgs)'-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 270</Issue>
+             <Issue Certainty="75" Level="Warning" Path="i:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack" File="GUI.cs" Line="270">Das Objekt "'writer'" kann mehrere Male in der 'GUI.btnExport_Click(object, EventArgs)'-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 270</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+      <Namespace Name="GPK_RePack.Parser">
+       <Types>
+        <Type Name="Reader" Kind="Class" Accessibility="Assembly" ExternallyVisible="False">
+         <Members>
+          <Member Name="#ReadGpk(System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="Objekte nicht mehrmals verwerfen" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2015-06-08 21:26:12Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="i:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\Parser" File="Reader.cs" Line="47">Das Objekt "'new FileStream(path, FileMode.Open, FileAccess.Read)'" kann mehrere Male in der 'Reader.ReadGpk(string)'-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 47</Issue>
+             <Issue Certainty="75" Level="Warning" Path="i:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\Parser" File="Reader.cs" Line="47">Das Objekt "'reader'" kann mehrere Male in der 'Reader.ReadGpk(string)'-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 47</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+      <Namespace Name="GPK_RePack.Saver">
+       <Types>
+        <Type Name="Save" Kind="Class" Accessibility="Assembly" ExternallyVisible="False">
+         <Members>
+          <Member Name="#SaveReplacedExport(GPK_RePack.Class.GpkPackage,System.String,System.Collections.Generic.List`1&lt;GPK_RePack.Class.GpkExport&gt;)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="Objekte nicht mehrmals verwerfen" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2015-06-08 21:26:12Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="i:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\Saver" File="Save.cs" Line="32">Das Objekt "'new MemoryStream(buffer)'" kann mehrere Male in der 'Save.SaveReplacedExport(GpkPackage, string, List&lt;GpkExport&gt;)'-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 32</Issue>
+             <Issue Certainty="75" Level="Warning" Path="i:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\Saver" File="Save.cs" Line="32">Das Objekt "'writer'" kann mehrere Male in der 'Save.SaveReplacedExport(GpkPackage, string, List&lt;GpkExport&gt;)'-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 32</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+ </Targets>
+ <Rules>
+  <Rule TypeName="Objekte nicht mehrmals verwerfen" Category="Microsoft.Usage" CheckId="CA2202">
+   <Name>Objekte nicht mehrmals verwerfen</Name>
+   <Description>Eine ordnungsgemäß implementierte Dispose-Methode kann mehrere Male aufgerufen werden, ohne dass eine Ausnahme ausgelöst wird. Dies ist jedoch nicht garantiert. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.</Description>
+   <Resolution Name="Default">Das Objekt "{0}" kann mehrere Male in der {1}-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 32</Resolution>
+   <Owner>RuleOwner</Owner>
+   <Url>http://msdn.microsoft.com/library/ms182334(VS.100).aspx</Url>
+   <Email />
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="dataflowrules.dll" Version="11.0.0.0" />
+  </Rule>
+ </Rules>
+ <Localized>
+  <String Key="Category">Kategorie</String>
+  <String Key="Certainty">Sicherheit</String>
+  <String Key="CollapseAll">Alle reduzieren</String>
+  <String Key="CheckId">Prüf-ID</String>
+  <String Key="Error">Fehler</String>
+  <String Key="Errors">Fehler</String>
+  <String Key="ExpandAll">Alle erweitern</String>
+  <String Key="Help">Hilfe</String>
+  <String Key="Line">Zeile</String>
+  <String Key="Messages">Meldung(en)</String>
+  <String Key="LocationNotStoredInPdb">[Nicht in PDB gespeicherter Speicherort]</String>
+  <String Key="Project">Projekt</String>
+  <String Key="Resolution">Auflösung</String>
+  <String Key="Rule">Regel</String>
+  <String Key="RuleFile">Regeldatei</String>
+  <String Key="RuleDescription">Regelbeschreibung</String>
+  <String Key="Source">Quelle</String>
+  <String Key="Status">Status</String>
+  <String Key="Target">Ziel</String>
+  <String Key="Warning">Warnung</String>
+  <String Key="Warnings">Warnung(en)</String>
+  <String Key="ReportTitle">Codeanalysebericht</String>
+ </Localized>
+</FxCopReport>

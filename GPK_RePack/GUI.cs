@@ -2,19 +2,23 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 using System.Xml.Serialization;
 using GPK_RePack.Class;
 using GPK_RePack.Class.Prop;
 using GPK_RePack.Parser;
 using GPK_RePack.Saver;
 using NLog;
+using NLog.Config;
 using NLog.Fluent;
 
 namespace GPK_RePack
@@ -26,10 +30,32 @@ namespace GPK_RePack
             InitializeComponent();
         }
 
+        #region nlogconf
+        string xml = @"<?xml version='1.0' encoding='utf-8' ?>
+<nlog xmlns='http://www.nlog-project.org/schemas/NLog.xsd'
+      xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+  <targets>
+    <target name='logfile' xsi:type='File' fileName='Terahelper.log' deleteOldFileOnStartup='true'/>
+    <target xsi:type='FormControl'
+        name='form'
+        layout='${longdate} ${level:uppercase=true} ${message} ${newline}'
+        append='true'
+        controlName='boxLog'
+        formName='GUI' />
+  </targets>
+
+  <rules>
+    <logger name='*' minlevel='Trace' writeTo='logfile' />
+    <logger name='*' minlevel='Info' writeTo='form' />
+  </rules>
+</nlog>";
+        #endregion
+
         #region def
 
         private Logger logger = LogManager.GetCurrentClassLogger();
         private Reader reader;
+        private Save saver;
 
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
@@ -43,7 +69,15 @@ namespace GPK_RePack
 
         private void GUI_Load(object sender, EventArgs e)
         {
+            //nlog init
+            StringReader sr = new StringReader(xml);
+            XmlReader xr = XmlReader.Create(sr);
+            XmlLoggingConfiguration config = new XmlLoggingConfiguration(xr, null);
+            LogManager.Configuration = config;
+
+            //Our stuff
             reader = new Reader();
+            saver = new Save();
             loadedGpkPackages = new List<GpkPackage>();
         }
 
@@ -52,7 +86,7 @@ namespace GPK_RePack
             OpenFileDialog open = new OpenFileDialog();
             open.Multiselect = true;
             open.ValidateNames = true;
-            open.InitialDirectory = Directory.GetCurrentDirectory();
+            //open.InitialDirectory = Directory.GetCurrentDirectory();
 
             open.ShowDialog();
 
@@ -60,15 +94,22 @@ namespace GPK_RePack
             {
                 if (File.Exists(path))
                 {
-                    try
+                    Thread newThread = new Thread(delegate()
+                      {
+                          GpkPackage tmpPack = reader.ReadGpk(path);
+                          tmpPack.Changes = true; //tmp, remove after tests
+                          loadedGpkPackages.Add(tmpPack);
+                      });
+                    newThread.Start();
+
+                    while (newThread.IsAlive)
                     {
-                        GpkPackage tmpPack = reader.ReadGpk(path);
-                        loadedGpkPackages.Add(tmpPack);
+                        Application.DoEvents();
+                        boxInfo.Text = String.Format("Progress of loading: {0}/{1}", reader.progress, reader.totalobjects);
                     }
-                    catch (Exception ex)
-                    {
-                        logger.FatalException("Parse failure! " + ex, ex);
-                    }
+
+
+
                 }
             }
             Array.Resize(ref changedExports, loadedGpkPackages.Count);
@@ -80,20 +121,27 @@ namespace GPK_RePack
             DrawPackages();
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            Environment.Exit(0);
         }
 
         private void boxLog_TextChanged(object sender, EventArgs e)
         {
             boxLog.SelectionStart = boxLog.TextLength;
             boxLog.ScrollToCaret();
+        }
+
+        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            changedExports = null;
+            selectedExport = null;
+            selectedPackage = null;
+            boxInfo.Text = "";
+            boxDataButtons.Enabled = false;
+            boxGeneralButtons.Enabled = false;
+            loadedGpkPackages.Clear();
+            DrawPackages();
         }
 
         #endregion
@@ -109,12 +157,10 @@ namespace GPK_RePack
                 GpkPackage package = loadedGpkPackages[i];
                 TreeNode nodeP = treeMain.Nodes.Add(i.ToString(), package.Filename);
 
-                TreeNode nodeI = nodeP.Nodes.Add("Imports");
                 TreeNode nodeE = nodeP.Nodes.Add("Exports");
-
+                TreeNode nodeI = nodeP.Nodes.Add("Imports");
 
                 //Imports 
-
                 foreach (var tmp in package.ImportList.OrderByDescending(pair => pair.Value.Object).Reverse())
                 {
                     nodeI.Nodes.Add(tmp.Key.ToString(), tmp.Value.Object);
@@ -133,11 +179,18 @@ namespace GPK_RePack
         private void treeMain_AfterSelect(object sender, TreeViewEventArgs e)
         {
             boxInfo.Text = "";
-            boxButtons.Enabled = false;
+            boxDataButtons.Enabled = false;
+            boxGeneralButtons.Enabled = false;
             selectedExport = null;
             selectedPackage = null;
 
-            if (e.Node.Level == 2)
+            if (e.Node.Level == 0)
+            {
+                boxGeneralButtons.Enabled = true;
+
+                selectedPackage = loadedGpkPackages[Convert.ToInt32(e.Node.Name)];
+            }
+            else if (e.Node.Level == 2)
             {
                 GpkPackage package = loadedGpkPackages[Convert.ToInt32(e.Node.Parent.Parent.Name)];
                 if (e.Node.Parent.Text == "Imports")
@@ -171,9 +224,10 @@ namespace GPK_RePack
                     }
 
                     info.AppendLine("Props: ");
-                    foreach (GpkBaseProperty prop in exp.Properties)
+                    foreach (object prop in exp.Properties)
                     {
-                        info.Append("Name: " + prop.Name);
+                        info.AppendLine(prop.ToString());
+                        /*info.Append("Name: " + prop.Name);
                         if (prop.value != null)
                         {
                             info.AppendLine("Value: " + prop.value.ToString());
@@ -181,19 +235,17 @@ namespace GPK_RePack
                         else
                         {
                             info.AppendLine();
-                        }
+                        }*/
                     }
 
                     boxInfo.Text = info.ToString();
-                    boxButtons.Enabled = true;
+                    boxDataButtons.Enabled = true;
                     selectedExport = exp;
                     selectedPackage = package;
                     // Class: DistributionFloatUniform, Name: DistributionFloatUniform, Data_Size: 100, Data_Offset 80654, Export_offset 9514
                 }
             }
         }
-
-
         #endregion
 
         #region editgpk
@@ -246,46 +298,117 @@ namespace GPK_RePack
                 byte[] buffer = File.ReadAllBytes(path);
                 int packageIndex = Convert.ToInt32(treeMain.SelectedNode.Parent.Parent.Name);
 
-
-                if (buffer.Length > selectedExport.data.Length)
+                if (btnPatchMode.Checked)
                 {
-                    //Too long, not possible without rebuiling the gpk
-                    logger.Info("File size too big. Size: " + buffer.Length + " Maximum Size: " +
-                             selectedExport.data.Length);
-                }
+                    if (buffer.Length > selectedExport.data.Length)
+                    {
+                        //Too long, not possible without rebuiling the gpk
+                        logger.Info("File size too big. Size: " + buffer.Length + " Maximum Size: " +
+                                 selectedExport.data.Length);
+                    }
 
-                if (buffer.Length < selectedExport.data.Length)
+                    if (buffer.Length < selectedExport.data.Length)
+                    {
+                        //Too short, fill it
+                        selectedExport.data = new byte[selectedExport.data.Length];
+                    }
+
+                    //selectedExport.data = buffer;
+                    Array.Copy(buffer, selectedExport.data, buffer.Length);
+
+                }
+                else
                 {
-                    //Too short, fill it
-                    selectedExport.data = new byte[selectedExport.data.Length];
-                }
+                    //Rebuild Mode
+                    //We force the rebuilder to recalculate the size. (atm we dont know how big the propertys are)
+                    logger.Trace(String.Format("rebuild mode old size {0} new size {1}", selectedExport.data.Length,
+                        buffer.Length));
 
-                //selectedExport.data = buffer;
-                Array.Copy(buffer, selectedExport.data, buffer.Length);
+                    selectedExport.SerialSize = -1;
+                    selectedExport.data = buffer;
+                    selectedPackage.Changes = true;
+                }
 
                 changedExports[packageIndex].Add(selectedExport);
                 logger.Info(String.Format("Replaced the data of {0} successfully! Dont forget to save.",
                     selectedExport.Name));
             }
+
+
+
         }
 
         private void replaceSaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < changedExports.Length; i++)
+            if (changedExports != null)
             {
-                List<GpkExport> list = changedExports[i];
-                if (list.Count > 0)
+                for (int i = 0; i < changedExports.Length; i++)
                 {
-                    GpkPackage package = loadedGpkPackages[i];
-                    string savepath = package.Path + "_patched";
-                    Save.SaveReplacedExport(package, savepath, list);
-                    logger.Info(String.Format("Saved the changed data of package '{0} to {1}'!",
-                    package.Filename, savepath));
+                    List<GpkExport> list = changedExports[i];
+                    if (list.Count > 0)
+                    {
+                        try
+                        {
+                            GpkPackage package = loadedGpkPackages[i];
+                            string savepath = package.Path + "_patched";
+                            saver.SaveReplacedExport(package, savepath, list);
+                            logger.Info(String.Format("Saved the changed data of package '{0} to {1}'!",
+                                package.Filename, savepath));
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.FatalException("Save failure! " + ex, ex);
+                        }
+                    }
                 }
             }
         }
 
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (GpkPackage package in loadedGpkPackages)
+            {
+                if (package.Changes)
+                {
+                    try
+                    {
+                        logger.Info(String.Format("Attemping to save {0}...", package.Filename));
+                        string savepath = package.Path + "_rebuild";
+                        saver.SaveGpkPackage(package, savepath);
+                        logger.Info(String.Format("Saved the package '{0} to {1}'!", package.Filename, savepath));
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.FatalException("Save failure! " + ex, ex);
+                    }
+                }
+            }
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (selectedPackage != null)
+            {
+                loadedGpkPackages.Remove(selectedPackage);
+                DrawPackages();
+
+                selectedPackage = null;
+                boxGeneralButtons.Enabled = false;
+            }
+
+        }
         #endregion
+
+
+
+
+
 
     }
 }

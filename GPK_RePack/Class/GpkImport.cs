@@ -12,5 +12,7 @@ namespace GPK_RePack.Class
         public string Class;
         public int PackageRef;
         public string Object;
+
+        public int Unk;
     }
 }

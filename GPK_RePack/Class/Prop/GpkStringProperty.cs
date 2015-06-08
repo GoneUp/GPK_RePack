@@ -3,7 +3,7 @@
     class GpkStringProperty : GpkBaseProperty 
     {
         public long unk;
-        public long length;
+        public int length;
         public string value;
 
         public bool IsUnicode = false;
@@ -16,6 +16,11 @@
         {
             Name = bp.Name;
             type = bp.type;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Name: {0} Type: {1} Value: {2}", Name, type, value);
         }
     }
 
