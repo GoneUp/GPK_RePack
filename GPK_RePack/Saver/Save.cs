@@ -20,7 +20,7 @@ namespace GPK_RePack.Saver
 
         public void SaveReplacedExport(GpkPackage package, string savepath, List<GpkExport> changedExports)
         {
-            byte[] buffer = File.ReadAllBytes(package.Filename);
+            byte[] buffer = File.ReadAllBytes(package.Path);
             BinaryWriter writer = new BinaryWriter(new MemoryStream(buffer));
 
             foreach (GpkExport export in changedExports)

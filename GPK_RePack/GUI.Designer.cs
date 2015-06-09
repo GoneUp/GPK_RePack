@@ -67,7 +67,7 @@
             this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeMain.Location = new System.Drawing.Point(0, 0);
             this.treeMain.Name = "treeMain";
-            this.treeMain.Size = new System.Drawing.Size(215, 507);
+            this.treeMain.Size = new System.Drawing.Size(292, 507);
             this.treeMain.TabIndex = 1;
             this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
             // 
@@ -77,7 +77,7 @@
             this.mainToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(804, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(878, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -138,10 +138,10 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tabControl1.Location = new System.Drawing.Point(215, 0);
+            this.tabControl1.Location = new System.Drawing.Point(292, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(589, 507);
+            this.tabControl1.Size = new System.Drawing.Size(586, 507);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -151,7 +151,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(581, 481);
+            this.tabPage1.Size = new System.Drawing.Size(578, 481);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Info";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -163,7 +163,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(3, 378);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(575, 100);
+            this.panel2.Size = new System.Drawing.Size(572, 100);
             this.panel2.TabIndex = 6;
             // 
             // boxGeneralButtons
@@ -176,7 +176,7 @@
             this.boxGeneralButtons.Enabled = false;
             this.boxGeneralButtons.Location = new System.Drawing.Point(0, 0);
             this.boxGeneralButtons.Name = "boxGeneralButtons";
-            this.boxGeneralButtons.Size = new System.Drawing.Size(174, 100);
+            this.boxGeneralButtons.Size = new System.Drawing.Size(171, 100);
             this.boxGeneralButtons.TabIndex = 5;
             this.boxGeneralButtons.TabStop = false;
             this.boxGeneralButtons.Text = "General";
@@ -230,7 +230,7 @@
             this.boxDataButtons.Controls.Add(this.btnExport);
             this.boxDataButtons.Dock = System.Windows.Forms.DockStyle.Right;
             this.boxDataButtons.Enabled = false;
-            this.boxDataButtons.Location = new System.Drawing.Point(174, 0);
+            this.boxDataButtons.Location = new System.Drawing.Point(171, 0);
             this.boxDataButtons.Name = "boxDataButtons";
             this.boxDataButtons.Size = new System.Drawing.Size(401, 100);
             this.boxDataButtons.TabIndex = 4;
@@ -286,11 +286,11 @@
             this.boxInfo.Multiline = true;
             this.boxInfo.Name = "boxInfo";
             this.boxInfo.ReadOnly = true;
-            this.boxInfo.Size = new System.Drawing.Size(575, 475);
+            this.boxInfo.Size = new System.Drawing.Size(572, 475);
             this.boxInfo.TabIndex = 5;
             this.boxInfo.Text = "Source Code: https://github.com/GoneUp/GPK_RePack/  \r\n\r\n##\r\n\r\nWarning: Only teste" +
     "d for the PCVoice GPK Files. It maybe works for others as well, it is just untes" +
-    "ted.";
+    "ted.\r\nUse at own risk ;)";
             // 
             // panel1
             // 
@@ -299,7 +299,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(804, 507);
+            this.panel1.Size = new System.Drawing.Size(878, 507);
             this.panel1.TabIndex = 4;
             // 
             // boxLog
@@ -310,7 +310,7 @@
             this.boxLog.Name = "boxLog";
             this.boxLog.ReadOnly = true;
             this.boxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.boxLog.Size = new System.Drawing.Size(804, 145);
+            this.boxLog.Size = new System.Drawing.Size(878, 145);
             this.boxLog.TabIndex = 5;
             this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
             // 
@@ -318,7 +318,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(804, 676);
+            this.ClientSize = new System.Drawing.Size(878, 676);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.boxLog);

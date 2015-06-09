@@ -45,10 +45,11 @@ namespace GPK_RePack
   </targets>
 
   <rules>
-    <logger name='*' minlevel='Trace' writeTo='logfile' />
+    <logger name='*' minlevel='%loglevel%' writeTo='logfile' />
     <logger name='*' minlevel='Info' writeTo='form' />
   </rules>
 </nlog>";
+        private string logLevel = "info";
         #endregion
 
         #region def
@@ -56,6 +57,7 @@ namespace GPK_RePack
         private Logger logger = LogManager.GetCurrentClassLogger();
         private Reader reader;
         private Save saver;
+        private bool debug = false;
 
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
@@ -70,7 +72,29 @@ namespace GPK_RePack
 
         private void GUI_Load(object sender, EventArgs e)
         {
+
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 0)
+            {
+                foreach (string arg in args)
+                {
+
+                    switch (arg.ToLowerInvariant())
+                    {
+                        case "log_trace":
+                        case "log_debug":
+                        case "log_info":
+                            logLevel = arg.Substring(4);
+                            break;
+                        case "debug":
+                            debug = true;
+                            break;
+                    }
+                }
+            }
+
             //nlog init
+            xml = xml.Replace("%loglevel%", logLevel);
             StringReader sr = new StringReader(xml);
             XmlReader xr = XmlReader.Create(sr);
             XmlLoggingConfiguration config = new XmlLoggingConfiguration(xr, null);
@@ -247,7 +271,7 @@ namespace GPK_RePack
                             info.AppendLine();
                         }*/
                     }
-                    
+
                     boxInfo.Text = info.ToString();
                     boxGeneralButtons.Enabled = true;
                     boxDataButtons.Enabled = true;
@@ -298,7 +322,7 @@ namespace GPK_RePack
             OpenFileDialog open = new OpenFileDialog();
             open.Multiselect = false;
             open.ValidateNames = true;
-            open.InitialDirectory = Directory.GetCurrentDirectory();
+            //open.InitialDirectory = Directory.GetCurrentDirectory();
 
             open.ShowDialog();
 
