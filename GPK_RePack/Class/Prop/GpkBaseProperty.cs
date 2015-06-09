@@ -10,7 +10,7 @@
 
         public override string ToString()
         {
-            return string.Format("Name: {0} Type: {1}", Name, type);
+            return string.Format("ObjectName: {0} Type: {1}", Name, type);
         }
     }
 }

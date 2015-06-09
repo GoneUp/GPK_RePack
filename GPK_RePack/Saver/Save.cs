@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using GPK_RePack.Class;
 using GPK_RePack.Class.Prop;
 using NLog;
@@ -48,6 +49,7 @@ namespace GPK_RePack.Saver
                 WriteImports(writer, package);
                 WriteExports(writer, package);
                 WriteExportsData(writer, package);
+                WriteFilePadding(writer, package);
             }
 
 
@@ -145,9 +147,10 @@ namespace GPK_RePack.Saver
             foreach (GpkExport export in package.ExportList.Values)
             {
                 writer.Write((int)GetObjectIndex(export.ClassName, package));
-                writer.Write(export.SuperIndex);
-                writer.Write(export.PackageIndex);
-                writer.Write(Convert.ToInt32(GetStringIndex(export.Name, package)));
+                writer.Write((int)GetObjectIndex(export.SuperName, package));
+                writer.Write((int)GetObjectIndex(export.PackageName, package));
+
+                writer.Write(Convert.ToInt32(GetStringIndex(export.ObjectName, package)));
 
                 writer.Write(export.Unk1);
                 writer.Write(export.Unk2);
@@ -166,24 +169,32 @@ namespace GPK_RePack.Saver
 
         private void WriteExportsData(BinaryWriter writer, GpkPackage package)
         {
-            writer.Write(new int());
+            //puffer, seems random in many files
+            writer.Write(new byte[10]);
 
             foreach (GpkExport export in package.ExportList.Values)
             {
-                logger.Trace("export data for " + export.Name);
+                if (export.SerialSize == 0)
+                {
+                    logger.Trace("skipping export data for " + export.ObjectName);
+                }
+                else
+                {
+                    logger.Trace("export data for " + export.ObjectName);
+                }
+
                 long data_start = writer.BaseStream.Position;
 
                 if (export.SerialOffset != writer.BaseStream.Position)
                 {
-                    long actualpos = writer.BaseStream.Position;
                     //if we have diffrent layout of the data then teh orginal file we need to fix the data pointers
-                    logger.Trace(string.Format("fixing export {0} offest old:{1} new:{2}", export.Name, export.SerialOffset, actualpos));
+                    logger.Trace(string.Format("fixing export {0} offset old:{1} new:{2}", export.ObjectName, export.SerialOffset, data_start));
 
 
                     export.SerialOffset = (int)writer.BaseStream.Position;
                     writer.BaseStream.Seek(export.SerialOffsetPosition, SeekOrigin.Begin);
                     writer.Write(export.SerialOffset);
-                    writer.BaseStream.Seek(actualpos, SeekOrigin.Begin);
+                    writer.BaseStream.Seek(data_start, SeekOrigin.Begin);
                 }
 
                 writer.Write(export.netIndex);
@@ -300,21 +311,45 @@ namespace GPK_RePack.Saver
                 long data_end = writer.BaseStream.Position;
                 int data_size = (int)(data_end - data_start);
                 if (data_size != export.SerialSize)
-                { 
+                {
                     //maybe replaced data OR some property errors. write new data size.
 
-                    logger.Trace(string.Format("fixing export {0} size old:{1} new:{2}", export.Name, export.SerialSize, data_size));
+                    logger.Trace(string.Format("fixing export {0} size old:{1} new:{2}", export.ObjectName, export.SerialSize, data_size));
                     export.SerialSize = data_size;
                     writer.BaseStream.Seek(export.SerialOffsetPosition - 4, SeekOrigin.Begin);
                     writer.Write(export.SerialSize);
                     writer.BaseStream.Seek(data_end, SeekOrigin.Begin);
-                    
+
                 }
 
-                logger.Trace("wrote export data for " + export.Name + " end pos " + writer.BaseStream.Position);
+                logger.Trace("wrote export data for " + export.ObjectName + " end pos " + writer.BaseStream.Position);
             }
 
             logger.Debug("Wrote export data pos " + writer.BaseStream.Position);
+        }
+
+        private void WriteFilePadding(BinaryWriter writer, GpkPackage package)
+        {
+            long final_size = writer.BaseStream.Position;
+            logger.Debug(String.Format("final size {0}, max {1}", final_size, package.OrginalSize));
+
+            if (final_size < package.OrginalSize)
+            {
+                //too short, fill up with 00s ^^
+                long missing = package.OrginalSize - final_size;
+                writer.Write(new byte[missing]);
+                logger.Info(String.Format("Package was filled up with {0} bytes..", missing));
+            }
+            else if (final_size == package.OrginalSize)
+            {
+                logger.Info(String.Format("Package size is the old size..."));
+            }
+            else if (final_size > package.OrginalSize)
+            {
+                //Too big
+                logger.Info(String.Format("The new package size is bigger than the orginal one! Tera may not acccept this file."));
+            }
+
         }
 
         private void WriteString(BinaryWriter writer, string text)
@@ -336,7 +371,7 @@ namespace GPK_RePack.Saver
                 if (pair.Value.name == text) return pair.Key;
             }
 
-            throw new Exception(string.Format("Name {0} not found!", text));
+            throw new Exception(string.Format("ObjectName {0} not found!", text));
         }
 
         private long GetObjectIndex(string text, GpkPackage package)
@@ -345,7 +380,7 @@ namespace GPK_RePack.Saver
 
             foreach (KeyValuePair<long, GpkImport> pair in package.ImportList)
             {
-                if (pair.Value.Object == text)
+                if (pair.Value.UID == text)
                 {
                     long tmpKey = (pair.Key + 1) * -1; //0 -> 1 --> -1 ## 1 --> 2 --> -2 ##
                     return tmpKey;
@@ -354,7 +389,7 @@ namespace GPK_RePack.Saver
 
             foreach (KeyValuePair<long, GpkExport> pair in package.ExportList)
             {
-                if (pair.Value.Name == text)
+                if (pair.Value.UID == text)
                 {
                     long tmpKey = (pair.Key + 1); //0 -> 1 --> -1 ## 1 --> 2 --> -2 ##
                     return tmpKey;

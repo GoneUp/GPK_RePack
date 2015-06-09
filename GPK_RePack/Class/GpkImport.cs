@@ -8,6 +8,8 @@ namespace GPK_RePack.Class
 {
     class GpkImport
     {
+        public string UID;
+
         public string ClassPackage;
         public string Class;
         public int PackageRef;

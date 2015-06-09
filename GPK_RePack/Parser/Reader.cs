@@ -20,6 +20,7 @@ namespace GPK_RePack.Parser
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public int progress;
         public int totalobjects;
+        public List<String> UidList = new List<string>();
 
         public GpkPackage ReadGpk(string path)
         {
@@ -28,7 +29,9 @@ namespace GPK_RePack.Parser
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
                 logger.Info("Reading: " + path);
+
                 progress = 0;
+                UidList = new List<string>();
 
                 GpkPackage package = new GpkPackage();
 
@@ -36,6 +39,7 @@ namespace GPK_RePack.Parser
                 {
                     package.Filename = Path.GetFileName(path);
                     package.Path = path;
+                    package.OrginalSize = reader.BaseStream.Length;
 
                     ReadHeader(reader, package);
                     ReadNames(reader, package);
@@ -101,7 +105,7 @@ namespace GPK_RePack.Parser
 
             logger.Info("DependsOffset " + package.Header.DependsOffset);
 
-            totalobjects = package.Header.NameCount + package.Header.ExportCount * 2 + package.Header.ImportCount; //Export & ExportData = *2
+            totalobjects = package.Header.NameCount + package.Header.ExportCount * 3 + package.Header.ImportCount; //Export, Export Linking, ExportData = *3
 
             package.Header.FGUID = reader.ReadBytes(16);
             logger.Info("FGUID " + package.Header.FGUID);
@@ -168,7 +172,7 @@ namespace GPK_RePack.Parser
 
                 package.NameList.Add(i, tmpString);
 
-                logger.Debug("Name {0}: {1}", i, tmpString.name);
+                logger.Debug("ObjectName {0}: {1}", i, tmpString.name);
                 progress++;
             }
 
@@ -192,6 +196,7 @@ namespace GPK_RePack.Parser
                 import.Class = package.NameList[class_index].name;
                 import.Object = package.NameList[object_index].name;
 
+                import.UID = GenerateUID(import);
                 package.ImportList.Add(i, import);
 
                 logger.Debug("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.Class, import.Object);
@@ -211,10 +216,8 @@ namespace GPK_RePack.Parser
                 export.SuperIndex = reader.ReadInt32();
                 export.PackageIndex = reader.ReadInt32();
 
-                export.ClassName = GetObject(export.ClassIndex, package);
-
                 long nameIndex = reader.ReadInt32();
-                export.Name = package.NameList[nameIndex].name;
+                export.ObjectName = package.NameList[nameIndex].name;
 
                 export.Unk1 = reader.ReadInt64();
                 export.Unk2 = reader.ReadInt64();
@@ -230,7 +233,22 @@ namespace GPK_RePack.Parser
 
                 package.ExportList.Add(i, export);
 
-                logger.Debug("Export {0}: Class: {1}, Name: {2}, Data_Size: {3}, Data_Offset {4}, Export_offset {5}", i, export.ClassName, export.Name, export.SerialSize, export.SerialOffset, reader.BaseStream.Position);
+                logger.Debug("Export {0}: Class: {1}, ObjectName: {2}, Data_Size: {3}, Data_Offset {4}, Export_offset {5}", i, export.ClassName, export.ObjectName, export.SerialSize, export.SerialOffset, reader.BaseStream.Position);
+                progress++;
+            }
+
+            //post-processing. needed if a object points to another export.
+            foreach (KeyValuePair<long, GpkExport> pair in package.ExportList)
+            {
+                GpkExport export = package.ExportList[pair.Key];
+                if (export.ClassName == null || export.SuperName == null || export.PackageName == null || export.UID == null)
+                {
+                    export.ClassName = GetObject(export.ClassIndex, package);
+                    export.SuperName = GetObject(export.SuperIndex, package);
+                    export.PackageName = GetObject(export.PackageIndex, package);
+                    export.UID = GenerateUID(export);
+                }
+
                 progress++;
             }
         }
@@ -288,13 +306,7 @@ namespace GPK_RePack.Parser
                     logger.FatalException("[ReadExportData]", ex);
                 }
 
-
-                if (export.ClassName == "SoundNodeWave")
-                {
-                    export.data_padding = new byte[32];
-                    export.data_padding = reader.ReadBytes(32);
-                }
-
+                export.property_size = (int)reader.BaseStream.Position - export.SerialOffset;
                 long object_end = export.SerialOffset + export.SerialSize;
                 if (reader.BaseStream.Position < object_end)
                 {
@@ -302,11 +314,11 @@ namespace GPK_RePack.Parser
                     export.data_start = reader.BaseStream.Position;
                     export.data = new byte[toread];
                     export.data = reader.ReadBytes(toread);
-                    logger.Debug(String.Format("Export {0}: Read Data ({1} bytes) and {2} Properties", export.Name, export.data.Length, export.Properties.Count));
+                    logger.Debug(String.Format("Export {0}: Read Data ({1} bytes) and {2} Properties ({3} bytes)", export.ObjectName, export.data.Length, export.Properties.Count, export.property_size));
                 }
                 else
                 {
-                    logger.Debug(String.Format("Export {0}: Read Data (0 bytes) and {1} Properties", export.Name, export.Properties.Count));
+                    logger.Debug(String.Format("Export {0}: Read Data (0 bytes) and {1} Properties ({2} bytes)", export.ObjectName, export.Properties.Count, export.property_size));
                 }
 
                 //data
@@ -344,20 +356,7 @@ namespace GPK_RePack.Parser
                     tmpStruct.innerType = package.NameList[structtype].name;
                     tmpStruct.value = new byte[tmpStruct.length];
                     tmpStruct.value = reader.ReadBytes((int)tmpStruct.length);
-                    /*
 
-                 switch (tmpStruct.innerType)
-                 {
-                     case "lol":
-                         break;
-                     default:
-                         logger.Debug(string.Format(
-                            "Unknown Struct Property Type {0}, Position {1}, Prop_Name {2}, Export_Name {3}, Strcut Len {4}, Strcut Type {5}",
-                            baseProp.type, reader.BaseStream.Position, baseProp.Name, export.Name, structlength, tmpStructType));
-                         break;
-                 }
-                        
-                    */
                     export.Properties.Add(tmpStruct);
                     break;
 
@@ -466,27 +465,36 @@ namespace GPK_RePack.Parser
                     throw new Exception(
                         string.Format(
                             "Unknown Property Type {0}, Position {1}, Prop_Name {2}, Export_Name {3}",
-                            baseProp.type, reader.BaseStream.Position, baseProp.Name, export.Name));
+                            baseProp.type, reader.BaseStream.Position, baseProp.Name, export.ObjectName));
 
 
 
 
             }
 
-            //logger.Trace(String.Format("Property Type {0}, Position after {1}, Prop_Name {2}, Export_Name {3}", baseProp.type, reader.BaseStream.Position, baseProp.Name, export.Name));
+            //logger.Trace(String.Format("Property Type {0}, Position after {1}, Prop_Name {2}, Export_Name {3}", baseProp.type, reader.BaseStream.Position, baseProp.ObjectName, export.ObjectName));
 
             return true;
         }
 
         private string GetObject(int index, GpkPackage package)
         {
+            //Import, Export added due to diffrent files appear to have the same object on import and export list
             if (index < 0)
             {
-                return package.ImportList[((index * -1) - 1)].Object;
+                return package.ImportList[((index * -1) - 1)].UID;
             }
             if (index > 0)
             {
-                return package.ExportList[index - 1].Name;
+                GpkExport export = package.ExportList[index - 1];
+                if (export.UID == null)
+                {
+                    export.ClassName = GetObject(export.ClassIndex, package);
+                    export.SuperName = GetObject(export.SuperIndex, package);
+                    export.PackageName = GetObject(export.PackageIndex, package);
+                    export.UID = GenerateUID(export);
+                }
+                return export.UID;
             }
             if (index == 0)
             {
@@ -510,6 +518,62 @@ namespace GPK_RePack.Parser
             reader.ReadBytes(2); //text control char 
 
             return text;
+        }
+
+        private string GenerateUID(GpkExport export)
+        {
+
+            string proposedName;
+            if (export.PackageName == "none")
+            {
+                proposedName = export.ObjectName;
+            }
+            else
+            {
+                proposedName = export.PackageName + "." + export.ObjectName;
+            }
+
+            int counter = 0;
+            do
+            {
+                string tmpName = proposedName;
+                if (counter > 0)
+                {
+                    tmpName += ("_" + counter);
+                }
+
+                if (UidList.Contains(tmpName) == false)
+                {
+                    UidList.Add(tmpName);
+                    return tmpName;
+                }
+
+                counter++;
+            } while (true);
+
+        }
+
+        private string GenerateUID(GpkImport import)
+        {
+            string proposedName = import.ClassPackage + "." + import.Object;
+
+            int counter = 0;
+            do
+            {
+                string tmpName = proposedName;
+                if (counter > 0)
+                {
+                    tmpName += ("_" + counter);
+                }
+
+                if (UidList.Contains(tmpName) == false)
+                {
+                    UidList.Add(tmpName);
+                    return tmpName;
+                }
+
+                counter++;
+            } while (true);
         }
 
 

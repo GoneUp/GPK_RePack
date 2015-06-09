@@ -35,22 +35,24 @@
             this.replaceSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.panel2 = new System.Windows.Forms.Panel();
             this.boxGeneralButtons = new System.Windows.Forms.GroupBox();
+            this.btnPaste = new System.Windows.Forms.Button();
+            this.btnCopy = new System.Windows.Forms.Button();
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.boxDataButtons = new System.Windows.Forms.GroupBox();
+            this.btnRebuildMode = new System.Windows.Forms.RadioButton();
+            this.btnPatchMode = new System.Windows.Forms.RadioButton();
             this.btnReplace = new System.Windows.Forms.Button();
             this.btnExport = new System.Windows.Forms.Button();
             this.boxInfo = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.boxLog = new System.Windows.Forms.TextBox();
-            this.btnPatchMode = new System.Windows.Forms.RadioButton();
-            this.btnRebuildMode = new System.Windows.Forms.RadioButton();
-            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -95,33 +97,40 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // replaceSaveToolStripMenuItem
             // 
             this.replaceSaveToolStripMenuItem.Name = "replaceSaveToolStripMenuItem";
-            this.replaceSaveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.replaceSaveToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.replaceSaveToolStripMenuItem.Text = "Replace Save";
             this.replaceSaveToolStripMenuItem.Click += new System.EventHandler(this.replaceSaveToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.saveToolStripMenuItem.Text = "Full Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(139, 6);
+            // 
+            // clearToolStripMenuItem
+            // 
+            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.clearToolStripMenuItem.Text = "Clear";
+            this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -159,23 +168,45 @@
             // 
             // boxGeneralButtons
             // 
+            this.boxGeneralButtons.Controls.Add(this.btnPaste);
+            this.boxGeneralButtons.Controls.Add(this.btnCopy);
             this.boxGeneralButtons.Controls.Add(this.btnAdd);
             this.boxGeneralButtons.Controls.Add(this.btnDelete);
             this.boxGeneralButtons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.boxGeneralButtons.Enabled = false;
             this.boxGeneralButtons.Location = new System.Drawing.Point(0, 0);
             this.boxGeneralButtons.Name = "boxGeneralButtons";
-            this.boxGeneralButtons.Size = new System.Drawing.Size(168, 100);
+            this.boxGeneralButtons.Size = new System.Drawing.Size(174, 100);
             this.boxGeneralButtons.TabIndex = 5;
             this.boxGeneralButtons.TabStop = false;
             this.boxGeneralButtons.Text = "General";
+            // 
+            // btnPaste
+            // 
+            this.btnPaste.Location = new System.Drawing.Point(87, 58);
+            this.btnPaste.Name = "btnPaste";
+            this.btnPaste.Size = new System.Drawing.Size(81, 24);
+            this.btnPaste.TabIndex = 3;
+            this.btnPaste.Text = "Paste Object";
+            this.btnPaste.UseVisualStyleBackColor = true;
+            this.btnPaste.Click += new System.EventHandler(this.btnPaste_Click);
+            // 
+            // btnCopy
+            // 
+            this.btnCopy.Location = new System.Drawing.Point(6, 58);
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.Size = new System.Drawing.Size(75, 24);
+            this.btnCopy.TabIndex = 2;
+            this.btnCopy.Text = "Copy Object";
+            this.btnCopy.UseVisualStyleBackColor = true;
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
             // 
             // btnAdd
             // 
             this.btnAdd.Enabled = false;
             this.btnAdd.Location = new System.Drawing.Point(6, 28);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(75, 43);
+            this.btnAdd.Size = new System.Drawing.Size(75, 24);
             this.btnAdd.TabIndex = 1;
             this.btnAdd.Text = "Add";
             this.btnAdd.UseVisualStyleBackColor = true;
@@ -185,9 +216,9 @@
             // 
             this.btnDelete.Location = new System.Drawing.Point(87, 28);
             this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(75, 43);
+            this.btnDelete.Size = new System.Drawing.Size(81, 24);
             this.btnDelete.TabIndex = 0;
-            this.btnDelete.Text = "Delete";
+            this.btnDelete.Text = "Remove";
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
@@ -199,12 +230,34 @@
             this.boxDataButtons.Controls.Add(this.btnExport);
             this.boxDataButtons.Dock = System.Windows.Forms.DockStyle.Right;
             this.boxDataButtons.Enabled = false;
-            this.boxDataButtons.Location = new System.Drawing.Point(168, 0);
+            this.boxDataButtons.Location = new System.Drawing.Point(174, 0);
             this.boxDataButtons.Name = "boxDataButtons";
-            this.boxDataButtons.Size = new System.Drawing.Size(407, 100);
+            this.boxDataButtons.Size = new System.Drawing.Size(401, 100);
             this.boxDataButtons.TabIndex = 4;
             this.boxDataButtons.TabStop = false;
             this.boxDataButtons.Text = "Data Commands";
+            // 
+            // btnRebuildMode
+            // 
+            this.btnRebuildMode.AutoSize = true;
+            this.btnRebuildMode.Checked = true;
+            this.btnRebuildMode.Location = new System.Drawing.Point(226, 54);
+            this.btnRebuildMode.Name = "btnRebuildMode";
+            this.btnRebuildMode.Size = new System.Drawing.Size(61, 17);
+            this.btnRebuildMode.TabIndex = 4;
+            this.btnRebuildMode.TabStop = true;
+            this.btnRebuildMode.Text = "Rebuild";
+            this.btnRebuildMode.UseVisualStyleBackColor = true;
+            // 
+            // btnPatchMode
+            // 
+            this.btnPatchMode.AutoSize = true;
+            this.btnPatchMode.Location = new System.Drawing.Point(226, 28);
+            this.btnPatchMode.Name = "btnPatchMode";
+            this.btnPatchMode.Size = new System.Drawing.Size(182, 17);
+            this.btnPatchMode.TabIndex = 3;
+            this.btnPatchMode.Text = "PatchMode (size same or smaller)";
+            this.btnPatchMode.UseVisualStyleBackColor = true;
             // 
             // btnReplace
             // 
@@ -261,35 +314,6 @@
             this.boxLog.TabIndex = 5;
             this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
             // 
-            // btnPatchMode
-            // 
-            this.btnPatchMode.AutoSize = true;
-            this.btnPatchMode.Location = new System.Drawing.Point(226, 28);
-            this.btnPatchMode.Name = "btnPatchMode";
-            this.btnPatchMode.Size = new System.Drawing.Size(182, 17);
-            this.btnPatchMode.TabIndex = 3;
-            this.btnPatchMode.Text = "PatchMode (size same or smaller)";
-            this.btnPatchMode.UseVisualStyleBackColor = true;
-            // 
-            // btnRebuildMode
-            // 
-            this.btnRebuildMode.AutoSize = true;
-            this.btnRebuildMode.Checked = true;
-            this.btnRebuildMode.Location = new System.Drawing.Point(226, 54);
-            this.btnRebuildMode.Name = "btnRebuildMode";
-            this.btnRebuildMode.Size = new System.Drawing.Size(61, 17);
-            this.btnRebuildMode.TabIndex = 4;
-            this.btnRebuildMode.TabStop = true;
-            this.btnRebuildMode.Text = "Rebuild";
-            this.btnRebuildMode.UseVisualStyleBackColor = true;
-            // 
-            // clearToolStripMenuItem
-            // 
-            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.clearToolStripMenuItem.Text = "Clear";
-            this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
-            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -300,7 +324,7 @@
             this.Controls.Add(this.boxLog);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GUI";
-            this.Text = "Terahelper 0.2 - by GoneUp";
+            this.Text = "Terahelper 0.3 - by GoneUp";
             this.Load += new System.EventHandler(this.GUI_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -342,6 +366,8 @@
         private System.Windows.Forms.RadioButton btnRebuildMode;
         private System.Windows.Forms.RadioButton btnPatchMode;
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
+        private System.Windows.Forms.Button btnPaste;
+        private System.Windows.Forms.Button btnCopy;
     }
 }
 

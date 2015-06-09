@@ -59,6 +59,7 @@ namespace GPK_RePack
 
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
+        private GpkExport copyExport;
 
         private List<GpkPackage> loadedGpkPackages;
         private List<GpkExport>[] changedExports;
@@ -97,8 +98,11 @@ namespace GPK_RePack
                     Thread newThread = new Thread(delegate()
                       {
                           GpkPackage tmpPack = reader.ReadGpk(path);
-                          tmpPack.Changes = true; //tmp, remove after tests
-                          loadedGpkPackages.Add(tmpPack);
+                          if (tmpPack != null)
+                          {
+                              tmpPack.Changes = true; //tmp, remove after tests
+                              loadedGpkPackages.Add(tmpPack);
+                          }
                       });
                     newThread.Start();
 
@@ -137,6 +141,7 @@ namespace GPK_RePack
             changedExports = null;
             selectedExport = null;
             selectedPackage = null;
+            copyExport = null;
             boxInfo.Text = "";
             boxDataButtons.Enabled = false;
             boxGeneralButtons.Enabled = false;
@@ -168,9 +173,9 @@ namespace GPK_RePack
 
 
                 //Exports 
-                foreach (var tmp in package.ExportList.OrderByDescending(pair => pair.Value.Name).Reverse())
+                foreach (var tmp in package.ExportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
                 {
-                    nodeE.Nodes.Add(tmp.Key.ToString(), tmp.Value.Name);
+                    nodeE.Nodes.Add(tmp.Key.ToString(), tmp.Value.ObjectName);
                 }
             }
         }
@@ -198,9 +203,11 @@ namespace GPK_RePack
                     GpkImport imp = package.ImportList[Convert.ToInt32(e.Node.Name)];
 
                     StringBuilder info = new StringBuilder();
+                    info.AppendLine("UID: " + imp.UID);
+                    info.AppendLine("Object: " + imp.Object);
                     info.AppendLine("ClassPackage: " + imp.ClassPackage);
                     info.AppendLine("Class: " + imp.Class);
-                    info.AppendLine("Object: " + imp.Object);
+
 
                     boxInfo.Text = info.ToString();
                     //ClassPackage Core Class: Class Object: ObjectRedirector
@@ -211,8 +218,11 @@ namespace GPK_RePack
                     GpkExport exp = package.ExportList[Convert.ToInt32(e.Node.Name)];
 
                     StringBuilder info = new StringBuilder();
-                    info.AppendLine("Name: " + exp.Name);
+                    info.AppendLine("UID: " + exp.UID);
+                    info.AppendLine("Object: " + exp.ObjectName);
                     info.AppendLine("Class: " + exp.ClassName);
+                    info.AppendLine("Super: " + exp.SuperName);
+                    info.AppendLine("Package: " + exp.PackageName);
                     info.AppendLine("Data_Offset: " + exp.SerialOffset);
                     if (exp.data != null)
                     {
@@ -223,11 +233,11 @@ namespace GPK_RePack
                         info.AppendLine("Data_Size: 0");
                     }
 
-                    info.AppendLine("Props: ");
+                    info.AppendLine("Properties:");
                     foreach (object prop in exp.Properties)
                     {
                         info.AppendLine(prop.ToString());
-                        /*info.Append("Name: " + prop.Name);
+                        /*info.Append("ObjectName: " + prop.ObjectName);
                         if (prop.value != null)
                         {
                             info.AppendLine("Value: " + prop.value.ToString());
@@ -237,12 +247,13 @@ namespace GPK_RePack
                             info.AppendLine();
                         }*/
                     }
-
+                    
                     boxInfo.Text = info.ToString();
+                    boxGeneralButtons.Enabled = true;
                     boxDataButtons.Enabled = true;
                     selectedExport = exp;
                     selectedPackage = package;
-                    // Class: DistributionFloatUniform, Name: DistributionFloatUniform, Data_Size: 100, Data_Offset 80654, Export_offset 9514
+                    // Class: DistributionFloatUniform, ObjectName: DistributionFloatUniform, Data_Size: 100, Data_Offset 80654, Export_offset 9514
                 }
             }
         }
@@ -260,7 +271,7 @@ namespace GPK_RePack
                 }
 
                 SaveFileDialog save = new SaveFileDialog();
-                save.FileName = selectedExport.Name;
+                save.FileName = selectedExport.ObjectName;
                 save.DefaultExt = ".raw";
                 save.ShowDialog();
 
@@ -305,6 +316,7 @@ namespace GPK_RePack
                         //Too long, not possible without rebuiling the gpk
                         logger.Info("File size too big. Size: " + buffer.Length + " Maximum Size: " +
                                  selectedExport.data.Length);
+                        return;
                     }
 
                     if (buffer.Length < selectedExport.data.Length)
@@ -324,14 +336,14 @@ namespace GPK_RePack
                     logger.Trace(String.Format("rebuild mode old size {0} new size {1}", selectedExport.data.Length,
                         buffer.Length));
 
-                    selectedExport.SerialSize = -1;
+                    selectedExport.SerialSize = selectedExport.property_size + buffer.Length;
                     selectedExport.data = buffer;
                     selectedPackage.Changes = true;
                 }
 
                 changedExports[packageIndex].Add(selectedExport);
                 logger.Info(String.Format("Replaced the data of {0} successfully! Dont forget to save.",
-                    selectedExport.Name));
+                    selectedExport.ObjectName));
             }
 
 
@@ -403,7 +415,47 @@ namespace GPK_RePack
             }
 
         }
+
+        private void btnCopy_Click(object sender, EventArgs e)
+        {
+            if (selectedExport == null)
+            {
+                return;
+            }
+
+            copyExport = new GpkExport(selectedExport); //clone
+
+            logger.Info("Made a copy of {0}...", selectedExport.UID);
+        }
+
+        private void btnPaste_Click(object sender, EventArgs e)
+        {
+            if (selectedExport == null || copyExport == null)
+            {
+                return;
+            }
+
+            //we copy only the data and the props, the rest is untoched
+            selectedExport.Properties.Clear();
+            selectedExport.Properties.AddRange(copyExport.Properties.ToArray());
+
+            //selectedExport.netIndex = copyExport.netIndex;
+            selectedExport.padding_unk = copyExport.padding_unk;
+            selectedExport.property_padding = copyExport.property_padding;
+            selectedExport.property_size = copyExport.property_size;
+
+            selectedExport.SerialSize = copyExport.SerialSize;
+            selectedExport.data_padding = copyExport.data_padding;
+            selectedExport.data = copyExport.data;
+
+            treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+            logger.Info("Pasted the data and properties of {0} to {1}", copyExport.UID, selectedExport.UID);
+        }
+
         #endregion
+
+
+
 
 
 

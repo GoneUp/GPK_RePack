@@ -17,7 +17,7 @@
 
         public override string ToString()
         {
-            return string.Format("Name: {0} Type: {1} Value: {2}", Name, type, value);
+            return string.Format("ObjectName: {0} Type: {1} Value: {2}", Name, type, value);
         }
     }
 

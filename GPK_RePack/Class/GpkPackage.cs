@@ -10,6 +10,7 @@ namespace GPK_RePack.Class
     {
         public string Filename;
         public string Path;
+        public long OrginalSize;
         public Boolean Changes = false;
 
         public GpkHeader Header;
