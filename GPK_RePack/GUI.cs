@@ -292,6 +292,7 @@ namespace GPK_RePack
                 if (selectedExport.data == null)
                 {
                     logger.Info("Length is zero. Nothing to export");
+                    return;
                 }
 
                 SaveFileDialog save = new SaveFileDialog();
@@ -476,7 +477,40 @@ namespace GPK_RePack
             logger.Info("Pasted the data and properties of {0} to {1}", copyExport.UID, selectedExport.UID);
         }
 
+
+
         #endregion
+
+        private void btnExtractOGG_Click(object sender, EventArgs e)
+        {
+
+            if (selectedExport != null)
+            {
+                if (selectedExport.data == null)
+                {
+                    logger.Info("Length is zero. Nothing to export");
+                    return;
+                }
+
+                SaveFileDialog save = new SaveFileDialog();
+                save.FileName = selectedExport.ObjectName;
+                save.DefaultExt = ".ogg";
+                save.ShowDialog();
+
+                byte[] tmpArray = new byte[selectedExport.data.Length - 32];
+                Array.Copy(selectedExport.data, 32, tmpArray, 0, tmpArray.Length);
+
+                StreamWriter writer = new StreamWriter(save.OpenFile());
+                writer.BaseStream.Write(tmpArray, 0, tmpArray.Length);
+                writer.Close();
+                writer.Dispose();
+
+                logger.Info(String.Format("Data was saved to {0}!", save.FileName));
+
+
+            }
+        }
+
 
 
 

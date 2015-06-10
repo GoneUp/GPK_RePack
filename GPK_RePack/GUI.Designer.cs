@@ -46,6 +46,7 @@
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.boxDataButtons = new System.Windows.Forms.GroupBox();
+            this.btnExtractOGG = new System.Windows.Forms.Button();
             this.btnRebuildMode = new System.Windows.Forms.RadioButton();
             this.btnPatchMode = new System.Windows.Forms.RadioButton();
             this.btnReplace = new System.Windows.Forms.Button();
@@ -224,6 +225,7 @@
             // 
             // boxDataButtons
             // 
+            this.boxDataButtons.Controls.Add(this.btnExtractOGG);
             this.boxDataButtons.Controls.Add(this.btnRebuildMode);
             this.boxDataButtons.Controls.Add(this.btnPatchMode);
             this.boxDataButtons.Controls.Add(this.btnReplace);
@@ -236,6 +238,16 @@
             this.boxDataButtons.TabIndex = 4;
             this.boxDataButtons.TabStop = false;
             this.boxDataButtons.Text = "Data Commands";
+            // 
+            // btnExtractOGG
+            // 
+            this.btnExtractOGG.Location = new System.Drawing.Point(6, 58);
+            this.btnExtractOGG.Name = "btnExtractOGG";
+            this.btnExtractOGG.Size = new System.Drawing.Size(102, 24);
+            this.btnExtractOGG.TabIndex = 5;
+            this.btnExtractOGG.Text = "Export OGG";
+            this.btnExtractOGG.UseVisualStyleBackColor = true;
+            this.btnExtractOGG.Click += new System.EventHandler(this.btnExtractOGG_Click);
             // 
             // btnRebuildMode
             // 
@@ -273,7 +285,7 @@
             // 
             this.btnExport.Location = new System.Drawing.Point(6, 28);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(102, 43);
+            this.btnExport.Size = new System.Drawing.Size(102, 24);
             this.btnExport.TabIndex = 1;
             this.btnExport.Text = "Export Raw Data";
             this.btnExport.UseVisualStyleBackColor = true;
@@ -368,6 +380,7 @@
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
         private System.Windows.Forms.Button btnPaste;
         private System.Windows.Forms.Button btnCopy;
+        private System.Windows.Forms.Button btnExtractOGG;
     }
 }
 
