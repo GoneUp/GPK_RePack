@@ -499,21 +499,41 @@ namespace GPK_RePack
                 return;
             }
 
-            //we copy only the data and the props, the rest is untoched
-            selectedExport.Properties.Clear();
-            selectedExport.Properties.AddRange(copyExport.Properties.ToArray());
+            switch (Settings.Default.CopyMode)
+            {
+                case "dataprops":
+                    ReplaceProperties(copyExport, selectedExport);
+                    ReplaceData(copyExport, selectedExport);
+                    break;
+                case "data":
+                    ReplaceData(copyExport, selectedExport);
+                    break;
+                case "props":
+                    ReplaceProperties(copyExport, selectedExport);
+                    break;
 
+            }
             //selectedExport.netIndex = copyExport.netIndex;
-            selectedExport.padding_unk = copyExport.padding_unk;
-            selectedExport.property_padding = copyExport.property_padding;
-            selectedExport.property_size = copyExport.property_size;
 
-            selectedExport.SerialSize = copyExport.SerialSize;
-            selectedExport.data_padding = copyExport.data_padding;
-            selectedExport.data = copyExport.data;
 
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
             logger.Info("Pasted the data and properties of {0} to {1}", copyExport.UID, selectedExport.UID);
+        }
+
+        private void ReplaceProperties(GpkExport source, GpkExport destination)
+        {
+            source.Properties.Clear();
+            source.Properties.AddRange(destination.Properties.ToArray());
+            source.property_padding = destination.property_padding;
+            source.property_size = destination.property_size;
+            source.padding_unk = destination.padding_unk;
+        }
+
+        private void ReplaceData(GpkExport source, GpkExport destination)
+        {
+            source.SerialSize = destination.SerialSize;
+            source.data_padding = destination.data_padding;
+            source.data = destination.data;
         }
 
         private void btnExtractOGG_Click(object sender, EventArgs e)
@@ -559,8 +579,8 @@ namespace GPK_RePack
 
         #endregion
 
- 
-   
+
+
 
 
 

@@ -1,2 +1,12 @@
 C:\Users\Henry\AppData\Local\Temporary Projects\GPK_RePack\bin\Debug\GPK_RePack.exe.config
 I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\bin\Debug\GPK_RePack.exe.config
+I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe.config
+I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe
+I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.pdb
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Debug\GPK_RePack.csprojResolveAssemblyReference.cache
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Debug\GPK_RePack.GUI.resources
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Debug\GPK_RePack.Forms.Options.resources
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Debug\GPK_RePack.Properties.Resources.resources
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Debug\GPK_RePack.csproj.GenerateResource.Cache
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Debug\Terahelper.exe
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Debug\Terahelper.pdb
