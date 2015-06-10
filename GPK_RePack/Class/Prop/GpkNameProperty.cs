@@ -1,5 +1,8 @@
-﻿namespace GPK_RePack.Class.Prop
+﻿using System;
+
+namespace GPK_RePack.Class.Prop
 {
+    [Serializable]
     class GpkNameProperty : GpkBaseProperty
     {
         public long unk;

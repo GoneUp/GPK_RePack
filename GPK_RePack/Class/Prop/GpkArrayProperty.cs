@@ -1,5 +1,8 @@
-﻿namespace GPK_RePack.Class.Prop
+﻿using System;
+
+namespace GPK_RePack.Class.Prop
 {
+    [Serializable]
     class GpkArrayProperty : GpkBaseProperty
     {
         public long length;

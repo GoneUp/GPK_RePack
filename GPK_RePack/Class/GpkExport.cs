@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using GPK_RePack.Class.Prop;
 
 namespace GPK_RePack.Class
 {
-    class GpkExport
+    [Serializable]
+    class GpkExport 
     {
         public string UID;
 

@@ -1,0 +1,16 @@
+2015-06-10 23:40:55.3099|INFO|GPK_RePack.Parser.Reader|Reading: I:\Henry\Projekte\Tera\GPK_RePack\build\PCFemale_Voice03.gpk_rebuild
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|NameCount 342
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|NameOffset 109
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|ExportCount 968
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|ExportOffset 9495
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|ImportCount 14
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|ImportOffset 9103
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|DependsOffset 75319
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|FGUID System.Byte[]
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|Generation 0, ExportCount 968, NameCount 342, NetObjectCount 968
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|Unk3 4206, Unk4 76, Unk5 0, Unk6 0, EngineVersion 98190125, CookerVersion 0
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|Reading Namelist at 109....
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|Reading Imports at 9103....
+2015-06-10 23:40:55.3179|INFO|GPK_RePack.Parser.Reader|Reading Exports at 9495....
+2015-06-10 23:40:55.3359|INFO|GPK_RePack.Parser.Reader|Reading ExportsData....
+2015-06-10 23:40:55.3359|INFO|GPK_RePack.Parser.Reader|Reading of I:\Henry\Projekte\Tera\GPK_RePack\build\PCFemale_Voice03.gpk_rebuild complete, took 37ms!
