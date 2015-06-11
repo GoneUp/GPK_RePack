@@ -14,5 +14,14 @@
     <Setting Name="ViewMode" Type="System.String" Scope="User">
       <Value Profile="(Default)">normal</Value>
     </Setting>
+    <Setting Name="SaveDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="OpenDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ShowImports" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

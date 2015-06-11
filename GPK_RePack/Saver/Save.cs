@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -130,7 +129,7 @@ namespace GPK_RePack.Saver
                 writer.Write(GetStringIndex(imp.ClassPackage, package));
                 writer.Write(GetStringIndex(imp.Class, package));
                 writer.Write(imp.PackageRef);
-                writer.Write((int)GetStringIndex(imp.Object, package));
+                writer.Write((int)GetStringIndex(imp.ObjectName, package));
                 writer.Write(imp.Unk);
             }
 

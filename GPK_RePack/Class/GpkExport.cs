@@ -81,5 +81,34 @@ namespace GPK_RePack.Class
             data = export.data;
         }
 
+        public override string ToString()
+        {
+            StringBuilder info = new StringBuilder();
+            info.AppendLine("Type: Export");
+            info.AppendLine("UID: " + UID);
+            info.AppendLine("Object: " + ObjectName);
+            info.AppendLine("Class: " + ClassName);
+            info.AppendLine("Super: " + SuperName);
+            info.AppendLine("Package: " + PackageName);
+            info.AppendLine("Data_Offset: " + SerialOffset);
+            if (data != null)
+            {
+                info.AppendLine("Data_Size: " + data.Length);
+            }
+            else
+            {
+                info.AppendLine("Data_Size: 0");
+            }
+
+            info.AppendLine("Properties:");
+            foreach (object prop in Properties)
+            {
+                info.AppendLine(prop.ToString());
+            }
+
+            return info.ToString();
+        }
+
+      
     }
 }

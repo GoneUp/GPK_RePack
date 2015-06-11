@@ -64,7 +64,6 @@ namespace GPK_RePack
 
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
-        private long selectedExportIndex;
 
         private List<GpkPackage> loadedGpkPackages;
         private List<GpkExport>[] changedExports;
@@ -86,14 +85,58 @@ namespace GPK_RePack
             reader = new Reader();
             saver = new Save();
             loadedGpkPackages = new List<GpkPackage>();
+
+            if (Settings.Default.SaveDir == "")
+                Settings.Default.SaveDir = Directory.GetCurrentDirectory();
+
+            if (Settings.Default.OpenDir == "")
+                Settings.Default.OpenDir = Directory.GetCurrentDirectory();
         }
 
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Options opt = new Options(this);
+            opt.Show();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
+        private void boxLog_TextChanged(object sender, EventArgs e)
+        {
+            boxLog.SelectionStart = boxLog.TextLength;
+            boxLog.ScrollToCaret();
+        }
+
+        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            changedExports = null;
+            selectedExport = null;
+            selectedPackage = null;
+            boxInfo.Text = "";
+            boxDataButtons.Enabled = false;
+            boxGeneralButtons.Enabled = false;
+            loadedGpkPackages.Clear();
+            DrawPackages();
+        }
+
+        private void GUI_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Settings.Default.Save();
+        }
+
+
+        #endregion
+
+        #region load/save
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog open = new OpenFileDialog();
             open.Multiselect = true;
             open.ValidateNames = true;
-            //open.InitialDirectory = Directory.GetCurrentDirectory();
+            open.InitialDirectory = Settings.Default.OpenDir;
 
             open.ShowDialog();
 
@@ -135,41 +178,58 @@ namespace GPK_RePack
             DrawPackages();
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+
+        private void replaceSaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Environment.Exit(0);
+            if (changedExports != null)
+            {
+                for (int i = 0; i < changedExports.Length; i++)
+                {
+                    List<GpkExport> list = changedExports[i];
+                    if (list.Count > 0)
+                    {
+                        try
+                        {
+                            GpkPackage package = loadedGpkPackages[i];
+                            string savepath = package.Path + "_patched";
+                            saver.SaveReplacedExport(package, savepath, list);
+                            logger.Info(String.Format("Saved the changed data of package '{0} to {1}'!",
+                                package.Filename, savepath));
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.FatalException("Save failure! " + ex, ex);
+                        }
+                    }
+                }
+            }
         }
 
-        private void boxLog_TextChanged(object sender, EventArgs e)
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            boxLog.SelectionStart = boxLog.TextLength;
-            boxLog.ScrollToCaret();
+            foreach (GpkPackage package in loadedGpkPackages)
+            {
+                if (package.Changes)
+                {
+                    try
+                    {
+                        logger.Info(String.Format("Attemping to save {0}...", package.Filename));
+                        string savepath = package.Path + "_rebuild";
+                        saver.SaveGpkPackage(package, savepath);
+                        logger.Info(String.Format("Saved the package '{0} to {1}'!", package.Filename, savepath));
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.FatalException("Save failure! " + ex, ex);
+                    }
+                }
+            }
         }
-
-        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            changedExports = null;
-            selectedExport = null;
-            selectedExportIndex = 0;
-            selectedPackage = null;
-            boxInfo.Text = "";
-            boxDataButtons.Enabled = false;
-            boxGeneralButtons.Enabled = false;
-            loadedGpkPackages.Clear();
-            DrawPackages();
-        }
-
-        private void GUI_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Settings.Default.Save();
-        }
-
-
         #endregion
 
         #region diplaygpk
-
-        private void DrawPackages()
+        public void DrawPackages()
         {
             treeMain.Nodes.Clear();
 
@@ -178,21 +238,59 @@ namespace GPK_RePack
                 GpkPackage package = loadedGpkPackages[i];
                 TreeNode nodeP = treeMain.Nodes.Add(i.ToString(), package.Filename);
 
-                TreeNode nodeE = nodeP.Nodes.Add("Exports");
-                TreeNode nodeI = nodeP.Nodes.Add("Imports");
-
-                //Imports 
-                foreach (var tmp in package.ImportList.OrderByDescending(pair => pair.Value.Object).Reverse())
+                switch (Settings.Default.ViewMode)
                 {
-                    nodeI.Nodes.Add(tmp.Key.ToString(), tmp.Value.Object);
+                    case "normal":
+                        if (Settings.Default.ShowImports)
+                        {
+                            TreeNode nodeI = nodeP.Nodes.Add("Imports");
+
+                            foreach (var tmp in package.ImportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
+                            {
+                                nodeI.Nodes.Add(tmp.Value.UID, tmp.Value.ObjectName);
+                            }
+                        }
+
+                        //Exports
+                        TreeNode nodeE = nodeP.Nodes.Add("Exports");
+                        foreach (var tmp in package.ExportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
+                        {
+                            nodeE.Nodes.Add(tmp.Value.UID, tmp.Value.ObjectName);
+                        }
+                        break;
+                    case "class":
+                        Dictionary<string, TreeNode> classNodes = new Dictionary<string, TreeNode>();
+                        if (Settings.Default.ShowImports)
+                        {
+                            foreach (var tmp in package.ImportList)
+                            {
+                                if (!classNodes.ContainsKey(tmp.Value.Class))
+                                {
+                                    TreeNode classNode = nodeP.Nodes.Add(tmp.Value.Class);
+                                    classNodes.Add(tmp.Value.Class, classNode);
+                                }
+
+                                classNodes[tmp.Value.Class].Nodes.Add(tmp.Value.UID, tmp.Value.ObjectName);
+
+                            }
+                        }
+
+                        foreach (var tmp in package.ExportList)
+                        {
+                            if (!classNodes.ContainsKey(tmp.Value.ClassName))
+                            {
+                                TreeNode classNode = nodeP.Nodes.Add(tmp.Value.ClassName);
+                                classNodes.Add(tmp.Value.ClassName, classNode);
+                            }
+
+                            classNodes[tmp.Value.ClassName].Nodes.Add(tmp.Value.UID, tmp.Value.ObjectName);
+                        }
+                        break;
+
                 }
 
 
-                //Exports 
-                foreach (var tmp in package.ExportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
-                {
-                    nodeE.Nodes.Add(tmp.Key.ToString(), tmp.Value.ObjectName);
-                }
+
             }
         }
 
@@ -203,7 +301,6 @@ namespace GPK_RePack
             boxDataButtons.Enabled = false;
             boxGeneralButtons.Enabled = false;
             selectedExport = null;
-            selectedExportIndex = 0;
             selectedPackage = null;
 
             if (e.Node.Level == 0)
@@ -215,63 +312,23 @@ namespace GPK_RePack
             else if (e.Node.Level == 2)
             {
                 GpkPackage package = loadedGpkPackages[Convert.ToInt32(e.Node.Parent.Parent.Name)];
-                if (e.Node.Parent.Text == "Imports")
+                Object selected = package.GetObjectByUID(e.Node.Name);
+
+                if (selected is GpkImport)
                 {
-                    GpkImport imp = package.ImportList[Convert.ToInt32(e.Node.Name)];
-
-                    StringBuilder info = new StringBuilder();
-                    info.AppendLine("UID: " + imp.UID);
-                    info.AppendLine("Object: " + imp.Object);
-                    info.AppendLine("ClassPackage: " + imp.ClassPackage);
-                    info.AppendLine("Class: " + imp.Class);
-
-
-                    boxInfo.Text = info.ToString();
-                    //ClassPackage Core Class: Class Object: ObjectRedirector
+                    GpkImport imp = (GpkImport)selected;
+                    boxInfo.Text = imp.ToString();
 
                 }
-                else if (e.Node.Parent.Text == "Exports")
+                else if (selected is GpkExport)
                 {
-                    GpkExport exp = package.ExportList[Convert.ToInt32(e.Node.Name)];
+                    GpkExport exp = (GpkExport)selected;
+                    boxInfo.Text = exp.ToString();
 
-                    StringBuilder info = new StringBuilder();
-                    info.AppendLine("UID: " + exp.UID);
-                    info.AppendLine("Object: " + exp.ObjectName);
-                    info.AppendLine("Class: " + exp.ClassName);
-                    info.AppendLine("Super: " + exp.SuperName);
-                    info.AppendLine("Package: " + exp.PackageName);
-                    info.AppendLine("Data_Offset: " + exp.SerialOffset);
-                    if (exp.data != null)
-                    {
-                        info.AppendLine("Data_Size: " + exp.data.Length);
-                    }
-                    else
-                    {
-                        info.AppendLine("Data_Size: 0");
-                    }
-
-                    info.AppendLine("Properties:");
-                    foreach (object prop in exp.Properties)
-                    {
-                        info.AppendLine(prop.ToString());
-                        /*info.Append("ObjectName: " + prop.ObjectName);
-                        if (prop.value != null)
-                        {
-                            info.AppendLine("Value: " + prop.value.ToString());
-                        }
-                        else
-                        {
-                            info.AppendLine();
-                        }*/
-                    }
-
-                    boxInfo.Text = info.ToString();
                     boxGeneralButtons.Enabled = true;
                     boxDataButtons.Enabled = true;
                     selectedExport = exp;
-                    selectedExportIndex = Convert.ToInt32(e.Node.Name);
                     selectedPackage = package;
-                    // Class: DistributionFloatUniform, ObjectName: DistributionFloatUniform, Data_Size: 100, Data_Offset 80654, Export_offset 9514
                 }
             }
         }
@@ -280,12 +337,6 @@ namespace GPK_RePack
         private void refreshViewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DrawPackages();
-        }
-
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Options opt = new Options();
-            opt.Show();
         }
 
         #endregion
@@ -305,6 +356,7 @@ namespace GPK_RePack
                 SaveFileDialog save = new SaveFileDialog();
                 save.FileName = selectedExport.ObjectName;
                 save.DefaultExt = ".raw";
+                save.InitialDirectory = Settings.Default.SaveDir;
                 save.ShowDialog();
 
                 StreamWriter writer = new StreamWriter(save.OpenFile());
@@ -330,7 +382,7 @@ namespace GPK_RePack
             OpenFileDialog open = new OpenFileDialog();
             open.Multiselect = false;
             open.ValidateNames = true;
-            //open.InitialDirectory = Directory.GetCurrentDirectory();
+            open.InitialDirectory = Settings.Default.OpenDir;
 
             open.ShowDialog();
 
@@ -382,53 +434,6 @@ namespace GPK_RePack
 
         }
 
-        private void replaceSaveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (changedExports != null)
-            {
-                for (int i = 0; i < changedExports.Length; i++)
-                {
-                    List<GpkExport> list = changedExports[i];
-                    if (list.Count > 0)
-                    {
-                        try
-                        {
-                            GpkPackage package = loadedGpkPackages[i];
-                            string savepath = package.Path + "_patched";
-                            saver.SaveReplacedExport(package, savepath, list);
-                            logger.Info(String.Format("Saved the changed data of package '{0} to {1}'!",
-                                package.Filename, savepath));
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.FatalException("Save failure! " + ex, ex);
-                        }
-                    }
-                }
-            }
-        }
-
-
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            foreach (GpkPackage package in loadedGpkPackages)
-            {
-                if (package.Changes)
-                {
-                    try
-                    {
-                        logger.Info(String.Format("Attemping to save {0}...", package.Filename));
-                        string savepath = package.Path + "_rebuild";
-                        saver.SaveGpkPackage(package, savepath);
-                        logger.Info(String.Format("Saved the package '{0} to {1}'!", package.Filename, savepath));
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.FatalException("Save failure! " + ex, ex);
-                    }
-                }
-            }
-        }
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
@@ -449,26 +454,13 @@ namespace GPK_RePack
             }
             else if (selectedPackage != null && selectedExport != null)
             {
-                selectedPackage.ExportList.Remove(selectedExportIndex);
+                selectedPackage.ExportList.Remove(selectedPackage.GetObjectKeyByUID(selectedExport.UID));
 
                 logger.Info("Removed object {0}...", selectedExport.UID);
 
                 selectedExport = null;
-                selectedExportIndex = 0;
-                TreeNode to_remove = treeMain.SelectedNode;
-                TreeNode to_select = null;
 
-                if (treeMain.SelectedNode.NextNode != null)
-                {
-                    to_select = treeMain.SelectedNode.NextNode;
-                }
-
-                treeMain.Nodes.Remove(to_remove);
-
-                if (to_select != null)
-                {
-                    treeMain.SelectedNode = to_select;
-                }
+                treeMain.Nodes.Remove(treeMain.SelectedNode);
             }
 
         }
@@ -502,38 +494,29 @@ namespace GPK_RePack
             switch (Settings.Default.CopyMode)
             {
                 case "dataprops":
-                    ReplaceProperties(copyExport, selectedExport);
-                    ReplaceData(copyExport, selectedExport);
+                    DataTools.ReplaceProperties(copyExport, selectedExport);
+                    DataTools.ReplaceData(copyExport, selectedExport);
                     break;
                 case "data":
-                    ReplaceData(copyExport, selectedExport);
+                    DataTools.ReplaceData(copyExport, selectedExport);
                     break;
                 case "props":
-                    ReplaceProperties(copyExport, selectedExport);
+                    DataTools.ReplaceProperties(copyExport, selectedExport);
                     break;
 
             }
-            //selectedExport.netIndex = copyExport.netIndex;
 
+            if (copyExport.data != null)
+            {
+                copyExport.SerialSize = copyExport.data.Length + copyExport.property_size;
+            }
+            else
+            {
+                copyExport.SerialSize = copyExport.property_size;
+            }
 
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
             logger.Info("Pasted the data and properties of {0} to {1}", copyExport.UID, selectedExport.UID);
-        }
-
-        private void ReplaceProperties(GpkExport source, GpkExport destination)
-        {
-            source.Properties.Clear();
-            source.Properties.AddRange(destination.Properties.ToArray());
-            source.property_padding = destination.property_padding;
-            source.property_size = destination.property_size;
-            source.padding_unk = destination.padding_unk;
-        }
-
-        private void ReplaceData(GpkExport source, GpkExport destination)
-        {
-            source.SerialSize = destination.SerialSize;
-            source.data_padding = destination.data_padding;
-            source.data = destination.data;
         }
 
         private void btnExtractOGG_Click(object sender, EventArgs e)
@@ -541,25 +524,34 @@ namespace GPK_RePack
 
             if (selectedExport != null)
             {
-                if (selectedExport.data == null)
-                {
-                    logger.Info("Length is zero. Nothing to export");
-                    return;
-                }
-
                 SaveFileDialog save = new SaveFileDialog();
                 save.FileName = selectedExport.ObjectName;
+                save.InitialDirectory = Settings.Default.SaveDir;
                 save.DefaultExt = ".ogg";
                 save.ShowDialog();
 
                 SoundwaveTools.ExportOgg(selectedExport, save.FileName);
-
-                logger.Info(String.Format("Data was saved to {0}!", save.FileName));
-
-
             }
         }
 
+
+        private void btnDeleteData_Click(object sender, EventArgs e)
+        {
+            if (selectedExport == null)
+            {
+                return;
+            }
+
+            if (selectedExport.data == null)
+            {
+                return;
+            }
+
+            selectedExport.data = null;
+            selectedExport.data_padding = null;
+
+            treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+        }
         private void GUI_KeyDown(object sender, KeyEventArgs e)
         {
             //Avoid annyoing ding sound - problem that is supresses also keystrokes
@@ -578,6 +570,8 @@ namespace GPK_RePack
         }
 
         #endregion
+
+
 
 
 

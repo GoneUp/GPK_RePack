@@ -29,18 +29,19 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.btnDataProps = new System.Windows.Forms.RadioButton();
-            this.btnData = new System.Windows.Forms.RadioButton();
             this.btnProperties = new System.Windows.Forms.RadioButton();
+            this.btnData = new System.Windows.Forms.RadioButton();
+            this.btnDataProps = new System.Windows.Forms.RadioButton();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btnLogTrace = new System.Windows.Forms.RadioButton();
-            this.btnLogDebug = new System.Windows.Forms.RadioButton();
             this.btnLogInfo = new System.Windows.Forms.RadioButton();
+            this.btnLogDebug = new System.Windows.Forms.RadioButton();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.btnViewNormal = new System.Windows.Forms.RadioButton();
             this.btnViewClass = new System.Windows.Forms.RadioButton();
             this.boxDebug = new System.Windows.Forms.CheckBox();
+            this.boxImports = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -58,26 +59,27 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Copy Mode";
             // 
-            // groupBox2
+            // btnProperties
             // 
-            this.groupBox2.Controls.Add(this.btnLogTrace);
-            this.groupBox2.Controls.Add(this.btnLogInfo);
-            this.groupBox2.Controls.Add(this.btnLogDebug);
-            this.groupBox2.Location = new System.Drawing.Point(171, 12);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(132, 98);
-            this.groupBox2.TabIndex = 1;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Log Level";
+            this.btnProperties.Location = new System.Drawing.Point(6, 65);
+            this.btnProperties.Name = "btnProperties";
+            this.btnProperties.Size = new System.Drawing.Size(107, 17);
+            this.btnProperties.TabIndex = 2;
+            this.btnProperties.TabStop = true;
+            this.btnProperties.Text = "Properties";
+            this.btnProperties.UseVisualStyleBackColor = true;
+            this.btnProperties.CheckedChanged += new System.EventHandler(this.btnProperties_CheckedChanged);
             // 
-            // label1
+            // btnData
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 113);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(182, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "The settings are saved automatically.";
+            this.btnData.Location = new System.Drawing.Point(6, 42);
+            this.btnData.Name = "btnData";
+            this.btnData.Size = new System.Drawing.Size(107, 17);
+            this.btnData.TabIndex = 1;
+            this.btnData.TabStop = true;
+            this.btnData.Text = "Data";
+            this.btnData.UseVisualStyleBackColor = true;
+            this.btnData.CheckedChanged += new System.EventHandler(this.btnData_CheckedChanged);
             // 
             // btnDataProps
             // 
@@ -91,27 +93,17 @@
             this.btnDataProps.UseVisualStyleBackColor = true;
             this.btnDataProps.CheckedChanged += new System.EventHandler(this.btnDataProps_CheckedChanged);
             // 
-            // btnData
+            // groupBox2
             // 
-            this.btnData.Location = new System.Drawing.Point(6, 42);
-            this.btnData.Name = "btnData";
-            this.btnData.Size = new System.Drawing.Size(107, 17);
-            this.btnData.TabIndex = 1;
-            this.btnData.TabStop = true;
-            this.btnData.Text = "Data";
-            this.btnData.UseVisualStyleBackColor = true;
-            this.btnData.CheckedChanged += new System.EventHandler(this.btnData_CheckedChanged);
-            // 
-            // btnProperties
-            // 
-            this.btnProperties.Location = new System.Drawing.Point(6, 65);
-            this.btnProperties.Name = "btnProperties";
-            this.btnProperties.Size = new System.Drawing.Size(107, 17);
-            this.btnProperties.TabIndex = 2;
-            this.btnProperties.TabStop = true;
-            this.btnProperties.Text = "Properties";
-            this.btnProperties.UseVisualStyleBackColor = true;
-            this.btnProperties.CheckedChanged += new System.EventHandler(this.btnProperties_CheckedChanged);
+            this.groupBox2.Controls.Add(this.btnLogTrace);
+            this.groupBox2.Controls.Add(this.btnLogInfo);
+            this.groupBox2.Controls.Add(this.btnLogDebug);
+            this.groupBox2.Location = new System.Drawing.Point(171, 12);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(132, 98);
+            this.groupBox2.TabIndex = 1;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Log Level";
             // 
             // btnLogTrace
             // 
@@ -124,17 +116,6 @@
             this.btnLogTrace.UseVisualStyleBackColor = true;
             this.btnLogTrace.CheckedChanged += new System.EventHandler(this.btnLogTrace_CheckedChanged);
             // 
-            // btnLogDebug
-            // 
-            this.btnLogDebug.Location = new System.Drawing.Point(6, 42);
-            this.btnLogDebug.Name = "btnLogDebug";
-            this.btnLogDebug.Size = new System.Drawing.Size(107, 17);
-            this.btnLogDebug.TabIndex = 4;
-            this.btnLogDebug.TabStop = true;
-            this.btnLogDebug.Text = "Debug";
-            this.btnLogDebug.UseVisualStyleBackColor = true;
-            this.btnLogDebug.CheckedChanged += new System.EventHandler(this.btnLogDebug_CheckedChanged);
-            // 
             // btnLogInfo
             // 
             this.btnLogInfo.AutoSize = true;
@@ -146,6 +127,26 @@
             this.btnLogInfo.Text = "Info";
             this.btnLogInfo.UseVisualStyleBackColor = true;
             this.btnLogInfo.CheckedChanged += new System.EventHandler(this.btnLogInfo_CheckedChanged);
+            // 
+            // btnLogDebug
+            // 
+            this.btnLogDebug.Location = new System.Drawing.Point(6, 42);
+            this.btnLogDebug.Name = "btnLogDebug";
+            this.btnLogDebug.Size = new System.Drawing.Size(107, 17);
+            this.btnLogDebug.TabIndex = 4;
+            this.btnLogDebug.TabStop = true;
+            this.btnLogDebug.Text = "Debug";
+            this.btnLogDebug.UseVisualStyleBackColor = true;
+            this.btnLogDebug.CheckedChanged += new System.EventHandler(this.btnLogDebug_CheckedChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 113);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(182, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "The settings are saved automatically.";
             // 
             // groupBox3
             // 
@@ -192,11 +193,23 @@
             this.boxDebug.UseVisualStyleBackColor = true;
             this.boxDebug.CheckedChanged += new System.EventHandler(this.boxDebug_CheckedChanged);
             // 
+            // boxImports
+            // 
+            this.boxImports.AutoSize = true;
+            this.boxImports.Location = new System.Drawing.Point(288, 112);
+            this.boxImports.Name = "boxImports";
+            this.boxImports.Size = new System.Drawing.Size(90, 17);
+            this.boxImports.TabIndex = 8;
+            this.boxImports.Text = "Show Imports";
+            this.boxImports.UseVisualStyleBackColor = true;
+            this.boxImports.CheckedChanged += new System.EventHandler(this.boxImports_CheckedChanged);
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(468, 134);
+            this.Controls.Add(this.boxImports);
             this.Controls.Add(this.boxDebug);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.label1);
@@ -233,5 +246,6 @@
         private System.Windows.Forms.RadioButton btnViewNormal;
         private System.Windows.Forms.RadioButton btnViewClass;
         private System.Windows.Forms.CheckBox boxDebug;
+        private System.Windows.Forms.CheckBox boxImports;
     }
 }

@@ -13,8 +13,10 @@ namespace GPK_RePack.Forms
 {
     public partial class Options : Form
     {
-        public Options()
+        private GUI gui = null;
+        public Options(GUI tmpGui)
         {
+            gui = tmpGui;
             InitializeComponent();
         }
 
@@ -57,12 +59,13 @@ namespace GPK_RePack.Forms
             }
 
             boxDebug.Checked = Settings.Default.Debug;
-
+            boxImports.Checked = Settings.Default.ShowImports;
         }
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
         {
             Settings.Default.Save();
+            gui.DrawPackages();
         }
 
 
@@ -111,5 +114,11 @@ namespace GPK_RePack.Forms
         {
             Settings.Default.Debug = boxDebug.Checked;
         }
+
+        private void boxImports_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.ShowImports = boxImports.Checked;
+        }
+
     }
 }

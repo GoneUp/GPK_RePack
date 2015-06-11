@@ -20,9 +20,16 @@ namespace GPK_RePack.Editors
 
         public static void ExportOgg(GpkExport export, string oggfile)
         {
-            if (export.data == null && export.data.Length < 32)
+            if (export.data == null)
+            {
+                logger.Info("No data. The file cannot be exported to ogg.");
+                return;
+            }
+
+            if (export.data.Length < 32)
             {
                 logger.Info("Data size too small. The file cannot be exported to ogg.");
+                return;
             }
 
             byte[] tmpArray = new byte[export.data.Length - 32];
@@ -32,6 +39,8 @@ namespace GPK_RePack.Editors
             writer.BaseStream.Write(tmpArray, 0, tmpArray.Length);
             writer.Close();
             writer.Dispose();
+
+            logger.Info(String.Format("Data was saved to {0}!", Path.GetFileName(oggfile)));
         }
     }
 }

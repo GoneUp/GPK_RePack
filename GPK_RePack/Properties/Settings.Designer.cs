@@ -70,5 +70,41 @@ namespace GPK_RePack.Properties {
                 this["ViewMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SaveDir {
+            get {
+                return ((string)(this["SaveDir"]));
+            }
+            set {
+                this["SaveDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string OpenDir {
+            get {
+                return ((string)(this["OpenDir"]));
+            }
+            set {
+                this["OpenDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowImports {
+            get {
+                return ((bool)(this["ShowImports"]));
+            }
+            set {
+                this["ShowImports"] = value;
+            }
+        }
     }
 }

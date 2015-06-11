@@ -194,12 +194,12 @@ namespace GPK_RePack.Parser
 
                 import.ClassPackage = package.NameList[package_class_index].name;
                 import.Class = package.NameList[class_index].name;
-                import.Object = package.NameList[object_index].name;
+                import.ObjectName = package.NameList[object_index].name;
 
                 import.UID = GenerateUID(import);
                 package.ImportList.Add(i, import);
 
-                logger.Debug("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.Class, import.Object);
+                logger.Debug("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.Class, import.ObjectName);
                 progress++;
             }
         }
@@ -555,7 +555,7 @@ namespace GPK_RePack.Parser
 
         private string GenerateUID(GpkImport import)
         {
-            string proposedName = import.ClassPackage + "." + import.Object;
+            string proposedName = import.ClassPackage + "." + import.ObjectName;
 
             int counter = 0;
             do
