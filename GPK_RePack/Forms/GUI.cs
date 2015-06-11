@@ -125,6 +125,7 @@ namespace GPK_RePack.Forms
             open.Multiselect = true;
             open.ValidateNames = true;
             open.InitialDirectory = Settings.Default.OpenDir;
+            Settings.Default.OpenDir = open.FileName;
 
             open.ShowDialog();
 
@@ -346,6 +347,7 @@ namespace GPK_RePack.Forms
                 save.DefaultExt = ".raw";
                 save.InitialDirectory = Settings.Default.SaveDir;
                 save.ShowDialog();
+                Settings.Default.SaveDir = save.FileName;
 
                 StreamWriter writer = new StreamWriter(save.OpenFile());
                 writer.BaseStream.Write(selectedExport.data, 0, selectedExport.data.Length);
@@ -375,6 +377,7 @@ namespace GPK_RePack.Forms
             open.ShowDialog();
 
             string path = open.FileName;
+            Settings.Default.OpenDir = path;
 
             if (File.Exists(path))
             {
@@ -552,7 +555,7 @@ namespace GPK_RePack.Forms
                     open.InitialDirectory = Settings.Default.OpenDir;
 
                     open.ShowDialog();
-
+                    Settings.Default.OpenDir = open.FileName;
                     if (File.Exists(open.FileName))
                     {
                         SoundwaveTools.ImportOgg(selectedExport, open.FileName);
@@ -580,6 +583,7 @@ namespace GPK_RePack.Forms
                 save.InitialDirectory = Settings.Default.SaveDir;
                 save.DefaultExt = ".ogg";
                 save.ShowDialog();
+                Settings.Default.SaveDir = save.FileName;
 
                 SoundwaveTools.ExportOgg(selectedExport, save.FileName);
             }
