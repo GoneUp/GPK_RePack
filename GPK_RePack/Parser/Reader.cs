@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using GPK_RePack.Class;
-using GPK_RePack.Class.Prop;
+using GPK_RePack.Classes;
+using GPK_RePack.Classes.Payload;
+using GPK_RePack.Classes.Prop;
 using NLog;
 using NLog.Fluent;
 using NLog.LayoutRenderers;
@@ -314,6 +316,16 @@ namespace GPK_RePack.Parser
                     export.data_start = reader.BaseStream.Position;
                     export.data = new byte[toread];
                     export.data = reader.ReadBytes(toread);
+
+                    switch (export.ClassName)
+                    {
+                        case "Core.SoundNodeWave":
+                            export.payload = new Soundwave();
+                            export.payload.ReadData(package, export);
+                            break;
+                    }
+
+
                     logger.Debug(String.Format("Export {0}: Read Data ({1} bytes) and {2} Properties ({3} bytes)", export.ObjectName, export.data.Length, export.Properties.Count, export.property_size));
                 }
                 else

@@ -4,8 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GPK_RePack.Class;
+using GPK_RePack.Classes;
+using GPK_RePack.Classes.Payload;
+using GPK_RePack.Classes.Prop;
 using NLog;
+using NVorbis;
 
 namespace GPK_RePack.Editors
 {
@@ -13,30 +16,96 @@ namespace GPK_RePack.Editors
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static GpkExport ImportOgg(GpkExport export, string oggfile)
+        public static void ImportOgg(GpkExport export, string oggfile)
         {
-            return null;
+            Soundwave wave = new Soundwave();
+            wave.oggfile = oggfile;
+
+            if (oggfile != "fake")
+            {
+                wave.oggdata = File.ReadAllBytes(oggfile);
+            }
+            else
+            {
+                wave.oggdata = new byte[1];
+            }
+
+            export.payload = wave;
+
+            //Refill data buffer with normal soundwave
+            export.data = new byte[wave.GetSize()];
+            BinaryWriter writer = new BinaryWriter(new MemoryStream(export.data));
+            wave.WriteData(writer, new GpkPackage(), export);
+            writer.Close();
+            writer.Dispose();
+
+
+            export.RecalculateSize();
+
+
+            //manipulate the sound duration
+            VorbisReader vorbis = null;
+            if (oggfile != "fake")
+                vorbis = new VorbisReader(new MemoryStream(wave.oggdata), true);
+
+            for (int i = 0; i < export.Properties.Count; i++)
+            {
+                object prop = export.Properties[i];
+                if (prop is GpkFloatProperty)
+                {
+                    GpkFloatProperty floatProperty = (GpkFloatProperty) prop;
+                    if (floatProperty.Name == "Duration")
+                    {
+                        if (oggfile != "fake")
+                        {
+                            floatProperty.value = (float) vorbis.TotalTime.TotalSeconds;
+                        }
+                        else
+                        {
+                            floatProperty.value = 0.1f;
+                        }
+                        break;
+                    }
+                }
+
+
+
+                if (oggfile != "fake")
+                {
+                    logger.Info(String.Format("Soundfile was imported to {0}!", export.UID));
+                }
+                else
+                {
+                    logger.Info(String.Format("Fake soundfile was imported to {0}!", export.UID));
+                }
+            }
         }
 
         public static void ExportOgg(GpkExport export, string oggfile)
         {
-            if (export.data == null)
+            if (export.payload == null)
             {
                 logger.Info("No data. The file cannot be exported to ogg.");
                 return;
             }
 
-            if (export.data.Length < 32)
+            if (!(export.payload is Soundwave))
             {
-                logger.Info("Data size too small. The file cannot be exported to ogg.");
+                logger.Info("Wrong payload data. The file cannot be exported to ogg.");
                 return;
             }
 
-            byte[] tmpArray = new byte[export.data.Length - 32];
-            Array.Copy(export.data, 32, tmpArray, 0, tmpArray.Length);
+            Soundwave wave = (Soundwave)export.payload;
+
+            if (wave.oggdata == null)
+            {
+                logger.Info("Empty Oggdata. The file cannot be exported to ogg.");
+                return;
+            }
+
 
             StreamWriter writer = new StreamWriter(File.OpenWrite(oggfile));
-            writer.BaseStream.Write(tmpArray, 0, tmpArray.Length);
+            writer.BaseStream.Write(wave.oggdata, 0, wave.oggdata.Length);
             writer.Close();
             writer.Dispose();
 

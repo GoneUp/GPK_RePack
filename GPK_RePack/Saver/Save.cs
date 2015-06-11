@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GPK_RePack.Class;
-using GPK_RePack.Class.Prop;
+using GPK_RePack.Classes;
+using GPK_RePack.Classes.Prop;
 using NLog;
 using NLog.Fluent;
 using NLog.LayoutRenderers;
@@ -302,7 +302,12 @@ namespace GPK_RePack.Saver
                 }
 
                 //finally our data ^^
-                if (export.data != null)
+                if (export.payload != null)
+                {
+                    //pos is important. we cant be sure that the data is acurate.
+                    export.payload.WriteData(writer, package, export);
+                }
+                else if (export.data != null)
                 {
                     writer.Write(export.data);
                 }
@@ -330,7 +335,7 @@ namespace GPK_RePack.Saver
         private void WriteFilePadding(BinaryWriter writer, GpkPackage package)
         {
             long final_size = writer.BaseStream.Position;
-            logger.Debug(String.Format("final size {0}, max {1}", final_size, package.OrginalSize));
+            logger.Debug(String.Format("New size {0}, Old size {1}.", final_size, package.OrginalSize));
 
             if (final_size < package.OrginalSize)
             {
@@ -347,6 +352,7 @@ namespace GPK_RePack.Saver
             {
                 //Too big
                 logger.Info(String.Format("The new package size is bigger than the orginal one! Tera may not acccept this file."));
+                logger.Info(String.Format("New size {0}, Old size {1}.", final_size, package.OrginalSize));
             }
 
         }

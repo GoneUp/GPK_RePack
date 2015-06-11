@@ -1,31 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-using System.Xml.Serialization;
-using GPK_RePack.Class;
-using GPK_RePack.Class.Prop;
+using GPK_RePack.Classes;
 using GPK_RePack.Editors;
-using GPK_RePack.Forms;
 using GPK_RePack.Parser;
 using GPK_RePack.Properties;
 using GPK_RePack.Saver;
 using NLog;
 using NLog.Config;
-using NLog.Fluent;
 
-namespace GPK_RePack
+namespace GPK_RePack.Forms
 {
     public partial class GUI : Form
     {
@@ -420,8 +408,8 @@ namespace GPK_RePack
                     logger.Trace(String.Format("rebuild mode old size {0} new size {1}", selectedExport.data.Length,
                         buffer.Length));
 
-                    selectedExport.SerialSize = selectedExport.property_size + buffer.Length;
                     selectedExport.data = buffer;
+                    selectedExport.RecalculateSize();
                     selectedPackage.Changes = true;
                 }
 
@@ -506,34 +494,10 @@ namespace GPK_RePack
 
             }
 
-            if (copyExport.data != null)
-            {
-                copyExport.SerialSize = copyExport.data.Length + copyExport.property_size;
-            }
-            else
-            {
-                copyExport.SerialSize = copyExport.property_size;
-            }
-
+            copyExport.RecalculateSize();
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
             logger.Info("Pasted the data and properties of {0} to {1}", copyExport.UID, selectedExport.UID);
         }
-
-        private void btnExtractOGG_Click(object sender, EventArgs e)
-        {
-
-            if (selectedExport != null)
-            {
-                SaveFileDialog save = new SaveFileDialog();
-                save.FileName = selectedExport.ObjectName;
-                save.InitialDirectory = Settings.Default.SaveDir;
-                save.DefaultExt = ".ogg";
-                save.ShowDialog();
-
-                SoundwaveTools.ExportOgg(selectedExport, save.FileName);
-            }
-        }
-
 
         private void btnDeleteData_Click(object sender, EventArgs e)
         {
@@ -549,6 +513,8 @@ namespace GPK_RePack
 
             selectedExport.data = null;
             selectedExport.data_padding = null;
+            selectedExport.payload = null;
+            selectedExport.RecalculateSize();
 
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
         }
@@ -572,7 +538,64 @@ namespace GPK_RePack
         #endregion
 
 
+        #region ogg
 
+        private void btnImportOgg_Click(object sender, EventArgs e)
+        {
+            if (selectedExport != null)
+            {
+                try
+                {
+                    OpenFileDialog open = new OpenFileDialog();
+                    open.Multiselect = false;
+                    open.ValidateNames = true;
+                    open.InitialDirectory = Settings.Default.OpenDir;
+
+                    open.ShowDialog();
+
+                    if (File.Exists(open.FileName))
+                    {
+                        SoundwaveTools.ImportOgg(selectedExport, open.FileName);
+                        treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+                    }
+                    else
+                    {
+                        logger.Info("File not found.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.FatalException("Import failure! " + ex, ex);
+                }
+            }
+        }
+
+        private void btnExtractOGG_Click(object sender, EventArgs e)
+        {
+
+            if (selectedExport != null)
+            {
+                SaveFileDialog save = new SaveFileDialog();
+                save.FileName = selectedExport.ObjectName;
+                save.InitialDirectory = Settings.Default.SaveDir;
+                save.DefaultExt = ".ogg";
+                save.ShowDialog();
+
+                SoundwaveTools.ExportOgg(selectedExport, save.FileName);
+            }
+        }
+
+        private void btnFakeOGG_Click(object sender, EventArgs e)
+        {
+            if (selectedExport != null)
+            {
+                SoundwaveTools.ImportOgg(selectedExport, "fake");
+                treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+            }
+        }
+
+
+        #endregion
 
 
 

@@ -39,8 +39,8 @@
       <HintPath>..\packages\NLog.4.0.0\lib\net40\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NLog.Windows.Forms, Version=1.0.13.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.Windows.Forms.1.0.13.0\lib\net35\NLog.Windows.Forms.dll</HintPath>
+    <Reference Include="NVorbis, Version=0.8.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NVorbis.0.8.4.0\lib\NVorbis.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -55,24 +55,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class\GpkDependList.cs" />
-    <Compile Include="Class\GpkExport.cs" />
-    <Compile Include="Class\GpkGeneration.cs" />
-    <Compile Include="Class\GpkHeader.cs" />
-    <Compile Include="Class\GpkImport.cs" />
-    <Compile Include="Class\GpkPackage.cs" />
-    <Compile Include="Class\Prop\GpkBaseProperty.cs" />
-    <Compile Include="Class\GpkString.cs" />
-    <Compile Include="Class\Prop\GpkBoolProperty.cs" />
-    <Compile Include="Class\Prop\GpkIntProperty.cs" />
-    <Compile Include="Class\Prop\GpkNameProperty.cs" />
-    <Compile Include="Class\Prop\GpkStringProperty.cs" />
-    <Compile Include="Class\Prop\GpkArrayProperty.cs" />
-    <Compile Include="Class\Prop\GpkObjectProperty.cs" />
-    <Compile Include="Class\Prop\GpkFloatProperty.cs" />
-    <Compile Include="Class\Prop\GpkGUIDProperty.cs" />
-    <Compile Include="Class\Prop\GpkStructProperty.cs" />
-    <Compile Include="Class\Prop\GpkByteProperty.cs" />
+    <Compile Include="Classes\GpkDependList.cs" />
+    <Compile Include="Classes\GpkExport.cs" />
+    <Compile Include="Classes\GpkGeneration.cs" />
+    <Compile Include="Classes\GpkHeader.cs" />
+    <Compile Include="Classes\GpkImport.cs" />
+    <Compile Include="Classes\GpkPackage.cs" />
+    <Compile Include="Classes\Interfaces\IPayload.cs" />
+    <Compile Include="Classes\Payload\Soundwave.cs" />
+    <Compile Include="Classes\Prop\GpkBaseProperty.cs" />
+    <Compile Include="Classes\GpkString.cs" />
+    <Compile Include="Classes\Prop\GpkBoolProperty.cs" />
+    <Compile Include="Classes\Prop\GpkIntProperty.cs" />
+    <Compile Include="Classes\Prop\GpkNameProperty.cs" />
+    <Compile Include="Classes\Prop\GpkStringProperty.cs" />
+    <Compile Include="Classes\Prop\GpkArrayProperty.cs" />
+    <Compile Include="Classes\Prop\GpkObjectProperty.cs" />
+    <Compile Include="Classes\Prop\GpkFloatProperty.cs" />
+    <Compile Include="Classes\Prop\GpkGUIDProperty.cs" />
+    <Compile Include="Classes\Prop\GpkStructProperty.cs" />
+    <Compile Include="Classes\Prop\GpkByteProperty.cs" />
     <Compile Include="Editors\DataTools.cs" />
     <Compile Include="Editors\SoundwaveTools.cs" />
     <Compile Include="Editors\TextureTools.cs" />

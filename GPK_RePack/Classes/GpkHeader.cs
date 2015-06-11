@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace GPK_RePack.Class
+namespace GPK_RePack.Classes
 {
     class GpkHeader
     {

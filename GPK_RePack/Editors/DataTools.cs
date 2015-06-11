@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GPK_RePack.Class;
+using GPK_RePack.Classes;
 
 namespace GPK_RePack.Editors
 {
@@ -23,6 +23,7 @@ namespace GPK_RePack.Editors
         {
             source.data_padding = destination.data_padding;
             source.data = destination.data;
+            source.payload = destination.payload;
         }
 
     }

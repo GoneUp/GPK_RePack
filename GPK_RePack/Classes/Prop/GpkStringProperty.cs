@@ -1,18 +1,21 @@
 ﻿using System;
 
-namespace GPK_RePack.Class.Prop
+namespace GPK_RePack.Classes.Prop
 {
     [Serializable]
-    class GpkFloatProperty : GpkBaseProperty
+    class GpkStringProperty : GpkBaseProperty 
     {
         public long unk;
-        public float value;
+        public int length;
+        public string value;
 
-        public GpkFloatProperty()
+        public bool IsUnicode = false;
+
+        public GpkStringProperty()
         {
-
+            
         }
-        public GpkFloatProperty(GpkBaseProperty bp)
+        public GpkStringProperty(GpkBaseProperty bp)
         {
             Name = bp.Name;
             type = bp.type;

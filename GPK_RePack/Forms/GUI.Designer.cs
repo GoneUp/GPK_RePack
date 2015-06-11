@@ -1,4 +1,4 @@
-﻿namespace GPK_RePack
+﻿namespace GPK_RePack.Forms
 {
     partial class GUI
     {
@@ -51,7 +51,7 @@
             this.btnDelete = new System.Windows.Forms.Button();
             this.boxDataButtons = new System.Windows.Forms.GroupBox();
             this.btnDeleteData = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnImportOgg = new System.Windows.Forms.Button();
             this.btnExtractOGG = new System.Windows.Forms.Button();
             this.btnRebuildMode = new System.Windows.Forms.RadioButton();
             this.btnPatchMode = new System.Windows.Forms.RadioButton();
@@ -60,6 +60,7 @@
             this.boxInfo = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.boxLog = new System.Windows.Forms.TextBox();
+            this.btnFakeOGG = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -260,8 +261,9 @@
             // 
             // boxDataButtons
             // 
+            this.boxDataButtons.Controls.Add(this.btnFakeOGG);
             this.boxDataButtons.Controls.Add(this.btnDeleteData);
-            this.boxDataButtons.Controls.Add(this.button1);
+            this.boxDataButtons.Controls.Add(this.btnImportOgg);
             this.boxDataButtons.Controls.Add(this.btnExtractOGG);
             this.boxDataButtons.Controls.Add(this.btnRebuildMode);
             this.boxDataButtons.Controls.Add(this.btnPatchMode);
@@ -280,21 +282,21 @@
             // 
             this.btnDeleteData.Location = new System.Drawing.Point(233, 28);
             this.btnDeleteData.Name = "btnDeleteData";
-            this.btnDeleteData.Size = new System.Drawing.Size(80, 24);
+            this.btnDeleteData.Size = new System.Drawing.Size(104, 24);
             this.btnDeleteData.TabIndex = 7;
             this.btnDeleteData.Text = "Delete Data";
             this.btnDeleteData.UseVisualStyleBackColor = true;
             this.btnDeleteData.Click += new System.EventHandler(this.btnDeleteData_Click);
             // 
-            // button1
+            // btnImportOgg
             // 
-            this.button1.Enabled = false;
-            this.button1.Location = new System.Drawing.Point(114, 58);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(113, 24);
-            this.button1.TabIndex = 6;
-            this.button1.Text = "Import OGG";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnImportOgg.Location = new System.Drawing.Point(114, 58);
+            this.btnImportOgg.Name = "btnImportOgg";
+            this.btnImportOgg.Size = new System.Drawing.Size(113, 24);
+            this.btnImportOgg.TabIndex = 6;
+            this.btnImportOgg.Text = "Import OGG";
+            this.btnImportOgg.UseVisualStyleBackColor = true;
+            this.btnImportOgg.Click += new System.EventHandler(this.btnImportOgg_Click);
             // 
             // btnExtractOGG
             // 
@@ -310,7 +312,7 @@
             // 
             this.btnRebuildMode.AutoSize = true;
             this.btnRebuildMode.Checked = true;
-            this.btnRebuildMode.Location = new System.Drawing.Point(330, 58);
+            this.btnRebuildMode.Location = new System.Drawing.Point(343, 62);
             this.btnRebuildMode.Name = "btnRebuildMode";
             this.btnRebuildMode.Size = new System.Drawing.Size(61, 17);
             this.btnRebuildMode.TabIndex = 4;
@@ -321,7 +323,7 @@
             // btnPatchMode
             // 
             this.btnPatchMode.AutoSize = true;
-            this.btnPatchMode.Location = new System.Drawing.Point(330, 32);
+            this.btnPatchMode.Location = new System.Drawing.Point(339, 32);
             this.btnPatchMode.Name = "btnPatchMode";
             this.btnPatchMode.Size = new System.Drawing.Size(80, 17);
             this.btnPatchMode.TabIndex = 3;
@@ -383,6 +385,16 @@
             this.boxLog.TabIndex = 5;
             this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
             // 
+            // btnFakeOGG
+            // 
+            this.btnFakeOGG.Location = new System.Drawing.Point(233, 58);
+            this.btnFakeOGG.Name = "btnFakeOGG";
+            this.btnFakeOGG.Size = new System.Drawing.Size(104, 24);
+            this.btnFakeOGG.TabIndex = 8;
+            this.btnFakeOGG.Text = "Insert Empy OGG";
+            this.btnFakeOGG.UseVisualStyleBackColor = true;
+            this.btnFakeOGG.Click += new System.EventHandler(this.btnFakeOGG_Click);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -441,11 +453,12 @@
         private System.Windows.Forms.Button btnCopy;
         private System.Windows.Forms.Button btnExtractOGG;
         private System.Windows.Forms.Button btnDeleteData;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnImportOgg;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem refreshViewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.Button btnFakeOGG;
     }
 }
 

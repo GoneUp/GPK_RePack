@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using GPK_RePack.Class.Prop;
+using GPK_RePack.Classes.Interfaces;
 
-namespace GPK_RePack.Class
+namespace GPK_RePack.Classes
 {
     [Serializable]
     class GpkExport 
@@ -42,7 +40,7 @@ namespace GPK_RePack.Class
         public byte[] data_padding;
         public byte[] data;
 
-
+        public IPayload payload;
 
         public GpkExport()
         {
@@ -79,6 +77,7 @@ namespace GPK_RePack.Class
             data_start = export.data_start;
             data_padding = export.data_padding;
             data = export.data;
+            payload = export.payload;
         }
 
         public override string ToString()
@@ -108,6 +107,22 @@ namespace GPK_RePack.Class
 
             return info.ToString();
         }
+
+        public int RecalculateSize()
+        {
+            int size = 0;
+            size += property_size;
+
+            if (data != null)
+            {
+                size += property_size;
+            } 
+
+            SerialSize = size;
+
+            return size;
+        }
+
 
       
     }

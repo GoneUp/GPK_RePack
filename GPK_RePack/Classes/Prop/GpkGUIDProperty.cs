@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GPK_RePack.Class.Prop
+namespace GPK_RePack.Classes.Prop
 {
     [Serializable]
     class GpkGUIDProperty : GpkBaseProperty
