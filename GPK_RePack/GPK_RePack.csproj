@@ -39,6 +39,10 @@
       <HintPath>..\packages\NLog.4.0.0\lib\net40\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog.Windows.Forms, Version=1.0.13.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.Windows.Forms.1.0.13.0\lib\net35\NLog.Windows.Forms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NVorbis, Version=0.8.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NVorbis.0.8.4.0\lib\NVorbis.dll</HintPath>
       <Private>True</Private>
@@ -125,7 +129,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

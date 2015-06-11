@@ -70,6 +70,7 @@ namespace GPK_RePack.Forms
             LogManager.Configuration = config;
 
             //Our stuff
+            logger.Info("Startup");
             reader = new Reader();
             saver = new Save();
             loadedGpkPackages = new List<GpkPackage>();

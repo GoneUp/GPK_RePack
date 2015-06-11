@@ -50,6 +50,7 @@
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.boxDataButtons = new System.Windows.Forms.GroupBox();
+            this.btnFakeOGG = new System.Windows.Forms.Button();
             this.btnDeleteData = new System.Windows.Forms.Button();
             this.btnImportOgg = new System.Windows.Forms.Button();
             this.btnExtractOGG = new System.Windows.Forms.Button();
@@ -60,7 +61,6 @@
             this.boxInfo = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.boxLog = new System.Windows.Forms.TextBox();
-            this.btnFakeOGG = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -75,7 +75,7 @@
             this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeMain.Location = new System.Drawing.Point(0, 0);
             this.treeMain.Name = "treeMain";
-            this.treeMain.Size = new System.Drawing.Size(280, 507);
+            this.treeMain.Size = new System.Drawing.Size(273, 507);
             this.treeMain.TabIndex = 1;
             this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
             this.treeMain.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GUI_KeyDown);
@@ -175,10 +175,10 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tabControl1.Location = new System.Drawing.Point(280, 0);
+            this.tabControl1.Location = new System.Drawing.Point(273, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(617, 507);
+            this.tabControl1.Size = new System.Drawing.Size(624, 507);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -188,7 +188,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(609, 481);
+            this.tabPage1.Size = new System.Drawing.Size(616, 481);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Info";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -200,7 +200,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(3, 378);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(603, 100);
+            this.panel2.Size = new System.Drawing.Size(610, 100);
             this.panel2.TabIndex = 6;
             // 
             // boxGeneralButtons
@@ -273,10 +273,20 @@
             this.boxDataButtons.Enabled = false;
             this.boxDataButtons.Location = new System.Drawing.Point(188, 0);
             this.boxDataButtons.Name = "boxDataButtons";
-            this.boxDataButtons.Size = new System.Drawing.Size(415, 100);
+            this.boxDataButtons.Size = new System.Drawing.Size(422, 100);
             this.boxDataButtons.TabIndex = 4;
             this.boxDataButtons.TabStop = false;
             this.boxDataButtons.Text = "Data Commands";
+            // 
+            // btnFakeOGG
+            // 
+            this.btnFakeOGG.Location = new System.Drawing.Point(233, 58);
+            this.btnFakeOGG.Name = "btnFakeOGG";
+            this.btnFakeOGG.Size = new System.Drawing.Size(104, 24);
+            this.btnFakeOGG.TabIndex = 8;
+            this.btnFakeOGG.Text = "Insert Empy OGG";
+            this.btnFakeOGG.UseVisualStyleBackColor = true;
+            this.btnFakeOGG.Click += new System.EventHandler(this.btnFakeOGG_Click);
             // 
             // btnDeleteData
             // 
@@ -323,7 +333,7 @@
             // btnPatchMode
             // 
             this.btnPatchMode.AutoSize = true;
-            this.btnPatchMode.Location = new System.Drawing.Point(339, 32);
+            this.btnPatchMode.Location = new System.Drawing.Point(343, 32);
             this.btnPatchMode.Name = "btnPatchMode";
             this.btnPatchMode.Size = new System.Drawing.Size(80, 17);
             this.btnPatchMode.TabIndex = 3;
@@ -357,7 +367,7 @@
             this.boxInfo.Multiline = true;
             this.boxInfo.Name = "boxInfo";
             this.boxInfo.ReadOnly = true;
-            this.boxInfo.Size = new System.Drawing.Size(603, 475);
+            this.boxInfo.Size = new System.Drawing.Size(610, 475);
             this.boxInfo.TabIndex = 5;
             this.boxInfo.Text = "Source Code: https://github.com/GoneUp/GPK_RePack/  \r\n\r\n##\r\n\r\nWarning: Only teste" +
     "d for the PCVoice GPK Files. It maybe works for others as well, it is just untes" +
@@ -384,16 +394,6 @@
             this.boxLog.Size = new System.Drawing.Size(897, 145);
             this.boxLog.TabIndex = 5;
             this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
-            // 
-            // btnFakeOGG
-            // 
-            this.btnFakeOGG.Location = new System.Drawing.Point(233, 58);
-            this.btnFakeOGG.Name = "btnFakeOGG";
-            this.btnFakeOGG.Size = new System.Drawing.Size(104, 24);
-            this.btnFakeOGG.TabIndex = 8;
-            this.btnFakeOGG.Text = "Insert Empy OGG";
-            this.btnFakeOGG.UseVisualStyleBackColor = true;
-            this.btnFakeOGG.Click += new System.EventHandler(this.btnFakeOGG_Click);
             // 
             // GUI
             // 
