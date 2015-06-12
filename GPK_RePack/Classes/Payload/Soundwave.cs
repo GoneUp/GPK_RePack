@@ -4,6 +4,7 @@ using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes.Payload
 {
+    [Serializable]
     class Soundwave : IPayload
     {
         public string oggfile;

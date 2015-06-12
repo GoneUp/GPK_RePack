@@ -12,6 +12,8 @@ using GPK_RePack.Properties;
 using GPK_RePack.Saver;
 using NLog;
 using NLog.Config;
+using NLog.Fluent;
+using NLog.Internal;
 
 namespace GPK_RePack.Forms
 {
@@ -45,7 +47,7 @@ namespace GPK_RePack.Forms
 
         #region def
 
-        private Logger logger = LogManager.GetCurrentClassLogger();
+        private Logger logger;
         private Reader reader;
         private Save saver;
         private DataFormats.Format exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
@@ -63,11 +65,21 @@ namespace GPK_RePack.Forms
         private void GUI_Load(object sender, EventArgs e)
         {
             //nlog init
+            String config_path = (AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+            if (!File.Exists(config_path))
+            {
+                File.WriteAllText(config_path, Resources.Config);
+                MessageBox.Show("Setting file was missing. Please restart the application.");
+                Environment.Exit(0);
+            }
+
+            
             xml = xml.Replace("%loglevel%", Settings.Default.LogLevel);
             StringReader sr = new StringReader(xml);
             XmlReader xr = XmlReader.Create(sr);
             XmlLoggingConfiguration config = new XmlLoggingConfiguration(xr, null);
             LogManager.Configuration = config;
+            logger = LogManager.GetCurrentClassLogger();
 
             //Our stuff
             logger.Info("Startup");
@@ -171,6 +183,7 @@ namespace GPK_RePack.Forms
 
         private void replaceSaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            bool save = false;
             if (changedExports != null)
             {
                 for (int i = 0; i < changedExports.Length; i++)
@@ -185,6 +198,7 @@ namespace GPK_RePack.Forms
                             saver.SaveReplacedExport(package, savepath, list);
                             logger.Info(String.Format("Saved the changed data of package '{0} to {1}'!",
                                 package.Filename, savepath));
+                            save = true;
                         }
                         catch (Exception ex)
                         {
@@ -192,6 +206,13 @@ namespace GPK_RePack.Forms
                         }
                     }
                 }
+
+                
+            }
+
+            if (!save)
+            {
+                logger.Info("Nothing to save in PatchMode!");
             }
         }
 
@@ -200,21 +221,21 @@ namespace GPK_RePack.Forms
         {
             foreach (GpkPackage package in loadedGpkPackages)
             {
-                if (package.Changes)
+                try
                 {
-                    try
-                    {
-                        logger.Info(String.Format("Attemping to save {0}...", package.Filename));
-                        string savepath = package.Path + "_rebuild";
-                        saver.SaveGpkPackage(package, savepath);
-                        logger.Info(String.Format("Saved the package '{0} to {1}'!", package.Filename, savepath));
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.FatalException("Save failure! " + ex, ex);
-                    }
+                    logger.Info(String.Format("Attemping to save {0}...", package.Filename));
+                    string savepath = package.Path + "_rebuild";
+                    saver.SaveGpkPackage(package, savepath);
+                    logger.Info(String.Format("Saved the package '{0} to {1}'!", package.Filename, savepath));
                 }
+                catch (Exception ex)
+                {
+                    logger.FatalException("Save failure! " + ex, ex);
+                }
+
             }
+
+            logger.Info("Saving done!");
         }
         #endregion
 
@@ -363,10 +384,12 @@ namespace GPK_RePack.Forms
         {
             if (selectedExport == null)
             {
+                logger.Trace("no selected export");
                 return;
             }
             if (selectedExport.data == null)
             {
+                logger.Trace("no export data");
                 return;
             }
 
@@ -461,6 +484,7 @@ namespace GPK_RePack.Forms
         {
             if (selectedExport == null)
             {
+                logger.Trace("no selected export");
                 return;
             }
 
@@ -472,6 +496,7 @@ namespace GPK_RePack.Forms
         {
             if (selectedExport == null)
             {
+                logger.Trace("no selected export");
                 return;
             }
 
@@ -480,6 +505,7 @@ namespace GPK_RePack.Forms
 
             if (copyExport == null)
             {
+                logger.Info("copy paste fail");
                 return;
             }
 
@@ -507,11 +533,13 @@ namespace GPK_RePack.Forms
         {
             if (selectedExport == null)
             {
+                logger.Trace("no selected export");
                 return;
             }
 
             if (selectedExport.data == null)
             {
+                logger.Trace("no export data");
                 return;
             }
 

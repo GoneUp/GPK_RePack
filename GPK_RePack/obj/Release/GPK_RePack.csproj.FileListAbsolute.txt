@@ -1,6 +1,5 @@
 I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.Properties.Resources.resources
 I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.csproj.GenerateResource.Cache
-I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe.config
 I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe
 I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.pdb
 I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\Terahelper.exe
