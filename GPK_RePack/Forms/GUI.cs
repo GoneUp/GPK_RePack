@@ -73,7 +73,7 @@ namespace GPK_RePack.Forms
                 Environment.Exit(0);
             }
 
-            
+
             xml = xml.Replace("%loglevel%", Settings.Default.LogLevel);
             StringReader sr = new StringReader(xml);
             XmlReader xr = XmlReader.Create(sr);
@@ -207,7 +207,7 @@ namespace GPK_RePack.Forms
                     }
                 }
 
-                
+
             }
 
             if (!save)
@@ -509,6 +509,7 @@ namespace GPK_RePack.Forms
                 return;
             }
 
+            logger.Trace(Settings.Default.CopyMode);
             switch (Settings.Default.CopyMode)
             {
                 case "dataprops":
@@ -520,6 +521,9 @@ namespace GPK_RePack.Forms
                     break;
                 case "props":
                     DataTools.ReplaceProperties(copyExport, selectedExport);
+                    break;
+                default:
+                    logger.Info("Your setting file is broken. Go to settings windows and select a copymode.");
                     break;
 
             }

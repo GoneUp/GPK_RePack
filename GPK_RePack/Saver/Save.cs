@@ -352,7 +352,7 @@ namespace GPK_RePack.Saver
             {
                 //Too big
                 logger.Info(String.Format("The new package size is bigger than the orginal one! Tera may not acccept this file."));
-                logger.Info(String.Format("New size {0}, Old size {1}.", final_size, package.OrginalSize));
+                logger.Info(String.Format("New size {0} bytes, Old size {1} bytes. +{2} bytes", final_size, package.OrginalSize, final_size - package.OrginalSize));
             }
 
         }
