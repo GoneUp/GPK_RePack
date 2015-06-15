@@ -120,4 +120,46 @@
   <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <metadata name="colName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="colType.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="colSize.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="colArrayIndex.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="colInner.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="colValue.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="boxInfo.Text" xml:space="preserve">
+    <value>Source Code: https://github.com/GoneUp/GPK_RePack/  
+
+##
+
+Warning: Only tested for the PCVoice GPK Files. It maybe works for others as well, it is just untested.
+Use at own risk ;)
+
+##
+Quick Guide:
+1. Open a *.gpk file via Main -&gt; Open
+2. Select a Object you want to edit on the treeview
+3 - Editing
+3a) Use the buttons Export/Replace raw data for editing any object data
+3b) Use the buttons Export/Import/Empty ogg for editing audio (Soundnodewave) files
+3c) Use the buttons Copy/Paste (or Control-C, Control-V) on any object. Via Settings you can select what the program should copy
+4 - Saving
+4a) The normal way to save is Main -&gt; Save. The program will rebuild a new Gpk file from scratch. Note that Tera may not accept the file if you imported too much data.
+4b) If the normal way is failing switch select Patch Mode in settings and try to import the data again (only over raw import/export). Save afterwards via Main -&gt; Save patched.
+ 
+
+Note: Tera accepts only files with the exact same file size as the orginal file. Terahelper will fill the file up if its too small and warn you if it is too big. In this case you need to reduce the file size to fit the maximum.
+If you want to change the maximum size manually select a the package and use the Misc -&gt; Set Filesize function.</value>
+  </data>
 </root>

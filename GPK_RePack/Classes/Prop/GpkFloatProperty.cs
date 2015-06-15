@@ -5,7 +5,6 @@ namespace GPK_RePack.Classes.Prop
     [Serializable]
     class GpkFloatProperty : GpkBaseProperty
     {
-        public long unk;
         public float value;
 
         public GpkFloatProperty()
@@ -14,13 +13,15 @@ namespace GPK_RePack.Classes.Prop
         }
         public GpkFloatProperty(GpkBaseProperty bp)
         {
-            Name = bp.Name;
+            name = bp.name;
             type = bp.type;
+            size = bp.size;
+            arrayIndex = bp.arrayIndex;
         }
 
         public override string ToString()
         {
-            return string.Format("ObjectName: {0} Type: {1} Value: {2}", Name, type, value);
+            return string.Format("ObjectName: {0} Type: {1} Value: {2}", name, type, value);
         }
     }
 

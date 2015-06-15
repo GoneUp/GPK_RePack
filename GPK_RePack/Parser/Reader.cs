@@ -22,7 +22,6 @@ namespace GPK_RePack.Parser
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public int progress;
         public int totalobjects;
-        public List<String> UidList = new List<string>();
 
         public GpkPackage ReadGpk(string path)
         {
@@ -33,7 +32,6 @@ namespace GPK_RePack.Parser
                 logger.Info("Reading: " + path);
 
                 progress = 0;
-                UidList = new List<string>();
 
                 GpkPackage package = new GpkPackage();
 
@@ -198,7 +196,7 @@ namespace GPK_RePack.Parser
                 import.Class = package.NameList[class_index].name;
                 import.ObjectName = package.NameList[object_index].name;
 
-                import.UID = GenerateUID(import);
+                import.UID = GenerateUID(package, import);
                 package.ImportList.Add(i, import);
 
                 logger.Debug("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.Class, import.ObjectName);
@@ -248,7 +246,7 @@ namespace GPK_RePack.Parser
                     export.ClassName = GetObject(export.ClassIndex, package);
                     export.SuperName = GetObject(export.SuperIndex, package);
                     export.PackageName = GetObject(export.PackageIndex, package);
-                    export.UID = GenerateUID(export);
+                    export.UID = GenerateUID(package, export);
                 }
 
                 progress++;
@@ -349,8 +347,8 @@ namespace GPK_RePack.Parser
                 logger.Info("name not found " + nameindex);
             }
 
-            baseProp.Name = package.NameList[nameindex].name;
-            if (baseProp.Name.ToLower() == "none") return false;
+            baseProp.name = package.NameList[nameindex].name;
+            if (baseProp.name.ToLower() == "none") return false;
 
             long typeindex = reader.ReadInt64();
             if (!package.NameList.ContainsKey(typeindex))
@@ -359,15 +357,17 @@ namespace GPK_RePack.Parser
             }
             baseProp.type = package.NameList[typeindex].name;
 
+            baseProp.size = reader.ReadInt32();
+            baseProp.arrayIndex = reader.ReadInt32();
+
             switch (baseProp.type)
             {
                 case "StructProperty":
                     GpkStructProperty tmpStruct = new GpkStructProperty(baseProp);
-                    tmpStruct.length = reader.ReadInt64();
                     long structtype = reader.ReadInt64();
                     tmpStruct.innerType = package.NameList[structtype].name;
-                    tmpStruct.value = new byte[tmpStruct.length];
-                    tmpStruct.value = reader.ReadBytes((int)tmpStruct.length);
+                    tmpStruct.value = new byte[tmpStruct.size];
+                    tmpStruct.value = reader.ReadBytes(tmpStruct.size);
 
                     export.Properties.Add(tmpStruct);
                     break;
@@ -375,34 +375,20 @@ namespace GPK_RePack.Parser
 
                 case "ArrayProperty":
                     GpkArrayProperty tmpArray = new GpkArrayProperty(baseProp);
-                    tmpArray.length = reader.ReadInt64();
-                    tmpArray.value = new byte[tmpArray.length];
-                    tmpArray.value = reader.ReadBytes((int)tmpArray.length);
+                    tmpArray.value = new byte[tmpArray.size];
+                    tmpArray.value = reader.ReadBytes(tmpArray.size);
 
                     export.Properties.Add(tmpArray);
                     break;
 
-                case " ": //DiffuseColor
-                    GpkGUIDProperty tmpGUID = new GpkGUIDProperty(baseProp);
-                    tmpGUID.length = reader.ReadInt64();
-                    tmpGUID.unk = reader.ReadInt64();
-                    tmpGUID.value = new byte[tmpGUID.length];
-                    tmpGUID.value = reader.ReadBytes((int)tmpGUID.length);
-
-                    export.Properties.Add(tmpGUID);
-                    break;
-
                 case "BoolProperty":
                     GpkBoolProperty tmpBool = new GpkBoolProperty(baseProp);
-                    tmpBool.unk = reader.ReadInt64();
                     tmpBool.value = Convert.ToBoolean(reader.ReadInt32());
                     export.Properties.Add(tmpBool);
                     break;
 
                 case "ByteProperty":
                     GpkByteProperty tmpByte = new GpkByteProperty(baseProp);
-                    tmpByte.size = reader.ReadInt32();
-                    tmpByte.arrayIndex = reader.ReadInt32();
 
                     if (tmpByte.size == 8)
                     {
@@ -419,7 +405,6 @@ namespace GPK_RePack.Parser
 
                 case "NameProperty":
                     GpkNameProperty tmpName = new GpkNameProperty(baseProp);
-                    tmpName.unk = reader.ReadInt64();
                     long index = reader.ReadInt32();
                     tmpName.value = package.NameList[index].name;
                     tmpName.padding = reader.ReadInt32();
@@ -429,7 +414,6 @@ namespace GPK_RePack.Parser
 
                 case "IntProperty":
                     GpkIntProperty tmpInt = new GpkIntProperty(baseProp);
-                    tmpInt.unk = reader.ReadInt64();
                     tmpInt.value = reader.ReadInt32();
 
                     export.Properties.Add(tmpInt);
@@ -437,7 +421,6 @@ namespace GPK_RePack.Parser
 
                 case "FloatProperty":
                     GpkFloatProperty tmpFloat = new GpkFloatProperty(baseProp);
-                    tmpFloat.unk = reader.ReadInt64();
                     tmpFloat.value = reader.ReadSingle();
 
                     export.Properties.Add(tmpFloat);
@@ -445,17 +428,16 @@ namespace GPK_RePack.Parser
 
                 case "StrProperty":
                     GpkStringProperty tmpString = new GpkStringProperty(baseProp);
-                    tmpString.unk = reader.ReadInt64(); //outer len
                     tmpString.length = reader.ReadInt32(); //inner len
 
                     if (tmpString.length > 0)
                     {
-                        tmpString.value = ReadString(reader, (int)tmpString.length);
+                        tmpString.value = ReadString(reader, tmpString.length);
                     }
                     else
                     {
                         //unicode :O
-                        tmpString.value = ReadUnicodeString(reader, (int)tmpString.unk);
+                        tmpString.value = ReadUnicodeString(reader, tmpString.size);
                     }
 
 
@@ -464,7 +446,6 @@ namespace GPK_RePack.Parser
 
                 case "ObjectProperty":
                     GpkObjectProperty tmpObj = new GpkObjectProperty(baseProp);
-                    tmpObj.unk = reader.ReadInt64(); //4
                     tmpObj.value = reader.ReadInt32();
                     tmpObj.ClassName = GetObject(tmpObj.value, package);
 
@@ -477,7 +458,7 @@ namespace GPK_RePack.Parser
                     throw new Exception(
                         string.Format(
                             "Unknown Property Type {0}, Position {1}, Prop_Name {2}, Export_Name {3}",
-                            baseProp.type, reader.BaseStream.Position, baseProp.Name, export.ObjectName));
+                            baseProp.type, reader.BaseStream.Position, baseProp.name, export.ObjectName));
 
 
 
@@ -504,7 +485,7 @@ namespace GPK_RePack.Parser
                     export.ClassName = GetObject(export.ClassIndex, package);
                     export.SuperName = GetObject(export.SuperIndex, package);
                     export.PackageName = GetObject(export.PackageIndex, package);
-                    export.UID = GenerateUID(export);
+                    export.UID = GenerateUID(package, export);
                 }
                 return export.UID;
             }
@@ -532,7 +513,7 @@ namespace GPK_RePack.Parser
             return text;
         }
 
-        private string GenerateUID(GpkExport export)
+        private string GenerateUID(GpkPackage package, GpkExport export)
         {
 
             string proposedName;
@@ -554,9 +535,9 @@ namespace GPK_RePack.Parser
                     tmpName += ("_" + counter);
                 }
 
-                if (UidList.Contains(tmpName) == false)
+                if (package.UidList.Contains(tmpName) == false)
                 {
-                    UidList.Add(tmpName);
+                    package.UidList.Add(tmpName);
                     return tmpName;
                 }
 
@@ -565,7 +546,7 @@ namespace GPK_RePack.Parser
 
         }
 
-        private string GenerateUID(GpkImport import)
+        private string GenerateUID(GpkPackage package, GpkImport import)
         {
             string proposedName = import.ClassPackage + "." + import.ObjectName;
 
@@ -578,9 +559,9 @@ namespace GPK_RePack.Parser
                     tmpName += ("_" + counter);
                 }
 
-                if (UidList.Contains(tmpName) == false)
+                if (package.UidList.Contains(tmpName) == false)
                 {
-                    UidList.Add(tmpName);
+                    package.UidList.Add(tmpName);
                     return tmpName;
                 }
 

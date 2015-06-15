@@ -4,5 +4,10 @@
     {
         public string name;
         public long flags;
+
+        public override string ToString()
+        {
+            return name;
+        }
     }
 }

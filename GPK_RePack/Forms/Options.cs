@@ -60,6 +60,7 @@ namespace GPK_RePack.Forms
 
             boxDebug.Checked = Settings.Default.Debug;
             boxImports.Checked = Settings.Default.ShowImports;
+            boxPatchmode.Checked = Settings.Default.PatchMode;
         }
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
@@ -118,6 +119,11 @@ namespace GPK_RePack.Forms
         private void boxImports_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.ShowImports = boxImports.Checked;
+        }
+
+        private void boxPatchmode_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.PatchMode = boxPatchmode.Checked;
         }
 
     }

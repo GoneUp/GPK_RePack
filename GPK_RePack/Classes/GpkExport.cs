@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Classes.Prop;
 
 namespace GPK_RePack.Classes
 {
@@ -122,7 +123,6 @@ namespace GPK_RePack.Classes
 
             return size;
         }
-
 
       
     }

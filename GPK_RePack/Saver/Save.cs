@@ -211,51 +211,46 @@ namespace GPK_RePack.Saver
                 foreach (object prop in export.Properties)
                 {
                     GpkBaseProperty baseProperty = (GpkBaseProperty)prop;
-                    writer.Write(GetStringIndex(baseProperty.Name, package));
+                    writer.Write(GetStringIndex(baseProperty.name, package));
                     writer.Write(GetStringIndex(baseProperty.type, package));
+                    writer.Write(baseProperty.size);
+                    writer.Write(baseProperty.arrayIndex);
 
                     if (prop is GpkArrayProperty)
                     {
                         GpkArrayProperty tmpArray = (GpkArrayProperty)prop;
-                        writer.Write(tmpArray.length);
                         writer.Write(tmpArray.value);
                     }
                     else if (prop is GpkStructProperty)
                     {
                         GpkStructProperty tmpStruct = (GpkStructProperty)prop;
-                        writer.Write(tmpStruct.length);
                         writer.Write(GetStringIndex(tmpStruct.innerType, package));
                         writer.Write(tmpStruct.value);
                     }
                     else if (prop is GpkBoolProperty)
                     {
                         GpkBoolProperty tmpBool = (GpkBoolProperty)prop;
-                        writer.Write(tmpBool.unk);
                         writer.Write(Convert.ToInt32(tmpBool.value));
                     }
                     else if (prop is GpkNameProperty)
                     {
                         GpkNameProperty tmpName = (GpkNameProperty)prop;
-                        writer.Write(tmpName.unk);
                         writer.Write((int)GetStringIndex(tmpName.value, package));
                         writer.Write(tmpName.padding);
                     }
                     else if (prop is GpkIntProperty)
                     {
                         GpkIntProperty tmpInt = (GpkIntProperty)prop;
-                        writer.Write(tmpInt.unk);
                         writer.Write(tmpInt.value);
                     }
                     else if (prop is GpkFloatProperty)
                     {
                         GpkFloatProperty tmpFloat = (GpkFloatProperty)prop;
-                        writer.Write(tmpFloat.unk);
                         writer.Write(tmpFloat.value);
                     }
                     else if (prop is GpkStringProperty)
                     {
                         GpkStringProperty tmpString = (GpkStringProperty)prop;
-                        writer.Write(tmpString.unk);
                         writer.Write(tmpString.length);
 
                         if (tmpString.length > 0)
@@ -270,15 +265,12 @@ namespace GPK_RePack.Saver
                     else if (prop is GpkObjectProperty)
                     {
                         GpkObjectProperty tmpObj = (GpkObjectProperty)prop;
-                        writer.Write(tmpObj.unk);
                         writer.Write((int)GetObjectIndex(tmpObj.ClassName, package));
 
                     }
                     else if (prop is GpkByteProperty)
                     {
                         GpkByteProperty tmpByte = (GpkByteProperty)prop;
-                        writer.Write(tmpByte.size);
-                        writer.Write(tmpByte.arrayIndex);
 
                         if (tmpByte.size == 8)
                         {

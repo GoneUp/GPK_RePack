@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using GPK_RePack.Classes;
+using GPK_RePack.Classes.Prop;
 using GPK_RePack.Editors;
 using GPK_RePack.Parser;
 using GPK_RePack.Properties;
@@ -336,10 +338,13 @@ namespace GPK_RePack.Forms
                     GpkExport exp = (GpkExport)selected;
                     boxInfo.Text = exp.ToString();
 
+
                     boxGeneralButtons.Enabled = true;
                     boxDataButtons.Enabled = true;
                     selectedExport = exp;
                     selectedPackage = package;
+
+                    DrawGrid(package, exp);
                 }
             }
         }
@@ -408,7 +413,7 @@ namespace GPK_RePack.Forms
                 byte[] buffer = File.ReadAllBytes(path);
                 int packageIndex = Convert.ToInt32(treeMain.SelectedNode.Parent.Parent.Name);
 
-                if (btnPatchMode.Checked)
+                if (Settings.Default.PatchMode)
                 {
                     if (buffer.Length > selectedExport.data.Length)
                     {
@@ -573,7 +578,6 @@ namespace GPK_RePack.Forms
 
         #endregion
 
-
         #region ogg
 
         private void btnImportOgg_Click(object sender, EventArgs e)
@@ -632,6 +636,164 @@ namespace GPK_RePack.Forms
         }
 
 
+        #endregion
+
+        #region misc
+        private void setFilesizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selectedPackage == null)
+            {
+                logger.Info("Select a package!");
+                return;
+            }
+
+            string input = Microsoft.VisualBasic.Interaction.InputBox("New filesize for " + selectedPackage.Filename + "? Old: " + selectedPackage.OrginalSize, "Filesize");
+
+            int num;
+            if (input == "" || !Int32.TryParse(input, out num))
+            {
+                logger.Info("No/Invalid input");
+            }
+            else
+            {
+                logger.Trace(num);
+                selectedPackage.OrginalSize = num;
+                logger.Info("Set filesize for {0} to {1}", selectedPackage.Filename, selectedPackage.OrginalSize);
+            }
+
+        }
+        #endregion
+
+        #region propgrid
+        private void DrawGrid(GpkPackage package, GpkExport export)
+        {
+            gridProps.Enabled = true;
+            gridProps.Rows.Clear();
+            
+            IEnumerable<String> nameQuery = from pair in package.NameList.Values.ToList() select pair.name;
+            //IEnumerable<String> uidQuery = from pair in package.UidList.Values.ToList() select pair.name;
+
+            foreach (GpkBaseProperty prop in export.Properties)
+            {
+                DataGridViewRow row = new DataGridViewRow();
+                row.DefaultCellStyle = gridProps.DefaultCellStyle;
+
+                DataGridViewTextBoxCell nameCell = new DataGridViewTextBoxCell();
+                nameCell.Value = prop.name;
+                row.Cells.Add(nameCell);
+
+                DataGridViewComboBoxCell typeCell = new DataGridViewComboBoxCell();
+                typeCell.Items.AddRange(((DataGridViewComboBoxColumn)gridProps.Columns["colType"]).Items);
+                typeCell.Value = prop.type;
+                row.Cells.Add(typeCell);
+
+                DataGridViewTextBoxCell sizeCell = new DataGridViewTextBoxCell();
+                sizeCell.Value = prop.size;
+                row.Cells.Add(sizeCell);
+
+                DataGridViewTextBoxCell arrayCell = new DataGridViewTextBoxCell();
+                arrayCell.Value = prop.arrayIndex;
+                row.Cells.Add(arrayCell);
+
+                DataGridViewComboBoxCell innerCell = new DataGridViewComboBoxCell();
+                
+                if (prop is GpkStructProperty)
+                {
+                    GpkStructProperty struc = (GpkStructProperty)prop;
+                    innerCell.Items.AddRange(nameQuery.ToArray());
+                    innerCell.Value = struc.innerType;
+
+                }
+                else
+                {
+                    innerCell.Items.Add("none");
+                    innerCell.Value = "none";
+                }
+                row.Cells.Add(innerCell);
+                innerCell.ReadOnly = true;
+
+                DataGridViewTextBoxCell valueCell = new DataGridViewTextBoxCell();
+                DataGridViewComboBoxCell comboCell = null;
+                if (prop is GpkArrayProperty)
+                {
+                    GpkArrayProperty tmpArray = (GpkArrayProperty)prop;
+                    valueCell.Value = tmpArray.GetValueHex();
+                }
+                else if (prop is GpkStructProperty)
+                {
+                    GpkStructProperty tmpStruct = (GpkStructProperty)prop;
+                    valueCell.Value = tmpStruct.GetValueHex();
+                    innerCell.ReadOnly = false;
+                }
+                else if (prop is GpkNameProperty)
+                {
+                    GpkNameProperty tmpName = (GpkNameProperty)prop;
+                    comboCell = new DataGridViewComboBoxCell();
+                    comboCell.Items.AddRange(nameQuery.ToArray());
+                    comboCell.Value = tmpName.name;
+
+                }
+                else if (prop is GpkObjectProperty)
+                {
+                    GpkObjectProperty tmpObj = (GpkObjectProperty)prop;
+                    comboCell = new DataGridViewComboBoxCell();
+                    comboCell.Items.AddRange(package.UidList.ToArray());
+                    comboCell.Value = tmpObj.value;
+
+                }
+                else if (prop is GpkByteProperty)
+                {
+                    GpkByteProperty tmpByte = (GpkByteProperty)prop;
+                    comboCell = new DataGridViewComboBoxCell();
+                    if (tmpByte.size == 8)
+                    {
+                        comboCell.Items.AddRange(nameQuery.ToArray());
+                        comboCell.Value = tmpByte.nameValue;
+                    }
+                    else
+                    {
+                        comboCell.Value = tmpByte.byteValue;
+                    }
+                }
+                else if (prop is GpkFloatProperty)
+                {
+                    GpkFloatProperty tmpFloat = (GpkFloatProperty)prop;
+                    valueCell.Value = tmpFloat.value;
+                }
+                else if (prop is GpkIntProperty)
+                {
+                    GpkIntProperty tmpInt = (GpkIntProperty)prop;
+                    valueCell.Value = tmpInt.value;
+                }
+                else if (prop is GpkStringProperty)
+                {
+                    GpkStringProperty tmpString = (GpkStringProperty)prop;
+                    valueCell.Value = tmpString.value;
+                }
+                else if (prop is GpkBoolProperty)
+                {
+                    GpkBoolProperty tmpBool = (GpkBoolProperty)prop;
+                    valueCell.Value = tmpBool.value;
+                }
+                else
+                {
+                    logger.Info("LOL");
+                }
+
+
+                if (comboCell == null)
+                {
+                    row.Cells.Add(valueCell);
+                }
+                else
+                {
+                    row.Cells.Add(comboCell);
+                }
+
+
+                gridProps.Rows.Add(row);
+            }
+        }
         #endregion
 
 

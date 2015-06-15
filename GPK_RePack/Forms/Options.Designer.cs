@@ -42,6 +42,7 @@
             this.btnViewClass = new System.Windows.Forms.RadioButton();
             this.boxDebug = new System.Windows.Forms.CheckBox();
             this.boxImports = new System.Windows.Forms.CheckBox();
+            this.boxPatchmode = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -204,11 +205,23 @@
             this.boxImports.UseVisualStyleBackColor = true;
             this.boxImports.CheckedChanged += new System.EventHandler(this.boxImports_CheckedChanged);
             // 
+            // boxPatchmode
+            // 
+            this.boxPatchmode.AutoSize = true;
+            this.boxPatchmode.Location = new System.Drawing.Point(384, 112);
+            this.boxPatchmode.Name = "boxPatchmode";
+            this.boxPatchmode.Size = new System.Drawing.Size(81, 17);
+            this.boxPatchmode.TabIndex = 9;
+            this.boxPatchmode.Text = "PatchMode";
+            this.boxPatchmode.UseVisualStyleBackColor = true;
+            this.boxPatchmode.CheckedChanged += new System.EventHandler(this.boxPatchmode_CheckedChanged);
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(468, 134);
+            this.ClientSize = new System.Drawing.Size(464, 134);
+            this.Controls.Add(this.boxPatchmode);
             this.Controls.Add(this.boxImports);
             this.Controls.Add(this.boxDebug);
             this.Controls.Add(this.groupBox3);
@@ -247,5 +260,6 @@
         private System.Windows.Forms.RadioButton btnViewClass;
         private System.Windows.Forms.CheckBox boxDebug;
         private System.Windows.Forms.CheckBox boxImports;
+        private System.Windows.Forms.CheckBox boxPatchmode;
     }
 }

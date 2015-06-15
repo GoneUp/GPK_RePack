@@ -54,7 +54,7 @@ namespace GPK_RePack.Editors
                 if (prop is GpkFloatProperty)
                 {
                     GpkFloatProperty floatProperty = (GpkFloatProperty) prop;
-                    if (floatProperty.Name == "Duration")
+                    if (floatProperty.name == "Duration")
                     {
                         if (oggfile != "fake")
                         {

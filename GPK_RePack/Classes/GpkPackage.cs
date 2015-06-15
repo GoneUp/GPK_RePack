@@ -17,8 +17,11 @@ namespace GPK_RePack.Classes
         public Dictionary<long, GpkExport> ExportList;
         public GpkDependList DependList;
 
+        public List<String> UidList;
+
         public GpkPackage()
         {
+            UidList = new List<string>();
             Header = new GpkHeader();
 
             NameList = new Dictionary<long, GpkString>();

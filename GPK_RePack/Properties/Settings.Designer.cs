@@ -106,5 +106,17 @@ namespace GPK_RePack.Properties {
                 this["ShowImports"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool PatchMode {
+            get {
+                return ((bool)(this["PatchMode"]));
+            }
+            set {
+                this["PatchMode"] = value;
+            }
+        }
     }
 }

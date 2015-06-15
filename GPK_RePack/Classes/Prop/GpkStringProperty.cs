@@ -5,7 +5,6 @@ namespace GPK_RePack.Classes.Prop
     [Serializable]
     class GpkStringProperty : GpkBaseProperty 
     {
-        public long unk;
         public int length;
         public string value;
 
@@ -17,13 +16,15 @@ namespace GPK_RePack.Classes.Prop
         }
         public GpkStringProperty(GpkBaseProperty bp)
         {
-            Name = bp.Name;
+            name = bp.name;
             type = bp.type;
+            size = bp.size;
+            arrayIndex = bp.arrayIndex;
         }
 
         public override string ToString()
         {
-            return string.Format("ObjectName: {0} Type: {1} Value: {2}", Name, type, value);
+            return string.Format("ObjectName: {0} Type: {1} Value: {2}", name, type, value);
         }
     }
 
