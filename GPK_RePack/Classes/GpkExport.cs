@@ -112,17 +112,37 @@ namespace GPK_RePack.Classes
         public int RecalculateSize()
         {
             int size = 0;
-            size += property_size;
 
+            //props
+            int tmpSize = 0;
+            tmpSize += 4; //netindex
+            if (property_padding != null)
+            {
+                tmpSize += property_padding.Length;
+            }
+
+            foreach (GpkBaseProperty baseProp in Properties)
+            {
+                tmpSize += baseProp.size + 24;
+            }
+            //none
+            tmpSize += 8;
+            //finally
+            property_size = tmpSize;
+            size += tmpSize;
+
+            //data
             if (data != null)
             {
-                size += property_size;
+                size += data.Length;
             } 
 
             SerialSize = size;
 
             return size;
         }
+
+
 
       
     }

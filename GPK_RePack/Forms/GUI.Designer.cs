@@ -216,7 +216,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(678, 481);
+            this.tabPage1.Size = new System.Drawing.Size(649, 481);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Info";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -228,7 +228,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(3, 378);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(672, 100);
+            this.panel2.Size = new System.Drawing.Size(643, 100);
             this.panel2.TabIndex = 6;
             // 
             // boxGeneralButtons
@@ -299,7 +299,7 @@
             this.boxDataButtons.Enabled = false;
             this.boxDataButtons.Location = new System.Drawing.Point(188, 0);
             this.boxDataButtons.Name = "boxDataButtons";
-            this.boxDataButtons.Size = new System.Drawing.Size(484, 100);
+            this.boxDataButtons.Size = new System.Drawing.Size(455, 100);
             this.boxDataButtons.TabIndex = 4;
             this.boxDataButtons.TabStop = false;
             this.boxDataButtons.Text = "Data Commands";
@@ -371,7 +371,7 @@
             this.boxInfo.Multiline = true;
             this.boxInfo.Name = "boxInfo";
             this.boxInfo.ReadOnly = true;
-            this.boxInfo.Size = new System.Drawing.Size(672, 475);
+            this.boxInfo.Size = new System.Drawing.Size(643, 475);
             this.boxInfo.TabIndex = 5;
             this.boxInfo.Text = resources.GetString("boxInfo.Text");
             // 
@@ -398,11 +398,15 @@
             this.colInner,
             this.colValue});
             this.gridProps.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridProps.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.gridProps.Enabled = false;
             this.gridProps.Location = new System.Drawing.Point(3, 3);
+            this.gridProps.MultiSelect = false;
             this.gridProps.Name = "gridProps";
             this.gridProps.Size = new System.Drawing.Size(643, 475);
             this.gridProps.TabIndex = 0;
+            this.gridProps.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridProps_CellEndEdit);
+            this.gridProps.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridProps_CellValueChanged);
             // 
             // colName
             // 

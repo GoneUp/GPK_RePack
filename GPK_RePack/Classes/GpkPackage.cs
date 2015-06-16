@@ -36,7 +36,7 @@ namespace GPK_RePack.Classes
                 if (pair.Value.name == text) return pair.Key;
             }
 
-            throw new Exception(string.Format("ObjectName {0} not found!", text));
+            throw new Exception(string.Format("Name {0} not found!", text));
         }
 
         public long GetObjectIndex(string text)

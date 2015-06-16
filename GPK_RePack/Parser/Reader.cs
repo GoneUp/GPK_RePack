@@ -447,7 +447,7 @@ namespace GPK_RePack.Parser
                 case "ObjectProperty":
                     GpkObjectProperty tmpObj = new GpkObjectProperty(baseProp);
                     tmpObj.value = reader.ReadInt32();
-                    tmpObj.ClassName = GetObject(tmpObj.value, package);
+                    tmpObj.objectName = GetObject(tmpObj.value, package);
 
 
                     export.Properties.Add(tmpObj);

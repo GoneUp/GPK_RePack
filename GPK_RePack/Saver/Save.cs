@@ -265,7 +265,7 @@ namespace GPK_RePack.Saver
                     else if (prop is GpkObjectProperty)
                     {
                         GpkObjectProperty tmpObj = (GpkObjectProperty)prop;
-                        writer.Write((int)GetObjectIndex(tmpObj.ClassName, package));
+                        writer.Write((int)GetObjectIndex(tmpObj.objectName, package));
 
                     }
                     else if (prop is GpkByteProperty)

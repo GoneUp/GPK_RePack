@@ -669,7 +669,7 @@ namespace GPK_RePack.Forms
         {
             gridProps.Enabled = true;
             gridProps.Rows.Clear();
-            
+
             IEnumerable<String> nameQuery = from pair in package.NameList.Values.ToList() select pair.name;
             //IEnumerable<String> uidQuery = from pair in package.UidList.Values.ToList() select pair.name;
 
@@ -696,7 +696,7 @@ namespace GPK_RePack.Forms
                 row.Cells.Add(arrayCell);
 
                 DataGridViewComboBoxCell innerCell = new DataGridViewComboBoxCell();
-                
+
                 if (prop is GpkStructProperty)
                 {
                     GpkStructProperty struc = (GpkStructProperty)prop;
@@ -794,6 +794,152 @@ namespace GPK_RePack.Forms
                 gridProps.Rows.Add(row);
             }
         }
+
+        private void gridProps_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                if ((e.RowIndex < 0 || e.RowIndex >= gridProps.RowCount) ||
+                    (e.ColumnIndex < 0 || e.ColumnIndex >= gridProps.ColumnCount))
+                {
+                    return;
+                }
+
+                var cell = gridProps[e.ColumnIndex, e.RowIndex];
+                if (selectedExport != null && cell != null && selectedPackage != null)
+                {
+                    var prop = selectedExport.Properties[e.RowIndex];
+
+
+                    switch (e.ColumnIndex)
+                    {
+                        case 0:
+                            //Name
+                            break;
+                        case 1:
+                            //Type
+                            break;
+                        case 2:
+                            //Size. Autocomputed. Do nothing.
+                            break;
+                        case 3:
+                            //arrayindex
+                            break;
+                        case 4:
+                            //innertype
+                            break;
+                        case 5:
+                            //vvalue    
+                            if (prop is GpkArrayProperty)
+                            {
+                                GpkArrayProperty tmpArray = (GpkArrayProperty)prop;
+                                if (tmpArray.GetValueHex() != cell.Value.ToString())
+                                {
+                                    tmpArray.value = ((string)cell.Value).ToBytes();
+                                }
+                            }
+                            else if (prop is GpkStructProperty)
+                            {
+                                GpkStructProperty tmpStruct = (GpkStructProperty)prop;
+                                if (tmpStruct.GetValueHex() != cell.Value.ToString())
+                                {
+                                    tmpStruct.value = ((string)cell.Value).ToBytes();
+                                }
+                            }
+                            else if (prop is GpkNameProperty)
+                            {
+                                GpkNameProperty tmpName = (GpkNameProperty)prop;
+                                if (tmpName.value != cell.Value.ToString())
+                                {
+                                    tmpName.value = cell.Value.ToString();
+                                }
+
+                            }
+                            else if (prop is GpkObjectProperty)
+                            {
+                                GpkObjectProperty tmpObj = (GpkObjectProperty)prop;
+                                if (tmpObj.objectName != cell.Value.ToString())
+                                {
+                                    tmpObj.objectName = cell.Value.ToString();
+                                }
+                            }
+                            else if (prop is GpkByteProperty)
+                            {
+                                GpkByteProperty tmpByte = (GpkByteProperty)prop;
+                                if (tmpByte.value != cell.Value.ToString())
+                                {
+                                    if (tmpByte.size == 8)
+                                    {
+                                        tmpByte.nameValue = cell.Value.ToString();
+                                        
+                                    }
+                                    else
+                                    {
+                                        tmpByte.byteValue = (byte)cell.Value;
+                                    }
+                                }
+                            }
+                            else if (prop is GpkFloatProperty)
+                            {
+                                GpkFloatProperty tmpFloat = (GpkFloatProperty)prop;
+                                float fCell = Convert.ToSingle(cell.Value);
+
+                                if (tmpFloat.value != fCell)
+                                {
+                                    tmpFloat.value = fCell;
+                                }
+                            }
+                            else if (prop is GpkIntProperty)
+                            {
+                                GpkIntProperty tmpInt = (GpkIntProperty)prop;
+                                int intCell = Convert.ToInt32(cell.Value);
+
+                                if (tmpInt.value != intCell)
+                                {
+                                    tmpInt.value = intCell;
+                                }
+                            }
+                            else if (prop is GpkStringProperty)
+                            {
+                                GpkStringProperty tmpString = (GpkStringProperty)prop;
+
+                                if (tmpString.value != cell.Value.ToString())
+                                {
+                                    tmpString.value = cell.Value.ToString();
+                                    tmpString.size = tmpString.length;
+                                }
+                            }
+                            else if (prop is GpkBoolProperty)
+                            {
+                                GpkBoolProperty tmpBool = (GpkBoolProperty)prop;
+                                if (tmpBool.value != (bool)cell.Value)
+                                {
+                                    tmpBool.value = (bool)cell.Value;
+                                }
+                            }
+                            else
+                            {
+                                logger.Info("LOL");
+                            }
+                            break;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                logger.Fatal("Propertry Edit failed! " + ex.Message);
+            }
+
+
+        }
+
+        private void gridProps_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
         #endregion
 
 

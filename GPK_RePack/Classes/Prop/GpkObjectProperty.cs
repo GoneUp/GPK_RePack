@@ -6,7 +6,7 @@ namespace GPK_RePack.Classes.Prop
     class GpkObjectProperty : GpkBaseProperty
     {
         public int value; //long index
-        public string ClassName;
+        public string objectName;
 
         public GpkObjectProperty()
         {
@@ -22,7 +22,7 @@ namespace GPK_RePack.Classes.Prop
 
         public override string ToString()
         {
-            return string.Format("ObjectName: {0} Type: {1} Value: {2}", name, type, ClassName);
+            return string.Format("ObjectName: {0} Type: {1} Value: {2}", name, type, objectName);
         }
     }
 

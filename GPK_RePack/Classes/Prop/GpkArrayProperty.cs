@@ -28,7 +28,7 @@ namespace GPK_RePack.Classes.Prop
         public string GetValueHex()
         {
             string hex = "";
-            if(value != null) hex = BitConverter.ToString(value);
+            if(value != null) hex = value.ToHex();
             return hex;
         }
     }
