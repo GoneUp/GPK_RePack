@@ -15,7 +15,6 @@ namespace GPK_RePack.Classes
         public Dictionary<long, GpkString> NameList;
         public Dictionary<long, GpkImport> ImportList;
         public Dictionary<long, GpkExport> ExportList;
-        public GpkDependList DependList;
 
         public List<String> UidList;
 

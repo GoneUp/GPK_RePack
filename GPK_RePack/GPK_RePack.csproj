@@ -60,14 +60,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\GpkDependList.cs" />
     <Compile Include="Classes\GpkExport.cs" />
     <Compile Include="Classes\GpkGeneration.cs" />
     <Compile Include="Classes\GpkHeader.cs" />
     <Compile Include="Classes\GpkImport.cs" />
     <Compile Include="Classes\GpkPackage.cs" />
+    <Compile Include="Classes\Interfaces\IProperty.cs" />
     <Compile Include="Classes\Interfaces\IPayload.cs" />
     <Compile Include="Classes\Payload\Soundwave.cs" />
+    <Compile Include="Classes\Payload\Texture2D.cs" />
     <Compile Include="Classes\Prop\GpkBaseProperty.cs" />
     <Compile Include="Classes\GpkString.cs" />
     <Compile Include="Classes\Prop\GpkBoolProperty.cs" />

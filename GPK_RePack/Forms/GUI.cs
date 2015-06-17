@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using GPK_RePack.Classes;
+using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Prop;
 using GPK_RePack.Editors;
 using GPK_RePack.Parser;
@@ -14,8 +15,6 @@ using GPK_RePack.Properties;
 using GPK_RePack.Saver;
 using NLog;
 using NLog.Config;
-using NLog.Fluent;
-using NLog.Internal;
 
 namespace GPK_RePack.Forms
 {
@@ -52,13 +51,15 @@ namespace GPK_RePack.Forms
         private Logger logger;
         private Reader reader;
         private Save saver;
-        private DataFormats.Format exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
 
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
 
         private List<GpkPackage> loadedGpkPackages;
         private List<GpkExport>[] changedExports;
+
+        private bool drawing = false;
+        private readonly DataFormats.Format exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
 
         #endregion
 
@@ -123,6 +124,7 @@ namespace GPK_RePack.Forms
             boxGeneralButtons.Enabled = false;
             loadedGpkPackages.Clear();
             DrawPackages();
+            ClearGrid();
         }
 
         private void GUI_FormClosed(object sender, FormClosedEventArgs e)
@@ -315,6 +317,7 @@ namespace GPK_RePack.Forms
             boxGeneralButtons.Enabled = false;
             selectedExport = null;
             selectedPackage = null;
+            ClearGrid();
 
             if (e.Node.Level == 0)
             {
@@ -665,8 +668,18 @@ namespace GPK_RePack.Forms
         #endregion
 
         #region propgrid
+
+        private void ClearGrid()
+        {
+            drawing = true;
+            gridProps.Rows.Clear();
+            drawing = false;
+        }
+
         private void DrawGrid(GpkPackage package, GpkExport export)
         {
+            drawing = true;
+
             gridProps.Enabled = true;
             gridProps.Rows.Clear();
 
@@ -792,13 +805,19 @@ namespace GPK_RePack.Forms
 
 
                 gridProps.Rows.Add(row);
+
+
             }
+
+            drawing = false;
         }
 
         private void gridProps_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             try
             {
+                if (drawing) return;
+
                 if ((e.RowIndex < 0 || e.RowIndex >= gridProps.RowCount) ||
                     (e.ColumnIndex < 0 || e.ColumnIndex >= gridProps.ColumnCount))
                 {
@@ -808,70 +827,75 @@ namespace GPK_RePack.Forms
                 var cell = gridProps[e.ColumnIndex, e.RowIndex];
                 if (selectedExport != null && cell != null && selectedPackage != null)
                 {
-                    var prop = selectedExport.Properties[e.RowIndex];
-
+                    IProperty iProp = selectedExport.Properties[e.RowIndex];
+                    GpkBaseProperty bProp = (GpkBaseProperty) iProp;
 
                     switch (e.ColumnIndex)
                     {
                         case 0:
                             //Name
+                            bProp.name = cell.Value.ToString();
                             break;
                         case 1:
                             //Type
+                            logger.Info("not supported");
                             break;
                         case 2:
                             //Size. Autocomputed. Do nothing.
                             break;
                         case 3:
                             //arrayindex
+                            bProp.arrayIndex = Convert.ToInt32(cell.Value);
                             break;
                         case 4:
                             //innertype
+                            logger.Info("not supported");
                             break;
                         case 5:
                             //vvalue    
-                            if (prop is GpkArrayProperty)
+                            if (iProp is GpkArrayProperty)
                             {
-                                GpkArrayProperty tmpArray = (GpkArrayProperty)prop;
+                                GpkArrayProperty tmpArray = (GpkArrayProperty)iProp;
                                 if (tmpArray.GetValueHex() != cell.Value.ToString())
                                 {
                                     tmpArray.value = ((string)cell.Value).ToBytes();
+
                                 }
                             }
-                            else if (prop is GpkStructProperty)
+                            else if (iProp is GpkStructProperty)
                             {
-                                GpkStructProperty tmpStruct = (GpkStructProperty)prop;
+                                GpkStructProperty tmpStruct = (GpkStructProperty)iProp;
                                 if (tmpStruct.GetValueHex() != cell.Value.ToString())
                                 {
                                     tmpStruct.value = ((string)cell.Value).ToBytes();
                                 }
                             }
-                            else if (prop is GpkNameProperty)
+                            else if (iProp is GpkNameProperty)
                             {
-                                GpkNameProperty tmpName = (GpkNameProperty)prop;
+                                GpkNameProperty tmpName = (GpkNameProperty)iProp;
                                 if (tmpName.value != cell.Value.ToString())
                                 {
                                     tmpName.value = cell.Value.ToString();
                                 }
 
                             }
-                            else if (prop is GpkObjectProperty)
+                            else if (iProp is GpkObjectProperty)
                             {
-                                GpkObjectProperty tmpObj = (GpkObjectProperty)prop;
+                                GpkObjectProperty tmpObj = (GpkObjectProperty)iProp;
                                 if (tmpObj.objectName != cell.Value.ToString())
                                 {
                                     tmpObj.objectName = cell.Value.ToString();
                                 }
                             }
-                            else if (prop is GpkByteProperty)
+                            else if (iProp is GpkByteProperty)
                             {
-                                GpkByteProperty tmpByte = (GpkByteProperty)prop;
+                                GpkByteProperty tmpByte = (GpkByteProperty)iProp;
                                 if (tmpByte.value != cell.Value.ToString())
                                 {
                                     if (tmpByte.size == 8)
                                     {
                                         tmpByte.nameValue = cell.Value.ToString();
-                                        
+
                                     }
                                     else
                                     {
@@ -879,9 +903,9 @@ namespace GPK_RePack.Forms
                                     }
                                 }
                             }
-                            else if (prop is GpkFloatProperty)
+                            else if (iProp is GpkFloatProperty)
                             {
-                                GpkFloatProperty tmpFloat = (GpkFloatProperty)prop;
+                                GpkFloatProperty tmpFloat = (GpkFloatProperty)iProp;
                                 float fCell = Convert.ToSingle(cell.Value);
 
                                 if (tmpFloat.value != fCell)
@@ -889,9 +913,9 @@ namespace GPK_RePack.Forms
                                     tmpFloat.value = fCell;
                                 }
                             }
-                            else if (prop is GpkIntProperty)
+                            else if (iProp is GpkIntProperty)
                             {
-                                GpkIntProperty tmpInt = (GpkIntProperty)prop;
+                                GpkIntProperty tmpInt = (GpkIntProperty)iProp;
                                 int intCell = Convert.ToInt32(cell.Value);
 
                                 if (tmpInt.value != intCell)
@@ -899,9 +923,9 @@ namespace GPK_RePack.Forms
                                     tmpInt.value = intCell;
                                 }
                             }
-                            else if (prop is GpkStringProperty)
+                            else if (iProp is GpkStringProperty)
                             {
-                                GpkStringProperty tmpString = (GpkStringProperty)prop;
+                                GpkStringProperty tmpString = (GpkStringProperty)iProp;
 
                                 if (tmpString.value != cell.Value.ToString())
                                 {
@@ -909,9 +933,9 @@ namespace GPK_RePack.Forms
                                     tmpString.size = tmpString.length;
                                 }
                             }
-                            else if (prop is GpkBoolProperty)
+                            else if (iProp is GpkBoolProperty)
                             {
-                                GpkBoolProperty tmpBool = (GpkBoolProperty)prop;
+                                GpkBoolProperty tmpBool = (GpkBoolProperty)iProp;
                                 if (tmpBool.value != (bool)cell.Value)
                                 {
                                     tmpBool.value = (bool)cell.Value;
@@ -924,6 +948,10 @@ namespace GPK_RePack.Forms
                             break;
                     }
 
+                    //update size
+                    iProp.RecalculateSize();
+                    gridProps[2, e.RowIndex].Value = bProp.size;
+
                 }
             }
             catch (Exception ex)
@@ -935,12 +963,81 @@ namespace GPK_RePack.Forms
 
         }
 
-        private void gridProps_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        private void gridProps_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
+            try
+            {
+                if (drawing) return;
+
+                var row = gridProps.Rows[e.RowIndex];
+                if (selectedExport != null && selectedPackage != null)
+                {
+                    GpkBaseProperty baseProp = new GpkBaseProperty(row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString(), 0, Convert.ToInt32(row.Cells[3].Value));
+                    IProperty iProp = null;
+
+                    switch (baseProp.type)
+                    {
+                        case "StructProperty":
+                        case "ArrayProperty":
+                        case "ByteProperty":
+                        case "NameProperty":
+                        case "ObjectProperty":
+                            logger.Info("not supported");
+                            return;
+
+                        case "BoolProperty":
+                            GpkBoolProperty tmpBool = new GpkBoolProperty();
+                            tmpBool.value = Convert.ToBoolean(row.Cells[5].Value);
+                            iProp = tmpBool;
+                            break;
+
+                        case "IntProperty":
+                            GpkIntProperty tmpInt = new GpkIntProperty();
+                            tmpInt.value = Convert.ToInt32(row.Cells[5].Value);
+                            iProp = tmpInt;
+                            break;
+
+                        case "FloatProperty":
+                            GpkFloatProperty tmpFloat = new GpkFloatProperty();
+                            tmpFloat.value = Convert.ToSingle(row.Cells[5].Value);
+                            iProp = tmpFloat;
+                            break;
+
+                        case "StrProperty":
+                            GpkStringProperty tmpStr = new GpkStringProperty();
+                            tmpStr.value = (row.Cells[5].Value.ToString());
+                            iProp = tmpStr;
+                            break;
+
+                        default:
+                            throw new Exception(
+                                string.Format("Unknown Property Type {0}, Prop_Name {1}", baseProp.type, baseProp.name));
+
+                    }
+
+                    iProp.RecalculateSize();
+                    selectedExport.Properties.Add(iProp);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                logger.Fatal("Propertry Add failed! " + ex.Message);
+            }
+
 
         }
 
+        private void gridProps_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
+        {
+            if (drawing) return;
+            logger.Info("not supported");
+
+        }
+
+
         #endregion
+
 
 
 

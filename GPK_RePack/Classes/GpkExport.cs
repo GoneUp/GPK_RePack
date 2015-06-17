@@ -35,7 +35,7 @@ namespace GPK_RePack.Classes
 
         public byte[] property_padding;
         public int property_size;
-        public List<object> Properties;
+        public List<IProperty> Properties;
 
         public long data_start;
         public byte[] data_padding;
@@ -45,7 +45,7 @@ namespace GPK_RePack.Classes
 
         public GpkExport()
         {
-            Properties = new List<object>();
+            Properties = new List<IProperty>();
         }
 
         public GpkExport(GpkExport export)
@@ -101,7 +101,7 @@ namespace GPK_RePack.Classes
             }
 
             info.AppendLine("Properties:");
-            foreach (object prop in Properties)
+            foreach (IProperty prop in Properties)
             {
                 info.AppendLine(prop.ToString());
             }
@@ -121,8 +121,9 @@ namespace GPK_RePack.Classes
                 tmpSize += property_padding.Length;
             }
 
-            foreach (GpkBaseProperty baseProp in Properties)
+            foreach (var property in Properties)
             {
+                var baseProp = (GpkBaseProperty) property;
                 tmpSize += baseProp.size + 24;
             }
             //none

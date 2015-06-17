@@ -1,4 +1,7 @@
-﻿namespace GPK_RePack.Forms
+﻿using System.Windows.Forms;
+using GPK_RePack.Classes;
+
+namespace GPK_RePack.Forms
 {
     partial class GUI
     {
@@ -405,8 +408,9 @@
             this.gridProps.Name = "gridProps";
             this.gridProps.Size = new System.Drawing.Size(643, 475);
             this.gridProps.TabIndex = 0;
-            this.gridProps.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridProps_CellEndEdit);
             this.gridProps.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridProps_CellValueChanged);
+            this.gridProps.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.gridProps_RowsAdded);
+            this.gridProps.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.gridProps_RowsRemoved);
             // 
             // colName
             // 

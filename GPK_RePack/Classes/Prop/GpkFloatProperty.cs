@@ -1,15 +1,18 @@
 ﻿using System;
+using System.IO;
+using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Parser;
 
 namespace GPK_RePack.Classes.Prop
 {
     [Serializable]
-    class GpkFloatProperty : GpkBaseProperty
+    class GpkFloatProperty : GpkBaseProperty, IProperty
     {
         public float value;
 
         public GpkFloatProperty()
         {
-
+            RecalculateSize();
         }
         public GpkFloatProperty(GpkBaseProperty bp)
         {
@@ -22,6 +25,22 @@ namespace GPK_RePack.Classes.Prop
         public override string ToString()
         {
             return string.Format("ObjectName: {0} Type: {1} Value: {2}", name, type, value);
+        }
+
+        public void WriteData(BinaryWriter writer, GpkPackage package, GpkExport export)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadData(BinaryReader reader, GpkPackage package)
+        {
+            value = reader.ReadSingle();
+        }
+
+        public int RecalculateSize()
+        {
+            size = 4;
+            return size;
         }
     }
 

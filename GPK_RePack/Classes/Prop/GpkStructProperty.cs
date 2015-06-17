@@ -1,16 +1,19 @@
 ﻿using System;
+using System.IO;
+using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Parser;
 
 namespace GPK_RePack.Classes.Prop
 {
     [Serializable]
-    class GpkStructProperty : GpkBaseProperty
+    class GpkStructProperty : GpkBaseProperty, IProperty
     {
         public string innerType;
         public byte[] value;
 
         public GpkStructProperty()
         {
-
+            RecalculateSize();
         }
         public GpkStructProperty(GpkBaseProperty bp)
         {
@@ -23,6 +26,30 @@ namespace GPK_RePack.Classes.Prop
         public override string ToString()
         {
             return string.Format("ObjectName: {0} Type: {1} Length: {2}", name, type, size);
+        }
+
+        public void WriteData(BinaryWriter writer, GpkPackage package, GpkExport export)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadData(BinaryReader reader, GpkPackage package)
+        {
+            long structtype = reader.ReadInt64();
+            innerType = package.NameList[structtype].name;
+            value = new byte[size];
+            value = reader.ReadBytes(size);
+        }
+
+        public int RecalculateSize()
+        {
+            int tmpSize = 0; //length
+            if (value != null)
+            {
+                tmpSize += value.Length;
+            }
+            size = tmpSize;
+            return size;
         }
 
         public string GetValueHex()
