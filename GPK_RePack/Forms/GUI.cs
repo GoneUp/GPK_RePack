@@ -13,6 +13,7 @@ using GPK_RePack.Editors;
 using GPK_RePack.Parser;
 using GPK_RePack.Properties;
 using GPK_RePack.Saver;
+using Microsoft.VisualBasic.Logging;
 using NLog;
 using NLog.Config;
 
@@ -54,11 +55,11 @@ namespace GPK_RePack.Forms
 
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
+        private string selectedClass = "";
 
         private List<GpkPackage> loadedGpkPackages;
         private List<GpkExport>[] changedExports;
 
-        private bool drawing = false;
         private readonly DataFormats.Format exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
 
         #endregion
@@ -116,14 +117,22 @@ namespace GPK_RePack.Forms
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            ResetGUI();
+
+            loadedGpkPackages.Clear();
+            DrawPackages();
+        }
+
+        private void ResetGUI()
+        {
             changedExports = null;
             selectedExport = null;
             selectedPackage = null;
+            selectedClass = "";
             boxInfo.Text = "";
-            boxDataButtons.Enabled = false;
             boxGeneralButtons.Enabled = false;
-            loadedGpkPackages.Clear();
-            DrawPackages();
+            boxDataButtons.Enabled = false;
+            boxPropertyButtons.Enabled = false;
             ClearGrid();
         }
 
@@ -312,18 +321,21 @@ namespace GPK_RePack.Forms
 
         private void treeMain_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            boxInfo.Text = "";
-            boxDataButtons.Enabled = false;
-            boxGeneralButtons.Enabled = false;
-            selectedExport = null;
-            selectedPackage = null;
-            ClearGrid();
+            ResetGUI();
 
             if (e.Node.Level == 0)
             {
                 boxGeneralButtons.Enabled = true;
+                boxDataButtons.Enabled = true;
 
                 selectedPackage = loadedGpkPackages[Convert.ToInt32(e.Node.Name)];
+            }
+            else if (e.Node.Level == 1 && Settings.Default.ViewMode == "class")
+            {
+                selectedPackage = loadedGpkPackages[Convert.ToInt32(e.Node.Parent.Name)];
+                selectedClass = e.Node.Text;
+
+                boxDataButtons.Enabled = true;
             }
             else if (e.Node.Level == 2)
             {
@@ -344,6 +356,7 @@ namespace GPK_RePack.Forms
 
                     boxGeneralButtons.Enabled = true;
                     boxDataButtons.Enabled = true;
+                    boxPropertyButtons.Enabled = true;
                     selectedExport = exp;
                     selectedPackage = package;
 
@@ -379,14 +392,61 @@ namespace GPK_RePack.Forms
                 save.ShowDialog();
                 Settings.Default.SaveDir = save.FileName;
 
-                StreamWriter writer = new StreamWriter(save.OpenFile());
-                writer.BaseStream.Write(selectedExport.data, 0, selectedExport.data.Length);
-                writer.Close();
-                writer.Dispose();
-
-                logger.Info(String.Format("Data was saved to {0}!", save.FileName));
+                DataTools.WriteExportDataFile(save.FileName, selectedExport);
             }
+            else if (selectedPackage != null && selectedClass != "")
+            {
+                List<GpkExport> exports = selectedPackage.GetExportsByClass(selectedClass);
+
+                if (exports.Count == 0)
+                {
+                    logger.Info("No exports found for class {0}.", selectedClass);
+                    return;
+                }
+
+
+                FolderBrowserDialog dialog = new FolderBrowserDialog();
+                dialog.SelectedPath = Settings.Default.SaveDir;
+                DialogResult result = dialog.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    Settings.Default.SaveDir = dialog.SelectedPath;
+
+                    foreach (GpkExport exp in exports)
+                    {
+                        if (exp.data != null)
+                        {
+                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}.raw", dialog.SelectedPath, exp.ObjectName), exp);
+                            logger.Trace("save for " + exp.UID);
+                        }
+                    }
+                }
+            }
+            else if (selectedPackage != null)
+            {
+                FolderBrowserDialog dialog = new FolderBrowserDialog();
+                dialog.SelectedPath = Settings.Default.SaveDir;
+                DialogResult result = dialog.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    Settings.Default.SaveDir = dialog.SelectedPath;
+
+                    foreach (GpkExport exp in selectedPackage.ExportList.Values)
+                    {
+                        if (exp.data != null)
+                        {
+                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}\\{2}.raw", dialog.SelectedPath, exp.ClassName, exp.ObjectName), exp);
+                            logger.Trace("save for " + exp.UID);
+                        }
+                    }
+                }
+            }
+
+            logger.Info("Data was saved!");
         }
+
 
         private void btnReplace_Click(object sender, EventArgs e)
         {
@@ -627,6 +687,34 @@ namespace GPK_RePack.Forms
 
                 SoundwaveTools.ExportOgg(selectedExport, save.FileName);
             }
+            else if (selectedPackage != null && selectedClass == "Core.SoundNodeWave")
+            {
+                List<GpkExport> exports = selectedPackage.GetExportsByClass(selectedClass);
+
+                if (exports.Count == 0)
+                {
+                    logger.Info("No oggs found for class {0}.", selectedClass);
+                    return;
+                }
+
+
+                FolderBrowserDialog dialog = new FolderBrowserDialog();
+                dialog.SelectedPath = Path.GetDirectoryName(Settings.Default.SaveDir);
+                DialogResult result = dialog.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    Settings.Default.SaveDir = dialog.SelectedPath;
+
+                    foreach (GpkExport exp in exports)
+                    {
+                        SoundwaveTools.ExportOgg(exp, String.Format("{0}\\{1}.ogg", dialog.SelectedPath, exp.ObjectName));
+                        logger.Trace("ogg save for " + exp.UID);
+                    }
+
+                    logger.Info(String.Format("Data was saved to {0}!", dialog.SelectedPath));
+                }
+            }
         }
 
         private void btnFakeOGG_Click(object sender, EventArgs e)
@@ -671,15 +759,11 @@ namespace GPK_RePack.Forms
 
         private void ClearGrid()
         {
-            drawing = true;
             gridProps.Rows.Clear();
-            drawing = false;
         }
 
         private void DrawGrid(GpkPackage package, GpkExport export)
         {
-            drawing = true;
-
             gridProps.Enabled = true;
             gridProps.Rows.Clear();
 
@@ -696,7 +780,8 @@ namespace GPK_RePack.Forms
                 row.Cells.Add(nameCell);
 
                 DataGridViewComboBoxCell typeCell = new DataGridViewComboBoxCell();
-                typeCell.Items.AddRange(((DataGridViewComboBoxColumn)gridProps.Columns["colType"]).Items);
+                typeCell.Items.AddRange(((DataGridViewComboBoxColumn)gridProps.Columns["type"]).Items);
+                typeCell.ValueType = typeof(string);
                 typeCell.Value = prop.type;
                 row.Cells.Add(typeCell);
 
@@ -709,21 +794,18 @@ namespace GPK_RePack.Forms
                 row.Cells.Add(arrayCell);
 
                 DataGridViewComboBoxCell innerCell = new DataGridViewComboBoxCell();
+                innerCell.Items.AddRange(nameQuery.ToArray());
 
                 if (prop is GpkStructProperty)
                 {
                     GpkStructProperty struc = (GpkStructProperty)prop;
-                    innerCell.Items.AddRange(nameQuery.ToArray());
                     innerCell.Value = struc.innerType;
-
                 }
                 else
                 {
-                    innerCell.Items.Add("none");
-                    innerCell.Value = "none";
+                    innerCell.Value = "None";
                 }
                 row.Cells.Add(innerCell);
-                innerCell.ReadOnly = true;
 
                 DataGridViewTextBoxCell valueCell = new DataGridViewTextBoxCell();
                 DataGridViewComboBoxCell comboCell = null;
@@ -736,7 +818,6 @@ namespace GPK_RePack.Forms
                 {
                     GpkStructProperty tmpStruct = (GpkStructProperty)prop;
                     valueCell.Value = tmpStruct.GetValueHex();
-                    innerCell.ReadOnly = false;
                 }
                 else if (prop is GpkNameProperty)
                 {
@@ -751,7 +832,7 @@ namespace GPK_RePack.Forms
                     GpkObjectProperty tmpObj = (GpkObjectProperty)prop;
                     comboCell = new DataGridViewComboBoxCell();
                     comboCell.Items.AddRange(package.UidList.ToArray());
-                    comboCell.Value = tmpObj.value;
+                    comboCell.Value = tmpObj.objectName;
 
                 }
                 else if (prop is GpkByteProperty)
@@ -807,236 +888,174 @@ namespace GPK_RePack.Forms
                 gridProps.Rows.Add(row);
 
 
+
             }
 
-            drawing = false;
         }
 
-        private void gridProps_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+
+
+        private void gridProps_DefaultValuesNeeded(object sender, DataGridViewRowEventArgs e)
         {
-            try
+            IEnumerable<String> nameQuery = from pair in selectedPackage.NameList.Values.ToList() select pair.name;
+
+            DataGridViewRow row = gridProps.Rows[e.Row.Index];
+            row.Cells[0].ValueType = typeof(String);
+            row.Cells[0].Value = "[NEW]";
+            //row.Cells[1].Value = "FloatProperty"; user should select that on hisself first
+            row.Cells[2].ValueType = typeof(String);
+            row.Cells[2].Value = "0";
+            row.Cells[3].ValueType = typeof(String);
+            row.Cells[3].Value = "0";
+
+            row.Cells[4] = new DataGridViewComboBoxCell();
+            DataGridViewComboBoxCell cell = (DataGridViewComboBoxCell)row.Cells[4];
+            cell.ValueType = typeof(String);
+            cell.Items.AddRange(nameQuery.ToArray());
+            row.Cells[4].Value = "None";
+
+            row.Cells[5].ValueType = typeof(String);
+            row.Cells[5].Value = "";
+        }
+
+        private void btnPropSave_Click(object sender, EventArgs e)
+        {
+            //1. compare and alter
+            //or 2. read and rebuild  -- this. we skip to the next in case of user input error.
+
+            if (selectedExport == null || selectedPackage == null)
             {
-                if (drawing) return;
+                logger.Info("save failed");
+                return;
+            }
 
-                if ((e.RowIndex < 0 || e.RowIndex >= gridProps.RowCount) ||
-                    (e.ColumnIndex < 0 || e.ColumnIndex >= gridProps.ColumnCount))
+            List<IProperty> list = new List<IProperty>();
+            foreach (DataGridViewRow row in gridProps.Rows)
+            {
+                try
                 {
-                    return;
-                }
-
-                var cell = gridProps[e.ColumnIndex, e.RowIndex];
-                if (selectedExport != null && cell != null && selectedPackage != null)
-                {
-                    IProperty iProp = selectedExport.Properties[e.RowIndex];
-                    GpkBaseProperty bProp = (GpkBaseProperty) iProp;
-
-                    switch (e.ColumnIndex)
+                    if (!row.IsNewRow)
                     {
-                        case 0:
-                            //Name
-                            bProp.name = cell.Value.ToString();
-                            break;
-                        case 1:
-                            //Type
-                            logger.Info("not supported");
-                            break;
-                        case 2:
-                            //Size. Autocomputed. Do nothing.
-                            break;
-                        case 3:
-                            //arrayindex
-                            bProp.arrayIndex = Convert.ToInt32(cell.Value);
-                            break;
-                        case 4:
-                            //innertype
-                            logger.Info("not supported");
-                            break;
-                        case 5:
-                            //vvalue    
-                            if (iProp is GpkArrayProperty)
-                            {
-                                GpkArrayProperty tmpArray = (GpkArrayProperty)iProp;
-                                if (tmpArray.GetValueHex() != cell.Value.ToString())
-                                {
-                                    tmpArray.value = ((string)cell.Value).ToBytes();
-
-                                }
-                            }
-                            else if (iProp is GpkStructProperty)
-                            {
-                                GpkStructProperty tmpStruct = (GpkStructProperty)iProp;
-                                if (tmpStruct.GetValueHex() != cell.Value.ToString())
-                                {
-                                    tmpStruct.value = ((string)cell.Value).ToBytes();
-                                }
-                            }
-                            else if (iProp is GpkNameProperty)
-                            {
-                                GpkNameProperty tmpName = (GpkNameProperty)iProp;
-                                if (tmpName.value != cell.Value.ToString())
-                                {
-                                    tmpName.value = cell.Value.ToString();
-                                }
-
-                            }
-                            else if (iProp is GpkObjectProperty)
-                            {
-                                GpkObjectProperty tmpObj = (GpkObjectProperty)iProp;
-                                if (tmpObj.objectName != cell.Value.ToString())
-                                {
-                                    tmpObj.objectName = cell.Value.ToString();
-                                }
-                            }
-                            else if (iProp is GpkByteProperty)
-                            {
-                                GpkByteProperty tmpByte = (GpkByteProperty)iProp;
-                                if (tmpByte.value != cell.Value.ToString())
-                                {
-                                    if (tmpByte.size == 8)
-                                    {
-                                        tmpByte.nameValue = cell.Value.ToString();
-
-                                    }
-                                    else
-                                    {
-                                        tmpByte.byteValue = (byte)cell.Value;
-                                    }
-                                }
-                            }
-                            else if (iProp is GpkFloatProperty)
-                            {
-                                GpkFloatProperty tmpFloat = (GpkFloatProperty)iProp;
-                                float fCell = Convert.ToSingle(cell.Value);
-
-                                if (tmpFloat.value != fCell)
-                                {
-                                    tmpFloat.value = fCell;
-                                }
-                            }
-                            else if (iProp is GpkIntProperty)
-                            {
-                                GpkIntProperty tmpInt = (GpkIntProperty)iProp;
-                                int intCell = Convert.ToInt32(cell.Value);
-
-                                if (tmpInt.value != intCell)
-                                {
-                                    tmpInt.value = intCell;
-                                }
-                            }
-                            else if (iProp is GpkStringProperty)
-                            {
-                                GpkStringProperty tmpString = (GpkStringProperty)iProp;
-
-                                if (tmpString.value != cell.Value.ToString())
-                                {
-                                    tmpString.value = cell.Value.ToString();
-                                    tmpString.size = tmpString.length;
-                                }
-                            }
-                            else if (iProp is GpkBoolProperty)
-                            {
-                                GpkBoolProperty tmpBool = (GpkBoolProperty)iProp;
-                                if (tmpBool.value != (bool)cell.Value)
-                                {
-                                    tmpBool.value = (bool)cell.Value;
-                                }
-                            }
-                            else
-                            {
-                                logger.Info("LOL");
-                            }
-                            break;
+                        list.Add(readProperty(row));
                     }
-
-                    //update size
-                    iProp.RecalculateSize();
-                    gridProps[2, e.RowIndex].Value = bProp.size;
-
                 }
-            }
-            catch (Exception ex)
-            {
+                catch (Exception ex)
+                {
 
-                logger.Fatal("Propertry Edit failed! " + ex.Message);
+                    logger.Info("Failed to save row {0}, {1}!", row.Index, ex);
+                }
+
             }
 
+            selectedExport.Properties = list;
+            logger.Info("Saved properties of export {0}.", selectedExport.UID);
 
         }
 
-        private void gridProps_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        private void btnPropClear_Click(object sender, EventArgs e)
         {
-            try
+            if (selectedExport == null || selectedPackage == null)
             {
-                if (drawing) return;
+                logger.Info("save failed");
+                return;
+            }
 
-                var row = gridProps.Rows[e.RowIndex];
-                if (selectedExport != null && selectedPackage != null)
-                {
-                    GpkBaseProperty baseProp = new GpkBaseProperty(row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString(), 0, Convert.ToInt32(row.Cells[3].Value));
-                    IProperty iProp = null;
+            selectedExport.Properties.Clear();
+            DrawGrid(selectedPackage, selectedExport);
+            logger.Info("Cleared!");
+        }
 
-                    switch (baseProp.type)
+        private IProperty readProperty(DataGridViewRow row)
+        {
+            GpkBaseProperty baseProp = new GpkBaseProperty(row.Cells["name"].Value.ToString(), row.Cells["type"].Value.ToString(), 0, Convert.ToInt32(row.Cells["aIndex"].Value.ToString()));
+            IProperty iProp = null;
+
+            //Check & Add name to our namelist
+            selectedPackage.AddString(baseProp.name);
+
+            string cellValue = row.Cells["value"].Value.ToString();
+            switch (baseProp.type)
+            {
+                case "StructProperty":
+                    GpkStructProperty tmpStruct = new GpkStructProperty(baseProp);
+                    tmpStruct.innerType = row.Cells["iType"].Value.ToString();
+                    tmpStruct.value = (cellValue).ToBytes(); ;
+                    iProp = tmpStruct;
+                    break;
+                case "ArrayProperty":
+                    GpkArrayProperty tmpArray = new GpkArrayProperty(baseProp);
+                    tmpArray.value = (cellValue).ToBytes(); ;
+                    iProp = tmpArray;
+                    break;
+                case "ByteProperty":
+                    GpkByteProperty tmpByte = new GpkByteProperty(baseProp);
+
+                    if (cellValue.Length > 2)
                     {
-                        case "StructProperty":
-                        case "ArrayProperty":
-                        case "ByteProperty":
-                        case "NameProperty":
-                        case "ObjectProperty":
-                            logger.Info("not supported");
-                            return;
-
-                        case "BoolProperty":
-                            GpkBoolProperty tmpBool = new GpkBoolProperty();
-                            tmpBool.value = Convert.ToBoolean(row.Cells[5].Value);
-                            iProp = tmpBool;
-                            break;
-
-                        case "IntProperty":
-                            GpkIntProperty tmpInt = new GpkIntProperty();
-                            tmpInt.value = Convert.ToInt32(row.Cells[5].Value);
-                            iProp = tmpInt;
-                            break;
-
-                        case "FloatProperty":
-                            GpkFloatProperty tmpFloat = new GpkFloatProperty();
-                            tmpFloat.value = Convert.ToSingle(row.Cells[5].Value);
-                            iProp = tmpFloat;
-                            break;
-
-                        case "StrProperty":
-                            GpkStringProperty tmpStr = new GpkStringProperty();
-                            tmpStr.value = (row.Cells[5].Value.ToString());
-                            iProp = tmpStr;
-                            break;
-
-                        default:
-                            throw new Exception(
-                                string.Format("Unknown Property Type {0}, Prop_Name {1}", baseProp.type, baseProp.name));
+                        selectedPackage.AddString(cellValue); //just in case 
+                        tmpByte.nameValue = cellValue;
 
                     }
+                    else
+                    {
+                        tmpByte.byteValue = Convert.ToByte(cellValue);
+                    }
+                    iProp = tmpByte;
+                    break;
 
-                    iProp.RecalculateSize();
-                    selectedExport.Properties.Add(iProp);
-                }
+                case "NameProperty":
+                    GpkNameProperty tmpName = new GpkNameProperty(baseProp);
+                    selectedPackage.AddString(cellValue); //just in case 
+                    tmpName.value = cellValue;
+                    iProp = tmpName;
+                    break;
+                case "ObjectProperty":
+                    GpkObjectProperty tmpObj = new GpkObjectProperty(baseProp);
+                    selectedPackage.GetObjectByUID(cellValue); //throws ex if uid is not present
+                    tmpObj.objectName = cellValue;
+                    iProp = tmpObj;
+                    break;
+
+                case "BoolProperty":
+                    GpkBoolProperty tmpBool = new GpkBoolProperty(baseProp);
+                    tmpBool.value = Convert.ToBoolean(row.Cells[5].Value);
+                    iProp = tmpBool;
+                    break;
+
+                case "IntProperty":
+                    GpkIntProperty tmpInt = new GpkIntProperty(baseProp);
+                    tmpInt.value = Convert.ToInt32(row.Cells[5].Value);
+                    iProp = tmpInt;
+                    break;
+
+                case "FloatProperty":
+                    GpkFloatProperty tmpFloat = new GpkFloatProperty(baseProp);
+                    tmpFloat.value = Convert.ToSingle(row.Cells[5].Value);
+                    iProp = tmpFloat;
+                    break;
+
+                case "StrProperty":
+                    GpkStringProperty tmpStr = new GpkStringProperty(baseProp);
+                    tmpStr.value = (row.Cells[5].Value.ToString());
+                    iProp = tmpStr;
+                    break;
+
+                default:
+                    throw new Exception(
+                        string.Format("Unknown Property Type {0}, Prop_Name {1}", baseProp.type, baseProp.name));
+
             }
-            catch (Exception ex)
-            {
 
-                logger.Fatal("Propertry Add failed! " + ex.Message);
-            }
-
-
+            iProp.RecalculateSize();
+            return iProp;
         }
-
-        private void gridProps_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
-        {
-            if (drawing) return;
-            logger.Info("not supported");
-
-        }
-
-
         #endregion
+
+
+
+
+
+
 
 
 

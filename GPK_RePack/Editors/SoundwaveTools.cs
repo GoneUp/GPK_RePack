@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GPK_RePack.Classes;
+using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Payload;
 using GPK_RePack.Classes.Prop;
 using NLog;
@@ -42,43 +43,52 @@ namespace GPK_RePack.Editors
 
             export.RecalculateSize();
 
+            if (oggfile == "fake")
+            {
+                logger.Info(String.Format("Fake soundfile was imported to {0}!", export.UID));
+                return;
+            }
 
             //manipulate the sound duration
             VorbisReader vorbis = null;
-            if (oggfile != "fake")
-                vorbis = new VorbisReader(new MemoryStream(wave.oggdata), true);
+            vorbis = new VorbisReader(new MemoryStream(wave.oggdata), true);
 
-            for (int i = 0; i < export.Properties.Count; i++)
+            /*
+             * ObjectName: Duration Type: FloatProperty Value: 0,4694785
+ObjectName: NumChannels Type: IntProperty Value: 1
+ObjectName: SampleRate Type: IntProperty Value: 22050
+ObjectName: SampleDataSize Type: IntProperty Value: 20704
+*/
+
+            foreach (IProperty prop in export.Properties)
             {
-                object prop = export.Properties[i];
                 if (prop is GpkFloatProperty)
                 {
-                    GpkFloatProperty floatProperty = (GpkFloatProperty) prop;
+                    GpkFloatProperty floatProperty = (GpkFloatProperty)prop;
                     if (floatProperty.name == "Duration")
                     {
-                        if (oggfile != "fake")
-                        {
-                            floatProperty.value = (float) vorbis.TotalTime.TotalSeconds;
-                        }
-                        else
-                        {
-                            floatProperty.value = 0.1f;
-                        }
-                        break;
+                        floatProperty.value = (float)vorbis.TotalTime.TotalSeconds;
                     }
                 }
-
-
-
-                if (oggfile != "fake")
+                else if (prop is GpkIntProperty)
                 {
-                    logger.Info(String.Format("Soundfile was imported to {0}!", export.UID));
-                }
-                else
-                {
-                    logger.Info(String.Format("Fake soundfile was imported to {0}!", export.UID));
+                    GpkIntProperty intProperty = (GpkIntProperty)prop;
+                    if (intProperty.name == "NumChannels")
+                    {
+                        intProperty.value = vorbis.Channels;
+                    }
+                    if (intProperty.name == "SampleRate")
+                    {
+                        intProperty.value = vorbis.SampleRate;
+                    }
+                    if (intProperty.name == "SampleDataSize")
+                    {
+                        intProperty.value = wave.oggdata.Length;
+                    }
                 }
             }
+
+            logger.Info(String.Format("Soundfile was imported to {0}!", export.UID));
         }
 
         public static void ExportOgg(GpkExport export, string oggfile)

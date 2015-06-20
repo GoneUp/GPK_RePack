@@ -134,6 +134,8 @@ namespace GPK_RePack.Parser
             package.Header.EngineVersion = reader.ReadInt32();
             package.Header.CookerVersion = reader.ReadInt32();
 
+            if (package.Header.EngineVersion == 0xC0FFEE) logger.Trace("Found a old brother ;)");
+
             logger.Info("Unk3 {0}, Unk4 {1}, Unk5 {2}, Unk6 {3}, EngineVersion {4}, CookerVersion {5}",
                 package.Header.Unk3, package.Header.Unk4, package.Header.Unk5, package.Header.Unk6, package.Header.EngineVersion, package.Header.CookerVersion);
         }

@@ -16,6 +16,9 @@ namespace GPK_RePack.Saver
     class Save
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+        private long offsetExportPos = 0;
+        private long offsetImportPos = 0;
+        private long offsetNamePos = 0;
 
         public void SaveReplacedExport(GpkPackage package, string savepath, List<GpkExport> changedExports)
         {
@@ -68,12 +71,15 @@ namespace GPK_RePack.Saver
             writer.Write(package.Header.Unk2);
 
             writer.Write(package.Header.NameCount + package.Header.NameOffset); //tera thing
+            offsetNamePos = writer.BaseStream.Position;
             writer.Write(package.Header.NameOffset);
 
             writer.Write(package.Header.ExportCount);
+            offsetExportPos = writer.BaseStream.Position;
             writer.Write(package.Header.ExportOffset);
 
             writer.Write(package.Header.ImportCount);
+            offsetImportPos = writer.BaseStream.Position;
             writer.Write(package.Header.ImportOffset);
 
             writer.Write(package.Header.DependsOffset);
@@ -94,8 +100,10 @@ namespace GPK_RePack.Saver
             writer.Write(package.Header.Unk5);
             writer.Write(package.Header.Unk6);
 
-            writer.Write(package.Header.EngineVersion);
+            //writer.Write(package.Header.EngineVersion); 
+            writer.Write(0xC0FFEE); //my signature ^^
             writer.Write(package.Header.CookerVersion);
+           
 
             logger.Debug("Wrote header pos " + writer.BaseStream.Position);
         }
@@ -104,7 +112,13 @@ namespace GPK_RePack.Saver
         {
             if (writer.BaseStream.Position != package.Header.NameOffset)
             {
-                throw new Exception("name offset mismatch!");
+                package.Header.NameOffset = (int)writer.BaseStream.Position;
+
+                writer.BaseStream.Seek(offsetNamePos, SeekOrigin.Begin);
+                writer.Write(package.Header.NameOffset);
+                writer.BaseStream.Seek(package.Header.NameOffset, SeekOrigin.Begin);
+
+                logger.Debug("name offset mismatch, fixed!");
             }
 
             foreach (GpkString tmpString in package.NameList.Values)
@@ -121,7 +135,13 @@ namespace GPK_RePack.Saver
         {
             if (writer.BaseStream.Position != package.Header.ImportOffset)
             {
-                throw new Exception("import offset mismatch!");
+                package.Header.ImportOffset = (int)writer.BaseStream.Position;
+
+                writer.BaseStream.Seek(offsetImportPos, SeekOrigin.Begin);
+                writer.Write(package.Header.ImportOffset);
+                writer.BaseStream.Seek(package.Header.ImportOffset, SeekOrigin.Begin);
+
+                logger.Debug("import offset mismatch, fixed!");
             }
 
             foreach (GpkImport imp in package.ImportList.Values)
@@ -140,7 +160,13 @@ namespace GPK_RePack.Saver
         {
             if (writer.BaseStream.Position != package.Header.ExportOffset)
             {
-                throw new Exception("export offset mismatch!");
+                package.Header.ExportOffset = (int)writer.BaseStream.Position;
+
+                writer.BaseStream.Seek(offsetExportPos, SeekOrigin.Begin);
+                writer.Write(package.Header.ExportOffset);
+                writer.BaseStream.Seek(package.Header.ExportOffset, SeekOrigin.Begin);
+
+                logger.Debug("export offset mismatch, fixed!");
             }
 
             foreach (GpkExport export in package.ExportList.Values)

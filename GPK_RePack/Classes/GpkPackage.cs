@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NLog.LayoutRenderers;
 
 namespace GPK_RePack.Classes
 {
@@ -26,6 +27,20 @@ namespace GPK_RePack.Classes
             NameList = new Dictionary<long, GpkString>();
             ImportList = new Dictionary<long, GpkImport>();
             ExportList = new Dictionary<long, GpkExport>();
+        }
+
+        public void AddString(string text)
+        {
+            long maxKey = 0;
+            foreach (KeyValuePair<long, GpkString> pair in NameList)
+            {
+                if (pair.Key > maxKey) maxKey = pair.Key;
+                if (pair.Value.name == text) return;
+            }
+
+            GpkString str = new GpkString();
+            str.name = text;
+            NameList.Add(maxKey + 1, str);
         }
 
         public long GetStringIndex(string text)
@@ -104,6 +119,19 @@ namespace GPK_RePack.Classes
             }
 
             throw new Exception(string.Format("Object {0} not found!", uid));
+        }
+
+        public List<GpkExport> GetExportsByClass(string className)
+        {
+            List<GpkExport> tmpList = new List<GpkExport>();
+            foreach (KeyValuePair<long, GpkExport> pair in ExportList)
+            {
+                if (pair.Value.ClassName == className)
+                {
+                    tmpList.Add(pair.Value);
+                }
+            }
+            return tmpList;
         }
     }
 }
