@@ -52,6 +52,12 @@ namespace GPK_RePack.Forms
             this.boxInfo = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.gridProps = new System.Windows.Forms.DataGridView();
+            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.type = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.size = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.aIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.iType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.boxCommands = new System.Windows.Forms.Panel();
             this.boxPropertyButtons = new System.Windows.Forms.GroupBox();
             this.btnPropClear = new System.Windows.Forms.Button();
@@ -70,12 +76,6 @@ namespace GPK_RePack.Forms
             this.btnExport = new System.Windows.Forms.Button();
             this.boxLog = new System.Windows.Forms.TextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.type = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.size = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.aIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.iType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -272,6 +272,47 @@ namespace GPK_RePack.Forms
             this.gridProps.Size = new System.Drawing.Size(685, 363);
             this.gridProps.TabIndex = 0;
             this.gridProps.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.gridProps_DefaultValuesNeeded);
+            // 
+            // name
+            // 
+            this.name.HeaderText = "Name";
+            this.name.Name = "name";
+            // 
+            // type
+            // 
+            this.type.HeaderText = "Type";
+            this.type.Items.AddRange(new object[] {
+            "ArrayProperty",
+            "BoolProperty",
+            "ByteProperty",
+            "FloatProperty",
+            "IntProperty",
+            "NameProperty",
+            "ObjectProperty",
+            "StrProperty",
+            "StructProperty"});
+            this.type.Name = "type";
+            // 
+            // size
+            // 
+            this.size.HeaderText = "Size";
+            this.size.Name = "size";
+            this.size.ReadOnly = true;
+            // 
+            // aIndex
+            // 
+            this.aIndex.HeaderText = "ArrayIndex";
+            this.aIndex.Name = "aIndex";
+            // 
+            // iType
+            // 
+            this.iType.HeaderText = "InnerType";
+            this.iType.Name = "iType";
+            // 
+            // value
+            // 
+            this.value.HeaderText = "Value";
+            this.value.Name = "value";
             // 
             // boxCommands
             // 
@@ -480,47 +521,6 @@ namespace GPK_RePack.Forms
             this.splitContainer1.SplitterDistance = 271;
             this.splitContainer1.TabIndex = 7;
             // 
-            // name
-            // 
-            this.name.HeaderText = "Name";
-            this.name.Name = "name";
-            // 
-            // type
-            // 
-            this.type.HeaderText = "Type";
-            this.type.Items.AddRange(new object[] {
-            "ArrayProperty",
-            "BoolProperty",
-            "ByteProperty",
-            "FloatProperty",
-            "IntProperty",
-            "NameProperty",
-            "ObjectProperty",
-            "StrProperty",
-            "StructProperty"});
-            this.type.Name = "type";
-            // 
-            // size
-            // 
-            this.size.HeaderText = "Size";
-            this.size.Name = "size";
-            this.size.ReadOnly = true;
-            // 
-            // aIndex
-            // 
-            this.aIndex.HeaderText = "ArrayIndex";
-            this.aIndex.Name = "aIndex";
-            // 
-            // iType
-            // 
-            this.iType.HeaderText = "InnerType";
-            this.iType.Name = "iType";
-            // 
-            // value
-            // 
-            this.value.HeaderText = "Value";
-            this.value.Name = "value";
-            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -532,7 +532,7 @@ namespace GPK_RePack.Forms
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GUI";
-            this.Text = "Terahelper 0.6 - by GoneUp";
+            this.Text = "Terahelper 0.7 - by GoneUp";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GUI_FormClosed);
             this.Load += new System.EventHandler(this.GUI_Load);
             this.menuStrip1.ResumeLayout(false);

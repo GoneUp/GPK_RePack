@@ -1,8 +1,9 @@
 ﻿using System.Text;
+using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes
 {
-    class GpkImport
+    class GpkImport : IGpkPart
     {
         public string UID;
 
@@ -22,6 +23,12 @@ namespace GPK_RePack.Classes
             info.AppendLine("ClassPackage: " + ClassPackage);
             info.AppendLine("Class: " + Class);
             return info.ToString();
+
+        }
+
+        public int GetSize()
+        {
+            return 28;
 
         }
     }

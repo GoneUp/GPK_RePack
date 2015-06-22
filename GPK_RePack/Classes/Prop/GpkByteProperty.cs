@@ -28,9 +28,16 @@ namespace GPK_RePack.Classes.Prop
             return string.Format("ObjectName: {0} Type: {1} NameValue: {2} NameValue: {3}", name, type, nameValue, byteValue);
         }
 
-        public void WriteData(BinaryWriter writer, GpkPackage package, GpkExport export)
+        public void WriteData(BinaryWriter writer, GpkPackage package)
         {
-            throw new NotImplementedException();
+            if (size == 8)
+            {
+                writer.Write(package.GetStringIndex(nameValue));
+            }
+            else
+            {
+                writer.Write(byteValue);
+            }
         }
 
         public void ReadData(BinaryReader reader, GpkPackage package)

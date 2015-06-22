@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes
 {
-    class GpkHeader
+    class GpkHeader : IGpkPart
     {
         public int Tag;
         public short FileVersion;
@@ -26,5 +27,11 @@ namespace GPK_RePack.Classes
         public int Unk3, Unk4, Unk5, Unk6;
         public int EngineVersion;
         public int CookerVersion;
+
+
+        public int GetSize()
+        {
+            return 109;
+        }
     }
 }

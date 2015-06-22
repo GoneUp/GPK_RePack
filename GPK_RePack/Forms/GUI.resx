@@ -123,12 +123,7 @@
   <data name="boxInfo.Text" xml:space="preserve">
     <value>Source Code: https://github.com/GoneUp/GPK_RePack/  
 
-##
 
-Warning: Only tested for the PCVoice GPK Files. It maybe works for others as well, it is just untested.
-Use at own risk ;)
-
-##
 Quick Guide:
 1. Open a *.gpk file via Main -&gt; Open
 2. Select a Object you want to edit on the treeview
@@ -142,7 +137,11 @@ Quick Guide:
  
 
 Note: Tera accepts only files with the exact same file size as the orginal file. Terahelper will fill the file up if its too small and warn you if it is too big. In this case you need to reduce the file size to fit the maximum.
-If you want to change the maximum size manually select a the package and use the Misc -&gt; Set Filesize function.</value>
+If you want to change the maximum size manually select a the package and use the Misc -&gt; Set Filesize function.
+
+
+Have Fun &amp; Always Backup
+-- GoneUp</value>
   </data>
   <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

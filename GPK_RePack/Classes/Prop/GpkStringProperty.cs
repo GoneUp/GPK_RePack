@@ -2,6 +2,7 @@
 using System.IO;
 using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Parser;
+using GPK_RePack.Saver;
 
 namespace GPK_RePack.Classes.Prop
 {
@@ -25,9 +26,18 @@ namespace GPK_RePack.Classes.Prop
             arrayIndex = bp.arrayIndex;
         }
 
-        public void WriteData(BinaryWriter writer, GpkPackage package, GpkExport export)
+        public void WriteData(BinaryWriter writer, GpkPackage package)
         {
-            throw new NotImplementedException();
+            writer.Write(length);
+
+            if (length > 0)
+            {
+                Save.WriteString(writer, value);
+            }
+            else
+            {
+                Save.WriteUnicodeString(writer, value);
+            }
         }
 
         public void ReadData(BinaryReader reader, GpkPackage package)
@@ -48,9 +58,14 @@ namespace GPK_RePack.Classes.Prop
         public int RecalculateSize()
         {
             int tmpSize = 4; //length
-            if (value != null)
+            if (length > 0)
             {
-                tmpSize += value.Length;
+                tmpSize += length;
+            }
+            else
+            {
+                //unicode :O
+                tmpSize += (length*-1) * 2;
             }
             size = tmpSize;
             return size;

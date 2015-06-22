@@ -1,9 +1,16 @@
-﻿namespace GPK_RePack.Classes
+﻿using GPK_RePack.Classes.Interfaces;
+
+namespace GPK_RePack.Classes
 {
-    class GpkGeneration
+    class GpkGeneration : IGpkPart
     {
-        public int ExportCount, NameCount;
+        public int ExportCount;
+        public int NameCount;
         public int NetObjectCount;
 
+        public int GetSize()
+        {
+            return 12;
+        }
     }
 }

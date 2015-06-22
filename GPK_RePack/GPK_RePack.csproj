@@ -65,6 +65,7 @@
     <Compile Include="Classes\GpkHeader.cs" />
     <Compile Include="Classes\GpkImport.cs" />
     <Compile Include="Classes\GpkPackage.cs" />
+    <Compile Include="Classes\Interfaces\IGpkPart.cs" />
     <Compile Include="Classes\Interfaces\IProperty.cs" />
     <Compile Include="Classes\Interfaces\IPayload.cs" />
     <Compile Include="Classes\Payload\Soundwave.cs" />

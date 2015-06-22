@@ -118,14 +118,13 @@ namespace GPK_RePack.Forms
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ResetGUI();
-
+            changedExports = null;
             loadedGpkPackages.Clear();
             DrawPackages();
         }
 
         private void ResetGUI()
         {
-            changedExports = null;
             selectedExport = null;
             selectedPackage = null;
             selectedClass = "";
@@ -329,6 +328,7 @@ namespace GPK_RePack.Forms
                 boxDataButtons.Enabled = true;
 
                 selectedPackage = loadedGpkPackages[Convert.ToInt32(e.Node.Name)];
+                boxInfo.Text = selectedPackage.ToString();
             }
             else if (e.Node.Level == 1 && Settings.Default.ViewMode == "class")
             {
@@ -476,7 +476,7 @@ namespace GPK_RePack.Forms
                 byte[] buffer = File.ReadAllBytes(path);
                 int packageIndex = Convert.ToInt32(treeMain.SelectedNode.Parent.Parent.Name);
 
-                if (Settings.Default.PatchMode)
+                if (!Settings.Default.PatchMode)
                 {
                     if (buffer.Length > selectedExport.data.Length)
                     {
@@ -504,7 +504,7 @@ namespace GPK_RePack.Forms
                         buffer.Length));
 
                     selectedExport.data = buffer;
-                    selectedExport.RecalculateSize();
+                    selectedExport.GetDataSize();
                     selectedPackage.Changes = true;
                 }
 
@@ -596,7 +596,7 @@ namespace GPK_RePack.Forms
 
             }
 
-            copyExport.RecalculateSize();
+            copyExport.GetDataSize();
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
             logger.Info("Pasted the data and properties of {0} to {1}", copyExport.UID, selectedExport.UID);
         }
@@ -618,7 +618,7 @@ namespace GPK_RePack.Forms
             selectedExport.data = null;
             selectedExport.data_padding = null;
             selectedExport.payload = null;
-            selectedExport.RecalculateSize();
+            selectedExport.GetDataSize();
 
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
         }

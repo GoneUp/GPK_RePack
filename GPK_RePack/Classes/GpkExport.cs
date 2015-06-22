@@ -8,7 +8,7 @@ using GPK_RePack.Classes.Prop;
 namespace GPK_RePack.Classes
 {
     [Serializable]
-    class GpkExport 
+    class GpkExport : IGpkPart
     {
         public string UID;
 
@@ -108,30 +108,30 @@ namespace GPK_RePack.Classes
 
             return info.ToString();
         }
-
-        public int RecalculateSize()
+        public int GetDataSize()
         {
             int size = 0;
 
             //props
-            int tmpSize = 0;
-            tmpSize += 4; //netindex
+            size += 4; //netindex
             if (property_padding != null)
             {
-                tmpSize += property_padding.Length;
+                size += property_padding.Length;
             }
 
-            foreach (var property in Properties)
+            foreach (IProperty iProp in Properties)
             {
-                var baseProp = (GpkBaseProperty) property;
-                tmpSize += baseProp.size + 24;
+                size += iProp.RecalculateSize() + 24;
             }
             //none
-            tmpSize += 8;
+            size += 8;
             //finally
-            property_size = tmpSize;
-            size += tmpSize;
+            property_size = size;
 
+            if (data_padding != null)
+            {
+                size += data_padding.Length;
+            }
             //data
             if (data != null)
             {
@@ -143,7 +143,17 @@ namespace GPK_RePack.Classes
             return size;
         }
 
+        public int GetSize()
+        {
+            //for export part ony, for data see recal func
+            int tmpSize = 0;
+            tmpSize += 36; //static
+            if (SerialSize > 0) tmpSize += 4;
+            tmpSize += padding_unk.Length;
 
+            return tmpSize;
+
+        }
 
       
     }

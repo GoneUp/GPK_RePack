@@ -20,7 +20,7 @@
                 <value>False</value>
             </setting>
             <setting name="ViewMode" serializeAs="String">
-                <value>normal</value>
+                <value>class</value>
             </setting>
             <setting name="SaveDir" serializeAs="String">
                 <value />
@@ -29,7 +29,7 @@
                 <value />
             </setting>
             <setting name="ShowImports" serializeAs="String">
-                <value>True</value>
+                <value>False</value>
             </setting>
             <setting name="PatchMode" serializeAs="String">
                 <value>False</value>

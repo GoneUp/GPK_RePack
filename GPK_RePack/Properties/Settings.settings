@@ -12,7 +12,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ViewMode" Type="System.String" Scope="User">
-      <Value Profile="(Default)">normal</Value>
+      <Value Profile="(Default)">class</Value>
     </Setting>
     <Setting Name="SaveDir" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -21,7 +21,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ShowImports" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="PatchMode" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

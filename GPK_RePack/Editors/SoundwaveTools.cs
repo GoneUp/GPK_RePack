@@ -41,7 +41,7 @@ namespace GPK_RePack.Editors
             writer.Dispose();
 
 
-            export.RecalculateSize();
+            export.GetDataSize();
 
             if (oggfile == "fake")
             {

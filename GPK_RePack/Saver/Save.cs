@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GPK_RePack.Classes;
+using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Prop;
+using GPK_RePack.Properties;
 using NLog;
 using NLog.Fluent;
 using NLog.LayoutRenderers;
@@ -44,6 +46,8 @@ namespace GPK_RePack.Saver
             //Imports
             //Exports
             logger.Debug("Start writing");
+            int compuSize = package.GetActualSize();
+
             using (BinaryWriter writer = new BinaryWriter(new FileStream(savepath, FileMode.Create)))
             {
                 WriteHeader(writer, package);
@@ -51,7 +55,7 @@ namespace GPK_RePack.Saver
                 WriteImports(writer, package);
                 WriteExports(writer, package);
                 WriteExportsData(writer, package);
-                WriteFilePadding(writer, package);
+                WriteFilePadding(writer, package, compuSize);
             }
 
 
@@ -103,7 +107,7 @@ namespace GPK_RePack.Saver
             //writer.Write(package.Header.EngineVersion); 
             writer.Write(0xC0FFEE); //my signature ^^
             writer.Write(package.Header.CookerVersion);
-           
+
 
             logger.Debug("Wrote header pos " + writer.BaseStream.Position);
         }
@@ -146,10 +150,10 @@ namespace GPK_RePack.Saver
 
             foreach (GpkImport imp in package.ImportList.Values)
             {
-                writer.Write(GetStringIndex(imp.ClassPackage, package));
-                writer.Write(GetStringIndex(imp.Class, package));
+                writer.Write(package.GetStringIndex(imp.ClassPackage));
+                writer.Write(package.GetStringIndex(imp.Class));
                 writer.Write(imp.PackageRef);
-                writer.Write((int)GetStringIndex(imp.ObjectName, package));
+                writer.Write((int)package.GetStringIndex(imp.ObjectName));
                 writer.Write(imp.Unk);
             }
 
@@ -171,11 +175,11 @@ namespace GPK_RePack.Saver
 
             foreach (GpkExport export in package.ExportList.Values)
             {
-                writer.Write((int)GetObjectIndex(export.ClassName, package));
-                writer.Write((int)GetObjectIndex(export.SuperName, package));
-                writer.Write((int)GetObjectIndex(export.PackageName, package));
+                writer.Write((int)package.GetObjectIndex(export.ClassName));
+                writer.Write((int)package.GetObjectIndex(export.SuperName));
+                writer.Write((int)package.GetObjectIndex(export.PackageName));
 
-                writer.Write(Convert.ToInt32(GetStringIndex(export.ObjectName, package)));
+                writer.Write(Convert.ToInt32(package.GetStringIndex(export.ObjectName)));
 
                 writer.Write(export.Unk1);
                 writer.Write(export.Unk2);
@@ -223,95 +227,32 @@ namespace GPK_RePack.Saver
                 }
 
                 writer.Write(export.netIndex);
-
                 if (export.property_padding != null)
                 {
                     writer.Write(export.property_padding);
                 }
-                else
-                {
-                    logger.Trace(1);
-                }
 
-
-                foreach (object prop in export.Properties)
+                foreach (IProperty iProp in export.Properties)
                 {
-                    GpkBaseProperty baseProperty = (GpkBaseProperty)prop;
-                    writer.Write(GetStringIndex(baseProperty.name, package));
-                    writer.Write(GetStringIndex(baseProperty.type, package));
+                    GpkBaseProperty baseProperty = (GpkBaseProperty)iProp;
+                    writer.Write(package.GetStringIndex(baseProperty.name));
+                    writer.Write(package.GetStringIndex(baseProperty.type));
                     writer.Write(baseProperty.size);
                     writer.Write(baseProperty.arrayIndex);
 
-                    if (prop is GpkArrayProperty)
-                    {
-                        GpkArrayProperty tmpArray = (GpkArrayProperty)prop;
-                        writer.Write(tmpArray.value);
-                    }
-                    else if (prop is GpkStructProperty)
-                    {
-                        GpkStructProperty tmpStruct = (GpkStructProperty)prop;
-                        writer.Write(GetStringIndex(tmpStruct.innerType, package));
-                        writer.Write(tmpStruct.value);
-                    }
-                    else if (prop is GpkBoolProperty)
-                    {
-                        GpkBoolProperty tmpBool = (GpkBoolProperty)prop;
-                        writer.Write(Convert.ToInt32(tmpBool.value));
-                    }
-                    else if (prop is GpkNameProperty)
-                    {
-                        GpkNameProperty tmpName = (GpkNameProperty)prop;
-                        writer.Write((int)GetStringIndex(tmpName.value, package));
-                        writer.Write(tmpName.padding);
-                    }
-                    else if (prop is GpkIntProperty)
-                    {
-                        GpkIntProperty tmpInt = (GpkIntProperty)prop;
-                        writer.Write(tmpInt.value);
-                    }
-                    else if (prop is GpkFloatProperty)
-                    {
-                        GpkFloatProperty tmpFloat = (GpkFloatProperty)prop;
-                        writer.Write(tmpFloat.value);
-                    }
-                    else if (prop is GpkStringProperty)
-                    {
-                        GpkStringProperty tmpString = (GpkStringProperty)prop;
-                        writer.Write(tmpString.length);
-
-                        if (tmpString.length > 0)
-                        {
-                            WriteString(writer, tmpString.value);
-                        }
-                        else
-                        {
-                            WriteUnicodeString(writer, tmpString.value);
-                        }
-                    }
-                    else if (prop is GpkObjectProperty)
-                    {
-                        GpkObjectProperty tmpObj = (GpkObjectProperty)prop;
-                        writer.Write((int)GetObjectIndex(tmpObj.objectName, package));
-
-                    }
-                    else if (prop is GpkByteProperty)
-                    {
-                        GpkByteProperty tmpByte = (GpkByteProperty)prop;
-
-                        if (tmpByte.size == 8)
-                        {
-                            writer.Write(GetStringIndex(tmpByte.nameValue, package));
-                        }
-                        else
-                        {
-                            writer.Write(tmpByte.byteValue);
-                        }
-
-                    }
+                    iProp.WriteData(writer, package);
                 }
 
                 //end with a none nameindex
-                writer.Write(GetStringIndex("None", package));
+                writer.Write(package.GetStringIndex("None"));
+
+
+                //check
+                long propRealSize = (writer.BaseStream.Position - data_start);
+                if (Settings.Default.Debug && propRealSize != export.property_size)
+                {
+                    logger.Trace("Compu Size: {0}, Diff {1} -", export.property_size, propRealSize - export.property_size);
+                }
 
 
                 if (export.data_padding != null)
@@ -350,10 +291,12 @@ namespace GPK_RePack.Saver
             logger.Debug("Wrote export data pos " + writer.BaseStream.Position);
         }
 
-        private void WriteFilePadding(BinaryWriter writer, GpkPackage package)
+        private void WriteFilePadding(BinaryWriter writer, GpkPackage package, int compuSize)
         {
             long final_size = writer.BaseStream.Position;
-            logger.Debug(String.Format("New size {0}, Old size {1}.", final_size, package.OrginalSize));
+            logger.Debug(String.Format("New size {0}, Old size {1}", final_size, package.OrginalSize));
+            logger.Debug("Compu Size: {0}, Diff {1} -", compuSize, final_size - compuSize);
+
 
             if (final_size < package.OrginalSize)
             {
@@ -375,51 +318,17 @@ namespace GPK_RePack.Saver
 
         }
 
-        private void WriteString(BinaryWriter writer, string text)
+        public static void WriteString(BinaryWriter writer, string text)
         {
             writer.Write(ASCIIEncoding.ASCII.GetBytes(text));
             writer.Write(new byte());
         }
 
-        private void WriteUnicodeString(BinaryWriter writer, string text)
+        public static void WriteUnicodeString(BinaryWriter writer, string text)
         {
             writer.Write(UnicodeEncoding.Unicode.GetBytes(text));
             writer.Write(new short());
         }
 
-        private long GetStringIndex(string text, GpkPackage package)
-        {
-            foreach (KeyValuePair<long, GpkString> pair in package.NameList)
-            {
-                if (pair.Value.name == text) return pair.Key;
-            }
-
-            throw new Exception(string.Format("ObjectName {0} not found!", text));
-        }
-
-        private long GetObjectIndex(string text, GpkPackage package)
-        {
-            if (text == "none") return 0;
-
-            foreach (KeyValuePair<long, GpkImport> pair in package.ImportList)
-            {
-                if (pair.Value.UID == text)
-                {
-                    long tmpKey = (pair.Key + 1) * -1; //0 -> 1 --> -1 ## 1 --> 2 --> -2 ##
-                    return tmpKey;
-                }
-            }
-
-            foreach (KeyValuePair<long, GpkExport> pair in package.ExportList)
-            {
-                if (pair.Value.UID == text)
-                {
-                    long tmpKey = (pair.Key + 1); //0 -> 1 --> -1 ## 1 --> 2 --> -2 ##
-                    return tmpKey;
-                }
-            }
-
-            throw new Exception(string.Format("Object {0} not found!", text));
-        }
     }
 }

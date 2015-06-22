@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using GPK_RePack.Properties;
 using NLog.LayoutRenderers;
 
 namespace GPK_RePack.Classes
@@ -132,6 +134,55 @@ namespace GPK_RePack.Classes
                 }
             }
             return tmpList;
+        }
+
+        public int GetActualSize()
+        {
+            int tmpSize = 0;
+            tmpSize += Header.GetSize();
+            
+            foreach (KeyValuePair<long, GpkString> pair in NameList)
+            {
+                tmpSize += pair.Value.GetSize();
+            }
+
+            tmpSize += ImportList.Count * new GpkImport().GetSize();
+
+            foreach (KeyValuePair<long, GpkExport> pair in ExportList)
+            {
+                tmpSize += pair.Value.GetSize(); //export list part
+               // tmpSize += pair.Value.RecalculateSize(); //data part
+            }
+
+            foreach (KeyValuePair<long, GpkExport> pair in ExportList)
+            {
+                //tmpSize += pair.Value.GetSize(); //export list part
+                tmpSize += pair.Value.GetDataSize(); //data part
+            }
+
+            tmpSize += 10; //puffer betwwen exportlist and data
+            return tmpSize;
+        }
+
+        public string GetDiffString()
+        {
+            int computedSize = GetActualSize();
+            return String.Format("Computed size {0} bytes, Orignal size {1} bytes. Difference: {2} bytes", computedSize, OrginalSize, computedSize - OrginalSize);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder info = new StringBuilder();
+            info.AppendLine("Type: Package");
+            info.AppendLine("Name: " + Filename);
+            info.AppendLine("Path: " + Path);
+            info.AppendLine("Orginal Size: " + OrginalSize);
+            info.AppendLine(GetDiffString());
+            info.AppendLine("Name count: " + NameList.Count);
+            info.AppendLine("Import count: " + ImportList.Count);
+            info.AppendLine("Export count: " + ExportList.Count);
+            info.AppendLine("UID count: " + UidList.Count);
+            return info.ToString();
         }
     }
 }

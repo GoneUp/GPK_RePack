@@ -28,9 +28,9 @@ namespace GPK_RePack.Classes.Prop
             return string.Format("ObjectName: {0} Type: {1} Value: {2}", name, type, objectName);
         }
 
-        public void WriteData(BinaryWriter writer, GpkPackage package, GpkExport export)
+        public void WriteData(BinaryWriter writer, GpkPackage package)
         {
-            throw new NotImplementedException();
+            writer.Write((int)package.GetObjectIndex(objectName));
         }
 
         public void ReadData(BinaryReader reader, GpkPackage package)
@@ -41,7 +41,7 @@ namespace GPK_RePack.Classes.Prop
 
         public int RecalculateSize()
         {
-            size = 8;
+            size = 4;
             return size;
         }
     }

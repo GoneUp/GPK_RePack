@@ -10,7 +10,7 @@ namespace GPK_RePack.Classes.Interfaces
 {
     interface IProperty
     {
-        void WriteData(BinaryWriter writer, GpkPackage package, GpkExport export);
+        void WriteData(BinaryWriter writer, GpkPackage package);
         void ReadData(BinaryReader reader, GpkPackage package);
         int RecalculateSize();
     }
