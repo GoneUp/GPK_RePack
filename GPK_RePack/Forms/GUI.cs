@@ -8,12 +8,15 @@ using System.Windows.Forms;
 using System.Xml;
 using GPK_RePack.Classes;
 using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Classes.Payload;
 using GPK_RePack.Classes.Prop;
 using GPK_RePack.Editors;
 using GPK_RePack.Parser;
 using GPK_RePack.Properties;
 using GPK_RePack.Saver;
 using Microsoft.VisualBasic.Logging;
+using NAudio.Vorbis;
+using NAudio.Wave;
 using NLog;
 using NLog.Config;
 
@@ -61,6 +64,9 @@ namespace GPK_RePack.Forms
         private List<GpkExport>[] changedExports;
 
         private readonly DataFormats.Format exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
+
+        private VorbisWaveReader waveReader;
+        private WaveOut waveOut = new WaveOut();
 
         #endregion
 
@@ -132,12 +138,22 @@ namespace GPK_RePack.Forms
             boxGeneralButtons.Enabled = false;
             boxDataButtons.Enabled = false;
             boxPropertyButtons.Enabled = false;
+            ResetOggPreview();
             ClearGrid();
         }
 
         private void GUI_FormClosed(object sender, FormClosedEventArgs e)
         {
             Settings.Default.Save();
+            if (waveReader != null)
+            {
+                waveReader.Dispose();
+            }
+            if (waveOut != null)
+            {
+                //waveOut.Dispose();
+            }
+
         }
 
 
@@ -578,17 +594,22 @@ namespace GPK_RePack.Forms
             }
 
             logger.Trace(Settings.Default.CopyMode);
+            string option = "";
+
             switch (Settings.Default.CopyMode)
             {
                 case "dataprops":
                     DataTools.ReplaceProperties(copyExport, selectedExport);
                     DataTools.ReplaceData(copyExport, selectedExport);
+                    option = "data and properties";
                     break;
                 case "data":
                     DataTools.ReplaceData(copyExport, selectedExport);
+                    option = "data";
                     break;
                 case "props":
                     DataTools.ReplaceProperties(copyExport, selectedExport);
+                    option = "properties";
                     break;
                 default:
                     logger.Info("Your setting file is broken. Go to settings windows and select a copymode.");
@@ -598,7 +619,7 @@ namespace GPK_RePack.Forms
 
             copyExport.GetDataSize();
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
-            logger.Info("Pasted the data and properties of {0} to {1}", copyExport.UID, selectedExport.UID);
+            logger.Info("Pasted the {0} of {1} to {2}", option, copyExport.UID, selectedExport.UID);
         }
 
         private void btnDeleteData_Click(object sender, EventArgs e)
@@ -645,10 +666,11 @@ namespace GPK_RePack.Forms
 
         private void btnImportOgg_Click(object sender, EventArgs e)
         {
-            if (selectedExport != null)
+            try
             {
-                try
+                if (selectedExport != null)
                 {
+
                     OpenFileDialog open = new OpenFileDialog();
                     open.Multiselect = false;
                     open.ValidateNames = true;
@@ -660,16 +682,56 @@ namespace GPK_RePack.Forms
                     {
                         SoundwaveTools.ImportOgg(selectedExport, open.FileName);
                         treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+                        logger.Info("Import successful.");
                     }
                     else
                     {
                         logger.Info("File not found.");
                     }
+
                 }
-                catch (Exception ex)
+                else if (selectedPackage != null && selectedClass == "Core.SoundNodeWave")
                 {
-                    logger.FatalException("Import failure! " + ex, ex);
+                    List<GpkExport> exports = selectedPackage.GetExportsByClass(selectedClass);
+
+                    FolderBrowserDialog dialog = new FolderBrowserDialog();
+                    dialog.SelectedPath = Path.GetDirectoryName(Settings.Default.SaveDir);
+                    DialogResult result = dialog.ShowDialog();
+
+                    if (result == DialogResult.OK)
+                    {
+                        Settings.Default.SaveDir = dialog.SelectedPath;
+
+                        string[] files = Directory.GetFiles(dialog.SelectedPath);
+
+                        foreach (string file in files)
+                        {
+                            string filename = Path.GetFileName(file); //AttackL_02.ogg
+                            string oggname = filename.Remove(filename.Length - 4);
+
+                            if (oggname == "") continue;
+
+                            foreach (GpkExport exp in exports)
+                            {
+                                if (exp.ObjectName == oggname)
+                                {
+                                    SoundwaveTools.ImportOgg(exp, file);
+                                    logger.Trace("Matched file {0} to export {1}!", filename, exp.ObjectName);
+                                    break;
+                                }
+                            }
+
+
+                        }
+
+
+                        logger.Info("Mass import to {0} was successful.", dialog.SelectedPath);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.FatalException("Import failure! " + ex, ex);
             }
         }
 
@@ -712,7 +774,7 @@ namespace GPK_RePack.Forms
                         logger.Trace("ogg save for " + exp.UID);
                     }
 
-                    logger.Info(String.Format("Data was saved to {0}!", dialog.SelectedPath));
+                    logger.Info("Mass export to {0} was successful.", dialog.SelectedPath);
                 }
             }
         }
@@ -724,6 +786,47 @@ namespace GPK_RePack.Forms
                 SoundwaveTools.ImportOgg(selectedExport, "fake");
                 treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
             }
+        }
+
+        private void btnOggPreview_Click(object sender, EventArgs e)
+        {
+            if (selectedExport != null && selectedExport.payload is Soundwave && waveOut.PlaybackState == PlaybackState.Stopped)
+            {
+                Soundwave wave = (Soundwave)selectedExport.payload;
+                waveReader = new VorbisWaveReader(new MemoryStream(wave.oggdata));
+                //waveOut = new WaveOut();
+
+                waveOut.Init(waveReader);
+                waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
+                waveOut.Play();
+
+                btnOggPreview.Text = "Stop Preview";
+            }
+            else if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
+            {
+                ResetOggPreview();
+            }
+        }
+
+        private void WaveOutOnPlaybackStopped(object sender, EventArgs eventArgs)
+        {
+            ResetOggPreview();
+        }
+
+        private void ResetOggPreview()
+        {
+            if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
+            {
+                waveOut.Stop();
+                //waveOut.Dispose();
+                waveReader.Close();
+                waveReader.Dispose();
+
+            }
+
+            //waveOut = null;
+            waveReader = null;
+            btnOggPreview.Text = "Ogg Preview";
         }
 
 
@@ -1050,6 +1153,8 @@ namespace GPK_RePack.Forms
             return iProp;
         }
         #endregion
+
+
 
 
 

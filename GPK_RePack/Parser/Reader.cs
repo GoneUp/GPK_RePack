@@ -109,7 +109,7 @@ namespace GPK_RePack.Parser
             totalobjects = package.Header.NameCount + package.Header.ExportCount * 3 + package.Header.ImportCount; //Export, Export Linking, ExportData = *3
 
             package.Header.FGUID = reader.ReadBytes(16);
-            logger.Info("FGUID " + package.Header.FGUID);
+            //logger.Info("FGUID " + package.Header.FGUID);
 
 
             int generation_count = reader.ReadInt32();

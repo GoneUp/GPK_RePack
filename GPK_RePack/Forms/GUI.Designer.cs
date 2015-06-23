@@ -68,6 +68,7 @@ namespace GPK_RePack.Forms
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.boxDataButtons = new System.Windows.Forms.GroupBox();
+            this.btnOggPreview = new System.Windows.Forms.Button();
             this.btnFakeOGG = new System.Windows.Forms.Button();
             this.btnDeleteData = new System.Windows.Forms.Button();
             this.btnImportOgg = new System.Windows.Forms.Button();
@@ -96,7 +97,7 @@ namespace GPK_RePack.Forms
             this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeMain.Location = new System.Drawing.Point(0, 0);
             this.treeMain.Name = "treeMain";
-            this.treeMain.Size = new System.Drawing.Size(271, 507);
+            this.treeMain.Size = new System.Drawing.Size(306, 507);
             this.treeMain.TabIndex = 1;
             this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
             this.treeMain.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GUI_KeyDown);
@@ -108,7 +109,7 @@ namespace GPK_RePack.Forms
             this.miscToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(974, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1103, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -216,7 +217,7 @@ namespace GPK_RePack.Forms
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(699, 395);
+            this.tabControl1.Size = new System.Drawing.Size(793, 395);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -225,7 +226,7 @@ namespace GPK_RePack.Forms
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(691, 369);
+            this.tabPage1.Size = new System.Drawing.Size(785, 369);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Info";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -237,7 +238,7 @@ namespace GPK_RePack.Forms
             this.boxInfo.Multiline = true;
             this.boxInfo.Name = "boxInfo";
             this.boxInfo.ReadOnly = true;
-            this.boxInfo.Size = new System.Drawing.Size(685, 351);
+            this.boxInfo.Size = new System.Drawing.Size(779, 351);
             this.boxInfo.TabIndex = 5;
             this.boxInfo.Text = resources.GetString("boxInfo.Text");
             // 
@@ -247,7 +248,7 @@ namespace GPK_RePack.Forms
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(691, 369);
+            this.tabPage2.Size = new System.Drawing.Size(785, 369);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Property Details";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -269,7 +270,7 @@ namespace GPK_RePack.Forms
             this.gridProps.Location = new System.Drawing.Point(3, 3);
             this.gridProps.MultiSelect = false;
             this.gridProps.Name = "gridProps";
-            this.gridProps.Size = new System.Drawing.Size(685, 363);
+            this.gridProps.Size = new System.Drawing.Size(779, 363);
             this.gridProps.TabIndex = 0;
             this.gridProps.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.gridProps_DefaultValuesNeeded);
             // 
@@ -322,7 +323,7 @@ namespace GPK_RePack.Forms
             this.boxCommands.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.boxCommands.Location = new System.Drawing.Point(0, 395);
             this.boxCommands.Name = "boxCommands";
-            this.boxCommands.Size = new System.Drawing.Size(699, 112);
+            this.boxCommands.Size = new System.Drawing.Size(793, 112);
             this.boxCommands.TabIndex = 6;
             // 
             // boxPropertyButtons
@@ -331,9 +332,9 @@ namespace GPK_RePack.Forms
             this.boxPropertyButtons.Controls.Add(this.btnPropSave);
             this.boxPropertyButtons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.boxPropertyButtons.Enabled = false;
-            this.boxPropertyButtons.Location = new System.Drawing.Point(188, 0);
+            this.boxPropertyButtons.Location = new System.Drawing.Point(199, 0);
             this.boxPropertyButtons.Name = "boxPropertyButtons";
-            this.boxPropertyButtons.Size = new System.Drawing.Size(160, 112);
+            this.boxPropertyButtons.Size = new System.Drawing.Size(146, 112);
             this.boxPropertyButtons.TabIndex = 6;
             this.boxPropertyButtons.TabStop = false;
             this.boxPropertyButtons.Text = "Property Commands";
@@ -368,14 +369,14 @@ namespace GPK_RePack.Forms
             this.boxGeneralButtons.Enabled = false;
             this.boxGeneralButtons.Location = new System.Drawing.Point(0, 0);
             this.boxGeneralButtons.Name = "boxGeneralButtons";
-            this.boxGeneralButtons.Size = new System.Drawing.Size(188, 112);
+            this.boxGeneralButtons.Size = new System.Drawing.Size(199, 112);
             this.boxGeneralButtons.TabIndex = 5;
             this.boxGeneralButtons.TabStop = false;
             this.boxGeneralButtons.Text = "General";
             // 
             // btnPaste
             // 
-            this.btnPaste.Location = new System.Drawing.Point(87, 58);
+            this.btnPaste.Location = new System.Drawing.Point(98, 58);
             this.btnPaste.Name = "btnPaste";
             this.btnPaste.Size = new System.Drawing.Size(95, 24);
             this.btnPaste.TabIndex = 3;
@@ -387,7 +388,7 @@ namespace GPK_RePack.Forms
             // 
             this.btnCopy.Location = new System.Drawing.Point(6, 58);
             this.btnCopy.Name = "btnCopy";
-            this.btnCopy.Size = new System.Drawing.Size(75, 24);
+            this.btnCopy.Size = new System.Drawing.Size(86, 24);
             this.btnCopy.TabIndex = 2;
             this.btnCopy.Text = "Copy Object";
             this.btnCopy.UseVisualStyleBackColor = true;
@@ -398,7 +399,7 @@ namespace GPK_RePack.Forms
             this.btnAdd.Enabled = false;
             this.btnAdd.Location = new System.Drawing.Point(6, 28);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(75, 24);
+            this.btnAdd.Size = new System.Drawing.Size(86, 24);
             this.btnAdd.TabIndex = 1;
             this.btnAdd.Text = "Add Object";
             this.btnAdd.UseVisualStyleBackColor = true;
@@ -406,7 +407,7 @@ namespace GPK_RePack.Forms
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(87, 28);
+            this.btnDelete.Location = new System.Drawing.Point(98, 28);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(95, 24);
             this.btnDelete.TabIndex = 0;
@@ -416,6 +417,7 @@ namespace GPK_RePack.Forms
             // 
             // boxDataButtons
             // 
+            this.boxDataButtons.Controls.Add(this.btnOggPreview);
             this.boxDataButtons.Controls.Add(this.btnFakeOGG);
             this.boxDataButtons.Controls.Add(this.btnDeleteData);
             this.boxDataButtons.Controls.Add(this.btnImportOgg);
@@ -424,12 +426,22 @@ namespace GPK_RePack.Forms
             this.boxDataButtons.Controls.Add(this.btnExport);
             this.boxDataButtons.Dock = System.Windows.Forms.DockStyle.Right;
             this.boxDataButtons.Enabled = false;
-            this.boxDataButtons.Location = new System.Drawing.Point(348, 0);
+            this.boxDataButtons.Location = new System.Drawing.Point(345, 0);
             this.boxDataButtons.Name = "boxDataButtons";
-            this.boxDataButtons.Size = new System.Drawing.Size(351, 112);
+            this.boxDataButtons.Size = new System.Drawing.Size(448, 112);
             this.boxDataButtons.TabIndex = 4;
             this.boxDataButtons.TabStop = false;
             this.boxDataButtons.Text = "Data Commands";
+            // 
+            // btnOggPreview
+            // 
+            this.btnOggPreview.Location = new System.Drawing.Point(344, 58);
+            this.btnOggPreview.Name = "btnOggPreview";
+            this.btnOggPreview.Size = new System.Drawing.Size(104, 24);
+            this.btnOggPreview.TabIndex = 9;
+            this.btnOggPreview.Text = "Ogg Preview";
+            this.btnOggPreview.UseVisualStyleBackColor = true;
+            this.btnOggPreview.Click += new System.EventHandler(this.btnOggPreview_Click);
             // 
             // btnFakeOGG
             // 
@@ -499,7 +511,7 @@ namespace GPK_RePack.Forms
             this.boxLog.Name = "boxLog";
             this.boxLog.ReadOnly = true;
             this.boxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.boxLog.Size = new System.Drawing.Size(974, 145);
+            this.boxLog.Size = new System.Drawing.Size(1103, 145);
             this.boxLog.TabIndex = 5;
             this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
             // 
@@ -517,15 +529,15 @@ namespace GPK_RePack.Forms
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
             this.splitContainer1.Panel2.Controls.Add(this.boxCommands);
-            this.splitContainer1.Size = new System.Drawing.Size(974, 507);
-            this.splitContainer1.SplitterDistance = 271;
+            this.splitContainer1.Size = new System.Drawing.Size(1103, 507);
+            this.splitContainer1.SplitterDistance = 306;
             this.splitContainer1.TabIndex = 7;
             // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(974, 676);
+            this.ClientSize = new System.Drawing.Size(1103, 676);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.boxLog);
@@ -601,6 +613,7 @@ namespace GPK_RePack.Forms
         private DataGridViewTextBoxColumn aIndex;
         private DataGridViewTextBoxColumn iType;
         private DataGridViewTextBoxColumn value;
+        private Button btnOggPreview;
     }
 }
 

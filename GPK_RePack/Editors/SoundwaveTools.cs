@@ -36,7 +36,7 @@ namespace GPK_RePack.Editors
             //Refill data buffer with normal soundwave
             export.data = new byte[wave.GetSize()];
             BinaryWriter writer = new BinaryWriter(new MemoryStream(export.data));
-            wave.WriteData(writer, new GpkPackage(), export);
+            wave.WriteData(writer, null, export);
             writer.Close();
             writer.Dispose();
 
