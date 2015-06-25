@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -14,9 +13,9 @@ using GPK_RePack.Editors;
 using GPK_RePack.Parser;
 using GPK_RePack.Properties;
 using GPK_RePack.Saver;
-using Microsoft.VisualBasic.Logging;
 using NAudio.Vorbis;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using NLog;
 using NLog.Config;
 
@@ -66,7 +65,7 @@ namespace GPK_RePack.Forms
         private readonly DataFormats.Format exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
 
         private VorbisWaveReader waveReader;
-        private WaveOut waveOut = new WaveOut();
+        private WaveOut waveOut;
 
         #endregion
 
@@ -97,6 +96,10 @@ namespace GPK_RePack.Forms
             saver = new Save();
             loadedGpkPackages = new List<GpkPackage>();
 
+            //audio
+            waveOut = new WaveOut();
+            waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
+
             if (Settings.Default.SaveDir == "")
                 Settings.Default.SaveDir = Directory.GetCurrentDirectory();
 
@@ -112,6 +115,7 @@ namespace GPK_RePack.Forms
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            GUI_FormClosing(null, new FormClosingEventArgs(CloseReason.UserClosing, false));
             Environment.Exit(0);
         }
 
@@ -125,6 +129,7 @@ namespace GPK_RePack.Forms
         {
             ResetGUI();
             changedExports = null;
+            ResetOggPreview();
             loadedGpkPackages.Clear();
             DrawPackages();
         }
@@ -138,11 +143,10 @@ namespace GPK_RePack.Forms
             boxGeneralButtons.Enabled = false;
             boxDataButtons.Enabled = false;
             boxPropertyButtons.Enabled = false;
-            ResetOggPreview();
             ClearGrid();
         }
 
-        private void GUI_FormClosed(object sender, FormClosedEventArgs e)
+        private void GUI_FormClosing(object sender, FormClosingEventArgs e)
         {
             Settings.Default.Save();
             if (waveReader != null)
@@ -151,7 +155,7 @@ namespace GPK_RePack.Forms
             }
             if (waveOut != null)
             {
-                //waveOut.Dispose();
+                waveOut.Dispose();
             }
 
         }
@@ -738,7 +742,7 @@ namespace GPK_RePack.Forms
         private void btnExtractOGG_Click(object sender, EventArgs e)
         {
 
-            if (selectedExport != null)
+            if (selectedExport != null && selectedExport.ClassName == "Core.SoundNodeWave")
             {
                 SaveFileDialog save = new SaveFileDialog();
                 save.FileName = selectedExport.ObjectName;
@@ -794,12 +798,8 @@ namespace GPK_RePack.Forms
             {
                 Soundwave wave = (Soundwave)selectedExport.payload;
                 waveReader = new VorbisWaveReader(new MemoryStream(wave.oggdata));
-                //waveOut = new WaveOut();
-
                 waveOut.Init(waveReader);
-                waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
-                waveOut.Play();
-
+                waveOut.Play();          
                 btnOggPreview.Text = "Stop Preview";
             }
             else if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
@@ -818,13 +818,10 @@ namespace GPK_RePack.Forms
             if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
             {
                 waveOut.Stop();
-                //waveOut.Dispose();
                 waveReader.Close();
                 waveReader.Dispose();
-
             }
 
-            //waveOut = null;
             waveReader = null;
             btnOggPreview.Text = "Ogg Preview";
         }
@@ -1154,8 +1151,7 @@ namespace GPK_RePack.Forms
         }
         #endregion
 
-
-
+  
 
 
 

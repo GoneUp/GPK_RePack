@@ -545,7 +545,7 @@ namespace GPK_RePack.Forms
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GUI";
             this.Text = "Terahelper 0.7 - by GoneUp";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GUI_FormClosed);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GUI_FormClosing);
             this.Load += new System.EventHandler(this.GUI_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="GPK_RePack" Label="GPK_RePack" Category="Projekt" />
+    <Node Id="NAudio 1.5" Label="NAudio 1.5" Category="Paket" />
+    <Node Id="NAudio.Vorbis 1.0.0.0" Label="NAudio.Vorbis 1.0.0.0" Category="Paket" />
+    <Node Id="NLog 4.0.0" Label="NLog 4.0.0" Category="Paket" />
+    <Node Id="NLog.Windows.Forms 1.0.13.0" Label="NLog.Windows.Forms 1.0.13.0" Category="Paket" />
+    <Node Id="NVorbis 0.8.4.0" Label="NVorbis 0.8.4.0" Category="Paket" />
+    <Node Id="NVorbis.NAudioSupport 0.5.6.1" Label="NVorbis.NAudioSupport 0.5.6.1" Category="Paket" />
+  </Nodes>
+  <Links>
+    <Link Source="NAudio.Vorbis 1.0.0.0" Target="NAudio 1.5" Category="Paketabhängigkeit" />
+    <Link Source="NAudio.Vorbis 1.0.0.0" Target="NVorbis 0.8.4.0" Category="Paketabhängigkeit" />
+    <Link Source="NLog.Windows.Forms 1.0.13.0" Target="NLog 4.0.0" Category="Paketabhängigkeit" />
+    <Link Source="NVorbis.NAudioSupport 0.5.6.1" Target="NAudio.Vorbis 1.0.0.0" Category="Paketabhängigkeit" />
+    <Link Source="GPK_RePack" Target="NLog.Windows.Forms 1.0.13.0" Category="Installiertes Paket" />
+    <Link Source="GPK_RePack" Target="NVorbis.NAudioSupport 0.5.6.1" Category="Installiertes Paket" />
+  </Links>
+  <Categories>
+    <Category Id="Projekt" />
+    <Category Id="Paket" />
+  </Categories>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Projekt" ValueLabel="True">
+      <Condition Expression="HasCategory('Projekt')" />
+      <Setter Property="Background" Value="Blue" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Paketabhängigkeit" ValueLabel="True">
+      <Condition Expression="HasCategory('Paketabhängigkeit')" />
+      <Setter Property="Background" Value="Yellow" />
+    </Style>
+  </Styles>
+</DirectedGraph>
