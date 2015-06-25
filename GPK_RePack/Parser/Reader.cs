@@ -246,9 +246,9 @@ namespace GPK_RePack.Parser
                 GpkExport export = package.ExportList[pair.Key];
                 if (export.ClassName == null || export.SuperName == null || export.PackageName == null || export.UID == null)
                 {
-                    export.ClassName = GetObject(export.ClassIndex, package);
-                    export.SuperName = GetObject(export.SuperIndex, package);
-                    export.PackageName = GetObject(export.PackageIndex, package);
+                    export.ClassName = GetObjectName(export.ClassIndex, package);
+                    export.SuperName = GetObjectName(export.SuperIndex, package);
+                    export.PackageName = GetObjectName(export.PackageIndex, package);
                     export.UID = GenerateUID(package, export);
                 }
 
@@ -266,8 +266,7 @@ namespace GPK_RePack.Parser
                 reader.BaseStream.Seek(export.SerialOffset, SeekOrigin.Begin);
 
                 //int objectindex (netindex)
-
-                export.netIndex = reader.ReadInt32();
+                export.netIndex = GetObjectName(reader.ReadInt32(), package);
 
                 //dirty hack until we find the begin 
                 long namePosStart = reader.BaseStream.Position;
@@ -324,8 +323,13 @@ namespace GPK_RePack.Parser
                             export.payload = new Soundwave();
                             export.payload.ReadData(package, export);
                             break;
+                        case "Core.SoundCue":
+                            export.payload = new SoundCue();
+                            export.payload.ReadData(package, export);
+                            break;
                     }
 
+                    if (export.payload != null) logger.Debug(export.payload.ToString());
 
                     logger.Debug(String.Format("Export {0}: Read Data ({1} bytes) and {2} Properties ({3} bytes)", export.ObjectName, export.data.Length, export.Properties.Count, export.property_size));
                 }
@@ -364,7 +368,7 @@ namespace GPK_RePack.Parser
             baseProp.arrayIndex = reader.ReadInt32();
 
             IProperty iProp = null;
-            
+
             switch (baseProp.type)
             {
                 case "StructProperty":
@@ -410,7 +414,7 @@ namespace GPK_RePack.Parser
             return true;
         }
 
-        public static string GetObject(int index, GpkPackage package)
+        public static string GetObjectName(int index, GpkPackage package)
         {
             //Import, Export added due to diffrent files appear to have the same object on import and export list
             if (index < 0)
@@ -422,9 +426,9 @@ namespace GPK_RePack.Parser
                 GpkExport export = package.ExportList[index - 1];
                 if (export.UID == null)
                 {
-                    export.ClassName = GetObject(export.ClassIndex, package);
-                    export.SuperName = GetObject(export.SuperIndex, package);
-                    export.PackageName = GetObject(export.PackageIndex, package);
+                    export.ClassName = GetObjectName(export.ClassIndex, package);
+                    export.SuperName = GetObjectName(export.SuperIndex, package);
+                    export.PackageName = GetObjectName(export.PackageIndex, package);
                     export.UID = GenerateUID(package, export);
                 }
                 return export.UID;

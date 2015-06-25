@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes.Payload
@@ -52,7 +53,7 @@ namespace GPK_RePack.Classes.Payload
 
         public int GetSize()
         {
-            if (oggfile != null)
+            if (oggdata != null)
             {
                 return oggdata.Length + 64;
             }
@@ -63,6 +64,14 @@ namespace GPK_RePack.Classes.Payload
         public string GetClassIdent()
         {
             return "Core.SoundNodeWave";
+        }
+
+        public override string ToString()
+        {
+            StringBuilder info = new StringBuilder();
+            info.AppendLine("Type: " + GetClassIdent());
+            if (oggdata != null)  info.AppendLine("Ogg data: " + oggdata.Length);
+            return info.ToString();
         }
 
     }

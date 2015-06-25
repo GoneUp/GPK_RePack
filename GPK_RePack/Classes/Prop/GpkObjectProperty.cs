@@ -36,7 +36,7 @@ namespace GPK_RePack.Classes.Prop
         public void ReadData(BinaryReader reader, GpkPackage package)
         {
             value = reader.ReadInt32();
-            objectName = Reader.GetObject(value, package);
+            objectName = Reader.GetObjectName(value, package);
         }
 
         public int RecalculateSize()

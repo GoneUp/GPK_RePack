@@ -76,6 +76,8 @@
     <Compile Include="Classes\Interfaces\IGpkPart.cs" />
     <Compile Include="Classes\Interfaces\IProperty.cs" />
     <Compile Include="Classes\Interfaces\IPayload.cs" />
+    <Compile Include="Classes\Payload\SoundCue.cs" />
+    <Compile Include="Classes\Payload\SoundCueObject.cs" />
     <Compile Include="Classes\Payload\Soundwave.cs" />
     <Compile Include="Classes\Payload\Texture2D.cs" />
     <Compile Include="Classes\Prop\GpkBaseProperty.cs" />

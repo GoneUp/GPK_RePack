@@ -29,7 +29,7 @@ namespace GPK_RePack.Classes
         public int SerialOffset;
         public long SerialOffsetPosition;
 
-        public int netIndex;
+        public string netIndex;
         public byte[] padding_unk = new byte[28];
         //28 byte byte padding? + 4 vor letztem
 

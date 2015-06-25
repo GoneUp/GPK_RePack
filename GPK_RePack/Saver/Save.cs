@@ -226,7 +226,7 @@ namespace GPK_RePack.Saver
                     writer.BaseStream.Seek(data_start, SeekOrigin.Begin);
                 }
 
-                writer.Write(export.netIndex);
+                writer.Write(package.GetObjectIndex(export.netIndex));
                 if (export.property_padding != null)
                 {
                     writer.Write(export.property_padding);
