@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using GPK_RePack.Parser;
 using GPK_RePack.Properties;
 using NLog.LayoutRenderers;
 
@@ -19,11 +23,11 @@ namespace GPK_RePack.Classes
         public Dictionary<long, GpkImport> ImportList;
         public Dictionary<long, GpkExport> ExportList;
 
-        public List<String> UidList;
+        public Dictionary<String, String> UidList;
 
         public GpkPackage()
         {
-            UidList = new List<string>();
+            UidList = new Dictionary<string, string>();
             Header = new GpkHeader();
 
             NameList = new Dictionary<long, GpkString>();
@@ -55,27 +59,74 @@ namespace GPK_RePack.Classes
             throw new Exception(string.Format("Name {0} not found!", text));
         }
 
+        public string GetObjectName(int index, bool returnNull = false)
+        {
+            //Import, Export added due to diffrent files appear to have the same object on import and export list
+
+            if (index == 0)
+            {
+                return "none";
+            }
+            if (index < 0)
+            {
+                if (!ImportList.ContainsKey((index * -1) - 1))
+                {
+                    //not found. return null or we get a exception.  
+                    if (returnNull) return null;
+                }
+
+                return ImportList[((index * -1) - 1)].UID;
+            }
+            if (index > 0)
+            {
+                if (!ExportList.ContainsKey(index - 1))
+                {
+                    //not found. return null or we get a excaption.  
+                    if (returnNull) return null;
+                }
+
+                GpkExport export = ExportList[index - 1];
+                if (export.UID == null)
+                {
+                    export.ClassName = GetObjectName(export.ClassIndex);
+                    export.SuperName = GetObjectName(export.SuperIndex);
+                    export.PackageName = GetObjectName(export.PackageIndex);
+                    export.UID = Reader.GenerateUID(this, export);
+                }
+                return export.UID;
+            }
+
+            if (returnNull) return null;
+
+            throw new Exception(string.Format("Object {0} not found!", index));
+        }
+
         public long GetObjectIndex(string text)
         {
             if (text == "none") return 0;
 
-            foreach (KeyValuePair<long, GpkImport> pair in ImportList)
+            long parallelKey = 1;
+            Parallel.ForEach(ImportList, (pair, state) =>
             {
                 if (pair.Value.UID == text)
                 {
-                    long tmpKey = (pair.Key + 1) * -1; //0 -> 1 --> -1 ## 1 --> 2 --> -2 ##
-                    return tmpKey;
+                    parallelKey = (pair.Key + 1) * -1;
+                    state.Break();
                 }
-            }
+            });
+            if (parallelKey != 1) return parallelKey;
 
-            foreach (KeyValuePair<long, GpkExport> pair in ExportList)
+            parallelKey = -1;
+            Parallel.ForEach(ExportList, (pair, state) =>
             {
                 if (pair.Value.UID == text)
                 {
-                    long tmpKey = (pair.Key + 1); //0 -> 1 --> -1 ## 1 --> 2 --> -2 ##
-                    return tmpKey;
+                    parallelKey = pair.Key + 1;
+                    state.Break();
                 }
-            }
+            });
+
+            if (parallelKey != -1) return parallelKey;
 
             throw new Exception(string.Format("Object {0} not found!", text));
         }
@@ -140,7 +191,7 @@ namespace GPK_RePack.Classes
         {
             int tmpSize = 0;
             tmpSize += Header.GetSize();
-            
+
             foreach (KeyValuePair<long, GpkString> pair in NameList)
             {
                 tmpSize += pair.Value.GetSize();
@@ -151,7 +202,7 @@ namespace GPK_RePack.Classes
             foreach (KeyValuePair<long, GpkExport> pair in ExportList)
             {
                 tmpSize += pair.Value.GetSize(); //export list part
-               // tmpSize += pair.Value.RecalculateSize(); //data part
+                // tmpSize += pair.Value.RecalculateSize(); //data part
             }
 
             foreach (KeyValuePair<long, GpkExport> pair in ExportList)

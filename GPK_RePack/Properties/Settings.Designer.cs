@@ -118,5 +118,17 @@ namespace GPK_RePack.Properties {
                 this["PatchMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseUID {
+            get {
+                return ((bool)(this["UseUID"]));
+            }
+            set {
+                this["UseUID"] = value;
+            }
+        }
     }
 }

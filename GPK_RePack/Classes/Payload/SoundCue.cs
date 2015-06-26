@@ -20,7 +20,7 @@ namespace GPK_RePack.Classes.Payload
             for (int i = 0; i < count; i++)
             {
                 SoundCueObject cue = new SoundCueObject();
-                cue.objectName = Reader.GetObjectName(reader.ReadInt32(), package);
+                cue.objectName = package.GetObjectName(reader.ReadInt32());
                 cue.Unk2 = reader.ReadInt32();
                 cue.Unk3 = reader.ReadInt32();
 

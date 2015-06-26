@@ -8,7 +8,7 @@ namespace GPK_RePack.Classes
         public string UID;
 
         public string ClassPackage;
-        public string Class;
+        public string ClassName;
         public int PackageRef;
         public string ObjectName;
 
@@ -21,7 +21,7 @@ namespace GPK_RePack.Classes
             info.AppendLine("UID: " + UID);
             info.AppendLine("Object: " + ObjectName);
             info.AppendLine("ClassPackage: " + ClassPackage);
-            info.AppendLine("Class: " + Class);
+            info.AppendLine("Class: " + ClassName);
             return info.ToString();
 
         }

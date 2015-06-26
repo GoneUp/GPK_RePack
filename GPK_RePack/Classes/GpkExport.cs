@@ -29,7 +29,8 @@ namespace GPK_RePack.Classes
         public int SerialOffset;
         public long SerialOffsetPosition;
 
-        public string netIndex;
+        public int netIndex;
+        public string netIndexName = null;
         public byte[] padding_unk = new byte[28];
         //28 byte byte padding? + 4 vor letztem
 
@@ -52,7 +53,7 @@ namespace GPK_RePack.Classes
         {
             //clone class
             UID = export.UID;
-
+            
             ClassIndex = export.ClassIndex;
             SuperIndex = export.SuperIndex;
             PackageIndex = export.PackageIndex;
@@ -70,6 +71,7 @@ namespace GPK_RePack.Classes
             SerialOffsetPosition = export.SerialOffsetPosition;
 
             netIndex = export.netIndex;
+            netIndexName = export.netIndexName;
             padding_unk = export.padding_unk;
             property_padding = export.property_padding;
             property_size = export.property_size;
@@ -90,6 +92,9 @@ namespace GPK_RePack.Classes
             info.AppendLine("Class: " + ClassName);
             info.AppendLine("Super: " + SuperName);
             info.AppendLine("Package: " + PackageName);
+            info.AppendLine("Netindex: " + netIndex);
+            if (netIndexName != null) info.AppendLine("NetindexObject: " + netIndexName);
+
             info.AppendLine("Data_Offset: " + SerialOffset);
             if (data != null)
             {

@@ -170,10 +170,9 @@ namespace GPK_RePack.Forms
             open.Multiselect = true;
             open.ValidateNames = true;
             open.InitialDirectory = Settings.Default.OpenDir;
-            Settings.Default.OpenDir = open.FileName;
-
             open.ShowDialog();
 
+            Settings.Default.OpenDir = open.FileName;
             foreach (var path in open.FileNames)
             {
                 if (File.Exists(path))
@@ -197,6 +196,7 @@ namespace GPK_RePack.Forms
                     {
                         Application.DoEvents();
                         boxInfo.Text = String.Format("Progress of loading: {0}/{1}", reader.progress, reader.totalobjects);
+                        Thread.Sleep(50);
                     }
 
 
@@ -290,7 +290,11 @@ namespace GPK_RePack.Forms
 
                             foreach (var tmp in package.ImportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
                             {
-                                nodeI.Nodes.Add(tmp.Value.UID, tmp.Value.ObjectName);
+                                string key = tmp.Value.UID;
+                                string value = tmp.Value.ObjectName;
+                                if (Settings.Default.UseUID) value = key;
+
+                                nodeI.Nodes.Add(key, value);
                             }
                         }
 
@@ -298,7 +302,11 @@ namespace GPK_RePack.Forms
                         TreeNode nodeE = nodeP.Nodes.Add("Exports");
                         foreach (var tmp in package.ExportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
                         {
-                            nodeE.Nodes.Add(tmp.Value.UID, tmp.Value.ObjectName);
+                            string key = tmp.Value.UID;
+                            string value = tmp.Value.ObjectName;
+                            if (Settings.Default.UseUID) value = key;
+
+                            nodeE.Nodes.Add(key, value);
                         }
                         break;
                     case "class":
@@ -307,33 +315,36 @@ namespace GPK_RePack.Forms
                         {
                             foreach (var tmp in package.ImportList)
                             {
-                                if (!classNodes.ContainsKey(tmp.Value.Class))
-                                {
-                                    TreeNode classNode = nodeP.Nodes.Add(tmp.Value.Class);
-                                    classNodes.Add(tmp.Value.Class, classNode);
-                                }
+                                string key = tmp.Value.UID;
+                                string value = tmp.Value.ObjectName;
+                                if (Settings.Default.UseUID) value = key;
 
-                                classNodes[tmp.Value.Class].Nodes.Add(tmp.Value.UID, tmp.Value.ObjectName);
+                                CheckClassNode(tmp.Value.ClassName, classNodes, nodeP);
+                                classNodes[tmp.Value.ClassName].Nodes.Add(key, value);
 
                             }
                         }
 
                         foreach (var tmp in package.ExportList)
                         {
-                            if (!classNodes.ContainsKey(tmp.Value.ClassName))
-                            {
-                                TreeNode classNode = nodeP.Nodes.Add(tmp.Value.ClassName);
-                                classNodes.Add(tmp.Value.ClassName, classNode);
-                            }
+                            string key = tmp.Value.UID;
+                            string value = tmp.Value.ObjectName;
+                            if (Settings.Default.UseUID) value = key;
 
-                            classNodes[tmp.Value.ClassName].Nodes.Add(tmp.Value.UID, tmp.Value.ObjectName);
+                            CheckClassNode(tmp.Value.ClassName, classNodes, nodeP);
+                            classNodes[tmp.Value.ClassName].Nodes.Add(key, value);
                         }
                         break;
-
                 }
+            }
+        }
 
-
-
+        private void CheckClassNode(string className, Dictionary<string, TreeNode> classNodes, TreeNode mainNode)
+        {
+            if (!classNodes.ContainsKey(className))
+            {
+                TreeNode classNode = mainNode.Nodes.Add(className);
+                classNodes.Add(className, classNode);
             }
         }
 
@@ -799,7 +810,7 @@ namespace GPK_RePack.Forms
                 Soundwave wave = (Soundwave)selectedExport.payload;
                 waveReader = new VorbisWaveReader(new MemoryStream(wave.oggdata));
                 waveOut.Init(waveReader);
-                waveOut.Play();          
+                waveOut.Play();
                 btnOggPreview.Text = "Stop Preview";
             }
             else if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
@@ -931,7 +942,7 @@ namespace GPK_RePack.Forms
                 {
                     GpkObjectProperty tmpObj = (GpkObjectProperty)prop;
                     comboCell = new DataGridViewComboBoxCell();
-                    comboCell.Items.AddRange(package.UidList.ToArray());
+                    comboCell.Items.AddRange(package.UidList.Keys.ToArray());
                     comboCell.Value = tmpObj.objectName;
 
                 }
@@ -1151,7 +1162,7 @@ namespace GPK_RePack.Forms
         }
         #endregion
 
-  
+
 
 
 

@@ -196,13 +196,13 @@ namespace GPK_RePack.Parser
                 import.Unk = reader.ReadInt32();
 
                 import.ClassPackage = package.NameList[package_class_index].name;
-                import.Class = package.NameList[class_index].name;
+                import.ClassName = package.NameList[class_index].name;
                 import.ObjectName = package.NameList[object_index].name;
 
                 import.UID = GenerateUID(package, import);
                 package.ImportList.Add(i, import);
 
-                logger.Debug("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.Class, import.ObjectName);
+                logger.Debug("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.ClassName, import.ObjectName);
                 progress++;
             }
         }
@@ -241,14 +241,15 @@ namespace GPK_RePack.Parser
             }
 
             //post-processing. needed if a object points to another export.
+            logger.Info("Postprocessing Exports..");
             foreach (KeyValuePair<long, GpkExport> pair in package.ExportList)
             {
                 GpkExport export = package.ExportList[pair.Key];
                 if (export.ClassName == null || export.SuperName == null || export.PackageName == null || export.UID == null)
                 {
-                    export.ClassName = GetObjectName(export.ClassIndex, package);
-                    export.SuperName = GetObjectName(export.SuperIndex, package);
-                    export.PackageName = GetObjectName(export.PackageIndex, package);
+                    export.ClassName = package.GetObjectName(export.ClassIndex);
+                    export.SuperName = package.GetObjectName(export.SuperIndex);
+                    export.PackageName = package.GetObjectName(export.PackageIndex);
                     export.UID = GenerateUID(package, export);
                 }
 
@@ -263,37 +264,42 @@ namespace GPK_RePack.Parser
 
             foreach (GpkExport export in package.ExportList.Values)
             {
-                reader.BaseStream.Seek(export.SerialOffset, SeekOrigin.Begin);
-
-                //int objectindex (netindex)
-                export.netIndex = GetObjectName(reader.ReadInt32(), package);
-
-                //dirty hack until we find the begin 
-                long namePosStart = reader.BaseStream.Position;
-                while (true)
-                {
-                    long test_nameindex = reader.ReadInt64();
-                    if (package.NameList.ContainsKey(test_nameindex))
-                    {
-                        long name_start = reader.BaseStream.Position - 8;
-                        long name_padding_count = name_start - (namePosStart);
-                        reader.BaseStream.Seek(namePosStart, SeekOrigin.Begin);
-
-                        export.property_padding = new byte[name_padding_count];
-                        export.property_padding = reader.ReadBytes((int)name_padding_count);
-
-                        //reader.BaseStream.Seek(name_start, SeekOrigin.Begin);
-                        break;
-                    }
-
-                    reader.BaseStream.Seek(reader.BaseStream.Position - 7, SeekOrigin.Begin);
-                }
-                //bad style :(
-                //logger.Info("First {0} Skip {1}", first, reader.BaseStream.Position - export.SerialOffset);
-                //Props  
-
                 try
                 {
+                    reader.BaseStream.Seek(export.SerialOffset, SeekOrigin.Begin);
+
+                    //int objectindex (netindex)
+                    int netIndex = reader.ReadInt32();
+                    if (netIndex != 0)
+                    {
+                        export.netIndexName = package.GetObjectName(netIndex, true);
+                    }
+
+                    //dirty hack until we find the begin 
+                    long namePosStart = reader.BaseStream.Position;
+                    while (true)
+                    {
+                        long test_nameindex = reader.ReadInt64();
+                        if (package.NameList.ContainsKey(test_nameindex))
+                        {
+                            long name_start = reader.BaseStream.Position - 8;
+                            long name_padding_count = name_start - (namePosStart);
+                            reader.BaseStream.Seek(namePosStart, SeekOrigin.Begin);
+
+                            export.property_padding = new byte[name_padding_count];
+                            export.property_padding = reader.ReadBytes((int)name_padding_count);
+
+                            //reader.BaseStream.Seek(name_start, SeekOrigin.Begin);
+                            break;
+                        }
+
+                        reader.BaseStream.Seek(reader.BaseStream.Position - 7, SeekOrigin.Begin);
+                    }
+                    //bad style :(
+                    //logger.Info("First {0} Skip {1}", first, reader.BaseStream.Position - export.SerialOffset);
+                    //Props  
+
+
                     while (true)
                     {
 
@@ -302,42 +308,42 @@ namespace GPK_RePack.Parser
 
                     }
 
+
+                    export.property_size = (int)reader.BaseStream.Position - export.SerialOffset;
+                    long object_end = export.SerialOffset + export.SerialSize;
+                    if (reader.BaseStream.Position < object_end)
+                    {
+                        int toread = (int)(object_end - reader.BaseStream.Position);
+                        export.data_start = reader.BaseStream.Position;
+                        export.data = new byte[toread];
+                        export.data = reader.ReadBytes(toread);
+
+                        switch (export.ClassName)
+                        {
+                            case "Core.SoundNodeWave":
+                                export.payload = new Soundwave();
+                                export.payload.ReadData(package, export);
+                                break;
+                            case "Core.SoundCue":
+                                export.payload = new SoundCue();
+                                export.payload.ReadData(package, export);
+                                break;
+                        }
+
+                        if (export.payload != null) logger.Debug(export.payload.ToString());
+
+                        logger.Debug(String.Format("Export {0}: Read Data ({1} bytes) and {2} Properties ({3} bytes)", export.ObjectName, export.data.Length, export.Properties.Count, export.property_size));
+                    }
+                    else
+                    {
+                        logger.Debug(String.Format("Export {0}: Read Data (0 bytes) and {1} Properties ({2} bytes)", export.ObjectName, export.Properties.Count, export.property_size));
+                    }
+
                 }
                 catch (Exception ex)
                 {
-                    logger.FatalException("[ReadExportData]", ex);
+                    logger.Fatal("[ReadExportData] UID: {0} Error: {1}", export.UID, ex);
                 }
-
-                export.property_size = (int)reader.BaseStream.Position - export.SerialOffset;
-                long object_end = export.SerialOffset + export.SerialSize;
-                if (reader.BaseStream.Position < object_end)
-                {
-                    int toread = (int)(object_end - reader.BaseStream.Position);
-                    export.data_start = reader.BaseStream.Position;
-                    export.data = new byte[toread];
-                    export.data = reader.ReadBytes(toread);
-
-                    switch (export.ClassName)
-                    {
-                        case "Core.SoundNodeWave":
-                            export.payload = new Soundwave();
-                            export.payload.ReadData(package, export);
-                            break;
-                        case "Core.SoundCue":
-                            export.payload = new SoundCue();
-                            export.payload.ReadData(package, export);
-                            break;
-                    }
-
-                    if (export.payload != null) logger.Debug(export.payload.ToString());
-
-                    logger.Debug(String.Format("Export {0}: Read Data ({1} bytes) and {2} Properties ({3} bytes)", export.ObjectName, export.data.Length, export.Properties.Count, export.property_size));
-                }
-                else
-                {
-                    logger.Debug(String.Format("Export {0}: Read Data (0 bytes) and {1} Properties ({2} bytes)", export.ObjectName, export.Properties.Count, export.property_size));
-                }
-
                 //data
                 progress++;
             }
@@ -414,33 +420,6 @@ namespace GPK_RePack.Parser
             return true;
         }
 
-        public static string GetObjectName(int index, GpkPackage package)
-        {
-            //Import, Export added due to diffrent files appear to have the same object on import and export list
-            if (index < 0)
-            {
-                return package.ImportList[((index * -1) - 1)].UID;
-            }
-            if (index > 0)
-            {
-                GpkExport export = package.ExportList[index - 1];
-                if (export.UID == null)
-                {
-                    export.ClassName = GetObjectName(export.ClassIndex, package);
-                    export.SuperName = GetObjectName(export.SuperIndex, package);
-                    export.PackageName = GetObjectName(export.PackageIndex, package);
-                    export.UID = GenerateUID(package, export);
-                }
-                return export.UID;
-            }
-            if (index == 0)
-            {
-                return "none";
-            }
-
-            throw new Exception(string.Format("Object {0} not found!", index));
-        }
-
         public static string ReadString(BinaryReader reader, int length)
         {
             string text = ASCIIEncoding.ASCII.GetString(reader.ReadBytes(length - 1));
@@ -457,7 +436,7 @@ namespace GPK_RePack.Parser
             return text;
         }
 
-        private static string GenerateUID(GpkPackage package, GpkExport export)
+        public static string GenerateUID(GpkPackage package, GpkExport export)
         {
 
             string proposedName;
@@ -479,9 +458,9 @@ namespace GPK_RePack.Parser
                     tmpName += ("_" + counter);
                 }
 
-                if (package.UidList.Contains(tmpName) == false)
+                if (package.UidList.ContainsKey(tmpName) == false)
                 {
-                    package.UidList.Add(tmpName);
+                    package.UidList.Add(tmpName, "");
                     return tmpName;
                 }
 
@@ -490,7 +469,7 @@ namespace GPK_RePack.Parser
 
         }
 
-        private static string GenerateUID(GpkPackage package, GpkImport import)
+        public static string GenerateUID(GpkPackage package, GpkImport import)
         {
             string proposedName = import.ClassPackage + "." + import.ObjectName;
 
@@ -503,9 +482,9 @@ namespace GPK_RePack.Parser
                     tmpName += ("_" + counter);
                 }
 
-                if (package.UidList.Contains(tmpName) == false)
+                if (package.UidList.ContainsKey(tmpName) == false)
                 {
-                    package.UidList.Add(tmpName);
+                    package.UidList.Add(tmpName, "");
                     return tmpName;
                 }
 

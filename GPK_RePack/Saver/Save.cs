@@ -151,7 +151,7 @@ namespace GPK_RePack.Saver
             foreach (GpkImport imp in package.ImportList.Values)
             {
                 writer.Write(package.GetStringIndex(imp.ClassPackage));
-                writer.Write(package.GetStringIndex(imp.Class));
+                writer.Write(package.GetStringIndex(imp.ClassName));
                 writer.Write(imp.PackageRef);
                 writer.Write((int)package.GetStringIndex(imp.ObjectName));
                 writer.Write(imp.Unk);
@@ -226,7 +226,15 @@ namespace GPK_RePack.Saver
                     writer.BaseStream.Seek(data_start, SeekOrigin.Begin);
                 }
 
-                writer.Write(package.GetObjectIndex(export.netIndex));
+                if (export.netIndexName != null)
+                {
+                     writer.Write(package.GetObjectIndex(export.netIndexName));
+                }
+                else
+                {
+                    writer.Write(export.netIndex);
+                }
+               
                 if (export.property_padding != null)
                 {
                     writer.Write(export.property_padding);
