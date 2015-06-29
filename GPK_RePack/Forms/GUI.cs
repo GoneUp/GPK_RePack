@@ -134,7 +134,7 @@ namespace GPK_RePack.Forms
             DrawPackages();
         }
 
-        private void ResetGUI()
+        public void ResetGUI()
         {
             selectedExport = null;
             selectedPackage = null;
@@ -505,14 +505,18 @@ namespace GPK_RePack.Forms
             if (File.Exists(path))
             {
                 byte[] buffer = File.ReadAllBytes(path);
-                int packageIndex = Convert.ToInt32(treeMain.SelectedNode.Parent.Parent.Name);
 
-                if (!Settings.Default.PatchMode)
+
+                if (Settings.Default.PatchMode)
                 {
+                    if (treeMain.SelectedNode.Parent.Parent == null) return;
+
+                    int packageIndex = Convert.ToInt32(treeMain.SelectedNode.Parent.Parent.Name);
+
                     if (buffer.Length > selectedExport.data.Length)
                     {
                         //Too long, not possible without rebuiling the gpk
-                        logger.Info("File size too big. Size: " + buffer.Length + " Maximum Size: " +
+                        logger.Info("File size too big for PatchMode. Size: " + buffer.Length + " Maximum Size: " +
                                  selectedExport.data.Length);
                         return;
                     }
@@ -525,6 +529,8 @@ namespace GPK_RePack.Forms
 
                     //selectedExport.data = buffer;
                     Array.Copy(buffer, selectedExport.data, buffer.Length);
+
+                    changedExports[packageIndex].Add(selectedExport);
 
                 }
                 else
@@ -539,7 +545,7 @@ namespace GPK_RePack.Forms
                     selectedPackage.Changes = true;
                 }
 
-                changedExports[packageIndex].Add(selectedExport);
+
                 logger.Info(String.Format("Replaced the data of {0} successfully! Dont forget to save.",
                     selectedExport.ObjectName));
             }
@@ -805,17 +811,25 @@ namespace GPK_RePack.Forms
 
         private void btnOggPreview_Click(object sender, EventArgs e)
         {
-            if (selectedExport != null && selectedExport.payload is Soundwave && waveOut.PlaybackState == PlaybackState.Stopped)
+            try
             {
-                Soundwave wave = (Soundwave)selectedExport.payload;
-                waveReader = new VorbisWaveReader(new MemoryStream(wave.oggdata));
-                waveOut.Init(waveReader);
-                waveOut.Play();
-                btnOggPreview.Text = "Stop Preview";
+
+                if (selectedExport != null && selectedExport.payload is Soundwave && waveOut.PlaybackState == PlaybackState.Stopped)
+                {
+                    Soundwave wave = (Soundwave)selectedExport.payload;
+                    waveReader = new VorbisWaveReader(new MemoryStream(wave.oggdata));
+                    waveOut.Init(waveReader);
+                    waveOut.Play();
+                    btnOggPreview.Text = "Stop Preview";
+                }
+                else if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
+                {
+                    ResetOggPreview();
+                }
             }
-            else if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
+            catch (Exception ex)
             {
-                ResetOggPreview();
+                logger.Info("Playback Error. " + ex);
             }
         }
 

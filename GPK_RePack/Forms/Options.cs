@@ -67,6 +67,7 @@ namespace GPK_RePack.Forms
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
         {
             Settings.Default.Save();
+            gui.ResetGUI();
             gui.DrawPackages();
         }
 

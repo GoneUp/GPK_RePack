@@ -1,9 +1,10 @@
-I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.Properties.Resources.resources
-I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.csproj.GenerateResource.Cache
 I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe
 I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.pdb
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.Forms.GUI.resources
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.Forms.Options.resources
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.Properties.Resources.resources
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.csproj.GenerateResource.Cache
 I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\Terahelper.exe
 I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\Terahelper.pdb
-I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.csprojResolveAssemblyReference.cache
-I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.Forms.Options.resources
-I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.Forms.GUI.resources
+I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe.CodeAnalysisLog.xml
+I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe.lastcodeanalysissucceeded
