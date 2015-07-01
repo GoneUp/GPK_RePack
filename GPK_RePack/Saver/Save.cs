@@ -228,7 +228,7 @@ namespace GPK_RePack.Saver
 
                 if (export.netIndexName != null)
                 {
-                     writer.Write(package.GetObjectIndex(export.netIndexName));
+                     writer.Write((int)package.GetObjectIndex(export.netIndexName));
                 }
                 else
                 {

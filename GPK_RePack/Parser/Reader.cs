@@ -269,10 +269,10 @@ namespace GPK_RePack.Parser
                     reader.BaseStream.Seek(export.SerialOffset, SeekOrigin.Begin);
 
                     //int objectindex (netindex)
-                    int netIndex = reader.ReadInt32();
-                    if (netIndex != 0)
+                    export.netIndex = reader.ReadInt32();
+                    if (export.netIndex != 0)
                     {
-                        export.netIndexName = package.GetObjectName(netIndex, true);
+                        //export.netIndexName = package.GetObjectName(netIndex, true);
                     }
 
                     //dirty hack until we find the begin 
@@ -325,8 +325,10 @@ namespace GPK_RePack.Parser
                                 export.payload.ReadData(package, export);
                                 break;
                             case "Core.SoundCue":
-                                export.payload = new SoundCue();
+                                /*
+                                 * export.payload = new SoundCue();
                                 export.payload.ReadData(package, export);
+                                 */ 
                                 break;
                         }
 

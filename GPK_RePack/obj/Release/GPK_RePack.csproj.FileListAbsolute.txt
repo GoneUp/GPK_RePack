@@ -6,5 +6,4 @@ I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.Properties.R
 I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.csproj.GenerateResource.Cache
 I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\Terahelper.exe
 I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\Terahelper.pdb
-I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe.CodeAnalysisLog.xml
-I:\Henry\Projekte\Tera\GPK_RePack\build\Terahelper.exe.lastcodeanalysissucceeded
+I:\Henry\Projekte\Tera\GPK_RePack\GPK_RePack\obj\Release\GPK_RePack.csprojResolveAssemblyReference.cache

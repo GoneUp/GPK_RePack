@@ -44,13 +44,13 @@ namespace GPK_RePack.Classes.Prop
 
         public int RecalculateSize()
         {
-            int tmpSize = 8; //length
+            int tmpSize = 0; 
             if (value != null)
             {
                 tmpSize += value.Length;
             }
             size = tmpSize;
-            return size;
+            return size + 8; //length not included in normal len
         }
 
         public string GetValueHex()
