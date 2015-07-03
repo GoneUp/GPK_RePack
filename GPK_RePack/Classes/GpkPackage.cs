@@ -25,6 +25,8 @@ namespace GPK_RePack.Classes
 
         public Dictionary<String, String> UidList;
 
+        public readonly int datapuffer = 10;
+
         public GpkPackage()
         {
             UidList = new Dictionary<string, string>();
@@ -35,6 +37,7 @@ namespace GPK_RePack.Classes
             ExportList = new Dictionary<long, GpkExport>();
         }
 
+        #region string
         public void AddString(string text)
         {
             long maxKey = 0;
@@ -44,9 +47,20 @@ namespace GPK_RePack.Classes
                 if (pair.Value.name == text) return;
             }
 
-            GpkString str = new GpkString();
-            str.name = text;
+            GpkString str = new GpkString(text, 0 , true);
             NameList.Add(maxKey + 1, str);
+            Header.NameCount += 1;
+        }
+
+        public string GetString(long index)
+        {
+            if (NameList.ContainsKey(index))
+            {
+                NameList[index].used = true;
+                return NameList[index].name;
+            }
+
+            throw new Exception(string.Format("NameIndex {0} not found!", index));
         }
 
         public long GetStringIndex(string text)
@@ -59,6 +73,24 @@ namespace GPK_RePack.Classes
             throw new Exception(string.Format("Name {0} not found!", text));
         }
 
+        public int RemoveUnusedStrings()
+        {
+            int count = 0;
+            var listCopy = NameList.ToArray();
+            foreach (KeyValuePair<long, GpkString> pair in listCopy)
+            {
+                if (!pair.Value.used)
+                {
+                    if (Settings.Default.Debug) NameList.Remove(pair.Key); //test
+                    count++;
+                }
+            }
+
+            return count;
+        }
+        #endregion
+
+        #region objects
         public string GetObjectName(int index, bool returnNull = false)
         {
             //Import, Export added due to diffrent files appear to have the same object on import and export list
@@ -173,6 +205,7 @@ namespace GPK_RePack.Classes
 
             throw new Exception(string.Format("Object {0} not found!", uid));
         }
+#endregion
 
         public List<GpkExport> GetExportsByClass(string className)
         {
@@ -187,37 +220,50 @@ namespace GPK_RePack.Classes
             return tmpList;
         }
 
-        public int GetActualSize()
+        public void PrepareWriting()
+        {
+            //set new offsets
+            //set coutn values on header
+            //remove unused strings
+            RemoveUnusedStrings();
+            Header.RecalculateCounts(this);
+            GetSize(true);
+        }
+
+        public int GetSize(bool fixOffsets)
         {
             int tmpSize = 0;
             tmpSize += Header.GetSize();
 
+            if (fixOffsets) Header.NameOffset = tmpSize;
             foreach (KeyValuePair<long, GpkString> pair in NameList)
             {
                 tmpSize += pair.Value.GetSize();
             }
 
+            if (fixOffsets) Header.ImportOffset = tmpSize;
             tmpSize += ImportList.Count * new GpkImport().GetSize();
 
+            if (fixOffsets) Header.ExportOffset = tmpSize;
             foreach (KeyValuePair<long, GpkExport> pair in ExportList)
             {
                 tmpSize += pair.Value.GetSize(); //export list part
-                // tmpSize += pair.Value.RecalculateSize(); //data part
             }
+
+            tmpSize += datapuffer; //puffer betwwen exportlist and data
 
             foreach (KeyValuePair<long, GpkExport> pair in ExportList)
             {
-                //tmpSize += pair.Value.GetSize(); //export list part
+                if (fixOffsets) pair.Value.SerialOffset = tmpSize;
                 tmpSize += pair.Value.GetDataSize(); //data part
             }
 
-            tmpSize += 10; //puffer betwwen exportlist and data
             return tmpSize;
         }
 
         public string GetDiffString()
         {
-            int computedSize = GetActualSize();
+            int computedSize = GetSize(false);
             return String.Format("Computed size {0} bytes, Orignal size {1} bytes. Difference: {2} bytes", computedSize, OrginalSize, computedSize - OrginalSize);
         }
 

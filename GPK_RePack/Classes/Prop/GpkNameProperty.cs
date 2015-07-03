@@ -37,7 +37,7 @@ namespace GPK_RePack.Classes.Prop
         public void ReadData(BinaryReader reader, GpkPackage package)
         {
             long index = reader.ReadInt32();
-            value = package.NameList[index].name;
+            value = package.GetString(index);
             padding = reader.ReadInt32();
         }
 

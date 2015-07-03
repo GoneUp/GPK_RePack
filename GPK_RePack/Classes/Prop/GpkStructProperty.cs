@@ -37,7 +37,7 @@ namespace GPK_RePack.Classes.Prop
         public void ReadData(BinaryReader reader, GpkPackage package)
         {
             long structtype = reader.ReadInt64();
-            innerType = package.NameList[structtype].name;
+            innerType = package.GetString(structtype);
             value = new byte[size];
             value = reader.ReadBytes(size);
         }

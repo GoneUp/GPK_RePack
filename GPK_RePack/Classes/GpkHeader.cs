@@ -22,11 +22,18 @@ namespace GPK_RePack.Classes
         
         public byte[] FGUID = new byte[16];
 
-        public List<GpkGeneration> Genrations = new List<GpkGeneration>();
+        public List<GpkGeneration> Generations = new List<GpkGeneration>();
 
         public int Unk3, Unk4, Unk5, Unk6;
         public int EngineVersion;
         public int CookerVersion;
+
+        public void RecalculateCounts(GpkPackage package)
+        {
+            NameCount = package.NameList.Count;
+            ExportCount = package.ExportList.Count;
+            ImportCount = package.ImportList.Count;
+        }
 
 
         public int GetSize()

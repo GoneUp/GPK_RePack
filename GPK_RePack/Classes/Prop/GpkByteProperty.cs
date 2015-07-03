@@ -45,7 +45,7 @@ namespace GPK_RePack.Classes.Prop
             if (size == 8)
             {
                 long byteIndex = reader.ReadInt64();
-                nameValue = package.NameList[byteIndex].name;
+                nameValue = package.GetString(byteIndex);
             }
             else
             {

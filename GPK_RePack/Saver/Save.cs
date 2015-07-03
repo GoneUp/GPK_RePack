@@ -46,7 +46,8 @@ namespace GPK_RePack.Saver
             //Imports
             //Exports
             logger.Debug("Start writing");
-            int compuSize = package.GetActualSize();
+            package.PrepareWriting();
+            int compuSize = package.GetSize(false);
 
             using (BinaryWriter writer = new BinaryWriter(new FileStream(savepath, FileMode.Create)))
             {
@@ -90,10 +91,10 @@ namespace GPK_RePack.Saver
 
             writer.Write(package.Header.FGUID);
 
-            writer.Write(package.Header.Genrations.Count);
-            for (int i = 0; i < package.Header.Genrations.Count; i++)
+            writer.Write(package.Header.Generations.Count);
+            for (int i = 0; i < package.Header.Generations.Count; i++)
             {
-                GpkGeneration tmpgen = package.Header.Genrations[i];
+                GpkGeneration tmpgen = package.Header.Generations[i];
                 writer.Write(tmpgen.ExportCount);
                 writer.Write(tmpgen.NameCount);
                 writer.Write(tmpgen.NetObjectCount);
@@ -199,7 +200,7 @@ namespace GPK_RePack.Saver
         private void WriteExportsData(BinaryWriter writer, GpkPackage package)
         {
             //puffer, seems random in many files
-            writer.Write(new byte[10]);
+            writer.Write(new byte[package.datapuffer]);
 
             foreach (GpkExport export in package.ExportList.Values)
             {
@@ -228,13 +229,13 @@ namespace GPK_RePack.Saver
 
                 if (export.netIndexName != null)
                 {
-                     writer.Write((int)package.GetObjectIndex(export.netIndexName));
+                    writer.Write((int)package.GetObjectIndex(export.netIndexName));
                 }
                 else
                 {
                     writer.Write(export.netIndex);
                 }
-               
+
                 if (export.property_padding != null)
                 {
                     writer.Write(export.property_padding);

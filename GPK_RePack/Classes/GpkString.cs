@@ -1,4 +1,6 @@
-﻿using GPK_RePack.Classes.Interfaces;
+﻿using System;
+using System.Diagnostics.Eventing.Reader;
+using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes
 {
@@ -6,6 +8,16 @@ namespace GPK_RePack.Classes
     {
         public string name;
         public long flags;
+        public bool used = false;
+
+        public GpkString() {}
+
+        public GpkString(string tmpName, long tmpFlags, bool tmpUsed)
+        {
+            name = tmpName;
+            flags = tmpFlags;
+            used = tmpUsed;
+        }
 
         public override string ToString() 
         {
@@ -21,4 +33,5 @@ namespace GPK_RePack.Classes
             return size;
         }
     }
+ 
 }

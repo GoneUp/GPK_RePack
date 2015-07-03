@@ -122,7 +122,7 @@ namespace GPK_RePack.Parser
 
                 logger.Info("Generation {0}, ExportCount {1}, NameCount {2}, NetObjectCount {3}", i, tmpgen.ExportCount, tmpgen.NameCount, tmpgen.NetObjectCount);
 
-                package.Header.Genrations.Add(tmpgen);
+                package.Header.Generations.Add(tmpgen);
             }
 
 
@@ -195,9 +195,9 @@ namespace GPK_RePack.Parser
                 long object_index = reader.ReadInt32();
                 import.Unk = reader.ReadInt32();
 
-                import.ClassPackage = package.NameList[package_class_index].name;
-                import.ClassName = package.NameList[class_index].name;
-                import.ObjectName = package.NameList[object_index].name;
+                import.ClassPackage = package.GetString(package_class_index);
+                import.ClassName = package.GetString(class_index);
+                import.ObjectName = package.GetString(object_index);
 
                 import.UID = GenerateUID(package, import);
                 package.ImportList.Add(i, import);
@@ -220,7 +220,7 @@ namespace GPK_RePack.Parser
                 export.PackageIndex = reader.ReadInt32();
 
                 long nameIndex = reader.ReadInt32();
-                export.ObjectName = package.NameList[nameIndex].name;
+                export.ObjectName = package.GetString(nameIndex);
 
                 export.Unk1 = reader.ReadInt64();
                 export.Unk2 = reader.ReadInt64();
@@ -362,7 +362,7 @@ namespace GPK_RePack.Parser
                 logger.Info("name not found " + nameindex);
             }
 
-            baseProp.name = package.NameList[nameindex].name;
+            baseProp.name = package.GetString(nameindex);
             if (baseProp.name.ToLower() == "none") return false;
 
             long typeindex = reader.ReadInt64();
@@ -370,7 +370,7 @@ namespace GPK_RePack.Parser
             {
                 logger.Info("type not found " + typeindex);
             }
-            baseProp.type = package.NameList[typeindex].name;
+            baseProp.type = package.GetString(typeindex);
 
             baseProp.size = reader.ReadInt32();
             baseProp.arrayIndex = reader.ReadInt32();
