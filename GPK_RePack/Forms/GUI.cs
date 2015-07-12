@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
@@ -857,13 +858,9 @@ namespace GPK_RePack.Forms
         #region misc
         private void setFilesizeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (selectedPackage == null)
-            {
-                logger.Info("Select a package!");
-                return;
-            }
+            if (!PackageSelected()) return;
 
-            string input = Microsoft.VisualBasic.Interaction.InputBox("New filesize for " + selectedPackage.Filename + "? Old: " + selectedPackage.OrginalSize, "Filesize");
+            string input = Microsoft.VisualBasic.Interaction.InputBox(string.Format("New filesize for {0}? Old: {1}", selectedPackage.Filename, selectedPackage.OrginalSize), "Filesize");
 
             int num;
             if (input == "" || !Int32.TryParse(input, out num))
@@ -878,6 +875,61 @@ namespace GPK_RePack.Forms
             }
 
         }
+
+        private void customToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!PackageSelected()) return;
+
+            try
+            {
+                string className = Microsoft.VisualBasic.Interaction.InputBox("Classname UID?\nWrite #all to select every object.\nSupported types: Int, Float (x,xx), Bool, String");
+                string propName = Microsoft.VisualBasic.Interaction.InputBox("Proprty Name to edit?");
+                string propValue = Microsoft.VisualBasic.Interaction.InputBox("Proprty Value:");
+
+                List<GpkExport> exports = selectedPackage.GetExportsByClass(className);
+
+                SoundwaveTools.SetPropertyDetails(exports, propName, propValue);
+
+                logger.Info("Custom set success for {0} Objects.", exports.Count);
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal("Custom update fail. Ex " + ex);
+            }
+
+
+        }
+
+        private void setAllVolumeMultipliersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!PackageSelected()) return;
+
+            string input = Microsoft.VisualBasic.Interaction.InputBox(String.Format("New VolumeMultiplier for all SoundCues in {0}: \nFormat: x,xx", selectedPackage.Filename));
+
+            float num;
+            if (input == "" || !Single.TryParse(input, out num))
+            {
+                logger.Info("No/Invalid input");
+            }
+            else
+            {
+                logger.Trace(num);
+                SoundwaveTools.SetAllVolumes(selectedPackage, num);
+                logger.Info("Set Volumes for {0} to {1}.", selectedPackage.Filename, num);
+            }
+        }
+
+        private bool PackageSelected()
+        {
+            if (selectedPackage == null)
+            {
+                logger.Info("Select a package!");
+                return false;
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region propgrid
@@ -1104,12 +1156,12 @@ namespace GPK_RePack.Forms
                 case "StructProperty":
                     GpkStructProperty tmpStruct = new GpkStructProperty(baseProp);
                     tmpStruct.innerType = row.Cells["iType"].Value.ToString();
-                    tmpStruct.value = (cellValue).ToBytes(); ;
+                    tmpStruct.value = (cellValue).ToBytes();
                     iProp = tmpStruct;
                     break;
                 case "ArrayProperty":
                     GpkArrayProperty tmpArray = new GpkArrayProperty(baseProp);
-                    tmpArray.value = (cellValue).ToBytes(); ;
+                    tmpArray.value = (cellValue).ToBytes();
                     iProp = tmpArray;
                     break;
                 case "ByteProperty":
@@ -1175,7 +1227,6 @@ namespace GPK_RePack.Forms
             return iProp;
         }
         #endregion
-
 
 
 

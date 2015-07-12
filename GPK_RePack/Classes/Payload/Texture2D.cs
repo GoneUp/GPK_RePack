@@ -8,8 +8,10 @@ using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes.Payload
 {
-    class Texture2D : IPayload 
+    class Texture2D : IPayload
     {
+        public byte[] startUnk = new byte[16];
+
         public string GetClassIdent()
         {
             throw new NotImplementedException();
@@ -22,7 +24,7 @@ namespace GPK_RePack.Classes.Payload
 
         public void ReadData(GpkPackage package, GpkExport export)
         {
-            throw new NotImplementedException();
+            
         }
 
         public int GetSize()

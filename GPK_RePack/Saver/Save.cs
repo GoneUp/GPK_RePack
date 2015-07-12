@@ -199,7 +199,7 @@ namespace GPK_RePack.Saver
 
         private void WriteExportsData(BinaryWriter writer, GpkPackage package)
         {
-            //puffer, seems random in many files
+            //puffer, seems random in many files, we use 10 empty bytes
             writer.Write(new byte[package.datapuffer]);
 
             foreach (GpkExport export in package.ExportList.Values)
@@ -215,13 +215,13 @@ namespace GPK_RePack.Saver
 
                 long data_start = writer.BaseStream.Position;
 
-                if (export.SerialOffset != writer.BaseStream.Position)
+                if (export.SerialOffset != data_start)
                 {
                     //if we have diffrent layout of the data then teh orginal file we need to fix the data pointers
                     logger.Trace(string.Format("fixing export {0} offset old:{1} new:{2}", export.ObjectName, export.SerialOffset, data_start));
 
 
-                    export.SerialOffset = (int)writer.BaseStream.Position;
+                    export.SerialOffset = (int)data_start;
                     writer.BaseStream.Seek(export.SerialOffsetPosition, SeekOrigin.Begin);
                     writer.Write(export.SerialOffset);
                     writer.BaseStream.Seek(data_start, SeekOrigin.Begin);
@@ -303,8 +303,8 @@ namespace GPK_RePack.Saver
         private void WriteFilePadding(BinaryWriter writer, GpkPackage package, int compuSize)
         {
             long final_size = writer.BaseStream.Position;
-            logger.Debug(String.Format("New size {0}, Old size {1}", final_size, package.OrginalSize));
-            logger.Debug("Compu Size: {0}, Diff {1} -", compuSize, final_size - compuSize);
+            logger.Debug("New size: {0}, Old size: {1}", final_size, package.OrginalSize);
+            logger.Debug("Compu Size: {0}, Diff: {1} -", compuSize, final_size - compuSize);
 
 
             if (final_size < package.OrginalSize)
@@ -321,8 +321,8 @@ namespace GPK_RePack.Saver
             else if (final_size > package.OrginalSize)
             {
                 //Too big
-                logger.Info(String.Format("The new package size is bigger than the orginal one! Tera may not acccept this file."));
-                logger.Info(String.Format("New size {0} bytes, Old size {1} bytes. +{2} bytes", final_size, package.OrginalSize, final_size - package.OrginalSize));
+                logger.Info("The new package size is bigger than the orginal one! Tera may not acccept this file.");
+                logger.Info("New size {0} bytes, Old size {1} bytes. +{2} bytes", final_size, package.OrginalSize, final_size - package.OrginalSize);
             }
 
         }

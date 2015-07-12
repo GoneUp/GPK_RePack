@@ -13,5 +13,8 @@ namespace GPK_RePack.Classes.Interfaces
         void WriteData(BinaryWriter writer, GpkPackage package);
         void ReadData(BinaryReader reader, GpkPackage package);
         int RecalculateSize();
+
+        bool ValidateValue(string input);
+        bool SetValue(string input);
     }
 }

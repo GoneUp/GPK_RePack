@@ -42,6 +42,24 @@ namespace GPK_RePack.Classes.Prop
             size = 4;
             return size;
         }
+
+        public bool ValidateValue(string input)
+        {
+            int validate;
+            if (int.TryParse(input, out validate))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool SetValue(string input)
+        {
+            if (!ValidateValue(input)) return false;
+            value = Convert.ToInt32(input);
+            return true;
+        }
     }
 
 }

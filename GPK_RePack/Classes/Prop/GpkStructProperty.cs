@@ -53,6 +53,16 @@ namespace GPK_RePack.Classes.Prop
             return size + 8; //length not included in normal len
         }
 
+        public bool ValidateValue(string input)
+        {
+            return false;
+        }
+
+        public bool SetValue(string input)
+        {
+            return false;
+        }
+
         public string GetValueHex()
         {
             string hex = "";

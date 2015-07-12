@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -120,6 +121,35 @@ ObjectName: SampleDataSize Type: IntProperty Value: 20704
             writer.Dispose();
 
             logger.Info(String.Format("Data was saved to {0}!", Path.GetFileName(oggfile)));
+        }
+
+
+        public static void SetAllVolumes(GpkPackage package, Single volume)
+        {
+            List<GpkExport> exports = package.GetExportsByClass(new SoundCue().GetClassIdent());
+
+            SetPropertyDetails(exports, "VolumeMultiplier", volume.ToString());
+        }
+
+        public static void SetPropertyDetails(List<GpkExport> exports, string name, string input)
+        {
+            foreach (GpkExport export in exports)
+            {
+                foreach (IProperty prop in export.Properties)
+                {
+                    string tmpName = ((GpkBaseProperty) prop).name;
+
+                    if (tmpName == name)
+                    {
+                        bool success = prop.SetValue(input);
+                        if (!success)
+                        {
+                            logger.Info("Failed to update property. UID {0} PropName {1} Value {2} RealPropInfo {3}", export.UID, name, input, prop);
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 }

@@ -175,7 +175,7 @@ namespace GPK_RePack.Parser
 
                 package.NameList.Add(i, tmpString);
 
-                logger.Debug("ObjectName {0}: {1}", i, tmpString.name);
+                logger.Debug("Name {0}: {1}", i, tmpString.name);
                 progress++;
             }
 
@@ -236,7 +236,7 @@ namespace GPK_RePack.Parser
 
                 package.ExportList.Add(i, export);
 
-                logger.Debug("Export {0}: Class: {1}, ObjectName: {2}, Data_Size: {3}, Data_Offset {4}, Export_offset {5}", i, export.ClassName, export.ObjectName, export.SerialSize, export.SerialOffset, reader.BaseStream.Position);
+                logger.Debug("Export {0}: ObjectName: {1}, Data_Size: {2}, Data_Offset {3}, Export_offset {4}", i, export.ObjectName, export.SerialSize, export.SerialOffset, reader.BaseStream.Position);
                 progress++;
             }
 
@@ -282,8 +282,8 @@ namespace GPK_RePack.Parser
                         long test_nameindex = reader.ReadInt64();
                         if (package.NameList.ContainsKey(test_nameindex))
                         {
-                            long name_start = reader.BaseStream.Position - 8;
-                            long name_padding_count = name_start - (namePosStart);
+                            long tmpNameStartPos = reader.BaseStream.Position - 8;
+                            long name_padding_count = tmpNameStartPos - namePosStart;
                             reader.BaseStream.Seek(namePosStart, SeekOrigin.Begin);
 
                             export.property_padding = new byte[name_padding_count];
@@ -325,10 +325,8 @@ namespace GPK_RePack.Parser
                                 export.payload.ReadData(package, export);
                                 break;
                             case "Core.SoundCue":
-                                /*
-                                 * export.payload = new SoundCue();
+                                export.payload = new SoundCue();
                                 export.payload.ReadData(package, export);
-                                 */ 
                                 break;
                         }
 

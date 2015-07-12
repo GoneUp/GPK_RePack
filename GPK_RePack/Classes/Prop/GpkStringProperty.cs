@@ -71,6 +71,17 @@ namespace GPK_RePack.Classes.Prop
             return size;
         }
 
+        public bool ValidateValue(string input)
+        {
+            return true;
+        }
+
+        public bool SetValue(string input)
+        {
+            value = input;
+            return true;
+        }
+
         public override string ToString()
         {
             return string.Format("ObjectName: {0} Type: {1} Value: {2}", name, type, value);

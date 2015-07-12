@@ -47,6 +47,9 @@ namespace GPK_RePack.Forms
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miscToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setFilesizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setAllPropertysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setAllVolumeMultipliersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.customToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.boxInfo = new System.Windows.Forms.TextBox();
@@ -197,7 +200,8 @@ namespace GPK_RePack.Forms
             // miscToolStripMenuItem
             // 
             this.miscToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.setFilesizeToolStripMenuItem});
+            this.setFilesizeToolStripMenuItem,
+            this.setAllPropertysToolStripMenuItem});
             this.miscToolStripMenuItem.Name = "miscToolStripMenuItem";
             this.miscToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.miscToolStripMenuItem.Text = "Misc";
@@ -205,9 +209,32 @@ namespace GPK_RePack.Forms
             // setFilesizeToolStripMenuItem
             // 
             this.setFilesizeToolStripMenuItem.Name = "setFilesizeToolStripMenuItem";
-            this.setFilesizeToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.setFilesizeToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.setFilesizeToolStripMenuItem.Text = "Set Filesize";
             this.setFilesizeToolStripMenuItem.Click += new System.EventHandler(this.setFilesizeToolStripMenuItem_Click);
+            // 
+            // setAllPropertysToolStripMenuItem
+            // 
+            this.setAllPropertysToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setAllVolumeMultipliersToolStripMenuItem,
+            this.customToolStripMenuItem});
+            this.setAllPropertysToolStripMenuItem.Name = "setAllPropertysToolStripMenuItem";
+            this.setAllPropertysToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.setAllPropertysToolStripMenuItem.Text = "Set all Propertys";
+            // 
+            // setAllVolumeMultipliersToolStripMenuItem
+            // 
+            this.setAllVolumeMultipliersToolStripMenuItem.Name = "setAllVolumeMultipliersToolStripMenuItem";
+            this.setAllVolumeMultipliersToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.setAllVolumeMultipliersToolStripMenuItem.Text = "Set all VolumeMultipliers";
+            this.setAllVolumeMultipliersToolStripMenuItem.Click += new System.EventHandler(this.setAllVolumeMultipliersToolStripMenuItem_Click);
+            // 
+            // customToolStripMenuItem
+            // 
+            this.customToolStripMenuItem.Name = "customToolStripMenuItem";
+            this.customToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.customToolStripMenuItem.Text = "Custom";
+            this.customToolStripMenuItem.Click += new System.EventHandler(this.customToolStripMenuItem_Click);
             // 
             // tabControl1
             // 
@@ -614,6 +641,9 @@ namespace GPK_RePack.Forms
         private DataGridViewTextBoxColumn iType;
         private DataGridViewTextBoxColumn value;
         private Button btnOggPreview;
+        private ToolStripMenuItem setAllPropertysToolStripMenuItem;
+        private ToolStripMenuItem setAllVolumeMultipliersToolStripMenuItem;
+        private ToolStripMenuItem customToolStripMenuItem;
     }
 }
 

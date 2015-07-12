@@ -46,6 +46,16 @@ namespace GPK_RePack.Classes.Prop
             size = 8;
             return size;
         }
+
+        public bool ValidateValue(string input)
+        {
+            return false;
+        }
+
+        public bool SetValue(string input)
+        {
+            return false;
+        }
     }
 
 }

@@ -210,6 +210,13 @@ namespace GPK_RePack.Classes
         public List<GpkExport> GetExportsByClass(string className)
         {
             List<GpkExport> tmpList = new List<GpkExport>();
+
+            if (className == "#all")
+            {
+                tmpList = ExportList.Values.ToList();
+                return tmpList;
+            }
+
             foreach (KeyValuePair<long, GpkExport> pair in ExportList)
             {
                 if (pair.Value.ClassName == className)
