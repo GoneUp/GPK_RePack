@@ -1048,7 +1048,7 @@ namespace GPK_RePack.Forms
                 }
                 else
                 {
-                    logger.Info("LOL");
+                    logger.Info("Unk Prop?!?");
                 }
 
 
@@ -1225,10 +1225,39 @@ namespace GPK_RePack.Forms
 
             iProp.RecalculateSize();
             return iProp;
+        }  
+        
+        private void TestBigBytePropExportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selectedExport != null)
+            {
+                if (gridProps.SelectedRows.Count != 1)
+                {
+                    logger.Info("select a row");
+                    return;
+                }
+
+                IProperty tmpProp = readProperty(gridProps.SelectedRows[0]);
+                if (!(tmpProp is GpkArrayProperty)) return;
+                GpkArrayProperty arrayProp = (GpkArrayProperty) tmpProp;
+
+                if (arrayProp.value == null) return;
+
+                SaveFileDialog save = new SaveFileDialog();
+                save.FileName = arrayProp.name;
+                save.DefaultExt = ".raw";
+                save.InitialDirectory = Settings.Default.SaveDir;
+                save.ShowDialog();
+                Settings.Default.SaveDir = save.FileName;
+
+                DataTools.WriteExportDataFile(save.FileName, arrayProp.value);
+            }
         }
+
+
         #endregion
 
-
+   
 
 
 

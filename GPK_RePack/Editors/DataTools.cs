@@ -29,12 +29,17 @@ namespace GPK_RePack.Editors
 
         public static void WriteExportDataFile(string path, GpkExport export)
         {
+            WriteExportDataFile(path, export.data);
+        }
+
+        public static void WriteExportDataFile(string path, byte[] data)
+        {
             if (!Directory.Exists(Path.GetDirectoryName(path)))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
             }
             StreamWriter writer = new StreamWriter(File.OpenWrite(path));
-            writer.BaseStream.Write(export.data, 0, export.data.Length);
+            writer.BaseStream.Write(data, 0, data.Length);
             writer.Close();
             writer.Dispose();
 
