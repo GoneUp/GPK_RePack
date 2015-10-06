@@ -1225,8 +1225,8 @@ namespace GPK_RePack.Forms
 
             iProp.RecalculateSize();
             return iProp;
-        }  
-        
+        }
+
         private void TestBigBytePropExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (selectedExport != null)
@@ -1239,9 +1239,10 @@ namespace GPK_RePack.Forms
 
                 IProperty tmpProp = readProperty(gridProps.SelectedRows[0]);
                 if (!(tmpProp is GpkArrayProperty)) return;
-                GpkArrayProperty arrayProp = (GpkArrayProperty) tmpProp;
+                GpkArrayProperty arrayProp = (GpkArrayProperty)tmpProp;
 
                 if (arrayProp.value == null) return;
+                byte[] data = arrayProp.value;
 
                 SaveFileDialog save = new SaveFileDialog();
                 save.FileName = arrayProp.name;
@@ -1250,14 +1251,22 @@ namespace GPK_RePack.Forms
                 save.ShowDialog();
                 Settings.Default.SaveDir = save.FileName;
 
-                DataTools.WriteExportDataFile(save.FileName, arrayProp.value);
+                DialogResult answer = MessageBox.Show("Remove Count bytes?", "TH", MessageBoxButtons.YesNo);
+
+                if (answer == DialogResult.Yes)
+                {
+                    data = new byte[arrayProp.value.Length - 4];
+                    Array.Copy(arrayProp.value, 4, data, 0, arrayProp.value.Length - 4);
+                }
+
+                DataTools.WriteExportDataFile(save.FileName, data);
             }
         }
 
 
         #endregion
 
-   
+
 
 
 
