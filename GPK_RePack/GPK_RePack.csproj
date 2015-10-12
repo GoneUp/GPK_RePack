@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\ExportData\DataLoader.cs" />
     <Compile Include="Classes\GpkExport.cs" />
     <Compile Include="Classes\GpkGeneration.cs" />
     <Compile Include="Classes\GpkHeader.cs" />

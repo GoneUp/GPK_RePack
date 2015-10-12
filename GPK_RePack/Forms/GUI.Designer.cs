@@ -50,6 +50,7 @@ namespace GPK_RePack.Forms
             this.setAllPropertysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setAllVolumeMultipliersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.customToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tESTBigBytePropExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.boxInfo = new System.Windows.Forms.TextBox();
@@ -80,7 +81,9 @@ namespace GPK_RePack.Forms
             this.btnExport = new System.Windows.Forms.Button();
             this.boxLog = new System.Windows.Forms.TextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.tESTBigBytePropExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -94,6 +97,7 @@ namespace GPK_RePack.Forms
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // treeMain
@@ -101,7 +105,7 @@ namespace GPK_RePack.Forms
             this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeMain.Location = new System.Drawing.Point(0, 0);
             this.treeMain.Name = "treeMain";
-            this.treeMain.Size = new System.Drawing.Size(306, 507);
+            this.treeMain.Size = new System.Drawing.Size(306, 485);
             this.treeMain.TabIndex = 1;
             this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
             this.treeMain.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GUI_KeyDown);
@@ -238,6 +242,13 @@ namespace GPK_RePack.Forms
             this.customToolStripMenuItem.Text = "Custom";
             this.customToolStripMenuItem.Click += new System.EventHandler(this.customToolStripMenuItem_Click);
             // 
+            // tESTBigBytePropExportToolStripMenuItem
+            // 
+            this.tESTBigBytePropExportToolStripMenuItem.Name = "tESTBigBytePropExportToolStripMenuItem";
+            this.tESTBigBytePropExportToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
+            this.tESTBigBytePropExportToolStripMenuItem.Text = "[TEST] Big ByteProp Export";
+            this.tESTBigBytePropExportToolStripMenuItem.Click += new System.EventHandler(this.TestBigBytePropExportToolStripMenuItem_Click);
+            // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
@@ -246,7 +257,7 @@ namespace GPK_RePack.Forms
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(793, 395);
+            this.tabControl1.Size = new System.Drawing.Size(793, 394);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -255,7 +266,7 @@ namespace GPK_RePack.Forms
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(785, 369);
+            this.tabPage1.Size = new System.Drawing.Size(785, 368);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Info";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -350,9 +361,9 @@ namespace GPK_RePack.Forms
             this.boxCommands.Controls.Add(this.boxGeneralButtons);
             this.boxCommands.Controls.Add(this.boxDataButtons);
             this.boxCommands.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.boxCommands.Location = new System.Drawing.Point(0, 395);
+            this.boxCommands.Location = new System.Drawing.Point(0, 394);
             this.boxCommands.Name = "boxCommands";
-            this.boxCommands.Size = new System.Drawing.Size(793, 112);
+            this.boxCommands.Size = new System.Drawing.Size(793, 91);
             this.boxCommands.TabIndex = 6;
             // 
             // boxPropertyButtons
@@ -363,7 +374,7 @@ namespace GPK_RePack.Forms
             this.boxPropertyButtons.Enabled = false;
             this.boxPropertyButtons.Location = new System.Drawing.Point(199, 0);
             this.boxPropertyButtons.Name = "boxPropertyButtons";
-            this.boxPropertyButtons.Size = new System.Drawing.Size(146, 112);
+            this.boxPropertyButtons.Size = new System.Drawing.Size(146, 91);
             this.boxPropertyButtons.TabIndex = 6;
             this.boxPropertyButtons.TabStop = false;
             this.boxPropertyButtons.Text = "Property Commands";
@@ -398,7 +409,7 @@ namespace GPK_RePack.Forms
             this.boxGeneralButtons.Enabled = false;
             this.boxGeneralButtons.Location = new System.Drawing.Point(0, 0);
             this.boxGeneralButtons.Name = "boxGeneralButtons";
-            this.boxGeneralButtons.Size = new System.Drawing.Size(199, 112);
+            this.boxGeneralButtons.Size = new System.Drawing.Size(199, 91);
             this.boxGeneralButtons.TabIndex = 5;
             this.boxGeneralButtons.TabStop = false;
             this.boxGeneralButtons.Text = "General";
@@ -457,7 +468,7 @@ namespace GPK_RePack.Forms
             this.boxDataButtons.Enabled = false;
             this.boxDataButtons.Location = new System.Drawing.Point(345, 0);
             this.boxDataButtons.Name = "boxDataButtons";
-            this.boxDataButtons.Size = new System.Drawing.Size(448, 112);
+            this.boxDataButtons.Size = new System.Drawing.Size(448, 91);
             this.boxDataButtons.TabIndex = 4;
             this.boxDataButtons.TabStop = false;
             this.boxDataButtons.Text = "Data Commands";
@@ -535,7 +546,7 @@ namespace GPK_RePack.Forms
             // boxLog
             // 
             this.boxLog.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.boxLog.Location = new System.Drawing.Point(0, 531);
+            this.boxLog.Location = new System.Drawing.Point(0, 509);
             this.boxLog.Multiline = true;
             this.boxLog.Name = "boxLog";
             this.boxLog.ReadOnly = true;
@@ -558,16 +569,35 @@ namespace GPK_RePack.Forms
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
             this.splitContainer1.Panel2.Controls.Add(this.boxCommands);
-            this.splitContainer1.Size = new System.Drawing.Size(1103, 507);
+            this.splitContainer1.Size = new System.Drawing.Size(1103, 485);
             this.splitContainer1.SplitterDistance = 306;
             this.splitContainer1.TabIndex = 7;
             // 
-            // tESTBigBytePropExportToolStripMenuItem
+            // statusStrip1
             // 
-            this.tESTBigBytePropExportToolStripMenuItem.Name = "tESTBigBytePropExportToolStripMenuItem";
-            this.tESTBigBytePropExportToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
-            this.tESTBigBytePropExportToolStripMenuItem.Text = "[TEST] Big ByteProp Export";
-            this.tESTBigBytePropExportToolStripMenuItem.Click += new System.EventHandler(this.TestBigBytePropExportToolStripMenuItem_Click);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ProgressBar,
+            this.lblStatus});
+            this.statusStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
+            this.statusStrip1.Location = new System.Drawing.Point(0, 654);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
+            this.statusStrip1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.statusStrip1.Size = new System.Drawing.Size(1103, 22);
+            this.statusStrip1.SizingGrip = false;
+            this.statusStrip1.Stretch = false;
+            this.statusStrip1.TabIndex = 8;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // ProgressBar
+            // 
+            this.ProgressBar.Name = "ProgressBar";
+            this.ProgressBar.Size = new System.Drawing.Size(100, 16);
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(0, 17);
             // 
             // GUI
             // 
@@ -577,6 +607,7 @@ namespace GPK_RePack.Forms
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.boxLog);
+            this.Controls.Add(this.statusStrip1);
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GUI";
@@ -598,6 +629,8 @@ namespace GPK_RePack.Forms
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -654,6 +687,9 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem setAllVolumeMultipliersToolStripMenuItem;
         private ToolStripMenuItem customToolStripMenuItem;
         private ToolStripMenuItem tESTBigBytePropExportToolStripMenuItem;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel lblStatus;
+        private ToolStripProgressBar ProgressBar;
     }
 }
 

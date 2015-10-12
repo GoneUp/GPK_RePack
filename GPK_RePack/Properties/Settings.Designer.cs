@@ -130,5 +130,17 @@ namespace GPK_RePack.Properties {
                 this["UseUID"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool JitData {
+            get {
+                return ((bool)(this["JitData"]));
+            }
+            set {
+                this["JitData"] = value;
+            }
+        }
     }
 }

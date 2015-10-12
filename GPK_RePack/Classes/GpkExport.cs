@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using GPK_RePack.Classes.ExportData;
 using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Prop;
+using GPK_RePack.Parser;
 
 namespace GPK_RePack.Classes
 {
     [Serializable]
     class GpkExport : IGpkPart
     {
+        private GpkPackage motherPackage;
         public string UID;
 
         public int ClassIndex;
@@ -29,31 +32,58 @@ namespace GPK_RePack.Classes
         public int SerialOffset;
         public long SerialOffsetPosition;
 
-        public int netIndex;
-        public string netIndexName = null;
-        public byte[] padding_unk = new byte[28];
-        //28 byte byte padding? + 4 vor letztem
+        public int NetIndex;
+        public string NetIndexName = null;
 
-        public byte[] property_padding;
-        public int property_size;
+        public byte[] PaddingUnk = new byte[28];//28 byte byte padding? + 4 vor letztem
+        public byte[] PropertyPadding;
+
+        public int PropertySize;
         public List<IProperty> Properties;
 
-        public long data_start;
-        public byte[] data_padding;
-        public byte[] data;
-
-        public IPayload payload;
-
-        public GpkExport()
+        public long DataStart;
+        public byte[] DataPadding;
+        private byte[] m_data;
+        public DataLoader Loader;
+        public IPayload Payload;
+        public byte[] Data
         {
-            Properties = new List<IProperty>();
+            get
+            {
+                if (Loader != null)
+                {
+                    m_data = Loader.LoadData(); 
+                    Loader = null; //null first, row is important here!
+                    Reader.ParsePayload(motherPackage, this); 
+                   
+                }
+
+                return m_data;
+            }
+
+            set
+            {
+                m_data = value;
+                Loader = null; //no overrides later
+            }
         }
 
+
+        public GpkExport(GpkPackage mothership)
+        {
+            motherPackage = mothership;
+            Properties = new List<IProperty>();
+
+        }
+
+        /*
+         * no idea why this is here. maybe its usefull later.
         public GpkExport(GpkExport export)
         {
             //clone class
+            motherPackage = export.motherPackage;
             UID = export.UID;
-            
+
             ClassIndex = export.ClassIndex;
             SuperIndex = export.SuperIndex;
             PackageIndex = export.PackageIndex;
@@ -70,18 +100,21 @@ namespace GPK_RePack.Classes
             SerialOffset = export.SerialOffset;
             SerialOffsetPosition = export.SerialOffsetPosition;
 
-            netIndex = export.netIndex;
-            netIndexName = export.netIndexName;
-            padding_unk = export.padding_unk;
-            property_padding = export.property_padding;
-            property_size = export.property_size;
+            NetIndex = export.NetIndex;
+            NetIndexName = export.NetIndexName;
+            PaddingUnk = export.PaddingUnk;
+            PropertyPadding = export.PropertyPadding;
+            PropertySize = export.PropertySize;
             Properties = export.Properties;
 
-            data_start = export.data_start;
-            data_padding = export.data_padding;
-            data = export.data;
-            payload = export.payload;
+            DataStart = export.DataStart;
+            DataPadding = export.DataPadding;
+            Data = export.Data;
+            Loader = export.Loader;
+            Payload = export.Payload;
+
         }
+         * */
 
         public override string ToString()
         {
@@ -92,18 +125,24 @@ namespace GPK_RePack.Classes
             info.AppendLine("Class: " + ClassName);
             info.AppendLine("Super: " + SuperName);
             info.AppendLine("Package: " + PackageName);
-            info.AppendLine("Netindex: " + netIndex);
-            if (netIndexName != null) info.AppendLine("NetindexObject: " + netIndexName);
+            info.AppendLine("Netindex: " + NetIndex);
+            if (NetIndexName != null) info.AppendLine("NetindexObject: " + NetIndexName);
 
             info.AppendLine("Data_Offset: " + SerialOffset);
-            if (data != null)
+            if (Loader != null)
             {
-                info.AppendLine("Data_Size: " + data.Length);
+                //loader first, we dont want loading if the data is not really needed
+                info.AppendLine(Loader.ToString());
+            }
+            else if (Data != null)
+            {
+                info.AppendLine("Data_Size: " + Data.Length);
             }
             else
             {
                 info.AppendLine("Data_Size: 0");
             }
+
 
             info.AppendLine("Properties:");
             foreach (IProperty prop in Properties)
@@ -119,9 +158,9 @@ namespace GPK_RePack.Classes
 
             //props
             size += 4; //netindex
-            if (property_padding != null)
+            if (PropertyPadding != null)
             {
-                size += property_padding.Length;
+                size += PropertyPadding.Length;
             }
 
             foreach (IProperty iProp in Properties)
@@ -131,17 +170,22 @@ namespace GPK_RePack.Classes
             //none
             size += 8;
             //finally
-            property_size = size;
+            PropertySize = size;
 
-            if (data_padding != null)
+            if (DataPadding != null)
             {
-                size += data_padding.Length;
+                size += DataPadding.Length;
             }
             //data
-            if (data != null)
+            if (Loader != null)
             {
-                size += data.Length;
-            } 
+                //loader first. prevents mass loading, eg for package size computing
+                size += Loader.Length;
+            }
+            else if (Data != null)
+            {
+                size += Data.Length;
+            }
 
             SerialSize = size;
 
@@ -154,12 +198,12 @@ namespace GPK_RePack.Classes
             int tmpSize = 0;
             tmpSize += 36; //static
             if (SerialSize > 0) tmpSize += 4;
-            tmpSize += padding_unk.Length;
+            tmpSize += PaddingUnk.Length;
 
             return tmpSize;
 
         }
 
-      
+
     }
 }

@@ -51,6 +51,7 @@ namespace GPK_RePack.Classes.Prop
             else
             {
                 //unicode :O
+                IsUnicode = true;
                 value = Reader.ReadUnicodeString(reader, (length * -1) * 2);
             }
         }
@@ -58,14 +59,15 @@ namespace GPK_RePack.Classes.Prop
         public int RecalculateSize()
         {
             int tmpSize = 4; //length
-            if (length > 0)
+            if (!IsUnicode)
             {
+                length = value.Length;
                 tmpSize += length;
             }
             else
             {
-                //unicode :O
-                tmpSize += (length*-1) * 2;
+                length = (value.Length * -1); //length in file format, unicode is marked with a negative value
+                tmpSize += value.Length * 2;
             }
             size = tmpSize;
             return size;

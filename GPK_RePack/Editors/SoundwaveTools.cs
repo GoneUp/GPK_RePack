@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GPK_RePack.Classes;
+using GPK_RePack.Classes.ExportData;
 using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Payload;
 using GPK_RePack.Classes.Prop;
@@ -32,15 +33,14 @@ namespace GPK_RePack.Editors
                 wave.oggdata = new byte[1];
             }
 
-            export.payload = wave;
+            export.Payload = wave;
 
             //Refill data buffer with normal soundwave
-            export.data = new byte[wave.GetSize()];
-            BinaryWriter writer = new BinaryWriter(new MemoryStream(export.data));
+            export.Data = new byte[wave.GetSize()];
+            BinaryWriter writer = new BinaryWriter(new MemoryStream(export.Data));
             wave.WriteData(writer, null, export);
             writer.Close();
             writer.Dispose();
-
 
             export.GetDataSize();
 
@@ -94,19 +94,22 @@ ObjectName: SampleDataSize Type: IntProperty Value: 20704
 
         public static void ExportOgg(GpkExport export, string oggfile)
         {
-            if (export.payload == null)
+            //check jit loader
+            if (export.Loader != null) export.Data.ToString(); //random trigger to load the jit data
+
+            if (export.Payload == null)
             {
                 logger.Info("No data. The file cannot be exported to ogg.");
                 return;
             }
 
-            if (!(export.payload is Soundwave))
+            if (!(export.Payload is Soundwave))
             {
                 logger.Info("Wrong payload data. The file cannot be exported to ogg.");
                 return;
             }
 
-            Soundwave wave = (Soundwave)export.payload;
+            Soundwave wave = (Soundwave)export.Payload;
 
             if (wave.oggdata == null)
             {

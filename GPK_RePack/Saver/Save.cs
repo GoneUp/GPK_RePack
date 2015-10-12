@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,9 @@ namespace GPK_RePack.Saver
         private long offsetImportPos = 0;
         private long offsetNamePos = 0;
 
+        public int progress;
+        public int totalobjects;
+
         public void SaveReplacedExport(GpkPackage package, string savepath, List<GpkExport> changedExports)
         {
             byte[] buffer = File.ReadAllBytes(package.Path);
@@ -29,8 +33,8 @@ namespace GPK_RePack.Saver
 
             foreach (GpkExport export in changedExports)
             {
-                writer.Seek((int)export.data_start, SeekOrigin.Begin);
-                writer.Write(export.data);
+                writer.Seek((int)export.DataStart, SeekOrigin.Begin);
+                writer.Write(export.Data);
             }
 
             writer.Close();
@@ -44,10 +48,17 @@ namespace GPK_RePack.Saver
             //Header 
             //Namelist
             //Imports
-            //Exports
-            logger.Debug("Start writing");
+            //Exports      
+            logger.Info(String.Format("Attemping to save {0}...", package.Filename));
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+            progress = 0;
+
             package.PrepareWriting();
             int compuSize = package.GetSize(false);
+
+            totalobjects = package.Header.NameCount + package.Header.ExportCount * 2 + package.Header.ImportCount; //Export, ExportData = x2
 
             using (BinaryWriter writer = new BinaryWriter(new FileStream(savepath, FileMode.Create)))
             {
@@ -59,7 +70,8 @@ namespace GPK_RePack.Saver
                 WriteFilePadding(writer, package, compuSize);
             }
 
-
+            watch.Stop();
+            logger.Info(String.Format("Saved the package '{0} to {1}', took {2}ms!", package.Filename, savepath, watch.ElapsedMilliseconds));
         }
 
         private void WriteHeader(BinaryWriter writer, GpkPackage package)
@@ -131,6 +143,7 @@ namespace GPK_RePack.Saver
                 writer.Write(tmpString.name.Length + 1);
                 WriteString(writer, tmpString.name);
                 writer.Write(tmpString.flags);
+                progress++;
             }
 
             logger.Debug("Wrote namelist pos " + writer.BaseStream.Position);
@@ -156,6 +169,7 @@ namespace GPK_RePack.Saver
                 writer.Write(imp.PackageRef);
                 writer.Write((int)package.GetStringIndex(imp.ObjectName));
                 writer.Write(imp.Unk);
+                progress++;
             }
 
             logger.Debug("Wrote imports pos " + writer.BaseStream.Position);
@@ -191,7 +205,8 @@ namespace GPK_RePack.Saver
                 export.SerialOffsetPosition = writer.BaseStream.Position;
                 if (export.SerialSize > 0) writer.Write(export.SerialOffset);
 
-                writer.Write(export.padding_unk);
+                writer.Write(export.PaddingUnk);
+                progress++;
             }
 
             logger.Debug("Wrote exports pos " + writer.BaseStream.Position);
@@ -227,18 +242,18 @@ namespace GPK_RePack.Saver
                     writer.BaseStream.Seek(data_start, SeekOrigin.Begin);
                 }
 
-                if (export.netIndexName != null)
+                if (export.NetIndexName != null)
                 {
-                    writer.Write((int)package.GetObjectIndex(export.netIndexName));
+                    writer.Write((int)package.GetObjectIndex(export.NetIndexName));
                 }
                 else
                 {
-                    writer.Write(export.netIndex);
+                    writer.Write(export.NetIndex);
                 }
 
-                if (export.property_padding != null)
+                if (export.PropertyPadding != null)
                 {
-                    writer.Write(export.property_padding);
+                    writer.Write(export.PropertyPadding);
                 }
 
                 foreach (IProperty iProp in export.Properties)
@@ -258,26 +273,32 @@ namespace GPK_RePack.Saver
 
                 //check
                 long propRealSize = (writer.BaseStream.Position - data_start);
-                if (Settings.Default.Debug && propRealSize != export.property_size)
+                if (Settings.Default.Debug && propRealSize != export.PropertySize)
                 {
-                    logger.Trace("Compu Size: {0}, Diff {1} -", export.property_size, propRealSize - export.property_size);
+                    logger.Trace("Compu Size: {0}, Diff {1} -", export.PropertySize, propRealSize - export.PropertySize);
                 }
 
 
-                if (export.data_padding != null)
+                if (export.DataPadding != null)
                 {
-                    writer.Write((export.data_padding));
+                    writer.Write((export.DataPadding));
                 }
 
-                //finally our data ^^
-                if (export.payload != null)
+                //finally our data 
+                //check loader...
+                if (export.Loader != null)
+                {
+                    int rndTrigger = export.Data.Length; //just a call to trigger the loading process
+                }
+
+                if (export.Payload != null)
                 {
                     //pos is important. we cant be sure that the data is acurate.
-                    export.payload.WriteData(writer, package, export);
+                    export.Payload.WriteData(writer, package, export);
                 }
-                else if (export.data != null)
+                else if (export.Data != null)
                 {
-                    writer.Write(export.data);
+                    writer.Write(export.Data);
                 }
 
                 long data_end = writer.BaseStream.Position;
@@ -295,6 +316,7 @@ namespace GPK_RePack.Saver
                 }
 
                 logger.Trace("wrote export data for " + export.ObjectName + " end pos " + writer.BaseStream.Position);
+                progress++;
             }
 
             logger.Debug("Wrote export data pos " + writer.BaseStream.Position);

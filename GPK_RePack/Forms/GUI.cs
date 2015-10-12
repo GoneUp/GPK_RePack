@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using GPK_RePack.Classes;
+using GPK_RePack.Classes.ExportData;
 using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Payload;
 using GPK_RePack.Classes.Prop;
@@ -144,6 +145,8 @@ namespace GPK_RePack.Forms
             boxGeneralButtons.Enabled = false;
             boxDataButtons.Enabled = false;
             boxPropertyButtons.Enabled = false;
+            ProgressBar.Value = 0;
+            lblStatus.Text = "";
             ClearGrid();
         }
 
@@ -197,6 +200,9 @@ namespace GPK_RePack.Forms
                     {
                         Application.DoEvents();
                         boxInfo.Text = String.Format("Progress of loading: {0}/{1}", reader.progress, reader.totalobjects);
+
+                        if (reader.totalobjects > 0)  ProgressBar.Value = (int)(((double)reader.progress / (double)reader.totalobjects) * 100);
+                        lblStatus.Text = String.Format("Loading {0} ..", Path.GetFileName(path));
                         Thread.Sleep(50);
                     }
 
@@ -211,6 +217,9 @@ namespace GPK_RePack.Forms
             }
 
             DrawPackages();
+
+            ProgressBar.Value = 0;
+            lblStatus.Text = "";
         }
 
 
@@ -256,10 +265,21 @@ namespace GPK_RePack.Forms
             {
                 try
                 {
-                    logger.Info(String.Format("Attemping to save {0}...", package.Filename));
-                    string savepath = package.Path + "_rebuild";
-                    saver.SaveGpkPackage(package, savepath);
-                    logger.Info(String.Format("Saved the package '{0} to {1}'!", package.Filename, savepath));
+               
+                    Thread newThread = new Thread(delegate()
+                    {
+                        string savepath = package.Path + "_rebuild";
+                        saver.SaveGpkPackage(package, savepath);
+                    });
+                    newThread.Start();
+
+                    while (newThread.IsAlive)
+                    {
+                        Application.DoEvents();
+                        if (saver.totalobjects > 0) ProgressBar.Value = (int)(((double)saver.progress / (double)saver.totalobjects) * 100);
+                        lblStatus.Text = String.Format("Saving {0}..", package.Filename);
+                        Thread.Sleep(50);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -268,6 +288,8 @@ namespace GPK_RePack.Forms
 
             }
 
+            ProgressBar.Value = 0;
+            lblStatus.Text = "";
             logger.Info("Saving done!");
         }
         #endregion
@@ -411,7 +433,7 @@ namespace GPK_RePack.Forms
         {
             if (selectedExport != null)
             {
-                if (selectedExport.data == null)
+                if (selectedExport.Data == null)
                 {
                     logger.Info("Length is zero. Nothing to export");
                     return;
@@ -447,7 +469,7 @@ namespace GPK_RePack.Forms
 
                     foreach (GpkExport exp in exports)
                     {
-                        if (exp.data != null)
+                        if (exp.Data != null)
                         {
                             DataTools.WriteExportDataFile(String.Format("{0}\\{1}.raw", dialog.SelectedPath, exp.ObjectName), exp);
                             logger.Trace("save for " + exp.UID);
@@ -467,7 +489,7 @@ namespace GPK_RePack.Forms
 
                     foreach (GpkExport exp in selectedPackage.ExportList.Values)
                     {
-                        if (exp.data != null)
+                        if (exp.Data != null)
                         {
                             DataTools.WriteExportDataFile(String.Format("{0}\\{1}\\{2}.raw", dialog.SelectedPath, exp.ClassName, exp.ObjectName), exp);
                             logger.Trace("save for " + exp.UID);
@@ -487,7 +509,7 @@ namespace GPK_RePack.Forms
                 logger.Trace("no selected export");
                 return;
             }
-            if (selectedExport.data == null)
+            if (selectedExport.Data == null)
             {
                 logger.Trace("no export data");
                 return;
@@ -511,25 +533,18 @@ namespace GPK_RePack.Forms
                 if (Settings.Default.PatchMode)
                 {
                     if (treeMain.SelectedNode.Parent.Parent == null) return;
-
                     int packageIndex = Convert.ToInt32(treeMain.SelectedNode.Parent.Parent.Name);
 
-                    if (buffer.Length > selectedExport.data.Length)
+                    if (buffer.Length > selectedExport.Data.Length)
                     {
                         //Too long, not possible without rebuiling the gpk
                         logger.Info("File size too big for PatchMode. Size: " + buffer.Length + " Maximum Size: " +
-                                 selectedExport.data.Length);
+                                 selectedExport.Data.Length);
                         return;
                     }
 
-                    if (buffer.Length < selectedExport.data.Length)
-                    {
-                        //Too short, fill it
-                        selectedExport.data = new byte[selectedExport.data.Length];
-                    }
-
                     //selectedExport.data = buffer;
-                    Array.Copy(buffer, selectedExport.data, buffer.Length);
+                    Array.Copy(buffer, selectedExport.Data, buffer.Length);
 
                     changedExports[packageIndex].Add(selectedExport);
 
@@ -538,10 +553,10 @@ namespace GPK_RePack.Forms
                 {
                     //Rebuild Mode
                     //We force the rebuilder to recalculate the size. (atm we dont know how big the propertys are)
-                    logger.Trace(String.Format("rebuild mode old size {0} new size {1}", selectedExport.data.Length,
+                    logger.Trace(String.Format("rebuild mode old size {0} new size {1}", selectedExport.Data.Length,
                         buffer.Length));
 
-                    selectedExport.data = buffer;
+                    selectedExport.Data = buffer;
                     selectedExport.GetDataSize();
                     selectedPackage.Changes = true;
                 }
@@ -652,15 +667,16 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            if (selectedExport.data == null)
+            if (selectedExport.Data == null)
             {
                 logger.Trace("no export data");
                 return;
             }
 
-            selectedExport.data = null;
-            selectedExport.data_padding = null;
-            selectedExport.payload = null;
+            selectedExport.Loader = null;
+            selectedExport.Data = null;
+            selectedExport.DataPadding = null;
+            selectedExport.Payload = null;
             selectedExport.GetDataSize();
 
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
@@ -814,10 +830,11 @@ namespace GPK_RePack.Forms
         {
             try
             {
+                if (selectedExport.Loader != null) selectedExport.Data.ToString(); //random trigger to load the jit data
 
-                if (selectedExport != null && selectedExport.payload is Soundwave && waveOut.PlaybackState == PlaybackState.Stopped)
+                if (selectedExport != null && selectedExport.Payload is Soundwave && waveOut.PlaybackState == PlaybackState.Stopped)
                 {
-                    Soundwave wave = (Soundwave)selectedExport.payload;
+                    Soundwave wave = (Soundwave)selectedExport.Payload;
                     waveReader = new VorbisWaveReader(new MemoryStream(wave.oggdata));
                     waveOut.Init(waveReader);
                     waveOut.Play();
@@ -947,8 +964,9 @@ namespace GPK_RePack.Forms
             IEnumerable<String> nameQuery = from pair in package.NameList.Values.ToList() select pair.name;
             //IEnumerable<String> uidQuery = from pair in package.UidList.Values.ToList() select pair.name;
 
-            foreach (GpkBaseProperty prop in export.Properties)
+            foreach (IProperty iProp in export.Properties)
             {
+                GpkBaseProperty prop = (GpkBaseProperty) iProp;
                 DataGridViewRow row = new DataGridViewRow();
                 row.DefaultCellStyle = gridProps.DefaultCellStyle;
 
@@ -963,7 +981,7 @@ namespace GPK_RePack.Forms
                 row.Cells.Add(typeCell);
 
                 DataGridViewTextBoxCell sizeCell = new DataGridViewTextBoxCell();
-                sizeCell.Value = prop.size;
+                sizeCell.Value = iProp.RecalculateSize();
                 row.Cells.Add(sizeCell);
 
                 DataGridViewTextBoxCell arrayCell = new DataGridViewTextBoxCell();
@@ -1217,6 +1235,10 @@ namespace GPK_RePack.Forms
                     iProp = tmpStr;
                     break;
 
+                case "":
+                    //new line, nothing selected
+                    throw new Exception(
+                       string.Format("You need to select a Property Type for {0}!", baseProp.name));
                 default:
                     throw new Exception(
                         string.Format("Unknown Property Type {0}, Prop_Name {1}", baseProp.type, baseProp.name));

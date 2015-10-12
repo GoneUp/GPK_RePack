@@ -62,6 +62,7 @@ namespace GPK_RePack.Forms
             boxImports.Checked = Settings.Default.ShowImports;
             boxPatchmode.Checked = Settings.Default.PatchMode;
             boxUseUID.Checked = Settings.Default.UseUID;
+            boxJitData.Checked = Settings.Default.JitData;
         }
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
@@ -131,6 +132,11 @@ namespace GPK_RePack.Forms
         private void boxUseUID_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.UseUID = boxUseUID.Checked;
+        }
+
+        private void boxJitData_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.JitData = boxJitData.Checked;
         }
 
     }

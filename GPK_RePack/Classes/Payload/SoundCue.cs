@@ -14,7 +14,7 @@ namespace GPK_RePack.Classes.Payload
 
         public void ReadData(GpkPackage package, GpkExport export)
         {
-            BinaryReader reader = new BinaryReader(new MemoryStream(export.data));
+            BinaryReader reader = new BinaryReader(new MemoryStream(export.Data));
 
             int count = reader.ReadInt32();
             for (int i = 0; i < count; i++)

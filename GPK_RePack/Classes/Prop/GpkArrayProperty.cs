@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Parser;
@@ -36,6 +39,25 @@ namespace GPK_RePack.Classes.Prop
         {
             value = new byte[size];
             value = reader.ReadBytes(size);
+
+            //real array parsing experiment
+            /*
+            BinaryReader internalReader = new BinaryReader(new MemoryStream(value));
+            List<byte[]> bList = new List<byte[]>();
+            int pointer = 0;
+            do
+            {
+                int elementSize = internalReader.ReadInt32();
+                byte[] element = internalReader.ReadBytes(elementSize);
+                bList.Add(element);
+                pointer += elementSize;
+            } while (pointer < size);
+
+            if (bList.Count > 1)
+            {
+                Debug.Print(bList.Count.ToString());
+            }
+           */
             RecalculateSize();
         }
 

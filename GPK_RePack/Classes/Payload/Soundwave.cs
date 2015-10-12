@@ -14,7 +14,7 @@ namespace GPK_RePack.Classes.Payload
         //http://forums.nexusmods.com/index.php?/topic/1964864-sound-replacement-possible/#entry18577584
         public void ReadData( GpkPackage package, GpkExport export)
         {
-            BinaryReader reader = new BinaryReader(new MemoryStream(export.data));
+            BinaryReader reader = new BinaryReader(new MemoryStream(export.Data));
 
             reader.ReadBytes(20); //(12bytes 00)
             int ogg_length1 = reader.ReadInt32();

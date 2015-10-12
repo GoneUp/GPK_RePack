@@ -44,6 +44,7 @@
             this.boxImports = new System.Windows.Forms.CheckBox();
             this.boxPatchmode = new System.Windows.Forms.CheckBox();
             this.boxUseUID = new System.Windows.Forms.CheckBox();
+            this.boxJitData = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -228,11 +229,23 @@
             this.boxUseUID.UseVisualStyleBackColor = true;
             this.boxUseUID.CheckedChanged += new System.EventHandler(this.boxUseUID_CheckedChanged);
             // 
+            // boxJitData
+            // 
+            this.boxJitData.AutoSize = true;
+            this.boxJitData.Location = new System.Drawing.Point(396, 93);
+            this.boxJitData.Name = "boxJitData";
+            this.boxJitData.Size = new System.Drawing.Size(67, 17);
+            this.boxJitData.TabIndex = 11;
+            this.boxJitData.Text = "JIT Data";
+            this.boxJitData.UseVisualStyleBackColor = true;
+            this.boxJitData.CheckedChanged += new System.EventHandler(this.boxJitData_CheckedChanged);
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(464, 134);
+            this.Controls.Add(this.boxJitData);
             this.Controls.Add(this.boxUseUID);
             this.Controls.Add(this.boxPatchmode);
             this.Controls.Add(this.boxImports);
@@ -275,5 +288,6 @@
         private System.Windows.Forms.CheckBox boxImports;
         private System.Windows.Forms.CheckBox boxPatchmode;
         private System.Windows.Forms.CheckBox boxUseUID;
+        private System.Windows.Forms.CheckBox boxJitData;
     }
 }
