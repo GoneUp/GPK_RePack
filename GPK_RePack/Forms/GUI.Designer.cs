@@ -82,6 +82,7 @@ namespace GPK_RePack.Forms
             this.boxLog = new System.Windows.Forms.TextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.lblFiller = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
@@ -278,6 +279,7 @@ namespace GPK_RePack.Forms
             this.boxInfo.Multiline = true;
             this.boxInfo.Name = "boxInfo";
             this.boxInfo.ReadOnly = true;
+            this.boxInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.boxInfo.Size = new System.Drawing.Size(779, 351);
             this.boxInfo.TabIndex = 5;
             this.boxInfo.Text = resources.GetString("boxInfo.Text");
@@ -288,7 +290,7 @@ namespace GPK_RePack.Forms
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(785, 369);
+            this.tabPage2.Size = new System.Drawing.Size(785, 368);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Property Details";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -310,7 +312,7 @@ namespace GPK_RePack.Forms
             this.gridProps.Location = new System.Drawing.Point(3, 3);
             this.gridProps.MultiSelect = false;
             this.gridProps.Name = "gridProps";
-            this.gridProps.Size = new System.Drawing.Size(779, 363);
+            this.gridProps.Size = new System.Drawing.Size(779, 362);
             this.gridProps.TabIndex = 0;
             this.gridProps.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.gridProps_DefaultValuesNeeded);
             // 
@@ -576,18 +578,23 @@ namespace GPK_RePack.Forms
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ProgressBar,
-            this.lblStatus});
-            this.statusStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
+            this.lblFiller,
+            this.lblStatus,
+            this.ProgressBar});
             this.statusStrip1.Location = new System.Drawing.Point(0, 654);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.statusStrip1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.statusStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.statusStrip1.Size = new System.Drawing.Size(1103, 22);
             this.statusStrip1.SizingGrip = false;
             this.statusStrip1.Stretch = false;
             this.statusStrip1.TabIndex = 8;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // lblFiller
+            // 
+            this.lblFiller.Name = "lblFiller";
+            this.lblFiller.Size = new System.Drawing.Size(986, 17);
+            this.lblFiller.Spring = true;
             // 
             // ProgressBar
             // 
@@ -690,6 +697,7 @@ namespace GPK_RePack.Forms
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel lblStatus;
         private ToolStripProgressBar ProgressBar;
+        private ToolStripStatusLabel lblFiller;
     }
 }
 

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using GPK_RePack.Classes;
@@ -38,7 +40,7 @@ namespace GPK_RePack.Forms
     <target name='logfile' xsi:type='File' fileName='Terahelper.log' deleteOldFileOnStartup='true'/>
     <target xsi:type='FormControl'
         name='form'
-        layout='${longdate} ${level:uppercase=true} ${message} ${newline}'
+        layout='${date} ${level:uppercase=true} ${logger} # ${message} ${newline}'
         append='true'
         controlName='boxLog'
         formName='GUI' />
@@ -54,9 +56,8 @@ namespace GPK_RePack.Forms
         #region def
 
         private Logger logger;
-        private Reader reader;
-        private Save saver;
 
+        private Save saver;
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
         private string selectedClass = "";
@@ -94,8 +95,6 @@ namespace GPK_RePack.Forms
 
             //Our stuff
             logger.Info("Startup");
-            reader = new Reader();
-            saver = new Save();
             loadedGpkPackages = new List<GpkPackage>();
 
             //audio
@@ -134,6 +133,7 @@ namespace GPK_RePack.Forms
             ResetOggPreview();
             loadedGpkPackages.Clear();
             DrawPackages();
+            GC.Collect(); //memory cleanup
         }
 
         public void ResetGUI()
@@ -146,7 +146,7 @@ namespace GPK_RePack.Forms
             boxDataButtons.Enabled = false;
             boxPropertyButtons.Enabled = false;
             ProgressBar.Value = 0;
-            lblStatus.Text = "";
+            lblStatus.Text = "Ready";
             ClearGrid();
         }
 
@@ -176,50 +176,58 @@ namespace GPK_RePack.Forms
             open.InitialDirectory = Settings.Default.OpenDir;
             open.ShowDialog();
 
+            if (open.FileNames.Length == 0) return;
+
             Settings.Default.OpenDir = open.FileName;
+            DateTime start = DateTime.Now;
+            List<IProgress> runningReaders = new List<IProgress>();
+            List<Task> runningTasks = new List<Task>();
+
+
             foreach (var path in open.FileNames)
             {
                 if (File.Exists(path))
                 {
-                    Thread newThread = new Thread(delegate()
-                      {
-                          GpkPackage tmpPack = reader.ReadGpk(path);
-                          if (tmpPack != null)
-                          {
-                              if (Settings.Default.Debug)
-                              {
-                                  tmpPack.Changes = true; //tmp, remove after tests
-                              }
-
-                              loadedGpkPackages.Add(tmpPack);
-                          }
-                      });
-                    newThread.Start();
-
-                    while (newThread.IsAlive)
+                    Task newTask = new Task(delegate()
                     {
-                        Application.DoEvents();
-                        boxInfo.Text = String.Format("Progress of loading: {0}/{1}", reader.progress, reader.totalobjects);
+                        Reader reader = new Reader();
+                        runningReaders.Add(reader);
+                        GpkPackage tmpPack = reader.ReadGpk(path);
+                        if (tmpPack != null)
+                        {
+                            if (Settings.Default.Debug)
+                            {
+                                tmpPack.Changes = true; //tmp, remove after tests
+                            }
 
-                        if (reader.totalobjects > 0)  ProgressBar.Value = (int)(((double)reader.progress / (double)reader.totalobjects) * 100);
-                        lblStatus.Text = String.Format("Loading {0} ..", Path.GetFileName(path));
-                        Thread.Sleep(50);
-                    }
-
-
-
+                            loadedGpkPackages.Add(tmpPack);
+                        }
+                    });
+                    newTask.Start();
+                    runningTasks.Add(newTask);
                 }
             }
+
+            //display info while loading
+            while (!Task.WaitAll(runningTasks.ToArray(), 50))
+            {
+                Application.DoEvents();
+                DisplayStatus(runningReaders, "Loading", start);
+                //Thread.Sleep(50);
+            }
+
+            //Diplay end info
+            DisplayStatus(runningReaders, "Loading", start);
+
+            //for patchmode
             Array.Resize(ref changedExports, loadedGpkPackages.Count);
             for (int i = 0; i < changedExports.Length; i++)
             {
                 changedExports[i] = new List<GpkExport>();
             }
 
+            //gui stuff
             DrawPackages();
-
-            ProgressBar.Value = 0;
-            lblStatus.Text = "";
         }
 
 
@@ -265,7 +273,7 @@ namespace GPK_RePack.Forms
             {
                 try
                 {
-               
+
                     Thread newThread = new Thread(delegate()
                     {
                         string savepath = package.Path + "_rebuild";
@@ -276,7 +284,7 @@ namespace GPK_RePack.Forms
                     while (newThread.IsAlive)
                     {
                         Application.DoEvents();
-                        if (saver.totalobjects > 0) ProgressBar.Value = (int)(((double)saver.progress / (double)saver.totalobjects) * 100);
+                        //if (saver.totalobjects > 0) ProgressBar.Value = (int)(((double)saver.progress / (double)saver.totalobjects) * 100);
                         lblStatus.Text = String.Format("Saving {0}..", package.Filename);
                         Thread.Sleep(50);
                     }
@@ -288,9 +296,43 @@ namespace GPK_RePack.Forms
 
             }
 
-            ProgressBar.Value = 0;
-            lblStatus.Text = "";
             logger.Info("Saving done!");
+        }
+
+        private void DisplayStatus(List<IProgress> list, string tag, DateTime start)
+        {
+            long actual = 0, total = 0, finished = 0;
+            foreach (IProgress p in list)
+            {
+                Status stat = p.GetStatus();
+                actual += stat.progress;
+                total += stat.totalobjects;
+                if (stat.finished) finished++;
+            }
+
+            if (finished < list.Count)
+            {
+                if (total > 0) ProgressBar.Value = (int) (((double) actual/(double) total)*100);
+                lblStatus.Text = String.Format("[{0}] Finished {1}/{2}", tag, finished, list.Count);
+            }
+            else
+            {
+                total = 0;
+                StringBuilder builder = new StringBuilder();
+                builder.AppendLine(String.Format("[{0} Task Info]", tag));
+                foreach (IProgress p in list)
+                {
+                    var stat = p.GetStatus();
+                    total += stat.time;
+                    builder.AppendLine(String.Format("Task {0}: {1}ms", stat.name, stat.time));
+                } 
+                builder.AppendLine(string.Format("Avg Worktime: {0}ms", total / list.Count));
+                builder.AppendLine(string.Format("Total elapsed Time: {0}ms", (int)DateTime.Now.Subtract(start).TotalMilliseconds));
+    
+                boxInfo.Text = builder.ToString();
+                ProgressBar.Value = 0;
+                lblStatus.Text = "Ready";
+            }
         }
         #endregion
 
@@ -966,7 +1008,7 @@ namespace GPK_RePack.Forms
 
             foreach (IProperty iProp in export.Properties)
             {
-                GpkBaseProperty prop = (GpkBaseProperty) iProp;
+                GpkBaseProperty prop = (GpkBaseProperty)iProp;
                 DataGridViewRow row = new DataGridViewRow();
                 row.DefaultCellStyle = gridProps.DefaultCellStyle;
 

@@ -16,15 +16,23 @@ using NLog.LayoutRenderers;
 
 namespace GPK_RePack.Saver
 {
-    class Save
+    struct Status
+    {
+        public int progress;
+        public int totalobjects;
+        public long time;
+        public bool finished;
+        public string name;
+    }
+
+    class Save : IProgress
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private long offsetExportPos = 0;
         private long offsetImportPos = 0;
         private long offsetNamePos = 0;
 
-        public int progress;
-        public int totalobjects;
+        public Status stat = new Status();
 
         public void SaveReplacedExport(GpkPackage package, string savepath, List<GpkExport> changedExports)
         {
@@ -53,12 +61,13 @@ namespace GPK_RePack.Saver
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
-            progress = 0;
+            stat = new Status();
+            stat.name = package.Filename;
 
             package.PrepareWriting();
             int compuSize = package.GetSize(false);
 
-            totalobjects = package.Header.NameCount + package.Header.ExportCount * 2 + package.Header.ImportCount; //Export, ExportData = x2
+            stat.totalobjects = package.Header.NameCount + package.Header.ExportCount * 2 + package.Header.ImportCount; //Export, ExportData = x2
 
             using (BinaryWriter writer = new BinaryWriter(new FileStream(savepath, FileMode.Create)))
             {
@@ -71,7 +80,9 @@ namespace GPK_RePack.Saver
             }
 
             watch.Stop();
-            logger.Info(String.Format("Saved the package '{0} to {1}', took {2}ms!", package.Filename, savepath, watch.ElapsedMilliseconds));
+            stat.time = watch.ElapsedMilliseconds;
+            stat.finished = true;
+            logger.Info(String.Format("Saved the package '{0} to {1}', took {2}ms!", package.Filename, savepath, stat.time));
         }
 
         private void WriteHeader(BinaryWriter writer, GpkPackage package)
@@ -143,7 +154,7 @@ namespace GPK_RePack.Saver
                 writer.Write(tmpString.name.Length + 1);
                 WriteString(writer, tmpString.name);
                 writer.Write(tmpString.flags);
-                progress++;
+                stat.progress++;
             }
 
             logger.Debug("Wrote namelist pos " + writer.BaseStream.Position);
@@ -169,7 +180,7 @@ namespace GPK_RePack.Saver
                 writer.Write(imp.PackageRef);
                 writer.Write((int)package.GetStringIndex(imp.ObjectName));
                 writer.Write(imp.Unk);
-                progress++;
+                stat.progress++;
             }
 
             logger.Debug("Wrote imports pos " + writer.BaseStream.Position);
@@ -206,7 +217,7 @@ namespace GPK_RePack.Saver
                 if (export.SerialSize > 0) writer.Write(export.SerialOffset);
 
                 writer.Write(export.PaddingUnk);
-                progress++;
+                stat.progress++;
             }
 
             logger.Debug("Wrote exports pos " + writer.BaseStream.Position);
@@ -316,7 +327,7 @@ namespace GPK_RePack.Saver
                 }
 
                 logger.Trace("wrote export data for " + export.ObjectName + " end pos " + writer.BaseStream.Position);
-                progress++;
+                stat.progress++;
             }
 
             logger.Debug("Wrote export data pos " + writer.BaseStream.Position);
@@ -361,5 +372,9 @@ namespace GPK_RePack.Saver
             writer.Write(new short());
         }
 
+        public Status GetStatus()
+        {
+            return stat;
+        }
     }
 }

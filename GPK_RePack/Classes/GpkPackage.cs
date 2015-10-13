@@ -75,18 +75,33 @@ namespace GPK_RePack.Classes
 
         public int RemoveUnusedStrings()
         {
+            int removed = 0;
             int count = 0;
+
+            if (!Settings.Default.Debug) return 0;
+
             var listCopy = NameList.ToArray();
             foreach (KeyValuePair<long, GpkString> pair in listCopy)
             {
-                if (!pair.Value.used)
+                if (pair.Value.used)
                 {
-                    if (Settings.Default.Debug) NameList.Remove(pair.Key); //test
+                    //renumbering for the case something was removed before
+                    if (pair.Key != count)
+                    {
+                        NameList.Remove(pair.Key);
+                        NameList.Add(count, pair.Value);
+                    }
+
                     count++;
+                }
+                else
+                {
+                    NameList.Remove(pair.Key); //test
+                    removed++;
                 }
             }
 
-            return count;
+            return removed;
         }
         #endregion
 

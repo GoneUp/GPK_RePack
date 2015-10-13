@@ -15,39 +15,44 @@ using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Payload;
 using GPK_RePack.Classes.Prop;
 using GPK_RePack.Properties;
+using GPK_RePack.Saver;
+using NAudio.Midi;
 using NLog;
 using NLog.Fluent;
 using NLog.LayoutRenderers;
 
 namespace GPK_RePack.Parser
 {
-    class Reader
+    class Reader : IProgress
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        public int progress;
-        public int totalobjects;
+        private Logger logger;
+
+        public Status stat;
 
         public GpkPackage ReadGpk(string path)
         {
             try
             {
-                Stopwatch watch = new Stopwatch();
-                watch.Start();
-                logger.Info("Reading: " + path);
-
-                progress = 0;
-
+                Stopwatch watch = new Stopwatch();  
                 GpkPackage package = new GpkPackage();
+                stat = new Status();
+
+                watch.Start();
+              
+                package.Filename = Path.GetFileName(path);
+                package.Path = path;
+                stat.name = package.Filename;
+
+                logger = LogManager.GetLogger("[Reader:" + package.Filename + "]");
+                logger.Info("Reading Start");
 
                 using (BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read)))
                 {
-                    package.Filename = Path.GetFileName(path);
-                    package.Path = path;
                     package.OrginalSize = reader.BaseStream.Length;
 
                     ReadHeader(reader, package);
-                    ReadNames(reader, package); 
-                    ReadImports(reader, package); 
+                    ReadNames(reader, package);
+                    ReadImports(reader, package);
                     ReadExports(reader, package);
                     ReadExportData(reader, package);
 
@@ -56,7 +61,10 @@ namespace GPK_RePack.Parser
                 }
 
                 watch.Stop();
+                stat.time = watch.ElapsedMilliseconds;
+                stat.finished = true;
                 logger.Info("Reading of {0} complete, took {1}ms!", path, watch.ElapsedMilliseconds);
+
 
                 return package;
             }
@@ -109,7 +117,8 @@ namespace GPK_RePack.Parser
 
             logger.Debug("DependsOffset " + package.Header.DependsOffset);
 
-            totalobjects = package.Header.NameCount + package.Header.ImportCount + package.Header.ExportCount * 3 ; //Export, Export Linking, ExportData = *3
+            stat.totalobjects = package.Header.NameCount + package.Header.ImportCount + package.Header.ExportCount * 3; //Export, Export Linking, ExportData = *3
+            logger.Info("File Info: NameCount {0}, ImportCount {1}, ExportCount {2}", package.Header.NameCount, package.Header.ImportCount, package.Header.ExportCount);
 
             package.Header.FGUID = reader.ReadBytes(16);
             //logger.Info("FGUID " + package.Header.FGUID);
@@ -123,7 +132,7 @@ namespace GPK_RePack.Parser
                 tmpgen.NameCount = reader.ReadInt32();
                 tmpgen.NetObjectCount = reader.ReadInt32();
 
-                logger.Info("Generation {0}, ExportCount {1}, NameCount {2}, NetObjectCount {3}", i, tmpgen.ExportCount, tmpgen.NameCount, tmpgen.NetObjectCount);
+                logger.Debug("Generation {0}, ExportCount {1}, NameCount {2}, NetObjectCount {3}", i, tmpgen.ExportCount, tmpgen.NameCount, tmpgen.NetObjectCount);
 
                 package.Header.Generations.Add(tmpgen);
             }
@@ -166,7 +175,7 @@ namespace GPK_RePack.Parser
 
         private void ReadNames(BinaryReader reader, GpkPackage package)
         {
-            logger.Info("Reading Namelist at {0}....", package.Header.NameOffset);
+            logger.Debug("Reading Namelist at {0}....", package.Header.NameOffset);
             reader.BaseStream.Seek(package.Header.NameOffset, SeekOrigin.Begin);
 
             for (int i = 0; i < package.Header.NameCount; i++)
@@ -179,14 +188,14 @@ namespace GPK_RePack.Parser
                 package.NameList.Add(i, tmpString);
 
                 logger.Debug("Name {0}: {1}", i, tmpString.name);
-                progress++;
+                stat.progress++;
             }
 
         }
 
         private void ReadImports(BinaryReader reader, GpkPackage package)
         {
-            logger.Info("Reading Imports at {0}....", package.Header.ImportOffset);
+            logger.Debug("Reading Imports at {0}....", package.Header.ImportOffset);
             reader.BaseStream.Seek(package.Header.ImportOffset, SeekOrigin.Begin);
 
             for (int i = 0; i < package.Header.ImportCount; i++)
@@ -206,13 +215,13 @@ namespace GPK_RePack.Parser
                 package.ImportList.Add(i, import);
 
                 logger.Debug("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.ClassName, import.ObjectName);
-                progress++;
+                stat.progress++;
             }
         }
 
         private void ReadExports(BinaryReader reader, GpkPackage package)
         {
-            logger.Info("Reading Exports at {0}....", package.Header.ExportOffset);
+            logger.Debug("Reading Exports at {0}....", package.Header.ExportOffset);
             reader.BaseStream.Seek(package.Header.ExportOffset, SeekOrigin.Begin);
 
             for (int i = 0; i < package.Header.ExportCount; i++)
@@ -240,11 +249,11 @@ namespace GPK_RePack.Parser
                 package.ExportList.Add(i, export);
 
                 logger.Debug("Export {0}: ObjectName: {1}, Data_Size: {2}, Data_Offset {3}, Export_offset {4}", i, export.ObjectName, export.SerialSize, export.SerialOffset, reader.BaseStream.Position);
-                progress++;
+                stat.progress++;
             }
 
             //post-processing. needed if a object points to another export.
-            logger.Info("Linking Exports..");
+            logger.Debug("Linking Exports..");
             foreach (KeyValuePair<long, GpkExport> pair in package.ExportList)
             {
                 GpkExport export = pair.Value;
@@ -256,13 +265,13 @@ namespace GPK_RePack.Parser
                     export.UID = GenerateUID(package, export);
                 }
 
-                progress++;
+                stat.progress++;
             }
         }
 
         private void ReadExportData(BinaryReader reader, GpkPackage package)
         {
-            logger.Info("Reading ExportsData....");
+            logger.Debug("Reading ExportsData....");
 
 
             foreach (GpkExport export in package.ExportList.Values)
@@ -338,7 +347,7 @@ namespace GPK_RePack.Parser
 
                         if (export.Payload != null) logger.Debug(export.Payload.ToString());
                     }
-                     
+
 
                     logger.Debug(String.Format("Export {0}: Read Data ({1} bytes {2}) and {3} Properties ({4} bytes)", export.ObjectName, toread, tag, export.Properties.Count, export.PropertySize));
                 }
@@ -347,7 +356,7 @@ namespace GPK_RePack.Parser
                     logger.Fatal("[ReadExportData] UID: {0} Error: {1}", export.UID, ex);
                 }
                 //data
-                progress++;
+                stat.progress++;
             }
         }
 
@@ -375,7 +384,7 @@ namespace GPK_RePack.Parser
 
             if (!package.NameList.ContainsKey(nameindex))
             {
-                logger.Info("name not found " + nameindex);
+                logger.Fatal("name not found " + nameindex);
             }
 
             baseProp.name = package.GetString(nameindex);
@@ -384,7 +393,7 @@ namespace GPK_RePack.Parser
             long typeindex = reader.ReadInt64();
             if (!package.NameList.ContainsKey(typeindex))
             {
-                logger.Info("type not found " + typeindex);
+                logger.Fatal("type not found " + typeindex);
             }
             baseProp.type = package.GetString(typeindex);
 
@@ -511,6 +520,9 @@ namespace GPK_RePack.Parser
             } while (true);
         }
 
-
+        public Status GetStatus()
+        {
+            return stat;
+        }
     }
 }
