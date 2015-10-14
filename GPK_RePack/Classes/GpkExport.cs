@@ -43,9 +43,10 @@ namespace GPK_RePack.Classes
 
         public long DataStart;
         public byte[] DataPadding;
-        private byte[] m_data;
+        private byte[] m_data; 
+        public IPayload m_payload;
         public DataLoader Loader;
-        public IPayload Payload;
+       
         public byte[] Data
         {
             get
@@ -64,6 +65,27 @@ namespace GPK_RePack.Classes
             set
             {
                 m_data = value;
+                Loader = null; //no overrides later
+            }
+        }
+
+        public IPayload Payload
+        {
+            get
+            {
+                if (Loader != null)
+                {
+                    //trigger data property, loads data from file, reads our payload
+                    Data.ToString();
+
+                }
+
+                return m_payload;
+            }
+
+            set
+            {
+                m_payload = value;
                 Loader = null; //no overrides later
             }
         }

@@ -27,7 +27,7 @@ namespace GPK_RePack.Saver
 
     class Save : IProgress
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private Logger logger;
         private long offsetExportPos = 0;
         private long offsetImportPos = 0;
         private long offsetNamePos = 0;
@@ -56,8 +56,10 @@ namespace GPK_RePack.Saver
             //Header 
             //Namelist
             //Imports
-            //Exports      
+            //Exports  
+            logger = LogManager.GetLogger("[Save:" + package.Filename + "]");
             logger.Info(String.Format("Attemping to save {0}...", package.Filename));
+
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
@@ -296,12 +298,6 @@ namespace GPK_RePack.Saver
                 }
 
                 //finally our data 
-                //check loader...
-                if (export.Loader != null)
-                {
-                    int rndTrigger = export.Data.Length; //just a call to trigger the loading process
-                }
-
                 if (export.Payload != null)
                 {
                     //pos is important. we cant be sure that the data is acurate.

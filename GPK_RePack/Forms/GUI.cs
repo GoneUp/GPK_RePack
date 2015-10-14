@@ -152,6 +152,7 @@ namespace GPK_RePack.Forms
 
         private void GUI_FormClosing(object sender, FormClosingEventArgs e)
         {
+            logger.Info("Shutdown");
             Settings.Default.Save();
             if (waveReader != null)
             {
@@ -269,25 +270,24 @@ namespace GPK_RePack.Forms
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            DateTime start = DateTime.Now;
+            List<IProgress> runningSavers = new List<IProgress>();
+            List<Task> runningTasks = new List<Task>();
+
+
             foreach (GpkPackage package in loadedGpkPackages)
             {
                 try
                 {
-
-                    Thread newThread = new Thread(delegate()
+                    Save tmpS = new Save(); 
+                    Task newTask = new Task(delegate()
                     {
                         string savepath = package.Path + "_rebuild";
-                        saver.SaveGpkPackage(package, savepath);
+                        tmpS.SaveGpkPackage(package, savepath);
                     });
-                    newThread.Start();
-
-                    while (newThread.IsAlive)
-                    {
-                        Application.DoEvents();
-                        //if (saver.totalobjects > 0) ProgressBar.Value = (int)(((double)saver.progress / (double)saver.totalobjects) * 100);
-                        lblStatus.Text = String.Format("Saving {0}..", package.Filename);
-                        Thread.Sleep(50);
-                    }
+                    newTask.Start();
+                    runningTasks.Add(newTask);
+                    runningSavers.Add(tmpS);
                 }
                 catch (Exception ex)
                 {
@@ -295,6 +295,17 @@ namespace GPK_RePack.Forms
                 }
 
             }
+
+            //display info while loading
+            while (!Task.WaitAll(runningTasks.ToArray(), 50))
+            {
+                Application.DoEvents();
+                DisplayStatus(runningSavers, "Saving", start);
+                //Thread.Sleep(50);
+            }
+
+            //Diplay end info
+            DisplayStatus(runningSavers, "Saving", start);
 
             logger.Info("Saving done!");
         }
@@ -872,8 +883,6 @@ namespace GPK_RePack.Forms
         {
             try
             {
-                if (selectedExport.Loader != null) selectedExport.Data.ToString(); //random trigger to load the jit data
-
                 if (selectedExport != null && selectedExport.Payload is Soundwave && waveOut.PlaybackState == PlaybackState.Stopped)
                 {
                     Soundwave wave = (Soundwave)selectedExport.Payload;

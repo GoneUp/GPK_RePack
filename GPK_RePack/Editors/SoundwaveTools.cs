@@ -94,9 +94,6 @@ ObjectName: SampleDataSize Type: IntProperty Value: 20704
 
         public static void ExportOgg(GpkExport export, string oggfile)
         {
-            //check jit loader
-            if (export.Loader != null) export.Data.ToString(); //random trigger to load the jit data
-
             if (export.Payload == null)
             {
                 logger.Info("No data. The file cannot be exported to ogg.");
