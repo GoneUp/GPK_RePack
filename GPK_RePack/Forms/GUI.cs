@@ -1120,7 +1120,10 @@ namespace GPK_RePack.Forms
                     logger.Info("Unk Prop?!?");
                 }
 
-
+                if (valueCell.Value.ToString().Length > valueCell.MaxInputLength)
+                {
+                    //valueCell.Value = "[##TOO_LONG##]";
+                }
                 if (comboCell == null)
                 {
                     row.Cells.Add(valueCell);
@@ -1220,6 +1223,8 @@ namespace GPK_RePack.Forms
             selectedPackage.AddString(baseProp.name);
 
             string cellValue = row.Cells["value"].Value.ToString();
+
+            
             switch (baseProp.type)
             {
                 case "StructProperty":

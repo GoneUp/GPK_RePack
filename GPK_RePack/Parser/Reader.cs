@@ -385,6 +385,10 @@ namespace GPK_RePack.Parser
             if (!package.NameList.ContainsKey(nameindex))
             {
                 logger.Fatal("name not found " + nameindex);
+                if (export.Properties.Count > 0)
+                {
+                    logger.Fatal("prev " + export.Properties[export.Properties.Count - 1]);
+                }
             }
 
             baseProp.name = package.GetString(nameindex);

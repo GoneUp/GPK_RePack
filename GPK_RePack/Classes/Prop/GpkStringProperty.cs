@@ -61,13 +61,13 @@ namespace GPK_RePack.Classes.Prop
             int tmpSize = 4; //length
             if (!IsUnicode)
             {
-                length = value.Length;
+                length = value.Length + 1; //OMG. NEVER FORGET LINE ENDING BYTE AGAIN. SAVES HEADACHES.
                 tmpSize += length;
             }
             else
             {
-                length = (value.Length * -1); //length in file format, unicode is marked with a negative value
-                tmpSize += value.Length * 2;
+                length = (value.Length * -1) - 1; //length in file format, unicode is marked with a negative value
+                tmpSize += value.Length + 1 * 2;
             }
             size = tmpSize;
             return size;
