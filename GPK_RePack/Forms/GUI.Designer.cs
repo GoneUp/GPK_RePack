@@ -51,6 +51,7 @@ namespace GPK_RePack.Forms
             this.setAllVolumeMultipliersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.customToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tESTBigBytePropExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bigBytePropImportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.boxInfo = new System.Windows.Forms.TextBox();
@@ -83,8 +84,8 @@ namespace GPK_RePack.Forms
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblFiller = new System.Windows.Forms.ToolStripStatusLabel();
-            this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -208,7 +209,8 @@ namespace GPK_RePack.Forms
             this.miscToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.setFilesizeToolStripMenuItem,
             this.setAllPropertysToolStripMenuItem,
-            this.tESTBigBytePropExportToolStripMenuItem});
+            this.tESTBigBytePropExportToolStripMenuItem,
+            this.bigBytePropImportToolStripMenuItem});
             this.miscToolStripMenuItem.Name = "miscToolStripMenuItem";
             this.miscToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.miscToolStripMenuItem.Text = "Misc";
@@ -216,7 +218,7 @@ namespace GPK_RePack.Forms
             // setFilesizeToolStripMenuItem
             // 
             this.setFilesizeToolStripMenuItem.Name = "setFilesizeToolStripMenuItem";
-            this.setFilesizeToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
+            this.setFilesizeToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.setFilesizeToolStripMenuItem.Text = "Set Filesize";
             this.setFilesizeToolStripMenuItem.Click += new System.EventHandler(this.setFilesizeToolStripMenuItem_Click);
             // 
@@ -226,7 +228,7 @@ namespace GPK_RePack.Forms
             this.setAllVolumeMultipliersToolStripMenuItem,
             this.customToolStripMenuItem});
             this.setAllPropertysToolStripMenuItem.Name = "setAllPropertysToolStripMenuItem";
-            this.setAllPropertysToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
+            this.setAllPropertysToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.setAllPropertysToolStripMenuItem.Text = "Set all Propertys";
             // 
             // setAllVolumeMultipliersToolStripMenuItem
@@ -246,9 +248,16 @@ namespace GPK_RePack.Forms
             // tESTBigBytePropExportToolStripMenuItem
             // 
             this.tESTBigBytePropExportToolStripMenuItem.Name = "tESTBigBytePropExportToolStripMenuItem";
-            this.tESTBigBytePropExportToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
-            this.tESTBigBytePropExportToolStripMenuItem.Text = "[TEST] Big ByteProp Export";
-            this.tESTBigBytePropExportToolStripMenuItem.Click += new System.EventHandler(this.TestBigBytePropExportToolStripMenuItem_Click);
+            this.tESTBigBytePropExportToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.tESTBigBytePropExportToolStripMenuItem.Text = "Big ByteProp Export";
+            this.tESTBigBytePropExportToolStripMenuItem.Click += new System.EventHandler(this.BigBytePropExport_Click);
+            // 
+            // bigBytePropImportToolStripMenuItem
+            // 
+            this.bigBytePropImportToolStripMenuItem.Name = "bigBytePropImportToolStripMenuItem";
+            this.bigBytePropImportToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.bigBytePropImportToolStripMenuItem.Text = "Big ByteProp Import";
+            this.bigBytePropImportToolStripMenuItem.Click += new System.EventHandler(this.BigBytePropImport_Click);
             // 
             // tabControl1
             // 
@@ -596,15 +605,15 @@ namespace GPK_RePack.Forms
             this.lblFiller.Size = new System.Drawing.Size(986, 17);
             this.lblFiller.Spring = true;
             // 
-            // ProgressBar
-            // 
-            this.ProgressBar.Name = "ProgressBar";
-            this.ProgressBar.Size = new System.Drawing.Size(100, 16);
-            // 
             // lblStatus
             // 
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(0, 17);
+            // 
+            // ProgressBar
+            // 
+            this.ProgressBar.Name = "ProgressBar";
+            this.ProgressBar.Size = new System.Drawing.Size(100, 16);
             // 
             // GUI
             // 
@@ -698,6 +707,7 @@ namespace GPK_RePack.Forms
         private ToolStripStatusLabel lblStatus;
         private ToolStripProgressBar ProgressBar;
         private ToolStripStatusLabel lblFiller;
+        private ToolStripMenuItem bigBytePropImportToolStripMenuItem;
     }
 }
 

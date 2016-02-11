@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
+using System.Windows.Forms;
+using GPK_RePack.Properties;
 
 namespace GPK_RePack
 {
@@ -84,8 +87,8 @@ namespace GPK_RePack
                 builder.Append("\t");
                 count += 3;
             }
-                 
-            for (int i = (pass * 16) - 16; i < (data.Length -1); i++)
+
+            for (int i = (pass * 16) - 16; i < (data.Length - 1); i++)
             {
                 char c = (char)data[i];
                 if (c > 0x1f && c < 0x80)
@@ -129,6 +132,34 @@ namespace GPK_RePack
                 return false;
 
             return new Random().Next(0, 100) <= chance;
+        }
+
+        public static string GenerateSaveDialog(string filename, string ext)
+        {
+            SaveFileDialog save = new SaveFileDialog();
+            save.FileName = filename;
+            save.DefaultExt = ext;
+            save.InitialDirectory = Settings.Default.SaveDir;
+            var result = save.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                Settings.Default.SaveDir = save.FileName;
+                return save.FileName; 
+            }
+            return "";
+        }
+
+        public static String[] GenerateOpenDialog()
+        {
+            OpenFileDialog open = new OpenFileDialog();
+            open.Multiselect = false;
+            open.ValidateNames = true;
+            open.InitialDirectory = Settings.Default.OpenDir;
+            open.ShowDialog();
+
+            if (File.Exists(open.FileName)) Settings.Default.OpenDir = Path.GetDirectoryName(open.FileName);
+            return open.FileNames;
         }
     }
 }

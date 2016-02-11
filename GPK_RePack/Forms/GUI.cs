@@ -171,21 +171,15 @@ namespace GPK_RePack.Forms
         #region load/save
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog open = new OpenFileDialog();
-            open.Multiselect = true;
-            open.ValidateNames = true;
-            open.InitialDirectory = Settings.Default.OpenDir;
-            open.ShowDialog();
+            String[] files = MiscFuncs.GenerateOpenDialog();
+            if (files.Length == 0) return;
 
-            if (open.FileNames.Length == 0) return;
-
-            Settings.Default.OpenDir = open.FileName;
             DateTime start = DateTime.Now;
             List<IProgress> runningReaders = new List<IProgress>();
             List<Task> runningTasks = new List<Task>();
 
 
-            foreach (var path in open.FileNames)
+            foreach (var path in files)
             {
                 if (File.Exists(path))
                 {
@@ -279,7 +273,7 @@ namespace GPK_RePack.Forms
             {
                 try
                 {
-                    Save tmpS = new Save(); 
+                    Save tmpS = new Save();
                     Task newTask = new Task(delegate()
                     {
                         string savepath = package.Path + "_rebuild";
@@ -323,7 +317,7 @@ namespace GPK_RePack.Forms
 
             if (finished < list.Count)
             {
-                if (total > 0) ProgressBar.Value = (int) (((double) actual/(double) total)*100);
+                if (total > 0) ProgressBar.Value = (int)(((double)actual / (double)total) * 100);
                 lblStatus.Text = String.Format("[{0}] Finished {1}/{2}", tag, finished, list.Count);
             }
             else
@@ -336,10 +330,10 @@ namespace GPK_RePack.Forms
                     var stat = p.GetStatus();
                     total += stat.time;
                     builder.AppendLine(String.Format("Task {0}: {1}ms", stat.name, stat.time));
-                } 
+                }
                 builder.AppendLine(string.Format("Avg Worktime: {0}ms", total / list.Count));
                 builder.AppendLine(string.Format("Total elapsed Time: {0}ms", (int)DateTime.Now.Subtract(start).TotalMilliseconds));
-    
+
                 boxInfo.Text = builder.ToString();
                 ProgressBar.Value = 0;
                 lblStatus.Text = "Ready";
@@ -492,14 +486,9 @@ namespace GPK_RePack.Forms
                     return;
                 }
 
-                SaveFileDialog save = new SaveFileDialog();
-                save.FileName = selectedExport.ObjectName;
-                save.DefaultExt = ".raw";
-                save.InitialDirectory = Settings.Default.SaveDir;
-                save.ShowDialog();
-                Settings.Default.SaveDir = save.FileName;
-
-                DataTools.WriteExportDataFile(save.FileName, selectedExport);
+                var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".raw");
+                if (path == "") return;
+                DataTools.WriteExportDataFile(path, selectedExport);
             }
             else if (selectedPackage != null && selectedClass != "")
             {
@@ -568,15 +557,9 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            OpenFileDialog open = new OpenFileDialog();
-            open.Multiselect = false;
-            open.ValidateNames = true;
-            open.InitialDirectory = Settings.Default.OpenDir;
-
-            open.ShowDialog();
-
-            string path = open.FileName;
-            Settings.Default.OpenDir = path;
+            String[] files = MiscFuncs.GenerateOpenDialog();
+            if (files.Length == 0) return;
+            string path = files[0];
 
             if (File.Exists(path))
             {
@@ -761,17 +744,12 @@ namespace GPK_RePack.Forms
             {
                 if (selectedExport != null)
                 {
+                    String[] files = MiscFuncs.GenerateOpenDialog();
+                    if (files.Length == 0) return;
 
-                    OpenFileDialog open = new OpenFileDialog();
-                    open.Multiselect = false;
-                    open.ValidateNames = true;
-                    open.InitialDirectory = Settings.Default.OpenDir;
-
-                    open.ShowDialog();
-                    Settings.Default.OpenDir = open.FileName;
-                    if (File.Exists(open.FileName))
+                    if (File.Exists(files[0]))
                     {
-                        SoundwaveTools.ImportOgg(selectedExport, open.FileName);
+                        SoundwaveTools.ImportOgg(selectedExport, files[0]);
                         treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
                         logger.Info("Import successful.");
                     }
@@ -831,14 +809,9 @@ namespace GPK_RePack.Forms
 
             if (selectedExport != null && selectedExport.ClassName == "Core.SoundNodeWave")
             {
-                SaveFileDialog save = new SaveFileDialog();
-                save.FileName = selectedExport.ObjectName;
-                save.InitialDirectory = Settings.Default.SaveDir;
-                save.DefaultExt = ".ogg";
-                save.ShowDialog();
-                Settings.Default.SaveDir = save.FileName;
-
-                SoundwaveTools.ExportOgg(selectedExport, save.FileName);
+                var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".ogg");
+                if (path != "")
+                    SoundwaveTools.ExportOgg(selectedExport, path);
             }
             else if (selectedPackage != null && selectedClass == "Core.SoundNodeWave")
             {
@@ -1019,6 +992,7 @@ namespace GPK_RePack.Forms
             {
                 GpkBaseProperty prop = (GpkBaseProperty)iProp;
                 DataGridViewRow row = new DataGridViewRow();
+                row.Tag = iProp;
                 row.DefaultCellStyle = gridProps.DefaultCellStyle;
 
                 DataGridViewTextBoxCell nameCell = new DataGridViewTextBoxCell();
@@ -1120,9 +1094,9 @@ namespace GPK_RePack.Forms
                     logger.Info("Unk Prop?!?");
                 }
 
-                if (valueCell.Value.ToString().Length > valueCell.MaxInputLength)
+                if (valueCell.Value != null && valueCell.Value.ToString().Length > valueCell.MaxInputLength)
                 {
-                    //valueCell.Value = "[##TOO_LONG##]";
+                    valueCell.Value = "[##TOO_LONG##]";
                 }
                 if (comboCell == null)
                 {
@@ -1135,11 +1109,7 @@ namespace GPK_RePack.Forms
 
 
                 gridProps.Rows.Add(row);
-
-
-
             }
-
         }
 
 
@@ -1148,7 +1118,8 @@ namespace GPK_RePack.Forms
         {
             IEnumerable<String> nameQuery = from pair in selectedPackage.NameList.Values.ToList() select pair.name;
 
-            DataGridViewRow row = gridProps.Rows[e.Row.Index];
+
+            var row = e.Row;
             row.Cells[0].ValueType = typeof(String);
             row.Cells[0].Value = "[NEW]";
             //row.Cells[1].Value = "FloatProperty"; user should select that on hisself first
@@ -1217,14 +1188,14 @@ namespace GPK_RePack.Forms
         private IProperty readProperty(DataGridViewRow row)
         {
             GpkBaseProperty baseProp = new GpkBaseProperty(row.Cells["name"].Value.ToString(), row.Cells["type"].Value.ToString(), 0, Convert.ToInt32(row.Cells["aIndex"].Value.ToString()));
-            IProperty iProp = null;
+            IProperty iProp;
 
             //Check & Add name to our namelist
             selectedPackage.AddString(baseProp.name);
 
             string cellValue = row.Cells["value"].Value.ToString();
 
-            
+
             switch (baseProp.type)
             {
                 case "StructProperty":
@@ -1235,7 +1206,16 @@ namespace GPK_RePack.Forms
                     break;
                 case "ArrayProperty":
                     GpkArrayProperty tmpArray = new GpkArrayProperty(baseProp);
-                    tmpArray.value = (cellValue).ToBytes();
+                    if (cellValue == "[##TOO_LONG##]")
+                    {
+                        //use row embeeded property instead
+                        tmpArray.value = ((GpkArrayProperty)row.Tag).value;
+                    }
+                    else
+                    {
+                        tmpArray.value = (cellValue).ToBytes();
+                    }
+
                     iProp = tmpArray;
                     break;
                 case "ByteProperty":
@@ -1305,44 +1285,71 @@ namespace GPK_RePack.Forms
             return iProp;
         }
 
-        private void TestBigBytePropExportToolStripMenuItem_Click(object sender, EventArgs e)
+        private void BigBytePropExport_Click(object sender, EventArgs e)
         {
-            if (selectedExport != null)
+            var arrayProp = checkArrayRow();
+            if (arrayProp == null || arrayProp.value == null) return;
+            byte[] data = arrayProp.value;
+
+            String path = MiscFuncs.GenerateSaveDialog(arrayProp.name, ".raw");
+            if (path == "") return;
+
+            DialogResult answer = MessageBox.Show("Remove Count bytes?", "TH", MessageBoxButtons.YesNo);
+            if (answer == DialogResult.Yes)
             {
-                if (gridProps.SelectedRows.Count != 1)
-                {
-                    logger.Info("select a row");
-                    return;
-                }
-
-                IProperty tmpProp = readProperty(gridProps.SelectedRows[0]);
-                if (!(tmpProp is GpkArrayProperty)) return;
-                GpkArrayProperty arrayProp = (GpkArrayProperty)tmpProp;
-
-                if (arrayProp.value == null) return;
-                byte[] data = arrayProp.value;
-
-                SaveFileDialog save = new SaveFileDialog();
-                save.FileName = arrayProp.name;
-                save.DefaultExt = ".raw";
-                save.InitialDirectory = Settings.Default.SaveDir;
-                save.ShowDialog();
-                Settings.Default.SaveDir = save.FileName;
-
-                DialogResult answer = MessageBox.Show("Remove Count bytes?", "TH", MessageBoxButtons.YesNo);
-
-                if (answer == DialogResult.Yes)
-                {
-                    data = new byte[arrayProp.value.Length - 4];
-                    Array.Copy(arrayProp.value, 4, data, 0, arrayProp.value.Length - 4);
-                }
-
-                DataTools.WriteExportDataFile(save.FileName, data);
+                data = new byte[arrayProp.value.Length - 4];
+                Array.Copy(arrayProp.value, 4, data, 0, arrayProp.value.Length - 4);
             }
+
+            DataTools.WriteExportDataFile(path, data);
         }
 
+        private void BigBytePropImport_Click(object sender, EventArgs e)
+        {
+            var arrayProp = checkArrayRow();
+            if (arrayProp == null) return;
+
+            String[] files = MiscFuncs.GenerateOpenDialog();
+            if (files.Length == 0) return;
+            string path = files[0];
+            if (!File.Exists(path)) return;
+
+            byte[] data = File.ReadAllBytes(path);
+            DialogResult answer = MessageBox.Show("Add Count bytes?", "TH", MessageBoxButtons.YesNo);
+            if (answer == DialogResult.Yes)
+            {
+                byte[] tmp = new byte[data.Length + 4];
+                Array.Copy(BitConverter.GetBytes(data.Length), tmp, 4);
+                Array.Copy(data, 0, tmp, 4, data.Length);
+                data = tmp;
+            }
+            arrayProp.value = data;
+            DrawGrid(selectedPackage, selectedExport);
+        }
+
+        private GpkArrayProperty checkArrayRow()
+        {
+            if (selectedExport == null) return null;
+            if (gridProps.SelectedRows.Count != 1)
+            {
+                logger.Info("select a row");
+                return null;
+            }
+
+            var row = gridProps.SelectedRows[0];
+            if (row.Cells["type"].Value.ToString() != "ArrayProperty")
+            {
+                logger.Info("select a arrayproperty row");
+                return null;
+            }
+
+            return (GpkArrayProperty)row.Tag;
+        }
 
         #endregion
+
+
+
 
 
 
