@@ -5,7 +5,7 @@ using System.Text;
 using GPK_RePack.Classes.ExportData;
 using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Prop;
-using GPK_RePack.Parser;
+using GPK_RePack.IO;
 
 namespace GPK_RePack.Classes
 {

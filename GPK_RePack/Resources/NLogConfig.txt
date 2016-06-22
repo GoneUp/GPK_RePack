@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<nlog  xmlns="http://www.nlog-project.org/schemas/NLog.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <targets>
+    <target name="logfile" 
+		xsi:type="File" 
+		fileName="Terahelper.log" 
+		deleteOldFileOnStartup="true"/>
+		
+    <target name="form"
+		xsi:type="FormControl"
+        layout="${date} ${level:uppercase=true} ${logger} # ${message} ${newline}"
+        append="true"
+        controlName="boxLog"
+        formName="GUI" />
+  </targets>
+
+  <rules>
+    <logger name="*" minlevel="%loglevel%" writeTo="logfile" />
+    <logger name="*" minlevel="Info" writeTo="form" />
+  </rules>
+ </nlog>

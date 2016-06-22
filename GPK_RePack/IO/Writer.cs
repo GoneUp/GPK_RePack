@@ -2,19 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using GPK_RePack.Classes;
 using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Prop;
 using GPK_RePack.Properties;
 using NLog;
-using NLog.Fluent;
-using NLog.LayoutRenderers;
 
-namespace GPK_RePack.Saver
+namespace GPK_RePack.IO
 {
     struct Status
     {
@@ -25,7 +20,7 @@ namespace GPK_RePack.Saver
         public string name;
     }
 
-    class Save : IProgress
+    class Writer : IProgress
     {
         private Logger logger;
         private long offsetExportPos = 0;
@@ -130,8 +125,8 @@ namespace GPK_RePack.Saver
             writer.Write(package.Header.Unk5);
             writer.Write(package.Header.Unk6);
 
-            //writer.Write(package.Header.EngineVersion); 
-            writer.Write(0xC0FFEE); //my signature ^^
+           //writer.Write(package.Header.EngineVersion); 
+            writer.Write(0xC0FFEEAA); //my signature ^^
             writer.Write(package.Header.CookerVersion);
 
 
@@ -288,7 +283,7 @@ namespace GPK_RePack.Saver
                 long propRealSize = (writer.BaseStream.Position - data_start);
                 if (Settings.Default.Debug && propRealSize != export.PropertySize)
                 {
-                    logger.Trace("Compu Size: {0}, Diff {1} -", export.PropertySize, propRealSize - export.PropertySize);
+                    logger.Trace("Compu Prop Size: {0}, Diff {1} -", export.PropertySize, propRealSize - export.PropertySize);
                 }
 
 

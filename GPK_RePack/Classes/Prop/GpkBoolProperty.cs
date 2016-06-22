@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using GPK_RePack.Classes.Interfaces;
-using GPK_RePack.Parser;
 
 namespace GPK_RePack.Classes.Prop
 {
@@ -39,8 +38,9 @@ namespace GPK_RePack.Classes.Prop
 
         public int RecalculateSize()
         {
-            size = 4;
-            return size;
+            //Seems that it is 0 when writing it to the property 
+            //size = 4;
+            return 4;
         }
 
         public bool ValidateValue(string input)

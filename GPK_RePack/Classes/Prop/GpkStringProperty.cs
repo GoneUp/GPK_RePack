@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
 using GPK_RePack.Classes.Interfaces;
-using GPK_RePack.Parser;
-using GPK_RePack.Saver;
+using GPK_RePack.IO;
 
 namespace GPK_RePack.Classes.Prop
 {
@@ -32,11 +31,11 @@ namespace GPK_RePack.Classes.Prop
 
             if (length > 0)
             {
-                Save.WriteString(writer, value);
+                Writer.WriteString(writer, value);
             }
             else
             {
-                Save.WriteUnicodeString(writer, value);
+                Writer.WriteUnicodeString(writer, value);
             }
         }
 
@@ -58,18 +57,17 @@ namespace GPK_RePack.Classes.Prop
 
         public int RecalculateSize()
         {
-            int tmpSize = 4; //length
-            if (!IsUnicode)
+            length = value.Length + 1;
+            size = length;
+
+            if (IsUnicode)
             {
-                length = value.Length + 1; //OMG. NEVER FORGET LINE ENDING BYTE AGAIN. SAVES HEADACHES.
-                tmpSize += length;
+                //length in file format, unicode is marked with a negative value
+                length *= -1;
+                size *= 2;
             }
-            else
-            {
-                length = (value.Length * -1) - 1; //length in file format, unicode is marked with a negative value
-                tmpSize += value.Length + 1 * 2;
-            }
-            size = tmpSize;
+
+            size+= 4; //header len
             return size;
         }
 

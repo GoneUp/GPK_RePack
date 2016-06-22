@@ -86,6 +86,7 @@ namespace GPK_RePack.Forms
             this.lblFiller = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.addNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -210,7 +211,8 @@ namespace GPK_RePack.Forms
             this.setFilesizeToolStripMenuItem,
             this.setAllPropertysToolStripMenuItem,
             this.tESTBigBytePropExportToolStripMenuItem,
-            this.bigBytePropImportToolStripMenuItem});
+            this.bigBytePropImportToolStripMenuItem,
+            this.addNameToolStripMenuItem});
             this.miscToolStripMenuItem.Name = "miscToolStripMenuItem";
             this.miscToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.miscToolStripMenuItem.Text = "Misc";
@@ -615,6 +617,13 @@ namespace GPK_RePack.Forms
             this.ProgressBar.Name = "ProgressBar";
             this.ProgressBar.Size = new System.Drawing.Size(100, 16);
             // 
+            // addNameToolStripMenuItem
+            // 
+            this.addNameToolStripMenuItem.Name = "addNameToolStripMenuItem";
+            this.addNameToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.addNameToolStripMenuItem.Text = "Add Name";
+            this.addNameToolStripMenuItem.Click += new System.EventHandler(this.addNameToolStripMenuItem_Click);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -627,7 +636,7 @@ namespace GPK_RePack.Forms
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GUI";
-            this.Text = "Terahelper 0.8 - by GoneUp";
+            this.Text = "Terahelper 0.9 - by GoneUp";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GUI_FormClosing);
             this.Load += new System.EventHandler(this.GUI_Load);
             this.menuStrip1.ResumeLayout(false);
@@ -708,6 +717,7 @@ namespace GPK_RePack.Forms
         private ToolStripProgressBar ProgressBar;
         private ToolStripStatusLabel lblFiller;
         private ToolStripMenuItem bigBytePropImportToolStripMenuItem;
+        private ToolStripMenuItem addNameToolStripMenuItem;
     }
 }
 

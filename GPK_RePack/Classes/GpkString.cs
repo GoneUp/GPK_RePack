@@ -4,6 +4,7 @@ using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes
 {
+    [Serializable]
     class GpkString : IGpkPart
     {
         public string name;

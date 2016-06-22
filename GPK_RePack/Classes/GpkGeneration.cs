@@ -1,7 +1,9 @@
-﻿using GPK_RePack.Classes.Interfaces;
+﻿using System;
+using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes
 {
+    [Serializable]
     class GpkGeneration : IGpkPart
     {
         public int ExportCount;

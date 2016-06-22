@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes
 {
+    [Serializable]
     class GpkImport : IGpkPart
     {
         public string UID;

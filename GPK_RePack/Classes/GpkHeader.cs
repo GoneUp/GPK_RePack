@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GPK_RePack.Classes.Interfaces;
 
 namespace GPK_RePack.Classes
 {
+    [Serializable]
     class GpkHeader : IGpkPart
     {
         public int Tag;

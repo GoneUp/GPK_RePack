@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GPK_RePack.Parser;
+using GPK_RePack.Forms;
+using GPK_RePack.IO;
 using GPK_RePack.Properties;
+using NLog;
 using NLog.LayoutRenderers;
 
 namespace GPK_RePack.Classes
 {
+    [Serializable]
     class GpkPackage
     {
         public string Filename;
@@ -47,9 +51,10 @@ namespace GPK_RePack.Classes
                 if (pair.Value.name == text) return;
             }
 
-            GpkString str = new GpkString(text, 0 , true);
+            //flag 1970393556451328 is unk
+            GpkString str = new GpkString(text, 1970393556451328, true);
             NameList.Add(maxKey + 1, str);
-            Header.NameCount += 1;
+            Header.NameCount++;
         }
 
         public string GetString(long index)
@@ -247,7 +252,8 @@ namespace GPK_RePack.Classes
             //set new offsets
             //set coutn values on header
             //remove unused strings
-            RemoveUnusedStrings();
+            int count = RemoveUnusedStrings();
+            GUI.logger.Debug("Removed {0} unused strings", count);
             Header.RecalculateCounts(this);
             GetSize(true);
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using GPK_RePack.Classes.Interfaces;
-using GPK_RePack.Parser;
 
 namespace GPK_RePack.Classes.Payload
 {
@@ -33,7 +32,7 @@ namespace GPK_RePack.Classes.Payload
             writer.Write(cues.Count);
             foreach (SoundCueObject cue in cues)
             {
-                writer.Write(package.GetObjectIndex(cue.objectName));
+                writer.Write((int)package.GetObjectIndex(cue.objectName));
                 writer.Write(cue.Unk2);
                 writer.Write(cue.Unk3);
             }

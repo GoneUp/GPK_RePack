@@ -1,27 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using GPK_RePack.Classes;
 using GPK_RePack.Classes.ExportData;
 using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Payload;
 using GPK_RePack.Classes.Prop;
 using GPK_RePack.Properties;
-using GPK_RePack.Saver;
-using NAudio.Midi;
 using NLog;
-using NLog.Fluent;
-using NLog.LayoutRenderers;
 
-namespace GPK_RePack.Parser
+namespace GPK_RePack.IO
 {
     class Reader : IProgress
     {
@@ -311,11 +301,10 @@ namespace GPK_RePack.Parser
                     //logger.Info("First {0} Skip {1}", first, reader.BaseStream.Position - export.SerialOffset);
                     //Props  
 
-                    while (true)
+                    bool cont = true;
+                    while (cont)
                     {
-
-                        bool cont = ReadPropertyDetails(reader, package, export);
-                        if (!cont) break;
+                        cont = ReadPropertyDetails(reader, package, export);
                     }
                     export.PropertySize = (int)reader.BaseStream.Position - export.SerialOffset;
 
@@ -342,14 +331,23 @@ namespace GPK_RePack.Parser
                             tag = "AOT";
                             export.Data = new byte[toread];
                             export.Data = reader.ReadBytes(toread);
-                            ParsePayload(package, export);
+                            ParsePayload(package, export);  
+                            
+                            if (export.Payload != null) logger.Debug(export.Payload.ToString());
                         }
-
-                        if (export.Payload != null) logger.Debug(export.Payload.ToString());
                     }
 
 
                     logger.Debug(String.Format("Export {0}: Read Data ({1} bytes {2}) and {3} Properties ({4} bytes)", export.ObjectName, toread, tag, export.Properties.Count, export.PropertySize));
+
+                    long totalRead = reader.BaseStream.Position - export.SerialOffset;
+                    long shouldBe = export.SerialSize;
+                    long oursize = export.GetDataSize();
+                    if (totalRead != shouldBe || totalRead != oursize)
+                    {
+                        logger.Debug(String.Format("totalRead {0} GetDataSize {1} shouldBe {2}", totalRead, oursize, shouldBe));
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -366,13 +364,17 @@ namespace GPK_RePack.Parser
             {
                 case "Core.SoundNodeWave":
                     export.Payload = new Soundwave();
-                    export.Payload.ReadData(package, export);
                     break;
                 case "Core.SoundCue":
                     export.Payload = new SoundCue();
-                    export.Payload.ReadData(package, export);
+                    break;
+                case "Core.Texture2D":
+                    //export.Payload = new Texture2D();
                     break;
             }
+
+            if (export.Payload != null)
+                export.Payload.ReadData(package, export);
         }
 
         private Boolean ReadPropertyDetails(BinaryReader reader, GpkPackage package, GpkExport export)

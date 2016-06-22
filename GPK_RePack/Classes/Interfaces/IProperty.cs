@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GPK_RePack.Parser;
 
 namespace GPK_RePack.Classes.Interfaces
 {

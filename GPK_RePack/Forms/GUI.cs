@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,14 +16,15 @@ using GPK_RePack.Classes.Interfaces;
 using GPK_RePack.Classes.Payload;
 using GPK_RePack.Classes.Prop;
 using GPK_RePack.Editors;
-using GPK_RePack.Parser;
+using GPK_RePack.IO;
 using GPK_RePack.Properties;
-using GPK_RePack.Saver;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
 using NLog.Config;
+using NLog.Targets;
+using NLog.Windows.Forms;
 
 namespace GPK_RePack.Forms
 {
@@ -32,32 +35,10 @@ namespace GPK_RePack.Forms
             InitializeComponent();
         }
 
-        #region nlogconf
-        string xml = @"<?xml version='1.0' encoding='utf-8' ?>
-<nlog xmlns='http://www.nlog-project.org/schemas/NLog.xsd'
-      xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
-  <targets>
-    <target name='logfile' xsi:type='File' fileName='Terahelper.log' deleteOldFileOnStartup='true'/>
-    <target xsi:type='FormControl'
-        name='form'
-        layout='${date} ${level:uppercase=true} ${logger} # ${message} ${newline}'
-        append='true'
-        controlName='boxLog'
-        formName='GUI' />
-  </targets>
-
-  <rules>
-    <logger name='*' minlevel='%loglevel%' writeTo='logfile' />
-    <logger name='*' minlevel='Info' writeTo='form' />
-  </rules>
-</nlog>";
-        #endregion
-
         #region def
 
-        private Logger logger;
+        public static Logger logger;
 
-        private Save saver;
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
         private string selectedClass = "";
@@ -76,36 +57,42 @@ namespace GPK_RePack.Forms
 
         private void GUI_Load(object sender, EventArgs e)
         {
-            //nlog init
-            String config_path = (AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
-            if (!File.Exists(config_path))
+            try
             {
-                File.WriteAllText(config_path, Resources.Config);
-                MessageBox.Show("Setting file was missing. Please restart the application.");
-                Environment.Exit(0);
+                //setting file check
+                String config_path = (AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+                if (!File.Exists(config_path))
+                {
+                    File.WriteAllText(config_path, Resources.Config);
+                    MessageBox.Show("Setting file was missing. Please restart the application.");
+                    Environment.Exit(0);
+                }
+
+                //nlog init
+                NLogConfig.SetDefaultConfig();
+                logger = LogManager.GetLogger("GUI");
+                Debug.Assert(logger != null);
+
+
+                //Our stuff
+                logger.Info("Startup");
+                loadedGpkPackages = new List<GpkPackage>();
+
+                //audio
+                waveOut = new WaveOut();
+                waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
+
+                if (Settings.Default.SaveDir == "")
+                    Settings.Default.SaveDir = Directory.GetCurrentDirectory();
+
+                if (Settings.Default.OpenDir == "")
+                    Settings.Default.OpenDir = Directory.GetCurrentDirectory();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException.Message);
             }
 
-
-            xml = xml.Replace("%loglevel%", Settings.Default.LogLevel);
-            StringReader sr = new StringReader(xml);
-            XmlReader xr = XmlReader.Create(sr);
-            XmlLoggingConfiguration config = new XmlLoggingConfiguration(xr, null);
-            LogManager.Configuration = config;
-            logger = LogManager.GetCurrentClassLogger();
-
-            //Our stuff
-            logger.Info("Startup");
-            loadedGpkPackages = new List<GpkPackage>();
-
-            //audio
-            waveOut = new WaveOut();
-            waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
-
-            if (Settings.Default.SaveDir == "")
-                Settings.Default.SaveDir = Directory.GetCurrentDirectory();
-
-            if (Settings.Default.OpenDir == "")
-                Settings.Default.OpenDir = Directory.GetCurrentDirectory();
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -238,9 +225,10 @@ namespace GPK_RePack.Forms
                     {
                         try
                         {
+                            Writer tmpS = new Writer();
                             GpkPackage package = loadedGpkPackages[i];
                             string savepath = package.Path + "_patched";
-                            saver.SaveReplacedExport(package, savepath, list);
+                            tmpS.SaveReplacedExport(package, savepath, list);
                             logger.Info(String.Format("Saved the changed data of package '{0} to {1}'!",
                                 package.Filename, savepath));
                             save = true;
@@ -273,7 +261,7 @@ namespace GPK_RePack.Forms
             {
                 try
                 {
-                    Save tmpS = new Save();
+                    Writer tmpS = new Writer();
                     Task newTask = new Task(delegate()
                     {
                         string savepath = package.Path + "_rebuild";
@@ -645,6 +633,7 @@ namespace GPK_RePack.Forms
                 return;
             }
 
+
             Clipboard.SetData(exportFormat.Name, selectedExport);
             logger.Info("Made a copy of {0}...", selectedExport.UID);
         }
@@ -656,10 +645,8 @@ namespace GPK_RePack.Forms
                 logger.Trace("no selected export");
                 return;
             }
-
-            var dataObject = Clipboard.GetDataObject();
-            GpkExport copyExport = (GpkExport)dataObject.GetData(exportFormat.Name);
-
+            GpkExport copyExport = (GpkExport) Clipboard.GetData(exportFormat.Name);
+   
             if (copyExport == null)
             {
                 logger.Info("copy paste fail");
@@ -960,6 +947,18 @@ namespace GPK_RePack.Forms
             }
         }
 
+        private void addNameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!PackageSelected()) return;
+
+            string input = Microsoft.VisualBasic.Interaction.InputBox("Add a new name to the package:");
+            if (input != "")
+            {
+                selectedPackage.AddString(input);
+                if (selectedExport != null)
+                    DrawGrid(selectedPackage, selectedExport);
+            }
+        }
         private bool PackageSelected()
         {
             if (selectedPackage == null)
@@ -970,6 +969,8 @@ namespace GPK_RePack.Forms
 
             return true;
         }
+
+        
 
         #endregion
 
@@ -1224,8 +1225,8 @@ namespace GPK_RePack.Forms
                     if (cellValue.Length > 2)
                     {
                         selectedPackage.AddString(cellValue); //just in case 
+                        
                         tmpByte.nameValue = cellValue;
-
                     }
                     else
                     {
@@ -1348,6 +1349,7 @@ namespace GPK_RePack.Forms
 
         #endregion
 
+    
 
 
 

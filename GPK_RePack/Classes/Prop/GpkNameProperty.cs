@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using GPK_RePack.Classes.Interfaces;
-using GPK_RePack.Parser;
 
 namespace GPK_RePack.Classes.Prop
 {
