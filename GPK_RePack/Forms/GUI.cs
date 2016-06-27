@@ -158,7 +158,16 @@ namespace GPK_RePack.Forms
         #region load/save
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            String[] files = MiscFuncs.GenerateOpenDialog();
+            String[] files;
+            if (sender is String[])
+            {
+                files = (String[]) sender;
+            }
+            else
+            {
+                files = MiscFuncs.GenerateOpenDialog();
+            }
+            
             if (files.Length == 0) return;
 
             DateTime start = DateTime.Now;
@@ -327,6 +336,23 @@ namespace GPK_RePack.Forms
                 lblStatus.Text = "Ready";
             }
         }
+
+        private void treeMain_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        }
+
+        private void treeMain_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[]) e.Data.GetData(DataFormats.FileDrop);
+            foreach (string file in files)
+            {
+                logger.Debug("Drop input: " + file);
+            }
+
+            openToolStripMenuItem_Click(files, null);
+        }
+    
         #endregion
 
         #region diplaygpk
@@ -1348,6 +1374,8 @@ namespace GPK_RePack.Forms
         }
 
         #endregion
+
+      
 
     
 

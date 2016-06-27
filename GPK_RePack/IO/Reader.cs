@@ -36,6 +36,8 @@ namespace GPK_RePack.IO
                 logger = LogManager.GetLogger("[Reader:" + package.Filename + "]");
                 logger.Info("Reading Start");
 
+            
+
                 using (BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read)))
                 {
                     package.OrginalSize = reader.BaseStream.Length;
@@ -45,6 +47,8 @@ namespace GPK_RePack.IO
                     ReadImports(reader, package);
                     ReadExports(reader, package);
                     ReadExportData(reader, package);
+
+                    logger.Info(String.Format("Remaining {0}b", reader.BaseStream.Length - reader.BaseStream.Position));
 
                     reader.Close();
                     reader.Dispose();
@@ -263,7 +267,8 @@ namespace GPK_RePack.IO
         {
             logger.Debug("Reading ExportsData....");
 
-
+            long maxValue = 0;
+            GpkExport maxExp = null;
             foreach (GpkExport export in package.ExportList.Values)
             {
                 try
@@ -348,6 +353,12 @@ namespace GPK_RePack.IO
                         logger.Debug(String.Format("totalRead {0} GetDataSize {1} shouldBe {2}", totalRead, oursize, shouldBe));
                     }
 
+                    if (reader.BaseStream.Position > maxValue)
+                    {
+                        maxValue = reader.BaseStream.Position;
+                        maxExp = export;
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -356,6 +367,9 @@ namespace GPK_RePack.IO
                 //data
                 stat.progress++;
             }
+
+            logger.Debug("MAX VALUE " + maxValue);
+            logger.Debug("MAX EXPORT " + maxExp.ObjectName);
         }
 
         public static void ParsePayload(GpkPackage package, GpkExport export)

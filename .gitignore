@@ -2,6 +2,9 @@
 *.gpk
 *.ogg
 
+GPK_RePack/bin/
+GPK_RePack/obj/
+
 #################
 ## Eclipse
 #################
@@ -188,7 +191,6 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 
-
 #############
 ## Python
 #############
@@ -220,3 +222,4 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 *.log
+
