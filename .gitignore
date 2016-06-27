@@ -81,6 +81,7 @@ x64/
 *.pidb
 *.log
 *.scc
+*.Cache
 
 # Visual C++ cache files
 ipch/
