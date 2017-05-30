@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Model.Interfaces;
 
-namespace GPK_RePack.Classes.Prop
+namespace GPK_RePack.Model.Prop
 {
     [Serializable]
-    class GpkArrayProperty : GpkBaseProperty, IProperty
+    class GpkStructProperty : GpkBaseProperty, IProperty
     {
+        public string innerType;
         public byte[] value;
 
-        public GpkArrayProperty()
+        public GpkStructProperty()
         {
             RecalculateSize();
         }
-        public GpkArrayProperty(GpkBaseProperty bp)
+        public GpkStructProperty(GpkBaseProperty bp)
         {
             name = bp.name;
             type = bp.type;
@@ -31,44 +29,27 @@ namespace GPK_RePack.Classes.Prop
 
         public void WriteData(BinaryWriter writer, GpkPackage package)
         {
+            writer.Write(package.GetStringIndex(innerType));
             writer.Write(value);
         }
 
         public void ReadData(BinaryReader reader, GpkPackage package)
         {
+            long structtype = reader.ReadInt64();
+            innerType = package.GetString(structtype);
             value = new byte[size];
             value = reader.ReadBytes(size);
-
-            //real array parsing experiment
-            /*
-            BinaryReader internalReader = new BinaryReader(new MemoryStream(value));
-            List<byte[]> bList = new List<byte[]>();
-            int pointer = 0;
-            do
-            {
-                int elementSize = internalReader.ReadInt32();
-                byte[] element = internalReader.ReadBytes(elementSize);
-                bList.Add(element);
-                pointer += elementSize;
-            } while (pointer < size);
-
-            if (bList.Count > 1)
-            {
-                Debug.Print(bList.Count.ToString());
-            }
-           */
-            RecalculateSize();
         }
 
         public int RecalculateSize()
         {
-            int tmpSize = 0;
+            int tmpSize = 0; 
             if (value != null)
             {
                 tmpSize += value.Length;
             }
             size = tmpSize;
-            return size;
+            return size + 8; //length not included in normal len
         }
 
         public bool ValidateValue(string input)
@@ -84,7 +65,7 @@ namespace GPK_RePack.Classes.Prop
         public string GetValueHex()
         {
             string hex = "";
-            if(value != null) hex = value.ToHex();
+            if (value != null) hex = value.ToHex();
             return hex;
         }
     }

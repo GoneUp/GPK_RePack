@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace GPK_RePack.Classes.Interfaces
+namespace GPK_RePack.Model.Interfaces
 {
     interface IPayload
     {

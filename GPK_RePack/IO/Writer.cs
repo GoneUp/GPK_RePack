@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using GPK_RePack.Classes;
-using GPK_RePack.Classes.Interfaces;
-using GPK_RePack.Classes.Prop;
+using GPK_RePack.Model;
+using GPK_RePack.Model.Interfaces;
+using GPK_RePack.Model.Prop;
 using GPK_RePack.Properties;
 using NLog;
 

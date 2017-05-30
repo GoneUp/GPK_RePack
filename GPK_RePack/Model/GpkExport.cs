@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text;
-using GPK_RePack.Classes.ExportData;
-using GPK_RePack.Classes.Interfaces;
-using GPK_RePack.Classes.Prop;
 using GPK_RePack.IO;
+using GPK_RePack.Model.ExportData;
+using GPK_RePack.Model.Interfaces;
 
-namespace GPK_RePack.Classes
+namespace GPK_RePack.Model
 {
     [Serializable]
     class GpkExport : IGpkPart

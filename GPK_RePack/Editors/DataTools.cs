@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GPK_RePack.Classes;
+using GPK_RePack.Model;
 
 namespace GPK_RePack.Editors
 {

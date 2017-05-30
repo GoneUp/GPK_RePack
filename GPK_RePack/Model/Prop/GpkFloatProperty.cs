@@ -1,20 +1,19 @@
 ﻿using System;
 using System.IO;
-using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Model.Interfaces;
 
-namespace GPK_RePack.Classes.Prop
+namespace GPK_RePack.Model.Prop
 {
     [Serializable]
-    class GpkNameProperty : GpkBaseProperty, IProperty
+    class GpkFloatProperty : GpkBaseProperty, IProperty
     {
-        public string value; //long index
-        public int padding;
+        public float value;
 
-        public GpkNameProperty()
+        public GpkFloatProperty()
         {
             RecalculateSize();
         }
-        public GpkNameProperty(GpkBaseProperty bp)
+        public GpkFloatProperty(GpkBaseProperty bp)
         {
             name = bp.name;
             type = bp.type;
@@ -29,31 +28,36 @@ namespace GPK_RePack.Classes.Prop
 
         public void WriteData(BinaryWriter writer, GpkPackage package)
         {
-            writer.Write((int)package.GetStringIndex(value));
-            writer.Write(padding); 
+            writer.Write(value);
         }
 
         public void ReadData(BinaryReader reader, GpkPackage package)
         {
-            long index = reader.ReadInt32();
-            value = package.GetString(index);
-            padding = reader.ReadInt32();
+            value = reader.ReadSingle();
         }
 
         public int RecalculateSize()
         {
-            size = 8;
+            size = 4;
             return size;
         }
 
         public bool ValidateValue(string input)
         {
+            float validate;
+            if (float.TryParse(input, out validate))
+            {
+                return true;
+            }
+
             return false;
         }
 
         public bool SetValue(string input)
         {
-            return false;
+            if (!ValidateValue(input)) return false;
+            value = Convert.ToSingle(input);
+            return true;
         }
     }
 

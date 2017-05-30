@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using GPK_RePack.Classes;
-using GPK_RePack.Classes.ExportData;
-using GPK_RePack.Classes.Interfaces;
-using GPK_RePack.Classes.Payload;
-using GPK_RePack.Classes.Prop;
+using GPK_RePack.Model;
+using GPK_RePack.Model.ExportData;
+using GPK_RePack.Model.Interfaces;
+using GPK_RePack.Model.Payload;
+using GPK_RePack.Model.Prop;
 using GPK_RePack.Properties;
 using NLog;
 
@@ -47,8 +47,6 @@ namespace GPK_RePack.IO
                     ReadImports(reader, package);
                     ReadExports(reader, package);
                     ReadExportData(reader, package);
-
-                    logger.Info(String.Format("Remaining {0}b", reader.BaseStream.Length - reader.BaseStream.Position));
 
                     reader.Close();
                     reader.Dispose();
@@ -383,7 +381,7 @@ namespace GPK_RePack.IO
                     export.Payload = new SoundCue();
                     break;
                 case "Core.Texture2D":
-                    //export.Payload = new Texture2D();
+                    export.Payload = new Texture2D();
                     break;
             }
 

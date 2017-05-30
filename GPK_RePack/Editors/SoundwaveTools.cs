@@ -5,11 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GPK_RePack.Classes;
-using GPK_RePack.Classes.ExportData;
-using GPK_RePack.Classes.Interfaces;
-using GPK_RePack.Classes.Payload;
-using GPK_RePack.Classes.Prop;
+using GPK_RePack.Model;
+using GPK_RePack.Model.Interfaces;
+using GPK_RePack.Model.Payload;
+using GPK_RePack.Model.Prop;
 using NLog;
 using NVorbis;
 

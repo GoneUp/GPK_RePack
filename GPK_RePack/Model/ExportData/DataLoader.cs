@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Security.Permissions;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GPK_RePack.Classes.ExportData
+namespace GPK_RePack.Model.ExportData
 {
     [Serializable]
     class DataLoader

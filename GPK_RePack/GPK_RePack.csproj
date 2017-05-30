@@ -34,12 +34,14 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="CSharpImageLibrary, Version=3.1.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CSharpImageLibrary.3.1.6.0\lib\net45\CSharpImageLibrary.exe</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LZ4, Version=1.0.15.93, Culture=neutral, PublicKeyToken=62e1b5ec1eec9bdd, processorArchitecture=MSIL">
+      <HintPath>..\packages\lz4net.1.0.15.93\lib\net4-client\LZ4.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -83,31 +85,32 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\ExportData\DataLoader.cs" />
-    <Compile Include="Classes\GpkExport.cs" />
-    <Compile Include="Classes\GpkGeneration.cs" />
-    <Compile Include="Classes\GpkHeader.cs" />
-    <Compile Include="Classes\GpkImport.cs" />
-    <Compile Include="Classes\GpkPackage.cs" />
-    <Compile Include="Classes\Interfaces\IGpkPart.cs" />
-    <Compile Include="Classes\Interfaces\IProgress.cs" />
-    <Compile Include="Classes\Interfaces\IProperty.cs" />
-    <Compile Include="Classes\Interfaces\IPayload.cs" />
-    <Compile Include="Classes\Payload\SoundCue.cs" />
-    <Compile Include="Classes\Payload\SoundCueObject.cs" />
-    <Compile Include="Classes\Payload\Soundwave.cs" />
-    <Compile Include="Classes\Payload\Texture2D.cs" />
-    <Compile Include="Classes\Prop\GpkBaseProperty.cs" />
-    <Compile Include="Classes\GpkString.cs" />
-    <Compile Include="Classes\Prop\GpkBoolProperty.cs" />
-    <Compile Include="Classes\Prop\GpkIntProperty.cs" />
-    <Compile Include="Classes\Prop\GpkNameProperty.cs" />
-    <Compile Include="Classes\Prop\GpkStringProperty.cs" />
-    <Compile Include="Classes\Prop\GpkArrayProperty.cs" />
-    <Compile Include="Classes\Prop\GpkObjectProperty.cs" />
-    <Compile Include="Classes\Prop\GpkFloatProperty.cs" />
-    <Compile Include="Classes\Prop\GpkStructProperty.cs" />
-    <Compile Include="Classes\Prop\GpkByteProperty.cs" />
+    <Compile Include="Model\ExportData\DataLoader.cs" />
+    <Compile Include="Model\GpkExport.cs" />
+    <Compile Include="Model\GpkGeneration.cs" />
+    <Compile Include="Model\GpkHeader.cs" />
+    <Compile Include="Model\GpkImport.cs" />
+    <Compile Include="Model\GpkPackage.cs" />
+    <Compile Include="Model\Interfaces\IGpkPart.cs" />
+    <Compile Include="Model\Interfaces\IProgress.cs" />
+    <Compile Include="Model\Interfaces\IProperty.cs" />
+    <Compile Include="Model\Interfaces\IPayload.cs" />
+    <Compile Include="Model\Payload\MipMap.cs" />
+    <Compile Include="Model\Payload\SoundCue.cs" />
+    <Compile Include="Model\Payload\SoundCueObject.cs" />
+    <Compile Include="Model\Payload\Soundwave.cs" />
+    <Compile Include="Model\Payload\Texture2D.cs" />
+    <Compile Include="Model\Prop\GpkBaseProperty.cs" />
+    <Compile Include="Model\GpkString.cs" />
+    <Compile Include="Model\Prop\GpkBoolProperty.cs" />
+    <Compile Include="Model\Prop\GpkIntProperty.cs" />
+    <Compile Include="Model\Prop\GpkNameProperty.cs" />
+    <Compile Include="Model\Prop\GpkStringProperty.cs" />
+    <Compile Include="Model\Prop\GpkArrayProperty.cs" />
+    <Compile Include="Model\Prop\GpkObjectProperty.cs" />
+    <Compile Include="Model\Prop\GpkFloatProperty.cs" />
+    <Compile Include="Model\Prop\GpkStructProperty.cs" />
+    <Compile Include="Model\Prop\GpkByteProperty.cs" />
     <Compile Include="Editors\DataTools.cs" />
     <Compile Include="Editors\SoundwaveTools.cs" />
     <Compile Include="Editors\TextureTools.cs" />
@@ -151,9 +154,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="app.manifest">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>

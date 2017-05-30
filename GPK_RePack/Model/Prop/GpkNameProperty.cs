@@ -1,19 +1,20 @@
 ﻿using System;
 using System.IO;
-using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Model.Interfaces;
 
-namespace GPK_RePack.Classes.Prop
+namespace GPK_RePack.Model.Prop
 {
     [Serializable]
-    class GpkBoolProperty : GpkBaseProperty, IProperty
+    class GpkNameProperty : GpkBaseProperty, IProperty
     {
-        public bool value;
+        public string value; //long index
+        public int padding;
 
-        public GpkBoolProperty()
+        public GpkNameProperty()
         {
             RecalculateSize();
         }
-        public GpkBoolProperty(GpkBaseProperty bp)
+        public GpkNameProperty(GpkBaseProperty bp)
         {
             name = bp.name;
             type = bp.type;
@@ -28,37 +29,31 @@ namespace GPK_RePack.Classes.Prop
 
         public void WriteData(BinaryWriter writer, GpkPackage package)
         {
-            writer.Write(Convert.ToInt32(value));
+            writer.Write((int)package.GetStringIndex(value));
+            writer.Write(padding); 
         }
 
         public void ReadData(BinaryReader reader, GpkPackage package)
         {
-            value = Convert.ToBoolean(reader.ReadInt32());
+            long index = reader.ReadInt32();
+            value = package.GetString(index);
+            padding = reader.ReadInt32();
         }
 
         public int RecalculateSize()
         {
-            //Seems that it is 0 when writing it to the property 
-            //size = 4;
-            return 4;
+            size = 8;
+            return size;
         }
 
         public bool ValidateValue(string input)
         {
-            bool validate;
-            if (bool.TryParse(input, out validate))
-            {
-                return true;
-            }
-
             return false;
         }
 
         public bool SetValue(string input)
         {
-            if (!ValidateValue(input)) return false;
-            value = Convert.ToBoolean(input);
-            return true;
+            return false;
         }
     }
 

@@ -1,19 +1,19 @@
 ﻿using System;
 using System.IO;
-using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Model.Interfaces;
 
-namespace GPK_RePack.Classes.Prop
+namespace GPK_RePack.Model.Prop
 {
     [Serializable]
-    class GpkFloatProperty : GpkBaseProperty, IProperty
+    class GpkBoolProperty : GpkBaseProperty, IProperty
     {
-        public float value;
+        public bool value;
 
-        public GpkFloatProperty()
+        public GpkBoolProperty()
         {
             RecalculateSize();
         }
-        public GpkFloatProperty(GpkBaseProperty bp)
+        public GpkBoolProperty(GpkBaseProperty bp)
         {
             name = bp.name;
             type = bp.type;
@@ -28,24 +28,25 @@ namespace GPK_RePack.Classes.Prop
 
         public void WriteData(BinaryWriter writer, GpkPackage package)
         {
-            writer.Write(value);
+            writer.Write(Convert.ToInt32(value));
         }
 
         public void ReadData(BinaryReader reader, GpkPackage package)
         {
-            value = reader.ReadSingle();
+            value = Convert.ToBoolean(reader.ReadInt32());
         }
 
         public int RecalculateSize()
         {
-            size = 4;
-            return size;
+            //Seems that it is 0 when writing it to the property 
+            //size = 4;
+            return 4;
         }
 
         public bool ValidateValue(string input)
         {
-            float validate;
-            if (float.TryParse(input, out validate))
+            bool validate;
+            if (bool.TryParse(input, out validate))
             {
                 return true;
             }
@@ -56,7 +57,7 @@ namespace GPK_RePack.Classes.Prop
         public bool SetValue(string input)
         {
             if (!ValidateValue(input)) return false;
-            value = Convert.ToSingle(input);
+            value = Convert.ToBoolean(input);
             return true;
         }
     }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Model.Interfaces;
 
-namespace GPK_RePack.Classes.Payload
+namespace GPK_RePack.Model.Payload
 {
     [Serializable]
     class Soundwave : IPayload

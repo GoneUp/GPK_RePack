@@ -1,7 +1,7 @@
 ﻿using System;
-using GPK_RePack.Classes.Interfaces;
+using GPK_RePack.Model.Interfaces;
 
-namespace GPK_RePack.Classes
+namespace GPK_RePack.Model
 {
     [Serializable]
     class GpkGeneration : IGpkPart

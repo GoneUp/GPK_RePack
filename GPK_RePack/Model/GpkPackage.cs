@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using GPK_RePack.Forms;
 using GPK_RePack.IO;
 using GPK_RePack.Properties;
-using NLog;
-using NLog.LayoutRenderers;
 
-namespace GPK_RePack.Classes
+namespace GPK_RePack.Model
 {
     [Serializable]
     class GpkPackage
