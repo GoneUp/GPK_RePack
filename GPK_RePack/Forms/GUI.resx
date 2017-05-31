@@ -130,9 +130,9 @@ Quick Guide:
 3 - Editing
 3a) Use the buttons Export/Replace raw data for editing any object data
 3b) Use the buttons Export/Import/Empty ogg for editing audio (Soundnodewave) files
-3c) Use the buttons Copy/Paste (or Control-C, Control-V) on any object. Via Settings you can select what the program should copy
+3c) Use the buttons Copy/Paste (or Control-C, Control-V) on any object. You can choose in the settings what the parts of the object the program should copy,
 4 - Saving
-4a) The normal way to save is Main -&gt; Save. The program will rebuild a new Gpk file from scratch. Note that Tera may not accept the file if you imported too much data.
+4a) The normal way to save is Main -&gt; Save. The program will rebuild a new Gpk file from scratch. 
 4b) If the normal way is failing switch select Patch Mode in settings and try to import the data again (only over raw import/export). Save afterwards via Main -&gt; Save patched.
  
 
@@ -143,6 +143,24 @@ If you want to change the maximum size manually select a the package and use the
 Have Fun &amp; Always Backup
 -- GoneUp</value>
   </data>
+  <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="type.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="size.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="aIndex.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="iType.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="value.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>

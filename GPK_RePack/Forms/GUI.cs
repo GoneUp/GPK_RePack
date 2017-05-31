@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media.Imaging;
 using System.Xml;
 using GPK_RePack.Editors;
 using GPK_RePack.IO;
@@ -24,6 +25,8 @@ using NLog;
 using NLog.Config;
 using NLog.Targets;
 using NLog.Windows.Forms;
+using UpkManager.Dds;
+using UpkManager.Dds.Constants;
 
 namespace GPK_RePack.Forms
 {
@@ -160,13 +163,13 @@ namespace GPK_RePack.Forms
             String[] files;
             if (sender is String[])
             {
-                files = (String[]) sender;
+                files = (String[])sender;
             }
             else
             {
                 files = MiscFuncs.GenerateOpenDialog();
             }
-            
+
             if (files.Length == 0) return;
 
             DateTime start = DateTime.Now;
@@ -178,7 +181,7 @@ namespace GPK_RePack.Forms
             {
                 if (File.Exists(path))
                 {
-                    Task newTask = new Task(delegate()
+                    Task newTask = new Task(delegate ()
                     {
                         Reader reader = new Reader();
                         runningReaders.Add(reader);
@@ -270,7 +273,7 @@ namespace GPK_RePack.Forms
                 try
                 {
                     Writer tmpS = new Writer();
-                    Task newTask = new Task(delegate()
+                    Task newTask = new Task(delegate ()
                     {
                         string savepath = package.Path + "_rebuild";
                         tmpS.SaveGpkPackage(package, savepath);
@@ -343,7 +346,7 @@ namespace GPK_RePack.Forms
 
         private void treeMain_DragDrop(object sender, DragEventArgs e)
         {
-            string[] files = (string[]) e.Data.GetData(DataFormats.FileDrop);
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             foreach (string file in files)
             {
                 logger.Debug("Drop input: " + file);
@@ -351,7 +354,7 @@ namespace GPK_RePack.Forms
 
             openToolStripMenuItem_Click(files, null);
         }
-    
+
         #endregion
 
         #region diplaygpk
@@ -465,19 +468,47 @@ namespace GPK_RePack.Forms
                 else if (selected is GpkExport)
                 {
                     GpkExport exp = (GpkExport)selected;
-                    boxInfo.Text = exp.ToString();
 
-
+                    //buttons
                     boxGeneralButtons.Enabled = true;
                     boxDataButtons.Enabled = true;
                     boxPropertyButtons.Enabled = true;
                     selectedExport = exp;
                     selectedPackage = package;
 
+                    //tabs
+                    boxInfo.Text = exp.ToString();
                     DrawGrid(package, exp);
+                    if (selectedExport.Payload != null && selectedExport.Payload is Texture2D)
+                    {
+                        Texture2D image = (Texture2D)selectedExport.Payload;
+                        DdsFile ddsFile = new DdsFile();
+                        Stream imageStream = image.GetObjectStream();
+                        if (imageStream != null)
+                        {
+                            ddsFile.Load(image.GetObjectStream());
+                            boxImagePreview.Image = BitmapFromSource(ddsFile.BitmapSource);
+                        }
+                    }
                 }
             }
         }
+
+
+
+        private System.Drawing.Bitmap BitmapFromSource(BitmapSource bitmapsource)
+        {
+            System.Drawing.Bitmap bitmap;
+            using (MemoryStream outStream = new MemoryStream())
+            {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(bitmapsource));
+                enc.Save(outStream);
+                bitmap = new System.Drawing.Bitmap(outStream);
+            }
+            return bitmap;
+        }
+
 
 
         private void refreshViewToolStripMenuItem_Click(object sender, EventArgs e)
@@ -670,8 +701,8 @@ namespace GPK_RePack.Forms
                 logger.Trace("no selected export");
                 return;
             }
-            GpkExport copyExport = (GpkExport) Clipboard.GetData(exportFormat.Name);
-   
+            GpkExport copyExport = (GpkExport)Clipboard.GetData(exportFormat.Name);
+
             if (copyExport == null)
             {
                 logger.Info("copy paste fail");
@@ -746,6 +777,44 @@ namespace GPK_RePack.Forms
             }
         }
 
+
+
+        #endregion
+
+
+        #region image
+        private void btnImageImport_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void btnImageExport_Click(object sender, EventArgs e)
+        {
+            if (selectedExport == null)
+            {
+                logger.Trace("no selected export");
+                return;
+            }
+
+            if (selectedExport.Payload == null || !(selectedExport.Payload is Texture2D))
+            {
+                logger.Info("Not a texture2d object");
+                return;
+            }
+
+            var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".dds");
+            if (path != "")
+            {
+                Texture2D image = (Texture2D)selectedExport.Payload;
+                DdsFile ddsFile = new DdsFile();
+
+                Task.Run(() => image.SaveObject(path, new DdsSaveConfig(image.GetFormat(), 0, 0, false, false)));
+            }
+
+
+        }
+
         #endregion
 
         #region ogg
@@ -812,7 +881,7 @@ namespace GPK_RePack.Forms
             }
             catch (Exception ex)
             {
-                logger.FatalException("Import failure! " + ex, ex);
+                logger.Fatal(ex, "Import failure!");
             }
         }
 
@@ -883,7 +952,7 @@ namespace GPK_RePack.Forms
             }
             catch (Exception ex)
             {
-                logger.Info("Playback Error. " + ex);
+                logger.Error(ex, "Playback Error");
             }
         }
 
@@ -995,7 +1064,7 @@ namespace GPK_RePack.Forms
             return true;
         }
 
-        
+
 
         #endregion
 
@@ -1250,7 +1319,7 @@ namespace GPK_RePack.Forms
                     if (cellValue.Length > 2)
                     {
                         selectedPackage.AddString(cellValue); //just in case 
-                        
+
                         tmpByte.nameValue = cellValue;
                     }
                     else
@@ -1372,23 +1441,28 @@ namespace GPK_RePack.Forms
             return (GpkArrayProperty)row.Tag;
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         #endregion
-
-      
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     }

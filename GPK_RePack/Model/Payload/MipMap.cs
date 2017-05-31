@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LZ4;
+using Ionic.Zip;
+using Ionic.Zlib;
+using Lzo64;
 using NLog;
+
 
 namespace GPK_RePack.Model.Payload
 {
@@ -13,55 +17,41 @@ namespace GPK_RePack.Model.Payload
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static int COMPRESS_ZLIB = 1;
-        public static int COMPRESS_LZO = 2;
-        public static int COMPRESS_LZX = 4;
-
         public int sizeX;
         public int sizeY;
 
         public int compFlag;
         public int uncompressedSize;
-        public int widthOffset;
+        public int compChunkSize;
+        public int compChunkOffset;
 
-        public int unk1;
-        public int unk2;
+        public int signature;
+        public int blocksize;
 
-        public int requiredBuffer;
         public int compressedSize;
-        public int uncompressedDataSize;
-
+        public int uncompressedSize_chunkheader;
 
         public byte[] compressedData;
         public byte[] uncompressedData;
 
 
 
-        public void decompress()
+      
+
+        public void compress()
         {
-            if ((compFlag & COMPRESS_ZLIB) > 0)
-            {
-                logger.Error("Found COMPRESS_ZLIB, unsupported!");
-            }
-            else if ((compFlag & COMPRESS_LZX) > 0)
-            {
-                logger.Error("Found COMPRESS_LZX, unsupported!");
-            }
-            else if ((compFlag & COMPRESS_LZO) > 0)
-            {
-                uncompressedData = LZ4Codec.Unwrap(compressedData);
-                logger.Debug("Extracted size " + uncompressedData.Length);
-            }
 
         }
+
+
 
         public override string ToString()
         {
             StringBuilder info = new StringBuilder();
-            info.AppendFormat("Size: {0} x {1}\n", sizeX, sizeY);
-            info.AppendFormat("Compression: {0}\n", compFlag);
-            info.AppendFormat("Compressed Size: {0}\n", compressedSize);
-            info.AppendFormat("Uncompressed Size: {0}\n", uncompressedSize);
+            info.AppendFormat("Size: {0} x {1} {2}", sizeX, sizeY, Environment.NewLine);
+            info.AppendLine("Compression: " + compFlag);
+            info.AppendLine("Compressed Size: " + compressedSize);
+            info.AppendLine("Uncompressed Size: " + uncompressedSize);
             return info.ToString();
         }
     }

@@ -63,6 +63,8 @@ namespace GPK_RePack.Forms
             this.aIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.iType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.boxImagePreview = new System.Windows.Forms.PictureBox();
             this.boxCommands = new System.Windows.Forms.Panel();
             this.boxPropertyButtons = new System.Windows.Forms.GroupBox();
             this.btnPropClear = new System.Windows.Forms.Button();
@@ -73,6 +75,8 @@ namespace GPK_RePack.Forms
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.boxDataButtons = new System.Windows.Forms.GroupBox();
+            this.btnImageExport = new System.Windows.Forms.Button();
+            this.btnImageImport = new System.Windows.Forms.Button();
             this.btnOggPreview = new System.Windows.Forms.Button();
             this.btnFakeOGG = new System.Windows.Forms.Button();
             this.btnDeleteData = new System.Windows.Forms.Button();
@@ -91,6 +95,8 @@ namespace GPK_RePack.Forms
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridProps)).BeginInit();
+            this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.boxImagePreview)).BeginInit();
             this.boxCommands.SuspendLayout();
             this.boxPropertyButtons.SuspendLayout();
             this.boxGeneralButtons.SuspendLayout();
@@ -106,6 +112,8 @@ namespace GPK_RePack.Forms
             // 
             this.treeMain.AllowDrop = true;
             this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeMain.FullRowSelect = true;
+            this.treeMain.HideSelection = false;
             this.treeMain.Location = new System.Drawing.Point(0, 0);
             this.treeMain.Name = "treeMain";
             this.treeMain.Size = new System.Drawing.Size(306, 485);
@@ -274,6 +282,7 @@ namespace GPK_RePack.Forms
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
@@ -294,13 +303,13 @@ namespace GPK_RePack.Forms
             // 
             // boxInfo
             // 
-            this.boxInfo.Dock = System.Windows.Forms.DockStyle.Top;
+            this.boxInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.boxInfo.Location = new System.Drawing.Point(3, 3);
             this.boxInfo.Multiline = true;
             this.boxInfo.Name = "boxInfo";
             this.boxInfo.ReadOnly = true;
             this.boxInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.boxInfo.Size = new System.Drawing.Size(779, 351);
+            this.boxInfo.Size = new System.Drawing.Size(779, 362);
             this.boxInfo.TabIndex = 5;
             this.boxInfo.Text = resources.GetString("boxInfo.Text");
             // 
@@ -376,6 +385,27 @@ namespace GPK_RePack.Forms
             // 
             this.value.HeaderText = "Value";
             this.value.Name = "value";
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.boxImagePreview);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(785, 368);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Texture Preview";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // boxImagePreview
+            // 
+            this.boxImagePreview.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.boxImagePreview.Location = new System.Drawing.Point(3, 3);
+            this.boxImagePreview.Name = "boxImagePreview";
+            this.boxImagePreview.Size = new System.Drawing.Size(779, 362);
+            this.boxImagePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.boxImagePreview.TabIndex = 0;
+            this.boxImagePreview.TabStop = false;
             // 
             // boxCommands
             // 
@@ -479,6 +509,8 @@ namespace GPK_RePack.Forms
             // 
             // boxDataButtons
             // 
+            this.boxDataButtons.Controls.Add(this.btnImageExport);
+            this.boxDataButtons.Controls.Add(this.btnImageImport);
             this.boxDataButtons.Controls.Add(this.btnOggPreview);
             this.boxDataButtons.Controls.Add(this.btnFakeOGG);
             this.boxDataButtons.Controls.Add(this.btnDeleteData);
@@ -495,11 +527,31 @@ namespace GPK_RePack.Forms
             this.boxDataButtons.TabStop = false;
             this.boxDataButtons.Text = "Data Commands";
             // 
+            // btnImageExport
+            // 
+            this.btnImageExport.Location = new System.Drawing.Point(370, 58);
+            this.btnImageExport.Name = "btnImageExport";
+            this.btnImageExport.Size = new System.Drawing.Size(75, 23);
+            this.btnImageExport.TabIndex = 11;
+            this.btnImageExport.Text = "Export DDS";
+            this.btnImageExport.UseVisualStyleBackColor = true;
+            this.btnImageExport.Click += new System.EventHandler(this.btnImageExport_Click);
+            // 
+            // btnImageImport
+            // 
+            this.btnImageImport.Location = new System.Drawing.Point(369, 29);
+            this.btnImageImport.Name = "btnImageImport";
+            this.btnImageImport.Size = new System.Drawing.Size(75, 23);
+            this.btnImageImport.TabIndex = 10;
+            this.btnImageImport.Text = "Import DDS";
+            this.btnImageImport.UseVisualStyleBackColor = true;
+            this.btnImageImport.Click += new System.EventHandler(this.btnImageImport_Click);
+            // 
             // btnOggPreview
             // 
-            this.btnOggPreview.Location = new System.Drawing.Point(344, 58);
+            this.btnOggPreview.Location = new System.Drawing.Point(282, 58);
             this.btnOggPreview.Name = "btnOggPreview";
-            this.btnOggPreview.Size = new System.Drawing.Size(104, 24);
+            this.btnOggPreview.Size = new System.Drawing.Size(78, 24);
             this.btnOggPreview.TabIndex = 9;
             this.btnOggPreview.Text = "Ogg Preview";
             this.btnOggPreview.UseVisualStyleBackColor = true;
@@ -507,9 +559,9 @@ namespace GPK_RePack.Forms
             // 
             // btnFakeOGG
             // 
-            this.btnFakeOGG.Location = new System.Drawing.Point(233, 58);
+            this.btnFakeOGG.Location = new System.Drawing.Point(176, 58);
             this.btnFakeOGG.Name = "btnFakeOGG";
-            this.btnFakeOGG.Size = new System.Drawing.Size(104, 24);
+            this.btnFakeOGG.Size = new System.Drawing.Size(100, 24);
             this.btnFakeOGG.TabIndex = 8;
             this.btnFakeOGG.Text = "Insert Emtpy OGG";
             this.btnFakeOGG.UseVisualStyleBackColor = true;
@@ -527,9 +579,9 @@ namespace GPK_RePack.Forms
             // 
             // btnImportOgg
             // 
-            this.btnImportOgg.Location = new System.Drawing.Point(114, 58);
+            this.btnImportOgg.Location = new System.Drawing.Point(94, 58);
             this.btnImportOgg.Name = "btnImportOgg";
-            this.btnImportOgg.Size = new System.Drawing.Size(113, 24);
+            this.btnImportOgg.Size = new System.Drawing.Size(76, 24);
             this.btnImportOgg.TabIndex = 6;
             this.btnImportOgg.Text = "Import OGG";
             this.btnImportOgg.UseVisualStyleBackColor = true;
@@ -539,7 +591,7 @@ namespace GPK_RePack.Forms
             // 
             this.btnExtractOGG.Location = new System.Drawing.Point(6, 58);
             this.btnExtractOGG.Name = "btnExtractOGG";
-            this.btnExtractOGG.Size = new System.Drawing.Size(102, 24);
+            this.btnExtractOGG.Size = new System.Drawing.Size(82, 24);
             this.btnExtractOGG.TabIndex = 5;
             this.btnExtractOGG.Text = "Export OGG";
             this.btnExtractOGG.UseVisualStyleBackColor = true;
@@ -649,6 +701,9 @@ namespace GPK_RePack.Forms
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridProps)).EndInit();
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.boxImagePreview)).EndInit();
             this.boxCommands.ResumeLayout(false);
             this.boxPropertyButtons.ResumeLayout(false);
             this.boxGeneralButtons.ResumeLayout(false);
@@ -721,6 +776,10 @@ namespace GPK_RePack.Forms
         private ToolStripStatusLabel lblFiller;
         private ToolStripMenuItem bigBytePropImportToolStripMenuItem;
         private ToolStripMenuItem addNameToolStripMenuItem;
+        private TabPage tabPage3;
+        private PictureBox boxImagePreview;
+        private Button btnImageExport;
+        private Button btnImageImport;
     }
 }
 

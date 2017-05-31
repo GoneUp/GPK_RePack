@@ -4,6 +4,7 @@ using System.Text;
 using GPK_RePack.IO;
 using GPK_RePack.Model.ExportData;
 using GPK_RePack.Model.Interfaces;
+using GPK_RePack.Model.Prop;
 
 namespace GPK_RePack.Model
 {
@@ -41,20 +42,20 @@ namespace GPK_RePack.Model
 
         public long DataStart;
         public byte[] DataPadding;
-        private byte[] m_data; 
+        private byte[] m_data;
         public IPayload m_payload;
         public DataLoader Loader;
-       
+
         public byte[] Data
         {
             get
             {
                 if (Loader != null)
                 {
-                    m_data = Loader.LoadData(); 
+                    m_data = Loader.LoadData();
                     Loader = null; //null first, row is important here!
-                    Reader.ParsePayload(motherPackage, this); 
-                   
+                    Reader.ParsePayload(motherPackage, this);
+
                 }
 
                 return m_data;
@@ -170,6 +171,11 @@ namespace GPK_RePack.Model
                 info.AppendLine(prop.ToString());
             }
 
+            if (Payload != null && Loader == null)
+            {
+                info.AppendLine("\nPayload:");
+                info.Append(Payload);
+            }
             return info.ToString();
         }
         public int GetDataSize()
@@ -222,6 +228,11 @@ namespace GPK_RePack.Model
 
             return tmpSize;
 
+        }
+
+        public IProperty GetProperty(String name)
+        {
+            return Properties.Find(x => ((GpkBaseProperty) x).name == name);
         }
 
 
