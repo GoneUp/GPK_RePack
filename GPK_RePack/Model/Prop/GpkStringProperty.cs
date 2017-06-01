@@ -31,11 +31,11 @@ namespace GPK_RePack.Model.Prop
 
             if (length > 0)
             {
-                Writer.WriteString(writer, value);
+                Writer.WriteString(writer, value, false);
             }
             else
             {
-                Writer.WriteUnicodeString(writer, value);
+                Writer.WriteUnicodeString(writer, value, false);
             }
         }
 

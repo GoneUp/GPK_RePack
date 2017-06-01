@@ -150,10 +150,10 @@ namespace GPK_RePack
             return "";
         }
 
-        public static String[] GenerateOpenDialog()
+        public static String[] GenerateOpenDialog(bool multiselect)
         {
             OpenFileDialog open = new OpenFileDialog();
-            open.Multiselect = false;
+            open.Multiselect = multiselect;
             open.ValidateNames = true;
             open.InitialDirectory = Settings.Default.OpenDir;
             open.ShowDialog();

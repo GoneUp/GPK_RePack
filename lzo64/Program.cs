@@ -30,7 +30,7 @@ namespace Lzo64
             Console.WriteLine("version=" + compressor.Version);
 
             var bytes = Encoding.UTF8.GetBytes(RandomString());
-            var compressed = compressor.Compress(bytes);
+            var compressed = compressor.Compress(bytes, true);
             Console.WriteLine("uncompressed {0:n0} compressed {1:n0}", bytes.Length, compressed.Length);
             var decompressed = compressor.Decompress(compressed);
             //bytes[512] = 1;

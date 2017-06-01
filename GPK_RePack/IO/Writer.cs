@@ -89,8 +89,7 @@ namespace GPK_RePack.IO
             writer.Write(package.Header.LicenseVersion);
             writer.Write(package.Header.PackageFlags);
 
-            writer.Write(package.Header.PackageName.Length + 1);
-            WriteString(writer, package.Header.PackageName);
+            WriteString(writer, package.Header.PackageName, true);
 
             writer.Write(package.Header.Unk1);
             writer.Write(package.Header.Unk2);
@@ -125,7 +124,7 @@ namespace GPK_RePack.IO
             writer.Write(package.Header.Unk5);
             writer.Write(package.Header.Unk6);
 
-           //writer.Write(package.Header.EngineVersion); 
+            //writer.Write(package.Header.EngineVersion); 
             writer.Write(0xC0FFEEAA); //my signature ^^
             writer.Write(package.Header.CookerVersion);
 
@@ -148,8 +147,7 @@ namespace GPK_RePack.IO
 
             foreach (GpkString tmpString in package.NameList.Values)
             {
-                writer.Write(tmpString.name.Length + 1);
-                WriteString(writer, tmpString.name);
+                WriteString(writer, tmpString.name, true);
                 writer.Write(tmpString.flags);
                 stat.progress++;
             }
@@ -351,15 +349,37 @@ namespace GPK_RePack.IO
 
         }
 
-        public static void WriteString(BinaryWriter writer, string text)
+        public static int GetStringBytes(string text, bool isUnicode)
         {
-            writer.Write(ASCIIEncoding.ASCII.GetBytes(text));
+            //length + string + terminating
+            if (isUnicode)
+            {
+                return 4 + Encoding.Unicode.GetBytes(text).Length + 2;
+            }
+            else
+            {
+                return 4 + Encoding.Unicode.GetBytes(text).Length + 1;
+            }
+        }
+
+
+        public static void WriteString(BinaryWriter writer, string text, bool includeHeader)
+        {
+            if (includeHeader)
+            {
+                writer.Write(text.Length + 1);
+            }
+            writer.Write(Encoding.ASCII.GetBytes(text));
             writer.Write(new byte());
         }
 
-        public static void WriteUnicodeString(BinaryWriter writer, string text)
+        public static void WriteUnicodeString(BinaryWriter writer, string text, bool includeHeader)
         {
-            writer.Write(UnicodeEncoding.Unicode.GetBytes(text));
+            if (includeHeader)
+            {
+                writer.Write(text.Length + 1 * -1);
+            }
+            writer.Write(Encoding.Unicode.GetBytes(text));
             writer.Write(new short());
         }
 

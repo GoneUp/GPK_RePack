@@ -94,7 +94,7 @@ namespace Lzo64
         /// </summary>
         /// <param name="src">Source array for compression</param>
         /// <returns>Byte array containing the compressed data</returns>
-        public byte[] Compress(byte[] src)
+        public byte[] Compress(byte[] src, bool includeLen = true)
         {
             if (_traceSwitch.TraceVerbose)
             {
@@ -111,7 +111,16 @@ namespace Lzo64
             {
                 Trace.WriteLine(String.Format("LZOCompressor: compressed {0} to {1} bytes", src.Length, outlen));
             }
-            byte[] ret = new byte[outlen + 4];
+
+            byte[] ret;
+            if (!includeLen)
+            {
+                ret = new byte[outlen];
+                Array.Copy(dst, 0, ret, 0, outlen);
+                return ret;
+            }
+
+            ret = new byte[outlen + 4];
             Array.Copy(dst, 0, ret, 0, outlen);
             byte[] outlenarr = BitConverter.GetBytes(src.Length);
             Array.Copy(outlenarr, 0, ret, outlen, 4);

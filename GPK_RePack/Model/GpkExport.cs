@@ -5,12 +5,15 @@ using GPK_RePack.IO;
 using GPK_RePack.Model.ExportData;
 using GPK_RePack.Model.Interfaces;
 using GPK_RePack.Model.Prop;
+using NLog;
 
 namespace GPK_RePack.Model
 {
     [Serializable]
     class GpkExport : IGpkPart
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private GpkPackage motherPackage;
         public string UID;
 
@@ -55,7 +58,7 @@ namespace GPK_RePack.Model
                     m_data = Loader.LoadData();
                     Loader = null; //null first, row is important here!
                     Reader.ParsePayload(motherPackage, this);
-
+                    logger.Trace("{0}: JIT Load triggerd", ObjectName);
                 }
 
                 return m_data;
@@ -96,46 +99,6 @@ namespace GPK_RePack.Model
             Properties = new List<IProperty>();
 
         }
-
-        /*
-         * no idea why this is here. maybe its usefull later.
-        public GpkExport(GpkExport export)
-        {
-            //clone class
-            motherPackage = export.motherPackage;
-            UID = export.UID;
-
-            ClassIndex = export.ClassIndex;
-            SuperIndex = export.SuperIndex;
-            PackageIndex = export.PackageIndex;
-
-            ClassName = export.ClassName;
-            SuperName = export.SuperName;
-            PackageName = export.PackageName;
-            ObjectName = export.ObjectName;
-
-            Unk1 = export.Unk1;
-            Unk2 = export.Unk2;
-
-            SerialSize = export.SerialSize;
-            SerialOffset = export.SerialOffset;
-            SerialOffsetPosition = export.SerialOffsetPosition;
-
-            NetIndex = export.NetIndex;
-            NetIndexName = export.NetIndexName;
-            PaddingUnk = export.PaddingUnk;
-            PropertyPadding = export.PropertyPadding;
-            PropertySize = export.PropertySize;
-            Properties = export.Properties;
-
-            DataStart = export.DataStart;
-            DataPadding = export.DataPadding;
-            Data = export.Data;
-            Loader = export.Loader;
-            Payload = export.Payload;
-
-        }
-         * */
 
         public override string ToString()
         {
@@ -207,6 +170,10 @@ namespace GPK_RePack.Model
             {
                 //loader first. prevents mass loading, eg for package size computing
                 size += Loader.Length;
+            }
+            else if (Payload != null)
+            {
+                size += Payload.GetSize();
             }
             else if (Data != null)
             {

@@ -20,6 +20,8 @@ namespace GPK_RePack.Model.Payload
     class ChunkBlock
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static LZOCompressor lzo = new LZOCompressor();
+        private static object lockObject = new Object();
 
         public int compressedSize;
         public int uncompressedDataSize;
@@ -56,24 +58,74 @@ namespace GPK_RePack.Model.Payload
             }
             else if (((CompressionTypes)compFlag & CompressionTypes.LZO) > 0)
             {
-                // Create the compressor object
-                LZOCompressor lzo = new LZOCompressor();
-
                 uncompressedData = new byte[uncompressedDataSize];
-                lzo.Decompress(compressedData, uncompressedData, uncompressedDataSize);
+                lock (lockObject)
+                {
+                    lzo.Decompress(compressedData, uncompressedData, uncompressedDataSize);
+                }
+            }
+
+            if (uncompressedData != null)
+            {
+                uncompressedDataSize = uncompressedData.Length;
+                compressedData = null; //save memory
+            }
+        }
+
+        public void compress(int compFlag)
+        {
+            if (compFlag == 0)
+            {
+                //uncompressed
+                compressedData = (byte[])(uncompressedData.Clone());
+            }
+            else if (((CompressionTypes)compFlag & CompressionTypes.ZLIB) > 0)
+            {
+                try
+                {
+                    var byteStream = new MemoryStream();
+                    var outStream = new ZlibStream(byteStream, CompressionMode.Compress);
+                    outStream.Write(uncompressedData, 0, uncompressedData.Length);
+                    compressedData = byteStream.GetBuffer();
+
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e);
+                }
+            }
+            else if (((CompressionTypes)compFlag & CompressionTypes.LZX) > 0)
+            {
+                logger.Error("Found COMPRESS_LZX, unsupported!");
+            }
+            else if (((CompressionTypes)compFlag & CompressionTypes.LZO) > 0)
+            {
+                lock (lockObject)
+                {
+                    compressedData = lzo.Compress(uncompressedData, false);
+                }
+            }
+
+            if (compressedData != null)
+            {
+                compressedSize = compressedData.Length;
             }
         }
     }
 
+
+
+
     [Serializable]
     class Texture2D : IPayload
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public GpkExport objectExport;
         public byte[] startUnk;
-        public String tgaPath;
+        public string tgaPath;
         public bool inUnicode = false;
-        public byte[] endUnk;
+        public byte[] guid;
 
         private const CompressionTypes NothingToDo = CompressionTypes.Unused | CompressionTypes.StoreInSeparatefile;
 
@@ -86,8 +138,61 @@ namespace GPK_RePack.Model.Payload
 
         public void WriteData(BinaryWriter writer, GpkPackage package, GpkExport export)
         {
-            throw new NotImplementedException();
+            writer.Write(startUnk);
+            if (inUnicode)
+            {
+                Writer.WriteUnicodeString(writer, tgaPath, true);
+            }
+            else
+            {
+                Writer.WriteString(writer, tgaPath, true);
+            }
+
+            writer.Write(maps.Count);
+
+            foreach (var map in maps)
+            {
+                //refressh block info, compress blocks
+                map.generateBlocks();
+
+                //chunk
+                //info
+                writer.Write(map.compFlag);
+                writer.Write(map.uncompressedSize);
+                int chunkSize = 16 + map.blocks.Count * 8 + map.compressedSize;
+                if (chunkSize != map.compChunkSize)
+                {
+                    logger.Info("fixing chunksize");
+                    map.compChunkSize = chunkSize;
+                }
+
+                writer.Write(map.compChunkSize);
+                writer.Write((int)(writer.BaseStream.Position + 4)); //chunkoffset
+
+                //header
+                writer.Write(map.signature);
+                writer.Write(map.blocksize);
+                writer.Write(map.compressedSize);
+                writer.Write(map.uncompressedSize_chunkheader);
+
+                foreach (var block in map.blocks)
+                {
+                    writer.Write(block.compressedSize);
+                    writer.Write(block.uncompressedDataSize);
+                }
+
+                foreach (var block in map.blocks)
+                {
+                    writer.Write(block.compressedData);
+                }
+
+                writer.Write(map.sizeX);
+                writer.Write(map.sizeY);
+            }
+
+            writer.Write(guid);
         }
+
 
         public void ReadData(GpkPackage package, GpkExport export)
         {
@@ -126,8 +231,8 @@ namespace GPK_RePack.Model.Payload
                 if (((CompressionTypes)map.compFlag & NothingToDo) == 0)
                 {
                     //header
-                    map.signature = reader.ReadInt32(); //0x9e2a83c1
-                    Debug.Assert((uint)map.signature == 0x9e2a83c1);
+                    map.signature = reader.ReadUInt32(); //0x9e2a83c1
+                    Debug.Assert(map.signature == MipMap.DEFAULT_SIGNATURE);
 
                     map.blocksize = reader.ReadInt32();
 
@@ -135,13 +240,8 @@ namespace GPK_RePack.Model.Payload
                     map.uncompressedSize_chunkheader = reader.ReadInt32();
                     map.uncompressedData = new byte[map.uncompressedSize];
 
-                    List<ChunkBlock> blocks = new List<ChunkBlock>();
                     int blockCount = (map.uncompressedSize + map.blocksize - 1) / map.blocksize;
                     int blockOffset = 0;
-
-                    if (blockCount > 1)
-                        Debug.Print("");
-
 
 
                     for (int j = 0; j < blockCount; ++j)
@@ -150,24 +250,27 @@ namespace GPK_RePack.Model.Payload
                         block.compressedSize = reader.ReadInt32();
                         block.uncompressedDataSize = reader.ReadInt32();
 
-                        blocks.Add(block);
+                        map.blocks.Add(block);
                     }
 
 
-                    foreach (ChunkBlock block in blocks)
+                    foreach (ChunkBlock block in map.blocks)
                     {
                         block.compressedData = reader.ReadBytes(block.compressedSize);
                         block.decompress(map.compFlag);
 
                         Array.ConstrainedCopy(block.uncompressedData, 0, map.uncompressedData, blockOffset, block.uncompressedDataSize);
                         blockOffset += block.uncompressedDataSize;
+
+                        //save memory
+                        block.uncompressedData = null;
                     }
 
-      
+
                 }
                 else
                 {
-                    Debug.Print("");
+                    logger.Trace("{0}, MipMap {0}, data 0", export.ObjectName, i);
                 }
 
                 map.sizeX = reader.ReadInt32();
@@ -177,7 +280,7 @@ namespace GPK_RePack.Model.Payload
                 maps.Add(map);
             }
 
-            endUnk = reader.ReadBytes(16);
+            guid = reader.ReadBytes(16);
         }
 
 
@@ -185,7 +288,22 @@ namespace GPK_RePack.Model.Payload
 
         public int GetSize()
         {
-            throw new NotImplementedException();
+            int tmpSize = 16;
+            tmpSize += Writer.GetStringBytes(tgaPath, inUnicode);
+            tmpSize += 4;
+
+            foreach (var map in maps)
+            {
+                //header
+                tmpSize += 32;
+                tmpSize += map.blocks.Count * 8 + map.compressedSize;
+                //sizex, sizey
+                tmpSize += 8;
+            }
+
+            //guid
+            tmpSize += 16;
+            return tmpSize;
         }
 
 
@@ -249,25 +367,19 @@ namespace GPK_RePack.Model.Payload
             if (maps == null || !maps.Any()) return;
 
             DdsSaveConfig config = configuration as DdsSaveConfig ?? new DdsSaveConfig(FileFormat.Unknown, 0, 0, false, false);
-
             FileFormat format;
 
             MipMap mipMap = maps.Where(mm => mm.uncompressedData != null && mm.uncompressedData.Length > 0).OrderByDescending(mm => mm.sizeX > mm.sizeY ? mm.sizeX : mm.sizeY).FirstOrDefault();
-
             if (mipMap == null) return;
 
             Stream memory = buildDdsImage(maps.IndexOf(mipMap), out format);
-
             if (memory == null) return;
 
             DdsFile ddsImage = new DdsFile(GetObjectStream());
-
             FileStream ddsStream = new FileStream(filename, FileMode.Create);
 
             config.FileFormat = format;
-
             ddsImage.Save(ddsStream, config);
-
             ddsStream.Close();
 
             memory.Close();

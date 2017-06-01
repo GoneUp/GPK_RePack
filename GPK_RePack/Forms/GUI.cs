@@ -167,7 +167,7 @@ namespace GPK_RePack.Forms
             }
             else
             {
-                files = MiscFuncs.GenerateOpenDialog();
+                files = MiscFuncs.GenerateOpenDialog(true);
             }
 
             if (files.Length == 0) return;
@@ -476,24 +476,31 @@ namespace GPK_RePack.Forms
                     selectedExport = exp;
                     selectedPackage = package;
 
-                    //tabs
-                    boxInfo.Text = exp.ToString();
-                    DrawGrid(package, exp);
-                    if (selectedExport.Payload != null && selectedExport.Payload is Texture2D)
-                    {
-                        Texture2D image = (Texture2D)selectedExport.Payload;
-                        DdsFile ddsFile = new DdsFile();
-                        Stream imageStream = image.GetObjectStream();
-                        if (imageStream != null)
-                        {
-                            ddsFile.Load(image.GetObjectStream());
-                            boxImagePreview.Image = BitmapFromSource(ddsFile.BitmapSource);
-                        }
-                    }
+                    refreshExportInfo();
                 }
             }
         }
 
+
+        private void refreshExportInfo()
+        {
+            //tabs
+            boxInfo.Text = selectedExport.ToString();
+            DrawGrid(selectedPackage, selectedExport);
+
+            boxImagePreview.Image = null;
+            if (selectedExport.Payload != null && selectedExport.Payload is Texture2D)
+            {
+                Texture2D image = (Texture2D)selectedExport.Payload;
+                DdsFile ddsFile = new DdsFile();
+                Stream imageStream = image.GetObjectStream();
+                if (imageStream != null)
+                {
+                    ddsFile.Load(image.GetObjectStream());
+                    boxImagePreview.Image = BitmapFromSource(ddsFile.BitmapSource);
+                }
+            }
+        }
 
 
         private System.Drawing.Bitmap BitmapFromSource(BitmapSource bitmapsource)
@@ -601,7 +608,7 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            String[] files = MiscFuncs.GenerateOpenDialog();
+            String[] files = MiscFuncs.GenerateOpenDialog(false);
             if (files.Length == 0) return;
             string path = files[0];
 
@@ -667,6 +674,7 @@ namespace GPK_RePack.Forms
 
                 selectedPackage = null;
                 boxGeneralButtons.Enabled = false;
+                GC.Collect(); //memory cleanup
             }
             else if (selectedPackage != null && selectedExport != null)
             {
@@ -783,9 +791,31 @@ namespace GPK_RePack.Forms
 
 
         #region image
+
+     
+
         private void btnImageImport_Click(object sender, EventArgs e)
         {
+            if (selectedExport == null)
+            {
+                logger.Trace("no selected export");
+                return;
+            }
 
+            if (selectedExport.Payload == null || !(selectedExport.Payload is Texture2D))
+            {
+                logger.Info("Not a Texture2D object");
+                return;
+            }
+
+            string[] files = MiscFuncs.GenerateOpenDialog(false);
+            if (files.Length == 0) return;
+
+            if (files[0] != "" && File.Exists(files[0]))
+            {
+                TextureTools.importTexture(selectedExport, files[0]);
+                refreshExportInfo();
+            }
         }
 
 
@@ -799,17 +829,14 @@ namespace GPK_RePack.Forms
 
             if (selectedExport.Payload == null || !(selectedExport.Payload is Texture2D))
             {
-                logger.Info("Not a texture2d object");
+                logger.Info("Not a Texture2D object");
                 return;
             }
 
             var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".dds");
             if (path != "")
             {
-                Texture2D image = (Texture2D)selectedExport.Payload;
-                DdsFile ddsFile = new DdsFile();
-
-                Task.Run(() => image.SaveObject(path, new DdsSaveConfig(image.GetFormat(), 0, 0, false, false)));
+                TextureTools.exportTexture(selectedExport, path);
             }
 
 
@@ -825,7 +852,7 @@ namespace GPK_RePack.Forms
             {
                 if (selectedExport != null)
                 {
-                    String[] files = MiscFuncs.GenerateOpenDialog();
+                    String[] files = MiscFuncs.GenerateOpenDialog(false);
                     if (files.Length == 0) return;
 
                     if (File.Exists(files[0]))
@@ -1053,6 +1080,8 @@ namespace GPK_RePack.Forms
                     DrawGrid(selectedPackage, selectedExport);
             }
         }
+
+
         private bool PackageSelected()
         {
             if (selectedPackage == null)
@@ -1064,6 +1093,16 @@ namespace GPK_RePack.Forms
             return true;
         }
 
+        private bool ExportSelected()
+        {
+            if (selectedExport == null)
+            {
+                logger.Info("Select a export!");
+                return false;
+            }
+
+            return true;
+        }
 
 
         #endregion
@@ -1404,7 +1443,7 @@ namespace GPK_RePack.Forms
             var arrayProp = checkArrayRow();
             if (arrayProp == null) return;
 
-            String[] files = MiscFuncs.GenerateOpenDialog();
+            String[] files = MiscFuncs.GenerateOpenDialog(false);
             if (files.Length == 0) return;
             string path = files[0];
             if (!File.Exists(path)) return;

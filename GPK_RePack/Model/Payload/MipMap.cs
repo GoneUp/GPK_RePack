@@ -15,7 +15,8 @@ namespace GPK_RePack.Model.Payload
     [Serializable]
     class MipMap
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        public static int DEFAULT_BLOCKSIZE = 131072;
+        public static uint DEFAULT_SIGNATURE = 0x9e2a83c1;
 
         public int sizeX;
         public int sizeY;
@@ -25,24 +26,39 @@ namespace GPK_RePack.Model.Payload
         public int compChunkSize;
         public int compChunkOffset;
 
-        public int signature;
-        public int blocksize;
+        public uint signature = DEFAULT_SIGNATURE;
+        public int blocksize = DEFAULT_BLOCKSIZE;
 
         public int compressedSize;
         public int uncompressedSize_chunkheader;
 
-        public byte[] compressedData;
         public byte[] uncompressedData;
 
+        public List<ChunkBlock> blocks = new List<ChunkBlock>();
 
-
-      
-
-        public void compress()
+        public void generateBlocks()
         {
+            int blockCount = (uncompressedSize + blocksize - 1) / blocksize;
 
+            compressedSize = 0;
+            for (int i = 0; i < blockCount; i++)
+            {
+                int blockOffset = i * blocksize;
+                int blockEnd = blockOffset + blocksize;
+                if (blockEnd > uncompressedSize)
+                    blockEnd = uncompressedSize;
+
+                var block = new ChunkBlock();
+                block.uncompressedDataSize = blockEnd - blockOffset;
+                block.uncompressedData = new byte[block.uncompressedDataSize];
+                Array.ConstrainedCopy(uncompressedData, blockOffset, block.uncompressedData, 0, block.uncompressedData.Length);
+
+                block.compress(compFlag);
+
+                compressedSize += block.compressedSize;
+                blocks.Add(block);
+            }
         }
-
 
 
         public override string ToString()
@@ -52,6 +68,8 @@ namespace GPK_RePack.Model.Payload
             info.AppendLine("Compression: " + compFlag);
             info.AppendLine("Compressed Size: " + compressedSize);
             info.AppendLine("Uncompressed Size: " + uncompressedSize);
+            info.AppendLine("Blocks: " + blocks.Count);
+            blocks.ForEach(b => info.AppendFormat("Block: Uncompressed Size: {0}, Compressed Size: {1} {2}", b.uncompressedDataSize, b.compressedSize, Environment.NewLine));
             return info.ToString();
         }
     }
