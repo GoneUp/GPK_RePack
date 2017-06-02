@@ -45,6 +45,7 @@
             this.boxPatchmode = new System.Windows.Forms.CheckBox();
             this.boxUseUID = new System.Windows.Forms.CheckBox();
             this.boxJitData = new System.Windows.Forms.CheckBox();
+            this.boxGenerateMipmaps = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -157,7 +158,7 @@
             this.groupBox3.Controls.Add(this.btnViewClass);
             this.groupBox3.Location = new System.Drawing.Point(309, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(152, 67);
+            this.groupBox3.Size = new System.Drawing.Size(169, 67);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "View Mode";
@@ -240,11 +241,23 @@
             this.boxJitData.UseVisualStyleBackColor = true;
             this.boxJitData.CheckedChanged += new System.EventHandler(this.boxJitData_CheckedChanged);
             // 
+            // boxGenerateMipmaps
+            // 
+            this.boxGenerateMipmaps.AutoSize = true;
+            this.boxGenerateMipmaps.Location = new System.Drawing.Point(396, 109);
+            this.boxGenerateMipmaps.Name = "boxGenerateMipmaps";
+            this.boxGenerateMipmaps.Size = new System.Drawing.Size(73, 30);
+            this.boxGenerateMipmaps.TabIndex = 12;
+            this.boxGenerateMipmaps.Text = "Generate \r\nMipMaps";
+            this.boxGenerateMipmaps.UseVisualStyleBackColor = true;
+            this.boxGenerateMipmaps.CheckedChanged += new System.EventHandler(this.boxGenerateMipmaps_CheckedChanged);
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(464, 134);
+            this.ClientSize = new System.Drawing.Size(476, 142);
+            this.Controls.Add(this.boxGenerateMipmaps);
             this.Controls.Add(this.boxJitData);
             this.Controls.Add(this.boxUseUID);
             this.Controls.Add(this.boxPatchmode);
@@ -289,5 +302,6 @@
         private System.Windows.Forms.CheckBox boxPatchmode;
         private System.Windows.Forms.CheckBox boxUseUID;
         private System.Windows.Forms.CheckBox boxJitData;
+        private System.Windows.Forms.CheckBox boxGenerateMipmaps;
     }
 }

@@ -142,5 +142,17 @@ namespace GPK_RePack.Properties {
                 this["JitData"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool GenerateMipMaps {
+            get {
+                return ((bool)(this["GenerateMipMaps"]));
+            }
+            set {
+                this["GenerateMipMaps"] = value;
+            }
+        }
     }
 }

@@ -27,8 +27,9 @@ namespace GPK_RePack.Editors
             var config = new DdsSaveConfig(texture2d.GetFormat(), 0, 0, false, false);
             image.Load(file);
 
-            if (image.MipMaps.Count <= 1)
+            if (image.MipMaps.Count == 0 || Settings.Default.GenerateMipMaps)
                 image.GenerateMipMaps();
+         
 
             texture2d.maps = new List<MipMap>();
             foreach (DdsMipMap mipMap in image.MipMaps.OrderByDescending(mip => mip.Width))

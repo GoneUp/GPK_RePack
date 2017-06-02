@@ -63,6 +63,7 @@ namespace GPK_RePack.Forms
             boxPatchmode.Checked = Settings.Default.PatchMode;
             boxUseUID.Checked = Settings.Default.UseUID;
             boxJitData.Checked = Settings.Default.JitData;
+            boxGenerateMipmaps.Checked = Settings.Default.GenerateMipMaps;
         }
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
@@ -139,5 +140,9 @@ namespace GPK_RePack.Forms
             Settings.Default.JitData = boxJitData.Checked;
         }
 
+        private void boxGenerateMipmaps_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.GenerateMipMaps = boxJitData.Checked;
+        }
     }
 }
