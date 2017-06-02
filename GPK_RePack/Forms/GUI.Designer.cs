@@ -90,6 +90,9 @@ namespace GPK_RePack.Forms
             this.lblFiller = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.searchForObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -222,7 +225,10 @@ namespace GPK_RePack.Forms
             this.setAllPropertysToolStripMenuItem,
             this.tESTBigBytePropExportToolStripMenuItem,
             this.bigBytePropImportToolStripMenuItem,
-            this.addNameToolStripMenuItem});
+            this.addNameToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.searchForObjectToolStripMenuItem,
+            this.nextToolStripMenuItem});
             this.miscToolStripMenuItem.Name = "miscToolStripMenuItem";
             this.miscToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.miscToolStripMenuItem.Text = "Misc";
@@ -678,6 +684,25 @@ namespace GPK_RePack.Forms
             this.ProgressBar.Name = "ProgressBar";
             this.ProgressBar.Size = new System.Drawing.Size(100, 16);
             // 
+            // searchForObjectToolStripMenuItem
+            // 
+            this.searchForObjectToolStripMenuItem.Name = "searchForObjectToolStripMenuItem";
+            this.searchForObjectToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.searchForObjectToolStripMenuItem.Text = "Search for object (CTRL-F)";
+            this.searchForObjectToolStripMenuItem.Click += new System.EventHandler(this.searchForObjectToolStripMenuItem_Click);
+            // 
+            // nextToolStripMenuItem
+            // 
+            this.nextToolStripMenuItem.Name = "nextToolStripMenuItem";
+            this.nextToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.nextToolStripMenuItem.Text = "Next result (F3)";
+            this.nextToolStripMenuItem.Click += new System.EventHandler(this.nextToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(210, 6);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -780,6 +805,9 @@ namespace GPK_RePack.Forms
         private PictureBox boxImagePreview;
         private Button btnImageExport;
         private Button btnImageImport;
+        private ToolStripMenuItem searchForObjectToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator4;
+        private ToolStripMenuItem nextToolStripMenuItem;
     }
 }
 

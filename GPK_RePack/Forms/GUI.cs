@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -52,6 +53,9 @@ namespace GPK_RePack.Forms
 
         private VorbisWaveReader waveReader;
         private WaveOut waveOut;
+
+        private List<TreeNode> searchResultNodes = new List<TreeNode>();
+        private int searchResultIndex = 0;
 
         #endregion
 
@@ -783,6 +787,16 @@ namespace GPK_RePack.Forms
             {
                 btnPaste_Click(btnPaste, new EventArgs());
             }
+
+            if (e.Control && e.KeyCode == Keys.F)
+            {
+                searchForObjectToolStripMenuItem_Click(null, null);
+            }
+
+            if (e.KeyCode == Keys.F3)
+            {
+                nextToolStripMenuItem_Click(null, null);
+            }
         }
 
 
@@ -792,7 +806,7 @@ namespace GPK_RePack.Forms
 
         #region image
 
-     
+
 
         private void btnImageImport_Click(object sender, EventArgs e)
         {
@@ -1105,7 +1119,62 @@ namespace GPK_RePack.Forms
         }
 
 
-        #endregion
+
+        #region search
+        private void searchForObjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string input = Microsoft.VisualBasic.Interaction.InputBox("String to search?", "Search");
+
+            if (input == "")
+                return;
+
+            searchResultNodes.Clear();
+            searchResultIndex = 0;
+
+            foreach (TreeNode node in Collect(treeMain.Nodes))
+            {
+                if (node.Text.ToLowerInvariant().Contains(input.ToLowerInvariant().Trim()))
+                {
+                    searchResultNodes.Add(node);
+                }
+            }
+
+            selectSearchResult();
+        }
+
+        IEnumerable<TreeNode> Collect(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                yield return node;
+
+                foreach (var child in Collect(node.Nodes))
+                    yield return child;
+            }
+        }
+
+        private void nextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            searchResultIndex++;
+            if (searchResultNodes.Count == 0 || searchResultNodes.Count <= searchResultIndex)
+            {
+                SystemSounds.Asterisk.Play();
+                return;
+
+            }
+
+
+            selectSearchResult();
+        }
+
+        private void selectSearchResult()
+        {
+            treeMain.SelectedNode = searchResultNodes[searchResultIndex];
+            treeMain_AfterSelect(this, new TreeViewEventArgs(searchResultNodes[searchResultIndex]));
+        }
+
+        #endregion //search
+        #endregion //misc
 
         #region propgrid
 
@@ -1479,6 +1548,8 @@ namespace GPK_RePack.Forms
 
             return (GpkArrayProperty)row.Tag;
         }
+
+
 
 
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GPK_RePack.Model;
 using GPK_RePack.Model.Payload;
+using GPK_RePack.Properties;
 using UpkManager.Dds;
 
 namespace GPK_RePack.Editors
