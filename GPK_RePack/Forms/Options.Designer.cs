@@ -256,7 +256,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(476, 142);
+            this.ClientSize = new System.Drawing.Size(476, 140);
             this.Controls.Add(this.boxGenerateMipmaps);
             this.Controls.Add(this.boxJitData);
             this.Controls.Add(this.boxUseUID);

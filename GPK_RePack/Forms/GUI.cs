@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -56,6 +57,7 @@ namespace GPK_RePack.Forms
 
         private List<TreeNode> searchResultNodes = new List<TreeNode>();
         private int searchResultIndex = 0;
+        private TabPage texturePage;
 
         #endregion
 
@@ -88,11 +90,16 @@ namespace GPK_RePack.Forms
                 waveOut = new WaveOut();
                 waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
 
+                //other stuff
                 if (Settings.Default.SaveDir == "")
                     Settings.Default.SaveDir = Directory.GetCurrentDirectory();
 
                 if (Settings.Default.OpenDir == "")
                     Settings.Default.OpenDir = Directory.GetCurrentDirectory();
+
+
+                texturePage = tabTexturePreview;
+                hidePreviewTab();
             }
             catch (Exception ex)
             {
@@ -250,7 +257,7 @@ namespace GPK_RePack.Forms
                         }
                         catch (Exception ex)
                         {
-                            logger.FatalException("Save failure! " + ex, ex);
+                            logger.Fatal(ex, "Save failure! ");
                         }
                     }
                 }
@@ -495,6 +502,8 @@ namespace GPK_RePack.Forms
             boxImagePreview.Image = null;
             if (selectedExport.Payload != null && selectedExport.Payload is Texture2D)
             {
+                showPreviewTab();
+
                 Texture2D image = (Texture2D)selectedExport.Payload;
                 DdsFile ddsFile = new DdsFile();
                 Stream imageStream = image.GetObjectStream();
@@ -502,20 +511,33 @@ namespace GPK_RePack.Forms
                 {
                     ddsFile.Load(image.GetObjectStream());
                     boxImagePreview.Image = BitmapFromSource(ddsFile.BitmapSource);
+
+                    if (ddsFile.Height > boxImagePreview.Height || ddsFile.Width > boxImagePreview.Width)
+                    {
+                        //shrink the file if ´the size is to big
+                        boxImagePreview.SizeMode = PictureBoxSizeMode.StretchImage;
+                    }
+                    else
+                    {
+                        boxImagePreview.SizeMode = PictureBoxSizeMode.Normal;
+                    }
                 }
+            }
+            else
+            {
+                hidePreviewTab();
             }
         }
 
-
-        private System.Drawing.Bitmap BitmapFromSource(BitmapSource bitmapsource)
+        private Bitmap BitmapFromSource(BitmapSource bitmapsource)
         {
-            System.Drawing.Bitmap bitmap;
+            Bitmap bitmap;
             using (MemoryStream outStream = new MemoryStream())
             {
                 BitmapEncoder enc = new BmpBitmapEncoder();
                 enc.Frames.Add(BitmapFrame.Create(bitmapsource));
                 enc.Save(outStream);
-                bitmap = new System.Drawing.Bitmap(outStream);
+                bitmap = new Bitmap(outStream);
             }
             return bitmap;
         }
@@ -1119,6 +1141,19 @@ namespace GPK_RePack.Forms
         }
 
 
+
+        private void showPreviewTab()
+        {
+            if (!tabControl.TabPages.Contains(tabTexturePreview))
+                tabControl.TabPages.Add(tabTexturePreview);
+        }
+
+
+        private void hidePreviewTab()
+        {
+            if (tabControl.TabPages.Contains(tabTexturePreview))
+                tabControl.TabPages.Remove(tabTexturePreview);
+        }
 
         #region search
         private void searchForObjectToolStripMenuItem_Click(object sender, EventArgs e)

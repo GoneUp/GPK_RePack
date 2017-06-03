@@ -52,10 +52,13 @@ namespace GPK_RePack.Forms
             this.tESTBigBytePropExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bigBytePropImportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.searchForObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.tabInfo = new System.Windows.Forms.TabPage();
             this.boxInfo = new System.Windows.Forms.TextBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabPropertys = new System.Windows.Forms.TabPage();
             this.gridProps = new System.Windows.Forms.DataGridView();
             this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.type = new System.Windows.Forms.DataGridViewComboBoxColumn();
@@ -63,7 +66,7 @@ namespace GPK_RePack.Forms
             this.aIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.iType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabTexturePreview = new System.Windows.Forms.TabPage();
             this.boxImagePreview = new System.Windows.Forms.PictureBox();
             this.boxCommands = new System.Windows.Forms.Panel();
             this.boxPropertyButtons = new System.Windows.Forms.GroupBox();
@@ -85,30 +88,32 @@ namespace GPK_RePack.Forms
             this.btnReplace = new System.Windows.Forms.Button();
             this.btnExport = new System.Windows.Forms.Button();
             this.boxLog = new System.Windows.Forms.TextBox();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.splitContainerTreeInfo = new System.Windows.Forms.SplitContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblFiller = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.searchForObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
             this.menuStrip1.SuspendLayout();
-            this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
+            this.tabControl.SuspendLayout();
+            this.tabInfo.SuspendLayout();
+            this.tabPropertys.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridProps)).BeginInit();
-            this.tabPage3.SuspendLayout();
+            this.tabTexturePreview.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.boxImagePreview)).BeginInit();
             this.boxCommands.SuspendLayout();
             this.boxPropertyButtons.SuspendLayout();
             this.boxGeneralButtons.SuspendLayout();
             this.boxDataButtons.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerTreeInfo)).BeginInit();
+            this.splitContainerTreeInfo.Panel1.SuspendLayout();
+            this.splitContainerTreeInfo.Panel2.SuspendLayout();
+            this.splitContainerTreeInfo.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerLog_InfoTree)).BeginInit();
+            this.splitContainerLog_InfoTree.Panel1.SuspendLayout();
+            this.splitContainerLog_InfoTree.Panel2.SuspendLayout();
+            this.splitContainerLog_InfoTree.SuspendLayout();
             this.SuspendLayout();
             // 
             // treeMain
@@ -119,7 +124,7 @@ namespace GPK_RePack.Forms
             this.treeMain.HideSelection = false;
             this.treeMain.Location = new System.Drawing.Point(0, 0);
             this.treeMain.Name = "treeMain";
-            this.treeMain.Size = new System.Drawing.Size(306, 485);
+            this.treeMain.Size = new System.Drawing.Size(322, 634);
             this.treeMain.TabIndex = 1;
             this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
             this.treeMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeMain_DragDrop);
@@ -133,7 +138,7 @@ namespace GPK_RePack.Forms
             this.miscToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1103, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1163, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -236,7 +241,7 @@ namespace GPK_RePack.Forms
             // setFilesizeToolStripMenuItem
             // 
             this.setFilesizeToolStripMenuItem.Name = "setFilesizeToolStripMenuItem";
-            this.setFilesizeToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.setFilesizeToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.setFilesizeToolStripMenuItem.Text = "Set Filesize";
             this.setFilesizeToolStripMenuItem.Click += new System.EventHandler(this.setFilesizeToolStripMenuItem_Click);
             // 
@@ -246,7 +251,7 @@ namespace GPK_RePack.Forms
             this.setAllVolumeMultipliersToolStripMenuItem,
             this.customToolStripMenuItem});
             this.setAllPropertysToolStripMenuItem.Name = "setAllPropertysToolStripMenuItem";
-            this.setAllPropertysToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.setAllPropertysToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.setAllPropertysToolStripMenuItem.Text = "Set all Propertys";
             // 
             // setAllVolumeMultipliersToolStripMenuItem
@@ -266,46 +271,65 @@ namespace GPK_RePack.Forms
             // tESTBigBytePropExportToolStripMenuItem
             // 
             this.tESTBigBytePropExportToolStripMenuItem.Name = "tESTBigBytePropExportToolStripMenuItem";
-            this.tESTBigBytePropExportToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.tESTBigBytePropExportToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.tESTBigBytePropExportToolStripMenuItem.Text = "Big ByteProp Export";
             this.tESTBigBytePropExportToolStripMenuItem.Click += new System.EventHandler(this.BigBytePropExport_Click);
             // 
             // bigBytePropImportToolStripMenuItem
             // 
             this.bigBytePropImportToolStripMenuItem.Name = "bigBytePropImportToolStripMenuItem";
-            this.bigBytePropImportToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.bigBytePropImportToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.bigBytePropImportToolStripMenuItem.Text = "Big ByteProp Import";
             this.bigBytePropImportToolStripMenuItem.Click += new System.EventHandler(this.BigBytePropImport_Click);
             // 
             // addNameToolStripMenuItem
             // 
             this.addNameToolStripMenuItem.Name = "addNameToolStripMenuItem";
-            this.addNameToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.addNameToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.addNameToolStripMenuItem.Text = "Add Name";
             this.addNameToolStripMenuItem.Click += new System.EventHandler(this.addNameToolStripMenuItem_Click);
             // 
-            // tabControl1
+            // toolStripSeparator4
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(793, 394);
-            this.tabControl1.TabIndex = 3;
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(210, 6);
             // 
-            // tabPage1
+            // searchForObjectToolStripMenuItem
             // 
-            this.tabPage1.Controls.Add(this.boxInfo);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(785, 368);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Info";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.searchForObjectToolStripMenuItem.Name = "searchForObjectToolStripMenuItem";
+            this.searchForObjectToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.searchForObjectToolStripMenuItem.Text = "Search for object (CTRL-F)";
+            this.searchForObjectToolStripMenuItem.Click += new System.EventHandler(this.searchForObjectToolStripMenuItem_Click);
+            // 
+            // nextToolStripMenuItem
+            // 
+            this.nextToolStripMenuItem.Name = "nextToolStripMenuItem";
+            this.nextToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.nextToolStripMenuItem.Text = "Next result (F3)";
+            this.nextToolStripMenuItem.Click += new System.EventHandler(this.nextToolStripMenuItem_Click);
+            // 
+            // tabControl
+            // 
+            this.tabControl.Controls.Add(this.tabInfo);
+            this.tabControl.Controls.Add(this.tabPropertys);
+            this.tabControl.Controls.Add(this.tabTexturePreview);
+            this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl.Location = new System.Drawing.Point(0, 0);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(837, 543);
+            this.tabControl.TabIndex = 3;
+            // 
+            // tabInfo
+            // 
+            this.tabInfo.Controls.Add(this.boxInfo);
+            this.tabInfo.Location = new System.Drawing.Point(4, 22);
+            this.tabInfo.Name = "tabInfo";
+            this.tabInfo.Padding = new System.Windows.Forms.Padding(3);
+            this.tabInfo.Size = new System.Drawing.Size(829, 517);
+            this.tabInfo.TabIndex = 0;
+            this.tabInfo.Text = "Info";
+            this.tabInfo.UseVisualStyleBackColor = true;
             // 
             // boxInfo
             // 
@@ -315,20 +339,20 @@ namespace GPK_RePack.Forms
             this.boxInfo.Name = "boxInfo";
             this.boxInfo.ReadOnly = true;
             this.boxInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.boxInfo.Size = new System.Drawing.Size(779, 362);
+            this.boxInfo.Size = new System.Drawing.Size(823, 511);
             this.boxInfo.TabIndex = 5;
             this.boxInfo.Text = resources.GetString("boxInfo.Text");
             // 
-            // tabPage2
+            // tabPropertys
             // 
-            this.tabPage2.Controls.Add(this.gridProps);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(785, 368);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Property Details";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tabPropertys.Controls.Add(this.gridProps);
+            this.tabPropertys.Location = new System.Drawing.Point(4, 22);
+            this.tabPropertys.Name = "tabPropertys";
+            this.tabPropertys.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPropertys.Size = new System.Drawing.Size(829, 517);
+            this.tabPropertys.TabIndex = 1;
+            this.tabPropertys.Text = "Property Details";
+            this.tabPropertys.UseVisualStyleBackColor = true;
             // 
             // gridProps
             // 
@@ -347,7 +371,7 @@ namespace GPK_RePack.Forms
             this.gridProps.Location = new System.Drawing.Point(3, 3);
             this.gridProps.MultiSelect = false;
             this.gridProps.Name = "gridProps";
-            this.gridProps.Size = new System.Drawing.Size(779, 362);
+            this.gridProps.Size = new System.Drawing.Size(823, 511);
             this.gridProps.TabIndex = 0;
             this.gridProps.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.gridProps_DefaultValuesNeeded);
             // 
@@ -392,24 +416,23 @@ namespace GPK_RePack.Forms
             this.value.HeaderText = "Value";
             this.value.Name = "value";
             // 
-            // tabPage3
+            // tabTexturePreview
             // 
-            this.tabPage3.Controls.Add(this.boxImagePreview);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(785, 368);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Texture Preview";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabTexturePreview.Controls.Add(this.boxImagePreview);
+            this.tabTexturePreview.Location = new System.Drawing.Point(4, 22);
+            this.tabTexturePreview.Name = "tabTexturePreview";
+            this.tabTexturePreview.Padding = new System.Windows.Forms.Padding(3);
+            this.tabTexturePreview.Size = new System.Drawing.Size(829, 517);
+            this.tabTexturePreview.TabIndex = 2;
+            this.tabTexturePreview.Text = "Texture Preview";
+            this.tabTexturePreview.UseVisualStyleBackColor = true;
             // 
             // boxImagePreview
             // 
             this.boxImagePreview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.boxImagePreview.Location = new System.Drawing.Point(3, 3);
             this.boxImagePreview.Name = "boxImagePreview";
-            this.boxImagePreview.Size = new System.Drawing.Size(779, 362);
-            this.boxImagePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.boxImagePreview.Size = new System.Drawing.Size(823, 511);
             this.boxImagePreview.TabIndex = 0;
             this.boxImagePreview.TabStop = false;
             // 
@@ -419,9 +442,9 @@ namespace GPK_RePack.Forms
             this.boxCommands.Controls.Add(this.boxGeneralButtons);
             this.boxCommands.Controls.Add(this.boxDataButtons);
             this.boxCommands.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.boxCommands.Location = new System.Drawing.Point(0, 394);
+            this.boxCommands.Location = new System.Drawing.Point(0, 543);
             this.boxCommands.Name = "boxCommands";
-            this.boxCommands.Size = new System.Drawing.Size(793, 91);
+            this.boxCommands.Size = new System.Drawing.Size(837, 91);
             this.boxCommands.TabIndex = 6;
             // 
             // boxPropertyButtons
@@ -432,7 +455,7 @@ namespace GPK_RePack.Forms
             this.boxPropertyButtons.Enabled = false;
             this.boxPropertyButtons.Location = new System.Drawing.Point(199, 0);
             this.boxPropertyButtons.Name = "boxPropertyButtons";
-            this.boxPropertyButtons.Size = new System.Drawing.Size(146, 91);
+            this.boxPropertyButtons.Size = new System.Drawing.Size(190, 91);
             this.boxPropertyButtons.TabIndex = 6;
             this.boxPropertyButtons.TabStop = false;
             this.boxPropertyButtons.Text = "Property Commands";
@@ -526,7 +549,7 @@ namespace GPK_RePack.Forms
             this.boxDataButtons.Controls.Add(this.btnExport);
             this.boxDataButtons.Dock = System.Windows.Forms.DockStyle.Right;
             this.boxDataButtons.Enabled = false;
-            this.boxDataButtons.Location = new System.Drawing.Point(345, 0);
+            this.boxDataButtons.Location = new System.Drawing.Point(389, 0);
             this.boxDataButtons.Name = "boxDataButtons";
             this.boxDataButtons.Size = new System.Drawing.Size(448, 91);
             this.boxDataButtons.TabIndex = 4;
@@ -625,33 +648,33 @@ namespace GPK_RePack.Forms
             // 
             // boxLog
             // 
-            this.boxLog.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.boxLog.Location = new System.Drawing.Point(0, 509);
+            this.boxLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.boxLog.Location = new System.Drawing.Point(0, 0);
             this.boxLog.Multiline = true;
             this.boxLog.Name = "boxLog";
             this.boxLog.ReadOnly = true;
             this.boxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.boxLog.Size = new System.Drawing.Size(1103, 145);
+            this.boxLog.Size = new System.Drawing.Size(1163, 150);
             this.boxLog.TabIndex = 5;
             this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
             // 
-            // splitContainer1
+            // splitContainerTreeInfo
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 24);
-            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainerTreeInfo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainerTreeInfo.Location = new System.Drawing.Point(0, 0);
+            this.splitContainerTreeInfo.Name = "splitContainerTreeInfo";
             // 
-            // splitContainer1.Panel1
+            // splitContainerTreeInfo.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.treeMain);
+            this.splitContainerTreeInfo.Panel1.Controls.Add(this.treeMain);
             // 
-            // splitContainer1.Panel2
+            // splitContainerTreeInfo.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
-            this.splitContainer1.Panel2.Controls.Add(this.boxCommands);
-            this.splitContainer1.Size = new System.Drawing.Size(1103, 485);
-            this.splitContainer1.SplitterDistance = 306;
-            this.splitContainer1.TabIndex = 7;
+            this.splitContainerTreeInfo.Panel2.Controls.Add(this.tabControl);
+            this.splitContainerTreeInfo.Panel2.Controls.Add(this.boxCommands);
+            this.splitContainerTreeInfo.Size = new System.Drawing.Size(1163, 634);
+            this.splitContainerTreeInfo.SplitterDistance = 322;
+            this.splitContainerTreeInfo.TabIndex = 7;
             // 
             // statusStrip1
             // 
@@ -659,10 +682,10 @@ namespace GPK_RePack.Forms
             this.lblFiller,
             this.lblStatus,
             this.ProgressBar});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 654);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 790);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.statusStrip1.Size = new System.Drawing.Size(1103, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1163, 22);
             this.statusStrip1.SizingGrip = false;
             this.statusStrip1.Stretch = false;
             this.statusStrip1.TabIndex = 8;
@@ -671,7 +694,7 @@ namespace GPK_RePack.Forms
             // lblFiller
             // 
             this.lblFiller.Name = "lblFiller";
-            this.lblFiller.Size = new System.Drawing.Size(986, 17);
+            this.lblFiller.Size = new System.Drawing.Size(1046, 17);
             this.lblFiller.Spring = true;
             // 
             // lblStatus
@@ -684,34 +707,33 @@ namespace GPK_RePack.Forms
             this.ProgressBar.Name = "ProgressBar";
             this.ProgressBar.Size = new System.Drawing.Size(100, 16);
             // 
-            // searchForObjectToolStripMenuItem
+            // splitContainerLog_InfoTree
             // 
-            this.searchForObjectToolStripMenuItem.Name = "searchForObjectToolStripMenuItem";
-            this.searchForObjectToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
-            this.searchForObjectToolStripMenuItem.Text = "Search for object (CTRL-F)";
-            this.searchForObjectToolStripMenuItem.Click += new System.EventHandler(this.searchForObjectToolStripMenuItem_Click);
+            this.splitContainerLog_InfoTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainerLog_InfoTree.Location = new System.Drawing.Point(0, 24);
+            this.splitContainerLog_InfoTree.Name = "splitContainerLog_InfoTree";
+            this.splitContainerLog_InfoTree.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
-            // nextToolStripMenuItem
+            // splitContainerLog_InfoTree.Panel1
             // 
-            this.nextToolStripMenuItem.Name = "nextToolStripMenuItem";
-            this.nextToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
-            this.nextToolStripMenuItem.Text = "Next result (F3)";
-            this.nextToolStripMenuItem.Click += new System.EventHandler(this.nextToolStripMenuItem_Click);
+            this.splitContainerLog_InfoTree.Panel1.Controls.Add(this.splitContainerTreeInfo);
             // 
-            // toolStripSeparator4
+            // splitContainerLog_InfoTree.Panel2
             // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(210, 6);
+            this.splitContainerLog_InfoTree.Panel2.Controls.Add(this.boxLog);
+            this.splitContainerLog_InfoTree.Size = new System.Drawing.Size(1163, 788);
+            this.splitContainerLog_InfoTree.SplitterDistance = 634;
+            this.splitContainerLog_InfoTree.TabIndex = 9;
             // 
             // GUI
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1103, 676);
-            this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.boxLog);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ClientSize = new System.Drawing.Size(1163, 812);
             this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.splitContainerLog_InfoTree);
+            this.Controls.Add(this.menuStrip1);
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GUI";
@@ -721,24 +743,28 @@ namespace GPK_RePack.Forms
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeMain_DragDrop);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
+            this.tabControl.ResumeLayout(false);
+            this.tabInfo.ResumeLayout(false);
+            this.tabInfo.PerformLayout();
+            this.tabPropertys.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridProps)).EndInit();
-            this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
+            this.tabTexturePreview.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.boxImagePreview)).EndInit();
             this.boxCommands.ResumeLayout(false);
             this.boxPropertyButtons.ResumeLayout(false);
             this.boxGeneralButtons.ResumeLayout(false);
             this.boxDataButtons.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
+            this.splitContainerTreeInfo.Panel1.ResumeLayout(false);
+            this.splitContainerTreeInfo.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerTreeInfo)).EndInit();
+            this.splitContainerTreeInfo.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.splitContainerLog_InfoTree.Panel1.ResumeLayout(false);
+            this.splitContainerLog_InfoTree.Panel2.ResumeLayout(false);
+            this.splitContainerLog_InfoTree.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerLog_InfoTree)).EndInit();
+            this.splitContainerLog_InfoTree.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -752,8 +778,8 @@ namespace GPK_RePack.Forms
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabControl tabControl;
+        private System.Windows.Forms.TabPage tabInfo;
         private System.Windows.Forms.GroupBox boxDataButtons;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.TextBox boxLog;
@@ -778,9 +804,9 @@ namespace GPK_RePack.Forms
         private System.Windows.Forms.Button btnFakeOGG;
         private System.Windows.Forms.ToolStripMenuItem miscToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setFilesizeToolStripMenuItem;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPropertys;
         private System.Windows.Forms.DataGridView gridProps;
-        private SplitContainer splitContainer1;
+        private SplitContainer splitContainerTreeInfo;
         private GroupBox boxPropertyButtons;
         private Button btnPropClear;
         private Button btnPropSave;
@@ -801,13 +827,14 @@ namespace GPK_RePack.Forms
         private ToolStripStatusLabel lblFiller;
         private ToolStripMenuItem bigBytePropImportToolStripMenuItem;
         private ToolStripMenuItem addNameToolStripMenuItem;
-        private TabPage tabPage3;
+        private TabPage tabTexturePreview;
         private PictureBox boxImagePreview;
         private Button btnImageExport;
         private Button btnImageImport;
         private ToolStripMenuItem searchForObjectToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator4;
         private ToolStripMenuItem nextToolStripMenuItem;
+        private SplitContainer splitContainerLog_InfoTree;
     }
 }
 
