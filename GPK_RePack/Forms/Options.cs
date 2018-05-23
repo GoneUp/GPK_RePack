@@ -64,6 +64,7 @@ namespace GPK_RePack.Forms
             boxUseUID.Checked = Settings.Default.UseUID;
             boxJitData.Checked = Settings.Default.JitData;
             boxGenerateMipmaps.Checked = Settings.Default.GenerateMipMaps;
+            boxScaleFactor.Text = Settings.Default.ScaleFactorHack.ToString();
         }
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
@@ -104,7 +105,7 @@ namespace GPK_RePack.Forms
             Settings.Default.LogLevel = "trace";
         }
 
-      
+
         private void btnViewNormal_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.ViewMode = "normal";
@@ -113,8 +114,8 @@ namespace GPK_RePack.Forms
         private void btnViewClass_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.ViewMode = "class";
-        } 
-        
+        }
+
         private void boxDebug_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.Debug = boxDebug.Checked;
@@ -143,6 +144,15 @@ namespace GPK_RePack.Forms
         private void boxGenerateMipmaps_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.GenerateMipMaps = boxJitData.Checked;
+        }
+
+        private void boxScaleFactor_TextChanged(object sender, EventArgs e)
+        {
+            float result = 1;
+            if (float.TryParse(boxScaleFactor.Text, out result))
+            {
+                Settings.Default.ScaleFactorHack = result;
+            }
         }
     }
 }

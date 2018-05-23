@@ -38,6 +38,7 @@ namespace GPK_RePack.Model.Payload
 
         public void generateBlocks()
         {
+            blocks.Clear();
             int blockCount = (uncompressedSize + blocksize - 1) / blocksize;
 
             compressedSize = 0;

@@ -62,7 +62,7 @@ namespace GPK_RePack.IO
             }
             catch (Exception ex)
             {
-                logger.FatalException("Parse failure! " + ex, ex);
+                logger.Fatal(ex, "Parse failure! ");
             }
 
             return null;
@@ -381,7 +381,7 @@ namespace GPK_RePack.IO
                     export.Payload = new SoundCue();
                     break;
                 case "Core.Texture2D":
-                    export.Payload = new Texture2D();
+                    //export.Payload = new Texture2D();
                     break;
             }
 

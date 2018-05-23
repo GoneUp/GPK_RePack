@@ -58,10 +58,27 @@ namespace GPK_RePack.Forms
         private List<TreeNode> searchResultNodes = new List<TreeNode>();
         private int searchResultIndex = 0;
         private TabPage texturePage;
-
         #endregion
 
         #region Main
+
+        protected override void OnLoad(EventArgs e)
+        {
+
+
+            base.OnLoad(e);
+        }
+
+        private void scaleFont()
+        {
+            float scaleFactor = 1;
+            if (Settings.Default != null)
+                scaleFactor = Settings.Default.ScaleFactorHack;
+
+            Font = new Font(Font.Name, 8.25f * scaleFactor, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
+            statusStrip.Font = Font;
+            menuStrip.Font = Font;
+        }
 
         private void GUI_Load(object sender, EventArgs e)
         {
@@ -192,7 +209,9 @@ namespace GPK_RePack.Forms
             {
                 if (File.Exists(path))
                 {
-                    Task newTask = new Task(delegate ()
+
+
+                    Task newTask = new Task(() =>
                     {
                         Reader reader = new Reader();
                         runningReaders.Add(reader);
@@ -251,7 +270,7 @@ namespace GPK_RePack.Forms
                             GpkPackage package = loadedGpkPackages[i];
                             string savepath = package.Path + "_patched";
                             tmpS.SaveReplacedExport(package, savepath, list);
-                            logger.Info(String.Format("Saved the changed data of package '{0} to {1}'!",
+                            logger.Info(string.Format("Saved the changed data of package '{0} to {1}'!",
                                 package.Filename, savepath));
                             save = true;
                         }
@@ -278,6 +297,8 @@ namespace GPK_RePack.Forms
             List<IProgress> runningSavers = new List<IProgress>();
             List<Task> runningTasks = new List<Task>();
 
+            if (loadedGpkPackages.Count == 0)
+                return;
 
             foreach (GpkPackage package in loadedGpkPackages)
             {
@@ -295,7 +316,7 @@ namespace GPK_RePack.Forms
                 }
                 catch (Exception ex)
                 {
-                    logger.FatalException("Save failure! " + ex, ex);
+                    logger.Fatal(ex, "Save failure!");
                 }
 
             }
@@ -503,25 +524,7 @@ namespace GPK_RePack.Forms
             if (selectedExport.Payload != null && selectedExport.Payload is Texture2D)
             {
                 showPreviewTab();
-
-                Texture2D image = (Texture2D)selectedExport.Payload;
-                DdsFile ddsFile = new DdsFile();
-                Stream imageStream = image.GetObjectStream();
-                if (imageStream != null)
-                {
-                    ddsFile.Load(image.GetObjectStream());
-                    boxImagePreview.Image = BitmapFromSource(ddsFile.BitmapSource);
-
-                    if (ddsFile.Height > boxImagePreview.Height || ddsFile.Width > boxImagePreview.Width)
-                    {
-                        //shrink the file if ´the size is to big
-                        boxImagePreview.SizeMode = PictureBoxSizeMode.StretchImage;
-                    }
-                    else
-                    {
-                        boxImagePreview.SizeMode = PictureBoxSizeMode.Normal;
-                    }
-                }
+                tabControl_Selected(null, new TabControlEventArgs(tabControl.SelectedTab, tabControl.SelectedIndex, new TabControlAction()));
             }
             else
             {
@@ -529,20 +532,37 @@ namespace GPK_RePack.Forms
             }
         }
 
-        private Bitmap BitmapFromSource(BitmapSource bitmapsource)
+        private void tabControl_Selected(object sender, TabControlEventArgs e)
         {
-            Bitmap bitmap;
-            using (MemoryStream outStream = new MemoryStream())
+            if (e.TabPage == tabTexturePreview)
             {
-                BitmapEncoder enc = new BmpBitmapEncoder();
-                enc.Frames.Add(BitmapFrame.Create(bitmapsource));
-                enc.Save(outStream);
-                bitmap = new Bitmap(outStream);
+                if (selectedExport.Payload != null && selectedExport.Payload is Texture2D)
+                {
+
+                    Texture2D image = (Texture2D)selectedExport.Payload;
+                    DdsFile ddsFile = new DdsFile();
+                    Stream imageStream = image.GetObjectStream();
+                    if (imageStream != null)
+                    {
+                        ddsFile.Load(image.GetObjectStream());
+                        boxImagePreview.Image = TextureTools.BitmapFromSource(ddsFile.BitmapSource);
+                        //workaround for a shrinking window
+                        scaleFont();
+
+                        if (ddsFile.Height > boxImagePreview.Height || ddsFile.Width > boxImagePreview.Width)
+                        {
+                            //shrink the file if ´the size is to big
+                            boxImagePreview.SizeMode = PictureBoxSizeMode.StretchImage;
+                        }
+                        else
+                        {
+                            boxImagePreview.SizeMode = PictureBoxSizeMode.Normal;
+                        }
+
+                    }
+                }
             }
-            return bitmap;
         }
-
-
 
         private void refreshViewToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1006,7 +1026,7 @@ namespace GPK_RePack.Forms
                     waveReader = new VorbisWaveReader(new MemoryStream(wave.oggdata));
                     waveOut.Init(waveReader);
                     waveOut.Play();
-                    btnOggPreview.Text = "Stop Preview";
+                    btnPreviewOgg.Text = "Stop Preview";
                 }
                 else if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
                 {
@@ -1034,7 +1054,7 @@ namespace GPK_RePack.Forms
             }
 
             waveReader = null;
-            btnOggPreview.Text = "Ogg Preview";
+            btnPreviewOgg.Text = "Ogg Preview";
         }
 
 
@@ -1296,15 +1316,15 @@ namespace GPK_RePack.Forms
                 else if (prop is GpkByteProperty)
                 {
                     GpkByteProperty tmpByte = (GpkByteProperty)prop;
-                    comboCell = new DataGridViewComboBoxCell();
                     if (tmpByte.size == 8)
                     {
+                        comboCell = new DataGridViewComboBoxCell();
                         comboCell.Items.AddRange(nameQuery.ToArray());
                         comboCell.Value = tmpByte.nameValue;
                     }
                     else
                     {
-                        comboCell.Value = tmpByte.byteValue;
+                        valueCell.Value = tmpByte.byteValue;
                     }
                 }
                 else if (prop is GpkFloatProperty)
@@ -1584,26 +1604,88 @@ namespace GPK_RePack.Forms
             return (GpkArrayProperty)row.Tag;
         }
 
+        private void GUI_Resize(object sender, EventArgs e)
+        {
+            gridProps.Refresh();
+        }
 
 
+        #endregion
+
+        #region contexnt menu 
+
+        string clickedNode;
+        private void treeMain_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                treeMain.SelectedNode = e.Node;
+                clickedNode = e.Node.Name;
+                treeContextMenu.Show(treeMain, e.Location);
+            }
+        }
 
 
+        private void treeContextMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            //dont keep the menu open
+            Task.Factory.StartNew(() => selectContextAction(sender, e));
+        }
 
 
+        private void selectContextAction(object sender, ToolStripItemClickedEventArgs e)
+        {
+            if (e.ClickedItem == addToolStripMenuItem)
+            {
 
+            }
+            else if (e.ClickedItem == removeToolStripMenuItem)
+            {
+                btnDelete_Click(null, null);
+            }
+            else if (e.ClickedItem == copyToolStripMenuItem)
+            {
+                btnCopy_Click(null, null);
+            }
+            else if (e.ClickedItem == pasteToolStripMenuItem)
+            {
+                btnPaste_Click(null, null);
+            }
 
+            //import
+            else if (e.ClickedItem == importRawDataToolStripMenuItem)
+            {
+                btnReplace_Click(null, null);
+            }
+            else if (e.ClickedItem == importDDSToolStripMenuItem)
+            {
+                btnImageImport_Click(null, null);
+            }
+            else if (e.ClickedItem == importOGGToolStripMenuItem)
+            {
+                btnImportOgg_Click(null, null);
+            }
 
+            //export
+            else if (e.ClickedItem == exportRawDataToolStripMenuItem)
+            {
+                btnExport_Click(null, null);
+            }
+            else if (e.ClickedItem == exportDDSToolStripMenuItem)
+            {
+                btnImageExport_Click(null, null);
+            }
+            else if (e.ClickedItem == exportOGGToolStripMenuItem)
+            {
+                btnExtractOGG_Click(null, null);
+            }
+            //preview ogg
 
-
-
-
-
-
-
-
-
-
-
+            else if (e.ClickedItem == previewOGGToolStripMenuItem)
+            {
+                btnOggPreview_Click(null, null);
+            }
+        }
 
 
 

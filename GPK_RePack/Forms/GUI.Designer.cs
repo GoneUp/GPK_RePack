@@ -30,9 +30,26 @@ namespace GPK_RePack.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GUI));
             this.treeMain = new System.Windows.Forms.TreeView();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.treeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importRawDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importOGGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importDDSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportRawDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportOGGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportDDSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.previewOGGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.mainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -58,6 +75,16 @@ namespace GPK_RePack.Forms
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabInfo = new System.Windows.Forms.TabPage();
             this.boxInfo = new System.Windows.Forms.TextBox();
+            this.boxDataButtons = new System.Windows.Forms.TableLayoutPanel();
+            this.btnExportDDS = new System.Windows.Forms.Button();
+            this.btnFakeOGG = new System.Windows.Forms.Button();
+            this.btnExportRaw = new System.Windows.Forms.Button();
+            this.btnImportDDS = new System.Windows.Forms.Button();
+            this.btnImportRaw = new System.Windows.Forms.Button();
+            this.btnDeleteData = new System.Windows.Forms.Button();
+            this.btnExportOgg = new System.Windows.Forms.Button();
+            this.btnImportOgg = new System.Windows.Forms.Button();
+            this.btnPreviewOgg = new System.Windows.Forms.Button();
             this.tabPropertys = new System.Windows.Forms.TabPage();
             this.gridProps = new System.Windows.Forms.DataGridView();
             this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -66,50 +93,39 @@ namespace GPK_RePack.Forms
             this.aIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.iType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.boxPropertyButtons = new System.Windows.Forms.TableLayoutPanel();
+            this.btnPropSave = new System.Windows.Forms.Button();
+            this.btnPropClear = new System.Windows.Forms.Button();
             this.tabTexturePreview = new System.Windows.Forms.TabPage();
             this.boxImagePreview = new System.Windows.Forms.PictureBox();
-            this.boxCommands = new System.Windows.Forms.Panel();
-            this.boxPropertyButtons = new System.Windows.Forms.GroupBox();
-            this.btnPropClear = new System.Windows.Forms.Button();
-            this.btnPropSave = new System.Windows.Forms.Button();
-            this.boxGeneralButtons = new System.Windows.Forms.GroupBox();
-            this.btnPaste = new System.Windows.Forms.Button();
-            this.btnCopy = new System.Windows.Forms.Button();
+            this.boxGeneralButtons = new System.Windows.Forms.TableLayoutPanel();
             this.btnAdd = new System.Windows.Forms.Button();
+            this.btnCopy = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
-            this.boxDataButtons = new System.Windows.Forms.GroupBox();
-            this.btnImageExport = new System.Windows.Forms.Button();
-            this.btnImageImport = new System.Windows.Forms.Button();
-            this.btnOggPreview = new System.Windows.Forms.Button();
-            this.btnFakeOGG = new System.Windows.Forms.Button();
-            this.btnDeleteData = new System.Windows.Forms.Button();
-            this.btnImportOgg = new System.Windows.Forms.Button();
-            this.btnExtractOGG = new System.Windows.Forms.Button();
-            this.btnReplace = new System.Windows.Forms.Button();
-            this.btnExport = new System.Windows.Forms.Button();
+            this.btnPaste = new System.Windows.Forms.Button();
             this.boxLog = new System.Windows.Forms.TextBox();
             this.splitContainerTreeInfo = new System.Windows.Forms.SplitContainer();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.lblFiller = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
-            this.menuStrip1.SuspendLayout();
+            this.treeContextMenu.SuspendLayout();
+            this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabInfo.SuspendLayout();
+            this.boxDataButtons.SuspendLayout();
             this.tabPropertys.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridProps)).BeginInit();
+            this.boxPropertyButtons.SuspendLayout();
             this.tabTexturePreview.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.boxImagePreview)).BeginInit();
-            this.boxCommands.SuspendLayout();
-            this.boxPropertyButtons.SuspendLayout();
             this.boxGeneralButtons.SuspendLayout();
-            this.boxDataButtons.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerTreeInfo)).BeginInit();
             this.splitContainerTreeInfo.Panel1.SuspendLayout();
             this.splitContainerTreeInfo.Panel2.SuspendLayout();
             this.splitContainerTreeInfo.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerLog_InfoTree)).BeginInit();
             this.splitContainerLog_InfoTree.Panel1.SuspendLayout();
             this.splitContainerLog_InfoTree.Panel2.SuspendLayout();
@@ -119,28 +135,144 @@ namespace GPK_RePack.Forms
             // treeMain
             // 
             this.treeMain.AllowDrop = true;
+            this.treeMain.ContextMenuStrip = this.treeContextMenu;
             this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeMain.FullRowSelect = true;
             this.treeMain.HideSelection = false;
             this.treeMain.Location = new System.Drawing.Point(0, 0);
             this.treeMain.Name = "treeMain";
-            this.treeMain.Size = new System.Drawing.Size(322, 634);
+            this.treeMain.Size = new System.Drawing.Size(322, 543);
             this.treeMain.TabIndex = 1;
             this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
+            this.treeMain.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeMain_NodeMouseClick);
             this.treeMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeMain_DragDrop);
             this.treeMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.treeMain_DragEnter);
             this.treeMain.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GUI_KeyDown);
             // 
-            // menuStrip1
+            // treeContextMenu
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.treeContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importToolStripMenuItem,
+            this.exportToolStripMenuItem,
+            this.toolStripSeparator5,
+            this.addToolStripMenuItem,
+            this.removeToolStripMenuItem,
+            this.copyToolStripMenuItem,
+            this.pasteToolStripMenuItem,
+            this.toolStripSeparator6,
+            this.previewOGGToolStripMenuItem});
+            this.treeContextMenu.Name = "treeContextMenu";
+            this.treeContextMenu.Size = new System.Drawing.Size(144, 170);
+            this.treeContextMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.treeContextMenu_ItemClicked);
+            // 
+            // importToolStripMenuItem
+            // 
+            this.importToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importRawDataToolStripMenuItem,
+            this.importOGGToolStripMenuItem,
+            this.importDDSToolStripMenuItem});
+            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.importToolStripMenuItem.Text = "Import";
+            this.importToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.treeContextMenu_ItemClicked);
+            // 
+            // importRawDataToolStripMenuItem
+            // 
+            this.importRawDataToolStripMenuItem.Name = "importRawDataToolStripMenuItem";
+            this.importRawDataToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.importRawDataToolStripMenuItem.Text = "Raw Data";
+            // 
+            // importOGGToolStripMenuItem
+            // 
+            this.importOGGToolStripMenuItem.Name = "importOGGToolStripMenuItem";
+            this.importOGGToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.importOGGToolStripMenuItem.Text = "OGG";
+            // 
+            // importDDSToolStripMenuItem
+            // 
+            this.importDDSToolStripMenuItem.Name = "importDDSToolStripMenuItem";
+            this.importDDSToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.importDDSToolStripMenuItem.Text = "DDS";
+            // 
+            // exportToolStripMenuItem
+            // 
+            this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportRawDataToolStripMenuItem,
+            this.exportOGGToolStripMenuItem,
+            this.exportDDSToolStripMenuItem});
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.exportToolStripMenuItem.Text = "Export";
+            this.exportToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.treeContextMenu_ItemClicked);
+            // 
+            // exportRawDataToolStripMenuItem
+            // 
+            this.exportRawDataToolStripMenuItem.Name = "exportRawDataToolStripMenuItem";
+            this.exportRawDataToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.exportRawDataToolStripMenuItem.Text = "Raw Data";
+            // 
+            // exportOGGToolStripMenuItem
+            // 
+            this.exportOGGToolStripMenuItem.Name = "exportOGGToolStripMenuItem";
+            this.exportOGGToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.exportOGGToolStripMenuItem.Text = "OGG";
+            // 
+            // exportDDSToolStripMenuItem
+            // 
+            this.exportDDSToolStripMenuItem.Name = "exportDDSToolStripMenuItem";
+            this.exportDDSToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.exportDDSToolStripMenuItem.Text = "DDS";
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(140, 6);
+            // 
+            // addToolStripMenuItem
+            // 
+            this.addToolStripMenuItem.Name = "addToolStripMenuItem";
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.addToolStripMenuItem.Text = "Add";
+            // 
+            // removeToolStripMenuItem
+            // 
+            this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.removeToolStripMenuItem.Text = "Remove";
+            // 
+            // copyToolStripMenuItem
+            // 
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.copyToolStripMenuItem.Text = "Copy";
+            // 
+            // pasteToolStripMenuItem
+            // 
+            this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.pasteToolStripMenuItem.Text = "Paste";
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(140, 6);
+            // 
+            // previewOGGToolStripMenuItem
+            // 
+            this.previewOGGToolStripMenuItem.Name = "previewOGGToolStripMenuItem";
+            this.previewOGGToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.previewOGGToolStripMenuItem.Text = "Preview OGG";
+            // 
+            // menuStrip
+            // 
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mainToolStripMenuItem,
             this.miscToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1163, 24);
-            this.menuStrip1.TabIndex = 2;
-            this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(1163, 24);
+            this.menuStrip.TabIndex = 2;
+            this.menuStrip.Text = "menuStrip1";
             // 
             // mainToolStripMenuItem
             // 
@@ -257,14 +389,14 @@ namespace GPK_RePack.Forms
             // setAllVolumeMultipliersToolStripMenuItem
             // 
             this.setAllVolumeMultipliersToolStripMenuItem.Name = "setAllVolumeMultipliersToolStripMenuItem";
-            this.setAllVolumeMultipliersToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.setAllVolumeMultipliersToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.setAllVolumeMultipliersToolStripMenuItem.Text = "Set all VolumeMultipliers";
             this.setAllVolumeMultipliersToolStripMenuItem.Click += new System.EventHandler(this.setAllVolumeMultipliersToolStripMenuItem_Click);
             // 
             // customToolStripMenuItem
             // 
             this.customToolStripMenuItem.Name = "customToolStripMenuItem";
-            this.customToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.customToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.customToolStripMenuItem.Text = "Custom";
             this.customToolStripMenuItem.Click += new System.EventHandler(this.customToolStripMenuItem_Click);
             // 
@@ -317,16 +449,18 @@ namespace GPK_RePack.Forms
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(837, 543);
+            this.tabControl.Size = new System.Drawing.Size(837, 615);
             this.tabControl.TabIndex = 3;
+            this.tabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabControl_Selected);
             // 
             // tabInfo
             // 
             this.tabInfo.Controls.Add(this.boxInfo);
+            this.tabInfo.Controls.Add(this.boxDataButtons);
             this.tabInfo.Location = new System.Drawing.Point(4, 22);
             this.tabInfo.Name = "tabInfo";
             this.tabInfo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabInfo.Size = new System.Drawing.Size(829, 517);
+            this.tabInfo.Size = new System.Drawing.Size(829, 589);
             this.tabInfo.TabIndex = 0;
             this.tabInfo.Text = "Info";
             this.tabInfo.UseVisualStyleBackColor = true;
@@ -339,17 +473,154 @@ namespace GPK_RePack.Forms
             this.boxInfo.Name = "boxInfo";
             this.boxInfo.ReadOnly = true;
             this.boxInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.boxInfo.Size = new System.Drawing.Size(823, 511);
+            this.boxInfo.Size = new System.Drawing.Size(823, 484);
             this.boxInfo.TabIndex = 5;
             this.boxInfo.Text = resources.GetString("boxInfo.Text");
+            // 
+            // boxDataButtons
+            // 
+            this.boxDataButtons.AutoSize = true;
+            this.boxDataButtons.ColumnCount = 3;
+            this.boxDataButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.boxDataButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.boxDataButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.boxDataButtons.Controls.Add(this.btnExportDDS, 2, 0);
+            this.boxDataButtons.Controls.Add(this.btnFakeOGG, 1, 2);
+            this.boxDataButtons.Controls.Add(this.btnExportRaw, 0, 0);
+            this.boxDataButtons.Controls.Add(this.btnImportDDS, 2, 1);
+            this.boxDataButtons.Controls.Add(this.btnImportRaw, 0, 1);
+            this.boxDataButtons.Controls.Add(this.btnDeleteData, 0, 2);
+            this.boxDataButtons.Controls.Add(this.btnExportOgg, 1, 0);
+            this.boxDataButtons.Controls.Add(this.btnImportOgg, 1, 1);
+            this.boxDataButtons.Controls.Add(this.btnPreviewOgg, 2, 2);
+            this.boxDataButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.boxDataButtons.Enabled = false;
+            this.boxDataButtons.Location = new System.Drawing.Point(3, 487);
+            this.boxDataButtons.Name = "boxDataButtons";
+            this.boxDataButtons.RowCount = 3;
+            this.boxDataButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.boxDataButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.boxDataButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.boxDataButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.boxDataButtons.Size = new System.Drawing.Size(823, 99);
+            this.boxDataButtons.TabIndex = 6;
+            // 
+            // btnExportDDS
+            // 
+            this.btnExportDDS.AutoSize = true;
+            this.btnExportDDS.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnExportDDS.Location = new System.Drawing.Point(551, 3);
+            this.btnExportDDS.Name = "btnExportDDS";
+            this.btnExportDDS.Size = new System.Drawing.Size(269, 27);
+            this.btnExportDDS.TabIndex = 11;
+            this.btnExportDDS.Text = "Export DDS";
+            this.btnExportDDS.UseVisualStyleBackColor = true;
+            this.btnExportDDS.Click += new System.EventHandler(this.btnImageExport_Click);
+            // 
+            // btnFakeOGG
+            // 
+            this.btnFakeOGG.AutoSize = true;
+            this.btnFakeOGG.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnFakeOGG.Location = new System.Drawing.Point(277, 69);
+            this.btnFakeOGG.Name = "btnFakeOGG";
+            this.btnFakeOGG.Size = new System.Drawing.Size(268, 27);
+            this.btnFakeOGG.TabIndex = 8;
+            this.btnFakeOGG.Text = "Import Emtpy OGG";
+            this.btnFakeOGG.UseVisualStyleBackColor = true;
+            this.btnFakeOGG.Click += new System.EventHandler(this.btnFakeOGG_Click);
+            // 
+            // btnExportRaw
+            // 
+            this.btnExportRaw.AutoSize = true;
+            this.btnExportRaw.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnExportRaw.Location = new System.Drawing.Point(3, 3);
+            this.btnExportRaw.Name = "btnExportRaw";
+            this.btnExportRaw.Size = new System.Drawing.Size(268, 27);
+            this.btnExportRaw.TabIndex = 1;
+            this.btnExportRaw.Text = "Export Raw Data";
+            this.btnExportRaw.UseVisualStyleBackColor = true;
+            this.btnExportRaw.Click += new System.EventHandler(this.btnExport_Click);
+            // 
+            // btnImportDDS
+            // 
+            this.btnImportDDS.AutoSize = true;
+            this.btnImportDDS.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnImportDDS.Location = new System.Drawing.Point(551, 36);
+            this.btnImportDDS.Name = "btnImportDDS";
+            this.btnImportDDS.Size = new System.Drawing.Size(269, 27);
+            this.btnImportDDS.TabIndex = 10;
+            this.btnImportDDS.Text = "Import DDS";
+            this.btnImportDDS.UseVisualStyleBackColor = true;
+            this.btnImportDDS.Click += new System.EventHandler(this.btnImageImport_Click);
+            // 
+            // btnImportRaw
+            // 
+            this.btnImportRaw.AutoSize = true;
+            this.btnImportRaw.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnImportRaw.Location = new System.Drawing.Point(3, 36);
+            this.btnImportRaw.Name = "btnImportRaw";
+            this.btnImportRaw.Size = new System.Drawing.Size(268, 27);
+            this.btnImportRaw.TabIndex = 2;
+            this.btnImportRaw.Text = "Import Raw Data";
+            this.btnImportRaw.UseVisualStyleBackColor = true;
+            this.btnImportRaw.Click += new System.EventHandler(this.btnReplace_Click);
+            // 
+            // btnDeleteData
+            // 
+            this.btnDeleteData.AutoSize = true;
+            this.btnDeleteData.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnDeleteData.Location = new System.Drawing.Point(3, 69);
+            this.btnDeleteData.Name = "btnDeleteData";
+            this.btnDeleteData.Size = new System.Drawing.Size(268, 27);
+            this.btnDeleteData.TabIndex = 7;
+            this.btnDeleteData.Text = "Delete Data";
+            this.btnDeleteData.UseVisualStyleBackColor = true;
+            this.btnDeleteData.Click += new System.EventHandler(this.btnDeleteData_Click);
+            // 
+            // btnExportOgg
+            // 
+            this.btnExportOgg.AutoSize = true;
+            this.btnExportOgg.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnExportOgg.Location = new System.Drawing.Point(277, 3);
+            this.btnExportOgg.Name = "btnExportOgg";
+            this.btnExportOgg.Size = new System.Drawing.Size(268, 27);
+            this.btnExportOgg.TabIndex = 5;
+            this.btnExportOgg.Text = "Export OGG";
+            this.btnExportOgg.UseVisualStyleBackColor = true;
+            this.btnExportOgg.Click += new System.EventHandler(this.btnExtractOGG_Click);
+            // 
+            // btnImportOgg
+            // 
+            this.btnImportOgg.AutoSize = true;
+            this.btnImportOgg.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnImportOgg.Location = new System.Drawing.Point(277, 36);
+            this.btnImportOgg.Name = "btnImportOgg";
+            this.btnImportOgg.Size = new System.Drawing.Size(268, 27);
+            this.btnImportOgg.TabIndex = 6;
+            this.btnImportOgg.Text = "Import OGG";
+            this.btnImportOgg.UseVisualStyleBackColor = true;
+            this.btnImportOgg.Click += new System.EventHandler(this.btnImportOgg_Click);
+            // 
+            // btnPreviewOgg
+            // 
+            this.btnPreviewOgg.AutoSize = true;
+            this.btnPreviewOgg.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnPreviewOgg.Location = new System.Drawing.Point(551, 69);
+            this.btnPreviewOgg.Name = "btnPreviewOgg";
+            this.btnPreviewOgg.Size = new System.Drawing.Size(269, 27);
+            this.btnPreviewOgg.TabIndex = 9;
+            this.btnPreviewOgg.Text = "Preview OGG";
+            this.btnPreviewOgg.UseVisualStyleBackColor = true;
+            this.btnPreviewOgg.Click += new System.EventHandler(this.btnOggPreview_Click);
             // 
             // tabPropertys
             // 
             this.tabPropertys.Controls.Add(this.gridProps);
+            this.tabPropertys.Controls.Add(this.boxPropertyButtons);
             this.tabPropertys.Location = new System.Drawing.Point(4, 22);
             this.tabPropertys.Name = "tabPropertys";
             this.tabPropertys.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPropertys.Size = new System.Drawing.Size(829, 517);
+            this.tabPropertys.Size = new System.Drawing.Size(829, 589);
             this.tabPropertys.TabIndex = 1;
             this.tabPropertys.Text = "Property Details";
             this.tabPropertys.UseVisualStyleBackColor = true;
@@ -371,7 +642,7 @@ namespace GPK_RePack.Forms
             this.gridProps.Location = new System.Drawing.Point(3, 3);
             this.gridProps.MultiSelect = false;
             this.gridProps.Name = "gridProps";
-            this.gridProps.Size = new System.Drawing.Size(823, 511);
+            this.gridProps.Size = new System.Drawing.Size(823, 551);
             this.gridProps.TabIndex = 0;
             this.gridProps.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.gridProps_DefaultValuesNeeded);
             // 
@@ -416,13 +687,53 @@ namespace GPK_RePack.Forms
             this.value.HeaderText = "Value";
             this.value.Name = "value";
             // 
+            // boxPropertyButtons
+            // 
+            this.boxPropertyButtons.ColumnCount = 2;
+            this.boxPropertyButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.boxPropertyButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.boxPropertyButtons.Controls.Add(this.btnPropSave, 0, 0);
+            this.boxPropertyButtons.Controls.Add(this.btnPropClear, 1, 0);
+            this.boxPropertyButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.boxPropertyButtons.Enabled = false;
+            this.boxPropertyButtons.Location = new System.Drawing.Point(3, 554);
+            this.boxPropertyButtons.Name = "boxPropertyButtons";
+            this.boxPropertyButtons.RowCount = 1;
+            this.boxPropertyButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+            this.boxPropertyButtons.Size = new System.Drawing.Size(823, 32);
+            this.boxPropertyButtons.TabIndex = 6;
+            // 
+            // btnPropSave
+            // 
+            this.btnPropSave.AutoSize = true;
+            this.btnPropSave.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnPropSave.Location = new System.Drawing.Point(3, 3);
+            this.btnPropSave.Name = "btnPropSave";
+            this.btnPropSave.Size = new System.Drawing.Size(405, 26);
+            this.btnPropSave.TabIndex = 4;
+            this.btnPropSave.Text = "Save Properties";
+            this.btnPropSave.UseVisualStyleBackColor = true;
+            this.btnPropSave.Click += new System.EventHandler(this.btnPropSave_Click);
+            // 
+            // btnPropClear
+            // 
+            this.btnPropClear.AutoSize = true;
+            this.btnPropClear.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnPropClear.Location = new System.Drawing.Point(414, 3);
+            this.btnPropClear.Name = "btnPropClear";
+            this.btnPropClear.Size = new System.Drawing.Size(406, 26);
+            this.btnPropClear.TabIndex = 5;
+            this.btnPropClear.Text = "Clear Properties";
+            this.btnPropClear.UseVisualStyleBackColor = true;
+            this.btnPropClear.Click += new System.EventHandler(this.btnPropClear_Click);
+            // 
             // tabTexturePreview
             // 
             this.tabTexturePreview.Controls.Add(this.boxImagePreview);
             this.tabTexturePreview.Location = new System.Drawing.Point(4, 22);
             this.tabTexturePreview.Name = "tabTexturePreview";
             this.tabTexturePreview.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTexturePreview.Size = new System.Drawing.Size(829, 517);
+            this.tabTexturePreview.Size = new System.Drawing.Size(829, 589);
             this.tabTexturePreview.TabIndex = 2;
             this.tabTexturePreview.Text = "Texture Preview";
             this.tabTexturePreview.UseVisualStyleBackColor = true;
@@ -430,221 +741,82 @@ namespace GPK_RePack.Forms
             // boxImagePreview
             // 
             this.boxImagePreview.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.boxImagePreview.Image = ((System.Drawing.Image)(resources.GetObject("boxImagePreview.Image")));
             this.boxImagePreview.Location = new System.Drawing.Point(3, 3);
             this.boxImagePreview.Name = "boxImagePreview";
-            this.boxImagePreview.Size = new System.Drawing.Size(823, 511);
+            this.boxImagePreview.Size = new System.Drawing.Size(823, 583);
             this.boxImagePreview.TabIndex = 0;
             this.boxImagePreview.TabStop = false;
             // 
-            // boxCommands
-            // 
-            this.boxCommands.Controls.Add(this.boxPropertyButtons);
-            this.boxCommands.Controls.Add(this.boxGeneralButtons);
-            this.boxCommands.Controls.Add(this.boxDataButtons);
-            this.boxCommands.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.boxCommands.Location = new System.Drawing.Point(0, 543);
-            this.boxCommands.Name = "boxCommands";
-            this.boxCommands.Size = new System.Drawing.Size(837, 91);
-            this.boxCommands.TabIndex = 6;
-            // 
-            // boxPropertyButtons
-            // 
-            this.boxPropertyButtons.Controls.Add(this.btnPropClear);
-            this.boxPropertyButtons.Controls.Add(this.btnPropSave);
-            this.boxPropertyButtons.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.boxPropertyButtons.Enabled = false;
-            this.boxPropertyButtons.Location = new System.Drawing.Point(199, 0);
-            this.boxPropertyButtons.Name = "boxPropertyButtons";
-            this.boxPropertyButtons.Size = new System.Drawing.Size(190, 91);
-            this.boxPropertyButtons.TabIndex = 6;
-            this.boxPropertyButtons.TabStop = false;
-            this.boxPropertyButtons.Text = "Property Commands";
-            // 
-            // btnPropClear
-            // 
-            this.btnPropClear.Location = new System.Drawing.Point(17, 58);
-            this.btnPropClear.Name = "btnPropClear";
-            this.btnPropClear.Size = new System.Drawing.Size(125, 24);
-            this.btnPropClear.TabIndex = 5;
-            this.btnPropClear.Text = "Clear Properties";
-            this.btnPropClear.UseVisualStyleBackColor = true;
-            this.btnPropClear.Click += new System.EventHandler(this.btnPropClear_Click);
-            // 
-            // btnPropSave
-            // 
-            this.btnPropSave.Location = new System.Drawing.Point(17, 28);
-            this.btnPropSave.Name = "btnPropSave";
-            this.btnPropSave.Size = new System.Drawing.Size(125, 24);
-            this.btnPropSave.TabIndex = 4;
-            this.btnPropSave.Text = "Save Properties";
-            this.btnPropSave.UseVisualStyleBackColor = true;
-            this.btnPropSave.Click += new System.EventHandler(this.btnPropSave_Click);
-            // 
             // boxGeneralButtons
             // 
-            this.boxGeneralButtons.Controls.Add(this.btnPaste);
-            this.boxGeneralButtons.Controls.Add(this.btnCopy);
-            this.boxGeneralButtons.Controls.Add(this.btnAdd);
-            this.boxGeneralButtons.Controls.Add(this.btnDelete);
-            this.boxGeneralButtons.Dock = System.Windows.Forms.DockStyle.Left;
+            this.boxGeneralButtons.BackColor = System.Drawing.Color.White;
+            this.boxGeneralButtons.ColumnCount = 2;
+            this.boxGeneralButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.boxGeneralButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.boxGeneralButtons.Controls.Add(this.btnAdd, 0, 0);
+            this.boxGeneralButtons.Controls.Add(this.btnCopy, 0, 1);
+            this.boxGeneralButtons.Controls.Add(this.btnDelete, 1, 0);
+            this.boxGeneralButtons.Controls.Add(this.btnPaste, 1, 1);
+            this.boxGeneralButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.boxGeneralButtons.Enabled = false;
-            this.boxGeneralButtons.Location = new System.Drawing.Point(0, 0);
+            this.boxGeneralButtons.Location = new System.Drawing.Point(0, 543);
+            this.boxGeneralButtons.MinimumSize = new System.Drawing.Size(50, 50);
             this.boxGeneralButtons.Name = "boxGeneralButtons";
-            this.boxGeneralButtons.Size = new System.Drawing.Size(199, 91);
-            this.boxGeneralButtons.TabIndex = 5;
-            this.boxGeneralButtons.TabStop = false;
-            this.boxGeneralButtons.Text = "General";
-            // 
-            // btnPaste
-            // 
-            this.btnPaste.Location = new System.Drawing.Point(98, 58);
-            this.btnPaste.Name = "btnPaste";
-            this.btnPaste.Size = new System.Drawing.Size(95, 24);
-            this.btnPaste.TabIndex = 3;
-            this.btnPaste.Text = "Paste Object";
-            this.btnPaste.UseVisualStyleBackColor = true;
-            this.btnPaste.Click += new System.EventHandler(this.btnPaste_Click);
-            // 
-            // btnCopy
-            // 
-            this.btnCopy.Location = new System.Drawing.Point(6, 58);
-            this.btnCopy.Name = "btnCopy";
-            this.btnCopy.Size = new System.Drawing.Size(86, 24);
-            this.btnCopy.TabIndex = 2;
-            this.btnCopy.Text = "Copy Object";
-            this.btnCopy.UseVisualStyleBackColor = true;
-            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            this.boxGeneralButtons.RowCount = 2;
+            this.boxGeneralButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.boxGeneralButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.boxGeneralButtons.Size = new System.Drawing.Size(322, 72);
+            this.boxGeneralButtons.TabIndex = 6;
             // 
             // btnAdd
             // 
+            this.btnAdd.AutoSize = true;
+            this.btnAdd.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnAdd.Enabled = false;
-            this.btnAdd.Location = new System.Drawing.Point(6, 28);
+            this.btnAdd.Location = new System.Drawing.Point(3, 3);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(86, 24);
+            this.btnAdd.Size = new System.Drawing.Size(155, 30);
             this.btnAdd.TabIndex = 1;
             this.btnAdd.Text = "Add Object";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
+            // btnCopy
+            // 
+            this.btnCopy.AutoSize = true;
+            this.btnCopy.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnCopy.Location = new System.Drawing.Point(3, 39);
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.Size = new System.Drawing.Size(155, 30);
+            this.btnCopy.TabIndex = 2;
+            this.btnCopy.Text = "Copy Object";
+            this.btnCopy.UseVisualStyleBackColor = true;
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(98, 28);
+            this.btnDelete.AutoSize = true;
+            this.btnDelete.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnDelete.Location = new System.Drawing.Point(164, 3);
             this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(95, 24);
+            this.btnDelete.Size = new System.Drawing.Size(155, 30);
             this.btnDelete.TabIndex = 0;
             this.btnDelete.Text = "Remove Object";
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
-            // boxDataButtons
+            // btnPaste
             // 
-            this.boxDataButtons.Controls.Add(this.btnImageExport);
-            this.boxDataButtons.Controls.Add(this.btnImageImport);
-            this.boxDataButtons.Controls.Add(this.btnOggPreview);
-            this.boxDataButtons.Controls.Add(this.btnFakeOGG);
-            this.boxDataButtons.Controls.Add(this.btnDeleteData);
-            this.boxDataButtons.Controls.Add(this.btnImportOgg);
-            this.boxDataButtons.Controls.Add(this.btnExtractOGG);
-            this.boxDataButtons.Controls.Add(this.btnReplace);
-            this.boxDataButtons.Controls.Add(this.btnExport);
-            this.boxDataButtons.Dock = System.Windows.Forms.DockStyle.Right;
-            this.boxDataButtons.Enabled = false;
-            this.boxDataButtons.Location = new System.Drawing.Point(389, 0);
-            this.boxDataButtons.Name = "boxDataButtons";
-            this.boxDataButtons.Size = new System.Drawing.Size(448, 91);
-            this.boxDataButtons.TabIndex = 4;
-            this.boxDataButtons.TabStop = false;
-            this.boxDataButtons.Text = "Data Commands";
-            // 
-            // btnImageExport
-            // 
-            this.btnImageExport.Location = new System.Drawing.Point(370, 58);
-            this.btnImageExport.Name = "btnImageExport";
-            this.btnImageExport.Size = new System.Drawing.Size(75, 23);
-            this.btnImageExport.TabIndex = 11;
-            this.btnImageExport.Text = "Export DDS";
-            this.btnImageExport.UseVisualStyleBackColor = true;
-            this.btnImageExport.Click += new System.EventHandler(this.btnImageExport_Click);
-            // 
-            // btnImageImport
-            // 
-            this.btnImageImport.Location = new System.Drawing.Point(369, 29);
-            this.btnImageImport.Name = "btnImageImport";
-            this.btnImageImport.Size = new System.Drawing.Size(75, 23);
-            this.btnImageImport.TabIndex = 10;
-            this.btnImageImport.Text = "Import DDS";
-            this.btnImageImport.UseVisualStyleBackColor = true;
-            this.btnImageImport.Click += new System.EventHandler(this.btnImageImport_Click);
-            // 
-            // btnOggPreview
-            // 
-            this.btnOggPreview.Location = new System.Drawing.Point(282, 58);
-            this.btnOggPreview.Name = "btnOggPreview";
-            this.btnOggPreview.Size = new System.Drawing.Size(78, 24);
-            this.btnOggPreview.TabIndex = 9;
-            this.btnOggPreview.Text = "Ogg Preview";
-            this.btnOggPreview.UseVisualStyleBackColor = true;
-            this.btnOggPreview.Click += new System.EventHandler(this.btnOggPreview_Click);
-            // 
-            // btnFakeOGG
-            // 
-            this.btnFakeOGG.Location = new System.Drawing.Point(176, 58);
-            this.btnFakeOGG.Name = "btnFakeOGG";
-            this.btnFakeOGG.Size = new System.Drawing.Size(100, 24);
-            this.btnFakeOGG.TabIndex = 8;
-            this.btnFakeOGG.Text = "Insert Emtpy OGG";
-            this.btnFakeOGG.UseVisualStyleBackColor = true;
-            this.btnFakeOGG.Click += new System.EventHandler(this.btnFakeOGG_Click);
-            // 
-            // btnDeleteData
-            // 
-            this.btnDeleteData.Location = new System.Drawing.Point(233, 28);
-            this.btnDeleteData.Name = "btnDeleteData";
-            this.btnDeleteData.Size = new System.Drawing.Size(104, 24);
-            this.btnDeleteData.TabIndex = 7;
-            this.btnDeleteData.Text = "Delete Data";
-            this.btnDeleteData.UseVisualStyleBackColor = true;
-            this.btnDeleteData.Click += new System.EventHandler(this.btnDeleteData_Click);
-            // 
-            // btnImportOgg
-            // 
-            this.btnImportOgg.Location = new System.Drawing.Point(94, 58);
-            this.btnImportOgg.Name = "btnImportOgg";
-            this.btnImportOgg.Size = new System.Drawing.Size(76, 24);
-            this.btnImportOgg.TabIndex = 6;
-            this.btnImportOgg.Text = "Import OGG";
-            this.btnImportOgg.UseVisualStyleBackColor = true;
-            this.btnImportOgg.Click += new System.EventHandler(this.btnImportOgg_Click);
-            // 
-            // btnExtractOGG
-            // 
-            this.btnExtractOGG.Location = new System.Drawing.Point(6, 58);
-            this.btnExtractOGG.Name = "btnExtractOGG";
-            this.btnExtractOGG.Size = new System.Drawing.Size(82, 24);
-            this.btnExtractOGG.TabIndex = 5;
-            this.btnExtractOGG.Text = "Export OGG";
-            this.btnExtractOGG.UseVisualStyleBackColor = true;
-            this.btnExtractOGG.Click += new System.EventHandler(this.btnExtractOGG_Click);
-            // 
-            // btnReplace
-            // 
-            this.btnReplace.Location = new System.Drawing.Point(114, 28);
-            this.btnReplace.Name = "btnReplace";
-            this.btnReplace.Size = new System.Drawing.Size(113, 24);
-            this.btnReplace.TabIndex = 2;
-            this.btnReplace.Text = "Replace Raw Data";
-            this.btnReplace.UseVisualStyleBackColor = true;
-            this.btnReplace.Click += new System.EventHandler(this.btnReplace_Click);
-            // 
-            // btnExport
-            // 
-            this.btnExport.Location = new System.Drawing.Point(6, 28);
-            this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(102, 24);
-            this.btnExport.TabIndex = 1;
-            this.btnExport.Text = "Export Raw Data";
-            this.btnExport.UseVisualStyleBackColor = true;
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            this.btnPaste.AutoSize = true;
+            this.btnPaste.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnPaste.Location = new System.Drawing.Point(164, 39);
+            this.btnPaste.Name = "btnPaste";
+            this.btnPaste.Size = new System.Drawing.Size(155, 30);
+            this.btnPaste.TabIndex = 3;
+            this.btnPaste.Text = "Paste Object";
+            this.btnPaste.UseVisualStyleBackColor = true;
+            this.btnPaste.Click += new System.EventHandler(this.btnPaste_Click);
             // 
             // boxLog
             // 
@@ -654,7 +826,7 @@ namespace GPK_RePack.Forms
             this.boxLog.Name = "boxLog";
             this.boxLog.ReadOnly = true;
             this.boxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.boxLog.Size = new System.Drawing.Size(1163, 150);
+            this.boxLog.Size = new System.Drawing.Size(1163, 147);
             this.boxLog.TabIndex = 5;
             this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
             // 
@@ -667,29 +839,29 @@ namespace GPK_RePack.Forms
             // splitContainerTreeInfo.Panel1
             // 
             this.splitContainerTreeInfo.Panel1.Controls.Add(this.treeMain);
+            this.splitContainerTreeInfo.Panel1.Controls.Add(this.boxGeneralButtons);
             // 
             // splitContainerTreeInfo.Panel2
             // 
             this.splitContainerTreeInfo.Panel2.Controls.Add(this.tabControl);
-            this.splitContainerTreeInfo.Panel2.Controls.Add(this.boxCommands);
-            this.splitContainerTreeInfo.Size = new System.Drawing.Size(1163, 634);
+            this.splitContainerTreeInfo.Size = new System.Drawing.Size(1163, 615);
             this.splitContainerTreeInfo.SplitterDistance = 322;
             this.splitContainerTreeInfo.TabIndex = 7;
             // 
-            // statusStrip1
+            // statusStrip
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblFiller,
             this.lblStatus,
             this.ProgressBar});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 790);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.statusStrip1.Size = new System.Drawing.Size(1163, 22);
-            this.statusStrip1.SizingGrip = false;
-            this.statusStrip1.Stretch = false;
-            this.statusStrip1.TabIndex = 8;
-            this.statusStrip1.Text = "statusStrip1";
+            this.statusStrip.Location = new System.Drawing.Point(0, 790);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.statusStrip.Size = new System.Drawing.Size(1163, 22);
+            this.statusStrip.SizingGrip = false;
+            this.statusStrip.Stretch = false;
+            this.statusStrip.TabIndex = 8;
+            this.statusStrip.Text = "statusStrip1";
             // 
             // lblFiller
             // 
@@ -721,45 +893,49 @@ namespace GPK_RePack.Forms
             // splitContainerLog_InfoTree.Panel2
             // 
             this.splitContainerLog_InfoTree.Panel2.Controls.Add(this.boxLog);
-            this.splitContainerLog_InfoTree.Size = new System.Drawing.Size(1163, 788);
-            this.splitContainerLog_InfoTree.SplitterDistance = 634;
+            this.splitContainerLog_InfoTree.Size = new System.Drawing.Size(1163, 766);
+            this.splitContainerLog_InfoTree.SplitterDistance = 615;
             this.splitContainerLog_InfoTree.TabIndex = 9;
             // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1163, 812);
-            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.splitContainerLog_InfoTree);
-            this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.menuStrip);
+            this.Controls.Add(this.statusStrip);
             this.KeyPreview = true;
-            this.MainMenuStrip = this.menuStrip1;
+            this.MainMenuStrip = this.menuStrip;
             this.Name = "GUI";
-            this.Text = "Terahelper 0.10 - by GoneUp";
+            this.Text = "Terahelper 0.11 - by GoneUp";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GUI_FormClosing);
             this.Load += new System.EventHandler(this.GUI_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeMain_DragDrop);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.Resize += new System.EventHandler(this.GUI_Resize);
+            this.treeContextMenu.ResumeLayout(false);
+            this.menuStrip.ResumeLayout(false);
+            this.menuStrip.PerformLayout();
             this.tabControl.ResumeLayout(false);
             this.tabInfo.ResumeLayout(false);
             this.tabInfo.PerformLayout();
+            this.boxDataButtons.ResumeLayout(false);
+            this.boxDataButtons.PerformLayout();
             this.tabPropertys.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridProps)).EndInit();
+            this.boxPropertyButtons.ResumeLayout(false);
+            this.boxPropertyButtons.PerformLayout();
             this.tabTexturePreview.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.boxImagePreview)).EndInit();
-            this.boxCommands.ResumeLayout(false);
-            this.boxPropertyButtons.ResumeLayout(false);
             this.boxGeneralButtons.ResumeLayout(false);
-            this.boxDataButtons.ResumeLayout(false);
+            this.boxGeneralButtons.PerformLayout();
             this.splitContainerTreeInfo.Panel1.ResumeLayout(false);
             this.splitContainerTreeInfo.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerTreeInfo)).EndInit();
             this.splitContainerTreeInfo.ResumeLayout(false);
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.splitContainerLog_InfoTree.Panel1.ResumeLayout(false);
             this.splitContainerLog_InfoTree.Panel2.ResumeLayout(false);
             this.splitContainerLog_InfoTree.Panel2.PerformLayout();
@@ -773,28 +949,25 @@ namespace GPK_RePack.Forms
         #endregion
 
         private System.Windows.Forms.TreeView treeMain;
-        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.MenuStrip menuStrip;
         private System.Windows.Forms.ToolStripMenuItem mainToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabInfo;
-        private System.Windows.Forms.GroupBox boxDataButtons;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.TextBox boxLog;
         private System.Windows.Forms.TextBox boxInfo;
-        private System.Windows.Forms.Button btnReplace;
-        private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.Button btnImportRaw;
+        private System.Windows.Forms.Button btnExportRaw;
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.ToolStripMenuItem replaceSaveToolStripMenuItem;
-        private System.Windows.Forms.Panel boxCommands;
-        private System.Windows.Forms.GroupBox boxGeneralButtons;
         private System.Windows.Forms.Button btnAdd;
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
         private System.Windows.Forms.Button btnPaste;
         private System.Windows.Forms.Button btnCopy;
-        private System.Windows.Forms.Button btnExtractOGG;
+        private System.Windows.Forms.Button btnExportOgg;
         private System.Windows.Forms.Button btnDeleteData;
         private System.Windows.Forms.Button btnImportOgg;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
@@ -807,7 +980,6 @@ namespace GPK_RePack.Forms
         private System.Windows.Forms.TabPage tabPropertys;
         private System.Windows.Forms.DataGridView gridProps;
         private SplitContainer splitContainerTreeInfo;
-        private GroupBox boxPropertyButtons;
         private Button btnPropClear;
         private Button btnPropSave;
         private DataGridViewTextBoxColumn name;
@@ -816,12 +988,12 @@ namespace GPK_RePack.Forms
         private DataGridViewTextBoxColumn aIndex;
         private DataGridViewTextBoxColumn iType;
         private DataGridViewTextBoxColumn value;
-        private Button btnOggPreview;
+        private Button btnPreviewOgg;
         private ToolStripMenuItem setAllPropertysToolStripMenuItem;
         private ToolStripMenuItem setAllVolumeMultipliersToolStripMenuItem;
         private ToolStripMenuItem customToolStripMenuItem;
         private ToolStripMenuItem tESTBigBytePropExportToolStripMenuItem;
-        private StatusStrip statusStrip1;
+        private StatusStrip statusStrip;
         private ToolStripStatusLabel lblStatus;
         private ToolStripProgressBar ProgressBar;
         private ToolStripStatusLabel lblFiller;
@@ -829,12 +1001,31 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem addNameToolStripMenuItem;
         private TabPage tabTexturePreview;
         private PictureBox boxImagePreview;
-        private Button btnImageExport;
-        private Button btnImageImport;
+        private Button btnExportDDS;
+        private Button btnImportDDS;
         private ToolStripMenuItem searchForObjectToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator4;
         private ToolStripMenuItem nextToolStripMenuItem;
         private SplitContainer splitContainerLog_InfoTree;
+        private TableLayoutPanel boxPropertyButtons;
+        private TableLayoutPanel boxGeneralButtons;
+        private TableLayoutPanel boxDataButtons;
+        private ContextMenuStrip treeContextMenu;
+        private ToolStripMenuItem importToolStripMenuItem;
+        private ToolStripMenuItem importRawDataToolStripMenuItem;
+        private ToolStripMenuItem importOGGToolStripMenuItem;
+        private ToolStripMenuItem importDDSToolStripMenuItem;
+        private ToolStripMenuItem exportToolStripMenuItem;
+        private ToolStripMenuItem exportRawDataToolStripMenuItem;
+        private ToolStripMenuItem exportOGGToolStripMenuItem;
+        private ToolStripMenuItem exportDDSToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator5;
+        private ToolStripMenuItem addToolStripMenuItem;
+        private ToolStripMenuItem removeToolStripMenuItem;
+        private ToolStripMenuItem copyToolStripMenuItem;
+        private ToolStripMenuItem pasteToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator6;
+        private ToolStripMenuItem previewOGGToolStripMenuItem;
     }
 }
 

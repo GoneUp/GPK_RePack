@@ -46,6 +46,8 @@
             this.boxUseUID = new System.Windows.Forms.CheckBox();
             this.boxJitData = new System.Windows.Forms.CheckBox();
             this.boxGenerateMipmaps = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.boxScaleFactor = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -102,9 +104,9 @@
             this.groupBox2.Controls.Add(this.btnLogTrace);
             this.groupBox2.Controls.Add(this.btnLogInfo);
             this.groupBox2.Controls.Add(this.btnLogDebug);
-            this.groupBox2.Location = new System.Drawing.Point(171, 12);
+            this.groupBox2.Location = new System.Drawing.Point(12, 116);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(132, 98);
+            this.groupBox2.Size = new System.Drawing.Size(153, 98);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Log Level";
@@ -146,7 +148,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 113);
+            this.label1.Location = new System.Drawing.Point(12, 217);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(182, 13);
             this.label1.TabIndex = 2;
@@ -156,9 +158,9 @@
             // 
             this.groupBox3.Controls.Add(this.btnViewNormal);
             this.groupBox3.Controls.Add(this.btnViewClass);
-            this.groupBox3.Location = new System.Drawing.Point(309, 12);
+            this.groupBox3.Location = new System.Drawing.Point(171, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(169, 67);
+            this.groupBox3.Size = new System.Drawing.Size(176, 98);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "View Mode";
@@ -189,7 +191,7 @@
             // boxDebug
             // 
             this.boxDebug.AutoSize = true;
-            this.boxDebug.Location = new System.Drawing.Point(309, 109);
+            this.boxDebug.Location = new System.Drawing.Point(171, 147);
             this.boxDebug.Name = "boxDebug";
             this.boxDebug.Size = new System.Drawing.Size(88, 17);
             this.boxDebug.TabIndex = 7;
@@ -200,7 +202,7 @@
             // boxImports
             // 
             this.boxImports.AutoSize = true;
-            this.boxImports.Location = new System.Drawing.Point(309, 78);
+            this.boxImports.Location = new System.Drawing.Point(171, 116);
             this.boxImports.Name = "boxImports";
             this.boxImports.Size = new System.Drawing.Size(90, 17);
             this.boxImports.TabIndex = 8;
@@ -211,7 +213,7 @@
             // boxPatchmode
             // 
             this.boxPatchmode.AutoSize = true;
-            this.boxPatchmode.Location = new System.Drawing.Point(309, 93);
+            this.boxPatchmode.Location = new System.Drawing.Point(171, 131);
             this.boxPatchmode.Name = "boxPatchmode";
             this.boxPatchmode.Size = new System.Drawing.Size(81, 17);
             this.boxPatchmode.TabIndex = 9;
@@ -222,7 +224,7 @@
             // boxUseUID
             // 
             this.boxUseUID.AutoSize = true;
-            this.boxUseUID.Location = new System.Drawing.Point(396, 78);
+            this.boxUseUID.Location = new System.Drawing.Point(258, 116);
             this.boxUseUID.Name = "boxUseUID";
             this.boxUseUID.Size = new System.Drawing.Size(70, 17);
             this.boxUseUID.TabIndex = 10;
@@ -233,7 +235,7 @@
             // boxJitData
             // 
             this.boxJitData.AutoSize = true;
-            this.boxJitData.Location = new System.Drawing.Point(396, 93);
+            this.boxJitData.Location = new System.Drawing.Point(258, 131);
             this.boxJitData.Name = "boxJitData";
             this.boxJitData.Size = new System.Drawing.Size(67, 17);
             this.boxJitData.TabIndex = 11;
@@ -243,29 +245,48 @@
             // 
             // boxGenerateMipmaps
             // 
-            this.boxGenerateMipmaps.AutoSize = true;
-            this.boxGenerateMipmaps.Location = new System.Drawing.Point(396, 109);
+            this.boxGenerateMipmaps.Location = new System.Drawing.Point(171, 163);
             this.boxGenerateMipmaps.Name = "boxGenerateMipmaps";
-            this.boxGenerateMipmaps.Size = new System.Drawing.Size(73, 30);
+            this.boxGenerateMipmaps.Size = new System.Drawing.Size(134, 17);
             this.boxGenerateMipmaps.TabIndex = 12;
-            this.boxGenerateMipmaps.Text = "Generate \r\nMipMaps";
+            this.boxGenerateMipmaps.Text = "Generate MipMaps";
             this.boxGenerateMipmaps.UseVisualStyleBackColor = true;
             this.boxGenerateMipmaps.CheckedChanged += new System.EventHandler(this.boxGenerateMipmaps_CheckedChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(171, 181);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(132, 13);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "Font Scaling Factor (x,xx): ";
+            // 
+            // boxScaleFactor
+            // 
+            this.boxScaleFactor.Location = new System.Drawing.Point(302, 178);
+            this.boxScaleFactor.Name = "boxScaleFactor";
+            this.boxScaleFactor.Size = new System.Drawing.Size(36, 20);
+            this.boxScaleFactor.TabIndex = 14;
+            this.boxScaleFactor.Text = "1,0";
+            this.boxScaleFactor.TextChanged += new System.EventHandler(this.boxScaleFactor_TextChanged);
             // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(476, 140);
+            this.ClientSize = new System.Drawing.Size(360, 249);
+            this.Controls.Add(this.boxScaleFactor);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.boxGenerateMipmaps);
             this.Controls.Add(this.boxJitData);
             this.Controls.Add(this.boxUseUID);
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.boxPatchmode);
             this.Controls.Add(this.boxImports);
             this.Controls.Add(this.boxDebug);
-            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Options";
@@ -303,5 +324,7 @@
         private System.Windows.Forms.CheckBox boxUseUID;
         private System.Windows.Forms.CheckBox boxJitData;
         private System.Windows.Forms.CheckBox boxGenerateMipmaps;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox boxScaleFactor;
     }
 }
