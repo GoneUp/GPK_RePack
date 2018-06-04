@@ -145,7 +145,7 @@ namespace GPK_RePack.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool GenerateMipMaps {
             get {
                 return ((bool)(this["GenerateMipMaps"]));

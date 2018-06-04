@@ -293,12 +293,18 @@ namespace GPK_RePack.Forms
             }
         }
 
+        private void savepaddingStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            saveToolStripMenuItem_Click(sender, e);
+        }
+
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DateTime start = DateTime.Now;
             List<IProgress> runningSavers = new List<IProgress>();
             List<Task> runningTasks = new List<Task>();
+            bool usePadding = sender == savepaddingStripMenuItem1;
 
             if (loadedGpkPackages.Count == 0)
                 return;
@@ -311,7 +317,7 @@ namespace GPK_RePack.Forms
                     Task newTask = new Task(delegate ()
                     {
                         string savepath = package.Path + "_rebuild";
-                        tmpS.SaveGpkPackage(package, savepath);
+                        tmpS.SaveGpkPackage(package, savepath, usePadding);
                     });
                     newTask.Start();
                     runningTasks.Add(newTask);
@@ -1747,9 +1753,11 @@ namespace GPK_RePack.Forms
 
 
 
+
+
         #endregion
 
-
+     
     }
 }
 

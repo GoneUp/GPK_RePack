@@ -124,27 +124,29 @@
     <value>17, 17</value>
   </metadata>
   <data name="boxInfo.Text" xml:space="preserve">
-    <value>Source Code: https://github.com/GoneUp/GPK_RePack/  
-
-
-Quick Guide:
+    <value>Quick Guide:
 1. Open a *.gpk file via Main -&gt; Open
 2. Select a Object you want to edit on the treeview
 3 - Editing
 3a) Use the buttons Export/Replace raw data for editing any object data
-3b) Use the buttons Export/Import/Empty ogg for editing audio (Soundnodewave) files
+3b) Use the buttons Import/Export/Empty ogg for editing audio (SoundNodeWave) files
+3c) Use the buttons Import/Export DDS for editing images (Texture2D)
 3c) Use the buttons Copy/Paste (or Control-C, Control-V) on any object. You can choose in the settings what the parts of the object the program should copy,
 4 - Saving
-4a) The normal way to save is Main -&gt; Save. The program will rebuild a new Gpk file from scratch. 
+4a) The normal way to save is Main -&gt; Save. The program will rebuild the GPK file from scratch. 
 4b) If the normal way is failing switch select Patch Mode in settings and try to import the data again (only over raw import/export). Save afterwards via Main -&gt; Save patched.
  
 
-Note: Tera accepts only files with the exact same file size as the orginal file. Terahelper will fill the file up if its too small and warn you if it is too big. In this case you need to reduce the file size to fit the maximum.
+About Padding: 
+Tera accepts only files with the exact same file size as the orginal file in some cases, for example at soundfiles. I'm not entire sure what's the reason for this, calls for some reverse engineering xD
+The save menu offers you the option to save as-is and a option with added padding. Terahelper will fill the file up if it's too small and warn you if it is too big. 
 If you want to change the maximum size manually select a the package and use the Misc -&gt; Set Filesize function.
 
 
-Have Fun &amp; Always Backup
--- GoneUp</value>
+hfgl
+-- GoneUp (hstrobel.dev@gmail.com)
+
+Source Code is available on Github: https://github.com/GoneUp/GPK_RePack/  </value>
   </data>
   <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

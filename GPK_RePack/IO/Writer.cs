@@ -46,7 +46,7 @@ namespace GPK_RePack.IO
             File.WriteAllBytes(savepath, buffer);
         }
 
-        public void SaveGpkPackage(GpkPackage package, string savepath)
+        public void SaveGpkPackage(GpkPackage package, string savepath, bool addPadding)
         {
             //Header 
             //Namelist
@@ -73,8 +73,16 @@ namespace GPK_RePack.IO
                 WriteImports(writer, package);
                 WriteExports(writer, package);
                 WriteExportsData(writer, package);
-                //WriteFilePadding(writer, package, compuSize);
-                WriteFileEnding(writer, package, compuSize);
+                if (addPadding)
+                {
+                    WriteFilePadding(writer, package, compuSize);
+                }
+                else
+                {
+                    WriteFileEnding(writer, package, compuSize);
+                }
+
+
             }
 
             watch.Stop();
@@ -359,7 +367,7 @@ namespace GPK_RePack.IO
             logger.Debug("Compu Size: {0}, Diff: {1} -", compuSize, final_size - compuSize);
 
 
-     
+
 
         }
 
