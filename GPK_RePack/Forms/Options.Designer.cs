@@ -38,6 +38,7 @@
             this.btnLogDebug = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnViewPack = new System.Windows.Forms.RadioButton();
             this.btnViewNormal = new System.Windows.Forms.RadioButton();
             this.btnViewClass = new System.Windows.Forms.RadioButton();
             this.boxDebug = new System.Windows.Forms.CheckBox();
@@ -156,6 +157,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.btnViewPack);
             this.groupBox3.Controls.Add(this.btnViewNormal);
             this.groupBox3.Controls.Add(this.btnViewClass);
             this.groupBox3.Location = new System.Drawing.Point(171, 12);
@@ -164,6 +166,17 @@
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "View Mode";
+            // 
+            // btnViewPack
+            // 
+            this.btnViewPack.Location = new System.Drawing.Point(6, 65);
+            this.btnViewPack.Name = "btnViewPack";
+            this.btnViewPack.Size = new System.Drawing.Size(107, 17);
+            this.btnViewPack.TabIndex = 5;
+            this.btnViewPack.TabStop = true;
+            this.btnViewPack.Text = "Per Package";
+            this.btnViewPack.UseVisualStyleBackColor = true;
+            this.btnViewPack.CheckedChanged += new System.EventHandler(this.btnViewPack_CheckedChanged);
             // 
             // btnViewNormal
             // 
@@ -326,5 +339,6 @@
         private System.Windows.Forms.CheckBox boxGenerateMipmaps;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox boxScaleFactor;
+        private System.Windows.Forms.RadioButton btnViewPack;
     }
 }

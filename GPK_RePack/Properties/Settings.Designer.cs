@@ -166,5 +166,17 @@ namespace GPK_RePack.Properties {
                 this["ScaleFactorHack"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableTexture2D {
+            get {
+                return ((bool)(this["EnableTexture2D"]));
+            }
+            set {
+                this["EnableTexture2D"] = value;
+            }
+        }
     }
 }

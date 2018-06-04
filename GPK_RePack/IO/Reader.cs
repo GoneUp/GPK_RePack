@@ -195,6 +195,7 @@ namespace GPK_RePack.IO
                 GpkImport import = new GpkImport();
                 long package_class_index = reader.ReadInt64();
                 long class_index = reader.ReadInt64();
+
                 import.PackageRef = reader.ReadInt32();
                 long object_index = reader.ReadInt32();
                 import.Unk = reader.ReadInt32();

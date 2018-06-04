@@ -56,6 +56,9 @@ namespace GPK_RePack.Forms
                 case "class":
                     btnViewClass.Checked = true;
                     break;
+                case "package":
+                    btnViewPack.Checked = true;
+                    break;
             }
 
             boxDebug.Checked = Settings.Default.Debug;
@@ -116,6 +119,11 @@ namespace GPK_RePack.Forms
             Settings.Default.ViewMode = "class";
         }
 
+        private void btnViewPack_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.ViewMode = "package";
+        }
+
         private void boxDebug_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.Debug = boxDebug.Checked;
@@ -154,5 +162,7 @@ namespace GPK_RePack.Forms
                 Settings.Default.ScaleFactorHack = result;
             }
         }
+
+      
     }
 }

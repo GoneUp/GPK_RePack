@@ -399,71 +399,106 @@ namespace GPK_RePack.Forms
                 GpkPackage package = loadedGpkPackages[i];
                 TreeNode nodeP = treeMain.Nodes.Add(i.ToString(), package.Filename);
 
-                switch (Settings.Default.ViewMode)
+                Dictionary<string, TreeNode> classNodes = new Dictionary<string, TreeNode>();
+                TreeNode nodeI = null;
+                TreeNode nodeE = null;
+
+                if (Settings.Default.ShowImports)
                 {
-                    case "normal":
-                        if (Settings.Default.ShowImports)
+                    foreach (var tmp in package.ImportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
+                    {
+                        string key = tmp.Value.UID;
+                        string value = tmp.Value.ObjectName;
+                        if (Settings.Default.UseUID) value = key;
+
+                        switch (Settings.Default.ViewMode)
                         {
-                            TreeNode nodeI = nodeP.Nodes.Add("Imports");
-
-                            foreach (var tmp in package.ImportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
-                            {
-                                string key = tmp.Value.UID;
-                                string value = tmp.Value.ObjectName;
-                                if (Settings.Default.UseUID) value = key;
-
+                            case "normal":
+                                if (nodeI == null)
+                                    nodeI = nodeP.Nodes.Add("Imports");
+                                
                                 nodeI.Nodes.Add(key, value);
-                            }
-                        }
-
-                        //Exports
-                        TreeNode nodeE = nodeP.Nodes.Add("Exports");
-                        foreach (var tmp in package.ExportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
-                        {
-                            string key = tmp.Value.UID;
-                            string value = tmp.Value.ObjectName;
-                            if (Settings.Default.UseUID) value = key;
-
-                            nodeE.Nodes.Add(key, value);
-                        }
-                        break;
-                    case "class":
-                        Dictionary<string, TreeNode> classNodes = new Dictionary<string, TreeNode>();
-                        if (Settings.Default.ShowImports)
-                        {
-                            foreach (var tmp in package.ImportList)
-                            {
-                                string key = tmp.Value.UID;
-                                string value = tmp.Value.ObjectName;
-                                if (Settings.Default.UseUID) value = key;
-
+                                break;
+                            case "class":
                                 CheckClassNode(tmp.Value.ClassName, classNodes, nodeP);
                                 classNodes[tmp.Value.ClassName].Nodes.Add(key, value);
-
-                            }
+                                break;
                         }
+                        
+                    }
+                }
 
-                        foreach (var tmp in package.ExportList)
-                        {
-                            string key = tmp.Value.UID;
-                            string value = tmp.Value.ObjectName;
-                            if (Settings.Default.UseUID) value = key;
+                //Exports
+                foreach (var tmp in package.ExportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
+                {
+                    string key = tmp.Value.UID;
+                    string value = tmp.Value.ObjectName;
+                    if (Settings.Default.UseUID) value = key;
 
+                    switch (Settings.Default.ViewMode)
+                    {
+                        case "normal":
+                            if (nodeE == null)
+                                nodeE = nodeP.Nodes.Add("Exports");
+
+
+                            nodeE.Nodes.Add(key, value);
+                            break;
+                        case "class":
                             CheckClassNode(tmp.Value.ClassName, classNodes, nodeP);
                             classNodes[tmp.Value.ClassName].Nodes.Add(key, value);
-                        }
-                        break;
+                            break;
+
+                        case "package":
+                            CheckClassNode(tmp.Value.PackageName, classNodes, nodeP);
+                            classNodes[tmp.Value.PackageName].Nodes.Add(key, value);
+                            break;
+
+                    }
+                    
                 }
             }
+
+
+            treeMain.TreeViewNodeSorter = new MiscFuncs.NodeSorter();
+            treeMain.Sort();
         }
+
+
+
 
         private void CheckClassNode(string className, Dictionary<string, TreeNode> classNodes, TreeNode mainNode)
         {
-            if (!classNodes.ContainsKey(className))
+
+            if (!className.Contains("."))
             {
-                TreeNode classNode = mainNode.Nodes.Add(className);
-                classNodes.Add(className, classNode);
+                //base case
+                if (!classNodes.ContainsKey(className))
+                {
+                    TreeNode classNode = mainNode.Nodes.Add(className);
+                    classNodes.Add(className, classNode);
+                }
+            } else
+            {
+                var split = className.Split('.').ToList();
+                String toAdd = split.Last();
+                split.RemoveAt(split.Count - 1);
+                String left = String.Join(".", split);
+                Debug.Print("toadd {0} left {1}", toAdd, left);
+
+                //recursion to add missing nodes
+                if (!classNodes.ContainsKey(left))
+                {
+                    CheckClassNode(left, classNodes, mainNode);
+                }
+
+                if (!classNodes.ContainsKey(className))
+                {
+                    TreeNode classNode = classNodes[left].Nodes.Add(toAdd);
+                    classNodes.Add(className, classNode);
+                }
             }
+            
         }
 
 
@@ -486,9 +521,12 @@ namespace GPK_RePack.Forms
 
                 boxDataButtons.Enabled = true;
             }
-            else if (e.Node.Level == 2)
+
+            //check if we have a leaf
+            else if (e.Node.Level == 2 && Settings.Default.ViewMode != "package" ||
+                Settings.Default.ViewMode == "package" && e.Node.Nodes.Count == 0)
             {
-                GpkPackage package = loadedGpkPackages[Convert.ToInt32(e.Node.Parent.Parent.Name)];
+                GpkPackage package = loadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
                 Object selected = package.GetObjectByUID(e.Node.Name);
 
                 if (selected is GpkImport)
@@ -513,6 +551,15 @@ namespace GPK_RePack.Forms
             }
         }
 
+        private TreeNode getRootNode()
+        {
+            TreeNode node = treeMain.SelectedNode;
+            while (node.Parent != null)
+            {
+                node = node.Parent;
+            }
+            return node;
+        }
 
         private void refreshExportInfo()
         {

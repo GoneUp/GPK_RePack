@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -160,6 +161,17 @@ namespace GPK_RePack
 
             if (File.Exists(open.FileName)) Settings.Default.OpenDir = Path.GetDirectoryName(open.FileName);
             return open.FileNames;
+        }
+
+        public class NodeSorter : IComparer
+        {
+            public int Compare(object x, object y)
+            {
+                TreeNode tx = (TreeNode)x;
+                TreeNode ty = (TreeNode)y;
+
+                return String.Compare(tx.Text, ty.Text);
+            }
         }
     }
 }
