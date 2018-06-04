@@ -64,7 +64,7 @@ namespace GPK_RePack.Model
             if (uncompressedData != null)
             {
                 uncompressedDataSize = uncompressedData.Length;
-                compressedData = null; //save memory
+                //compressedData = null; //save memory
             }
         }
 
@@ -102,10 +102,7 @@ namespace GPK_RePack.Model
                 }
             }
 
-            if (compressedData != null)
-            {
-                compressedSize = compressedData.Length;
-            }
+            compressedSize = compressedData.Length;
         }
     }
 }

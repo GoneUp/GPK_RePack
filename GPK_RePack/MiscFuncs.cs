@@ -151,15 +151,27 @@ namespace GPK_RePack
             return "";
         }
 
-        public static String[] GenerateOpenDialog(bool multiselect)
+        [STAThread]
+        public static String[] GenerateOpenDialog(bool multiselect, Control cnt, bool useWorkingDir = true)
         {
             OpenFileDialog open = new OpenFileDialog();
             open.Multiselect = multiselect;
             open.ValidateNames = true;
-            open.InitialDirectory = Settings.Default.OpenDir;
+            open.InitialDirectory = useWorkingDir ? Settings.Default.WorkingDir : Settings.Default.OpenDir;
             open.ShowDialog();
 
-            if (File.Exists(open.FileName)) Settings.Default.OpenDir = Path.GetDirectoryName(open.FileName);
+            if (File.Exists(open.FileName))
+            {
+                if (useWorkingDir)
+                {
+                    Settings.Default.WorkingDir = Path.GetDirectoryName(open.FileName);
+                } else
+                {
+                    Settings.Default.OpenDir = Path.GetDirectoryName(open.FileName);
+                }
+                
+            }
+                
             return open.FileNames;
         }
 

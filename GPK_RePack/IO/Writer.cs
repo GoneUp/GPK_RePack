@@ -73,7 +73,8 @@ namespace GPK_RePack.IO
                 WriteImports(writer, package);
                 WriteExports(writer, package);
                 WriteExportsData(writer, package);
-                WriteFilePadding(writer, package, compuSize);
+                //WriteFilePadding(writer, package, compuSize);
+                WriteFileEnding(writer, package, compuSize);
             }
 
             watch.Stop();
@@ -349,6 +350,19 @@ namespace GPK_RePack.IO
 
         }
 
+        private void WriteFileEnding(BinaryWriter writer, GpkPackage package, int compuSize)
+        {
+            long final_size = writer.BaseStream.Position + 4;
+            writer.Write((int)final_size);
+
+            logger.Debug("New size: {0}, Old size: {1}", final_size, package.OrginalSize);
+            logger.Debug("Compu Size: {0}, Diff: {1} -", compuSize, final_size - compuSize);
+
+
+     
+
+        }
+
         public static int GetStringBytes(string text, bool isUnicode)
         {
             //length + string + terminating
@@ -377,7 +391,7 @@ namespace GPK_RePack.IO
         {
             if (includeHeader)
             {
-                writer.Write(text.Length + 1 * -1);
+                writer.Write((text.Length + 1) * -1);
             }
             writer.Write(Encoding.Unicode.GetBytes(text));
             writer.Write(new short());

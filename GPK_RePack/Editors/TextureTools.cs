@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using GPK_RePack.Model;
 using GPK_RePack.Model.Payload;
+using GPK_RePack.Model.Prop;
 using GPK_RePack.Properties;
 using NLog;
 using UpkManager.Dds;
@@ -48,6 +49,7 @@ namespace GPK_RePack.Editors
 
                     var textureMipMap = new MipMap();
                     textureMipMap.compFlag = (int)CompressionTypes.LZO;
+                    //textureMipMap.compFlag = 0;
                     textureMipMap.uncompressedData = outputData;
                     textureMipMap.uncompressedSize = outputData.Length;
                     textureMipMap.uncompressedSize_chunkheader = outputData.Length;
@@ -58,7 +60,10 @@ namespace GPK_RePack.Editors
                     texture2d.maps.Add(textureMipMap);
                 }
 
+                int mipTailBaseIdx = (int)Math.Log(image.Width > image.Height ? image.Width : image.Height, 2);
+                ((GpkIntProperty) export.GetProperty("MipTailBaseIdx")).SetValue(mipTailBaseIdx.ToString());
 
+                logger.Info("Imported image from {0}, size {1}x{2}, target format {3}, mipTailBaseIdx {4}", file, image.Width, image.Height, config.FileFormat, mipTailBaseIdx);
             }
             catch (Exception ex)
             {

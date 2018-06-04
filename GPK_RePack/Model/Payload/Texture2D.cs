@@ -53,7 +53,7 @@ namespace GPK_RePack.Model.Payload
             foreach (var map in maps)
             {
                 //refressh block info, compress blocks
-                map.generateBlocks();
+                //map.generateBlocks();
 
                 //chunk
                 //info

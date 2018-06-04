@@ -49,6 +49,8 @@
             this.boxGenerateMipmaps = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.boxScaleFactor = new System.Windows.Forms.TextBox();
+            this.btnOpenSettingsFolder = new System.Windows.Forms.Button();
+            this.boxEnableTexture2D = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -149,7 +151,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 217);
+            this.label1.Location = new System.Drawing.Point(9, 243);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(182, 13);
             this.label1.TabIndex = 2;
@@ -284,11 +286,34 @@
             this.boxScaleFactor.Text = "1,0";
             this.boxScaleFactor.TextChanged += new System.EventHandler(this.boxScaleFactor_TextChanged);
             // 
+            // btnOpenSettingsFolder
+            // 
+            this.btnOpenSettingsFolder.Location = new System.Drawing.Point(18, 220);
+            this.btnOpenSettingsFolder.Name = "btnOpenSettingsFolder";
+            this.btnOpenSettingsFolder.Size = new System.Drawing.Size(147, 20);
+            this.btnOpenSettingsFolder.TabIndex = 15;
+            this.btnOpenSettingsFolder.Text = "Open Setting Folder";
+            this.btnOpenSettingsFolder.UseVisualStyleBackColor = true;
+            this.btnOpenSettingsFolder.Click += new System.EventHandler(this.btnOpenSettingsFolder_Click);
+            // 
+            // boxEnableTexture2D
+            // 
+            this.boxEnableTexture2D.AutoSize = true;
+            this.boxEnableTexture2D.Location = new System.Drawing.Point(258, 147);
+            this.boxEnableTexture2D.Name = "boxEnableTexture2D";
+            this.boxEnableTexture2D.Size = new System.Drawing.Size(102, 17);
+            this.boxEnableTexture2D.TabIndex = 16;
+            this.boxEnableTexture2D.Text = "Texture Support";
+            this.boxEnableTexture2D.UseVisualStyleBackColor = true;
+            this.boxEnableTexture2D.CheckedChanged += new System.EventHandler(this.boxEnableTexture2D_CheckedChanged);
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(360, 249);
+            this.ClientSize = new System.Drawing.Size(356, 265);
+            this.Controls.Add(this.boxEnableTexture2D);
+            this.Controls.Add(this.btnOpenSettingsFolder);
             this.Controls.Add(this.boxScaleFactor);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.boxGenerateMipmaps);
@@ -340,5 +365,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox boxScaleFactor;
         private System.Windows.Forms.RadioButton btnViewPack;
+        private System.Windows.Forms.Button btnOpenSettingsFolder;
+        private System.Windows.Forms.CheckBox boxEnableTexture2D;
     }
 }

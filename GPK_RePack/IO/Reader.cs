@@ -382,7 +382,11 @@ namespace GPK_RePack.IO
                     export.Payload = new SoundCue();
                     break;
                 case "Core.Texture2D":
-                    //export.Payload = new Texture2D();
+                    if (Settings.Default.EnableTexture2D)
+                    {
+                        export.Payload = new Texture2D();
+                    }
+                    
                     break;
             }
 

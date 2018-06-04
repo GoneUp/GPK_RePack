@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -68,6 +71,7 @@ namespace GPK_RePack.Forms
             boxJitData.Checked = Settings.Default.JitData;
             boxGenerateMipmaps.Checked = Settings.Default.GenerateMipMaps;
             boxScaleFactor.Text = Settings.Default.ScaleFactorHack.ToString();
+            boxEnableTexture2D.Checked = Settings.Default.EnableTexture2D;
         }
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
@@ -163,6 +167,17 @@ namespace GPK_RePack.Forms
             }
         }
 
-      
+        private void btnOpenSettingsFolder_Click(object sender, EventArgs e)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+            var folder = Path.GetDirectoryName(config.FilePath);
+            Process.Start("explorer.exe", folder);
+     
+        }
+
+        private void boxEnableTexture2D_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.EnableTexture2D = boxEnableTexture2D.Checked;
+        }
     }
 }

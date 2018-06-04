@@ -92,6 +92,7 @@ namespace GPK_RePack.Forms
                     MessageBox.Show("Setting file was missing. Please restart the application.");
                     Environment.Exit(0);
                 }
+                Debug.Print("LOL" + Settings.Default.EnableTexture2D);
 
                 //nlog init
                 NLogConfig.SetDefaultConfig();
@@ -114,6 +115,8 @@ namespace GPK_RePack.Forms
                 if (Settings.Default.OpenDir == "")
                     Settings.Default.OpenDir = Directory.GetCurrentDirectory();
 
+                if (Settings.Default.WorkingDir == "")
+                    Settings.Default.WorkingDir = Directory.GetCurrentDirectory();
 
                 texturePage = tabTexturePreview;
                 hidePreviewTab();
@@ -195,7 +198,7 @@ namespace GPK_RePack.Forms
             }
             else
             {
-                files = MiscFuncs.GenerateOpenDialog(true);
+                files = MiscFuncs.GenerateOpenDialog(true, this, false);
             }
 
             if (files.Length == 0) return;
@@ -523,8 +526,8 @@ namespace GPK_RePack.Forms
             }
 
             //check if we have a leaf
-            else if (e.Node.Level == 2 && Settings.Default.ViewMode != "package" ||
-                Settings.Default.ViewMode == "package" && e.Node.Nodes.Count == 0)
+            else if (e.Node.Level == 2 && Settings.Default.ViewMode == "normal" ||
+                 e.Node.Nodes.Count == 0)
             {
                 GpkPackage package = loadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
                 Object selected = package.GetObjectByUID(e.Node.Name);
@@ -581,6 +584,9 @@ namespace GPK_RePack.Forms
 
         private void tabControl_Selected(object sender, TabControlEventArgs e)
         {
+            if (selectedExport == null)
+                return;
+
             if (e.TabPage == tabTexturePreview)
             {
                 if (selectedExport.Payload != null && selectedExport.Payload is Texture2D)
@@ -701,7 +707,7 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            String[] files = MiscFuncs.GenerateOpenDialog(false);
+            String[] files = MiscFuncs.GenerateOpenDialog(false, this);
             if (files.Length == 0) return;
             string path = files[0];
 
@@ -911,7 +917,7 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            string[] files = MiscFuncs.GenerateOpenDialog(false);
+            string[] files = MiscFuncs.GenerateOpenDialog(false, this);
             if (files.Length == 0) return;
 
             if (files[0] != "" && File.Exists(files[0]))
@@ -955,7 +961,7 @@ namespace GPK_RePack.Forms
             {
                 if (selectedExport != null)
                 {
-                    String[] files = MiscFuncs.GenerateOpenDialog(false);
+                    String[] files = MiscFuncs.GenerateOpenDialog(false, this);
                     if (files.Length == 0) return;
 
                     if (File.Exists(files[0]))
@@ -1614,7 +1620,7 @@ namespace GPK_RePack.Forms
             var arrayProp = checkArrayRow();
             if (arrayProp == null) return;
 
-            String[] files = MiscFuncs.GenerateOpenDialog(false);
+            String[] files = MiscFuncs.GenerateOpenDialog(false, this);
             if (files.Length == 0) return;
             string path = files[0];
             if (!File.Exists(path)) return;
@@ -1680,59 +1686,64 @@ namespace GPK_RePack.Forms
         }
 
 
+        [STAThread]
         private void selectContextAction(object sender, ToolStripItemClickedEventArgs e)
         {
-            if (e.ClickedItem == addToolStripMenuItem)
+            this.BeginInvoke(new MethodInvoker(delegate
             {
 
-            }
-            else if (e.ClickedItem == removeToolStripMenuItem)
-            {
-                btnDelete_Click(null, null);
-            }
-            else if (e.ClickedItem == copyToolStripMenuItem)
-            {
-                btnCopy_Click(null, null);
-            }
-            else if (e.ClickedItem == pasteToolStripMenuItem)
-            {
-                btnPaste_Click(null, null);
-            }
+                if (e.ClickedItem == addToolStripMenuItem)
+                {
 
-            //import
-            else if (e.ClickedItem == importRawDataToolStripMenuItem)
-            {
-                btnReplace_Click(null, null);
-            }
-            else if (e.ClickedItem == importDDSToolStripMenuItem)
-            {
-                btnImageImport_Click(null, null);
-            }
-            else if (e.ClickedItem == importOGGToolStripMenuItem)
-            {
-                btnImportOgg_Click(null, null);
-            }
+                }
+                else if (e.ClickedItem == removeToolStripMenuItem)
+                {
+                    btnDelete_Click(null, null);
+                }
+                else if (e.ClickedItem == copyToolStripMenuItem)
+                {
+                    btnCopy_Click(null, null);
+                }
+                else if (e.ClickedItem == pasteToolStripMenuItem)
+                {
+                    btnPaste_Click(null, null);
+                }
 
-            //export
-            else if (e.ClickedItem == exportRawDataToolStripMenuItem)
-            {
-                btnExport_Click(null, null);
-            }
-            else if (e.ClickedItem == exportDDSToolStripMenuItem)
-            {
-                btnImageExport_Click(null, null);
-            }
-            else if (e.ClickedItem == exportOGGToolStripMenuItem)
-            {
-                btnExtractOGG_Click(null, null);
-            }
-            //preview ogg
+                //import
+                else if (e.ClickedItem == importRawDataToolStripMenuItem)
+                {
+                    btnReplace_Click(null, null);
+                }
+                else if (e.ClickedItem == importDDSToolStripMenuItem)
+                {
+                    btnImageImport_Click(null, null);
+                }
+                else if (e.ClickedItem == importOGGToolStripMenuItem)
+                {
+                    btnImportOgg_Click(null, null);
+                }
 
-            else if (e.ClickedItem == previewOGGToolStripMenuItem)
-            {
-                btnOggPreview_Click(null, null);
-            }
-        }
+                //export
+                else if (e.ClickedItem == exportRawDataToolStripMenuItem)
+                {
+                    btnExport_Click(null, null);
+                }
+                else if (e.ClickedItem == exportDDSToolStripMenuItem)
+                {
+                    btnImageExport_Click(null, null);
+                }
+                else if (e.ClickedItem == exportOGGToolStripMenuItem)
+                {
+                    btnExtractOGG_Click(null, null);
+                }
+                //preview ogg
+
+                else if (e.ClickedItem == previewOGGToolStripMenuItem)
+                {
+                    btnOggPreview_Click(null, null);
+                }
+            })); 
+         }
 
 
 
