@@ -4,6 +4,7 @@
 
 GPK_RePack/bin/
 GPK_RePack/obj/
+build/
 
 
 ## Ignore Visual Studio temporary files, build results, and
