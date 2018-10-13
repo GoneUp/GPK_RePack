@@ -1,12 +1,9 @@
 ﻿<Fluent:RibbonWindow x:Class="GpkWpfUI.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ribbon="clr-namespace:System.Windows.Controls.Ribbon;assembly=System.Windows.Controls.Ribbon"
-        xmlns:Fluent="urn:fluent-ribbon"
+               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:Fluent="urn:fluent-ribbon"
         xmlns:local="clr-namespace:GpkWpfUI"
-        mc:Ignorable="d"
+      
         Title="MainWindow" Height="517" Width="896">
 
 
@@ -20,16 +17,17 @@
 
             <!--Tabs-->
             <Fluent:RibbonTabItem Header="Home">
-                <Fluent:RibbonGroupBox Header="Object Handling">
-                    <Fluent:Button Header="Ad9d"
-                         LargeIcon="pack://application:,,,/Icons/Import_16x.png" />
+                
+                <Fluent:RibbonGroupBox Name="lol" Header="Object Handling">
+                    <Fluent:Button Header="Add"
+                         Icon="pack://application:,,,/icons/add.ico"
+                         LargeIcon="pack://application:,,,/GpkWpfUI;component/icons/add.ico" />
                     
-                    <Fluent:Button Header="Remove" 
-                         LargeIcon="/Icons/Export_16x.png" />
+                    <Fluent:Button Header="Remove" />
                     <Fluent:Button Header="Copy" 
-                        LargeIcon="Icons/Copy_16x.png" />
+                        Icon="/icons/copy.png" />
                     <Fluent:Button Header="Paste" 
-                        LargeIcon="Icons/Paste_16x.png" />
+                        Icon="Icons/paste.png" />
                 </Fluent:RibbonGroupBox>
                 <Fluent:RibbonGroupBox Header="Data Handling">
                     <Fluent:Button Header="Import"
