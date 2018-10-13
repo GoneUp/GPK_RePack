@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using GPK_RePack.Editors;
+using GPK_RePack.Forms.Helper;
 using GPK_RePack.IO;
 using GPK_RePack.Model;
 using GPK_RePack.Model.Interfaces;
@@ -57,6 +58,7 @@ namespace GPK_RePack.Forms
 
         private List<TreeNode> searchResultNodes = new List<TreeNode>();
         private int searchResultIndex = 0;
+        private TextBoxTempShow tempStatusLabel;
         private TabPage texturePage;
         #endregion
 
@@ -64,7 +66,6 @@ namespace GPK_RePack.Forms
 
         protected override void OnLoad(EventArgs e)
         {
-
 
             base.OnLoad(e);
         }
@@ -103,6 +104,7 @@ namespace GPK_RePack.Forms
                 //Our stuff
                 logger.Info("Startup");
                 loadedGpkPackages = new List<GpkPackage>();
+                tempStatusLabel = new TextBoxTempShow(lblStatus, this);
 
                 //audio
                 waveOut = new WaveOut();
@@ -1239,7 +1241,7 @@ namespace GPK_RePack.Forms
         {
             string input = Microsoft.VisualBasic.Interaction.InputBox("String to search?", "Search");
 
-            if (input == "")
+            if (String.IsNullOrEmpty(input))
                 return;
 
             searchResultNodes.Clear();
@@ -1253,7 +1255,7 @@ namespace GPK_RePack.Forms
                 }
             }
 
-            selectSearchResult();
+            tryToSelectNextSearchResult();
         }
 
         IEnumerable<TreeNode> Collect(TreeNodeCollection nodes)
@@ -1269,22 +1271,25 @@ namespace GPK_RePack.Forms
 
         private void nextToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            searchResultIndex++;
-            if (searchResultNodes.Count == 0 || searchResultNodes.Count <= searchResultIndex)
+            tryToSelectNextSearchResult();
+        }
+
+        private void tryToSelectNextSearchResult()
+        {
+            if (searchResultNodes.Count == 0 || searchResultIndex >= searchResultNodes.Count)
             {
                 SystemSounds.Asterisk.Play();
+                searchResultIndex = 0;
+                tempStatusLabel.StartTimer("Ready", String.Format("End reached, searching from start.", searchResultIndex, searchResultNodes.Count), 2000);
                 return;
 
             }
 
-
-            selectSearchResult();
-        }
-
-        private void selectSearchResult()
-        {
             treeMain.SelectedNode = searchResultNodes[searchResultIndex];
             treeMain_AfterSelect(this, new TreeViewEventArgs(searchResultNodes[searchResultIndex]));
+            tempStatusLabel.StartTimer("Ready", String.Format("Result {0}/{1}", searchResultIndex + 1, searchResultNodes.Count), 2000);
+
+            searchResultIndex++;
         }
 
         #endregion //search

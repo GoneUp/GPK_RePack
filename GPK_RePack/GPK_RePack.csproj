@@ -118,6 +118,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\Helper\TextBoxTempShow.cs" />
     <Compile Include="Model\Payload\ChunkBlock.cs" />
     <Compile Include="ResourceExtractor.cs" />
     <Compile Include="Model\ExportData\DataLoader.cs" />
