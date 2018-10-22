@@ -72,6 +72,7 @@ namespace GPK_RePack.Forms
             boxGenerateMipmaps.Checked = Settings.Default.GenerateMipMaps;
             boxScaleFactor.Text = Settings.Default.ScaleFactorHack.ToString();
             boxEnableTexture2D.Checked = Settings.Default.EnableTexture2D;
+            boxColorPreview.BackColor = Settings.Default.PreviewColor;
         }
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
@@ -178,6 +179,20 @@ namespace GPK_RePack.Forms
         private void boxEnableTexture2D_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.EnableTexture2D = boxEnableTexture2D.Checked;
+        }
+
+        private void btnSelectColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog dialog = new ColorDialog();
+            dialog.Color = Settings.Default.PreviewColor;
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                Settings.Default.PreviewColor = dialog.Color;
+                boxColorPreview.BackColor = dialog.Color;
+            }
+
+
         }
     }
 }

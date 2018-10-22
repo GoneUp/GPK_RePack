@@ -170,6 +170,7 @@ namespace GPK_RePack.Forms
             ProgressBar.Value = 0;
             lblStatus.Text = "Ready";
             ClearGrid();
+            boxImagePreview.Image = null;
         }
 
         private void GUI_FormClosing(object sender, FormClosingEventArgs e)
@@ -295,7 +296,7 @@ namespace GPK_RePack.Forms
             }
         }
 
-        private void savepaddingStripMenuItem1_Click(object sender, EventArgs e)
+        private void savepaddingStripMenuItem_Click(object sender, EventArgs e)
         {
             saveToolStripMenuItem_Click(sender, e);
         }
@@ -306,7 +307,7 @@ namespace GPK_RePack.Forms
             DateTime start = DateTime.Now;
             List<IProgress> runningSavers = new List<IProgress>();
             List<Task> runningTasks = new List<Task>();
-            bool usePadding = sender == savepaddingStripMenuItem1;
+            bool usePadding = sender == savePaddingStripMenuItem;
 
             if (loadedGpkPackages.Count == 0)
                 return;
@@ -427,7 +428,7 @@ namespace GPK_RePack.Forms
                             case "normal":
                                 if (nodeI == null)
                                     nodeI = nodeP.Nodes.Add("Imports");
-                                
+
                                 nodeI.Nodes.Add(key, value);
                                 break;
                             case "class":
@@ -435,7 +436,7 @@ namespace GPK_RePack.Forms
                                 classNodes[tmp.Value.ClassName].Nodes.Add(key, value);
                                 break;
                         }
-                        
+
                     }
                 }
 
@@ -466,7 +467,7 @@ namespace GPK_RePack.Forms
                             break;
 
                     }
-                    
+
                 }
             }
 
@@ -489,7 +490,8 @@ namespace GPK_RePack.Forms
                     TreeNode classNode = mainNode.Nodes.Add(className);
                     classNodes.Add(className, classNode);
                 }
-            } else
+            }
+            else
             {
                 var split = className.Split('.').ToList();
                 String toAdd = split.Last();
@@ -509,12 +511,13 @@ namespace GPK_RePack.Forms
                     classNodes.Add(className, classNode);
                 }
             }
-            
+
         }
 
 
         private void treeMain_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            var tabIndex = tabControl.SelectedIndex;
             ResetGUI();
 
             if (e.Node.Level == 0)
@@ -560,6 +563,11 @@ namespace GPK_RePack.Forms
                     refreshExportInfo();
                 }
             }
+
+            if (tabIndex < tabControl.TabCount)
+            {
+                tabControl.SelectedIndex = tabIndex;
+            }
         }
 
         private TreeNode getRootNode()
@@ -592,6 +600,7 @@ namespace GPK_RePack.Forms
 
         private void tabControl_Selected(object sender, TabControlEventArgs e)
         {
+
             if (selectedExport == null)
                 return;
 
@@ -606,24 +615,34 @@ namespace GPK_RePack.Forms
                     if (imageStream != null)
                     {
                         ddsFile.Load(image.GetObjectStream());
+
                         boxImagePreview.Image = TextureTools.BitmapFromSource(ddsFile.BitmapSource);
+                        boxImagePreview.BackColor = Settings.Default.PreviewColor;
                         //workaround for a shrinking window
                         scaleFont();
-
-                        if (ddsFile.Height > boxImagePreview.Height || ddsFile.Width > boxImagePreview.Width)
-                        {
-                            //shrink the file if ´the size is to big
-                            boxImagePreview.SizeMode = PictureBoxSizeMode.StretchImage;
-                        }
-                        else
-                        {
-                            boxImagePreview.SizeMode = PictureBoxSizeMode.Normal;
-                        }
-
+                        resizePiutureBox();
                     }
                 }
             }
+
         }
+
+        private void resizePiutureBox()
+        {
+            if (boxImagePreview.Image == null)
+                return;
+
+            if (boxImagePreview.Image.Height > boxImagePreview.Height || boxImagePreview.Image.Width > boxImagePreview.Width)
+            {
+                //shrink the file if ´the size is to big
+                boxImagePreview.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                boxImagePreview.SizeMode = PictureBoxSizeMode.Normal;
+            }
+        }
+
 
         private void refreshViewToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -875,34 +894,60 @@ namespace GPK_RePack.Forms
 
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
         }
-        private void GUI_KeyDown(object sender, KeyEventArgs e)
+     
+        protected override bool ProcessCmdKey(ref Message message, Keys keys)
         {
-            //Avoid annyoing ding sound - problem that is supresses also keystrokes
-            //e.Handled = true;
-            //e.SuppressKeyPress = true;
-
-            if (e.Control && e.KeyCode == Keys.C)
+            switch (keys)
             {
-                btnCopy_Click(btnCopy, new EventArgs());
+                //Copypaste
+                case Keys.Control | Keys.C:
+                    btnCopy_Click(btnCopy, new EventArgs());
+                    return true;
+
+                case Keys.Control | Keys.V:
+                    btnPaste_Click(btnPaste, new EventArgs());
+                    return true;
+
+               //Search
+                case Keys.Control | Keys.F:
+                    searchForObjectToolStripMenuItem_Click(null, null);
+                    return true;
+                case Keys.F3:
+                    nextToolStripMenuItem_Click(null, null);
+                    return true;
+
+                //menu
+                case Keys.Control | Keys.O:
+                    openToolStripMenuItem_Click(null, null);
+                    return true;
+                case Keys.Control | Keys.S:
+                    saveToolStripMenuItem_Click(null, null);
+                    return true;
+                case Keys.Control | Keys.P:
+                    savepaddingStripMenuItem_Click(null, null);
+                    return true;
+                case Keys.Control | Keys.Shift | Keys.P:
+                    replaceSaveToolStripMenuItem_Click(null, null);
+                    return true;
+
+                //TABS
+                case Keys.D1:
+                    tabControl.SelectedIndex = 0;
+                    boxInfo.Select(0, 0); //prevent full text selection
+                    return true;
+                case Keys.D2:
+                    tabControl.SelectedIndex = 1;
+                    return true;
+                case Keys.D3:
+                    if (tabControl.TabCount > 2)
+                        tabControl.SelectedIndex = 2;
+                    return true;
+                
             }
 
-            if (e.Control && e.KeyCode == Keys.V)
-            {
-                btnPaste_Click(btnPaste, new EventArgs());
-            }
-
-            if (e.Control && e.KeyCode == Keys.F)
-            {
-                searchForObjectToolStripMenuItem_Click(null, null);
-            }
-
-            if (e.KeyCode == Keys.F3)
-            {
-                nextToolStripMenuItem_Click(null, null);
-            }
+            // run base implementation
+            return base.ProcessCmdKey(ref message, keys);
         }
-
-
 
         #endregion
 
@@ -1255,7 +1300,16 @@ namespace GPK_RePack.Forms
                 }
             }
 
-            tryToSelectNextSearchResult();
+            if (searchResultNodes.Count > 0)
+            {
+                tryToSelectNextSearchResult();
+            }
+            else
+            {
+                logger.Info(string.Format("Nothing found for '{0}'!", input));
+            }
+
+
         }
 
         IEnumerable<TreeNode> Collect(TreeNodeCollection nodes)
@@ -1671,6 +1725,7 @@ namespace GPK_RePack.Forms
         private void GUI_Resize(object sender, EventArgs e)
         {
             gridProps.Refresh();
+            resizePiutureBox();
         }
 
 
@@ -1753,8 +1808,10 @@ namespace GPK_RePack.Forms
                 {
                     btnOggPreview_Click(null, null);
                 }
-            })); 
-         }
+            }));
+        }
+
+
 
 
 
@@ -1762,7 +1819,7 @@ namespace GPK_RePack.Forms
 
         #endregion
 
-     
+
     }
 }
 

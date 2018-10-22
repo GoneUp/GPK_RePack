@@ -51,9 +51,12 @@
             this.boxScaleFactor = new System.Windows.Forms.TextBox();
             this.btnOpenSettingsFolder = new System.Windows.Forms.Button();
             this.boxEnableTexture2D = new System.Windows.Forms.CheckBox();
+            this.boxColorPreview = new System.Windows.Forms.PictureBox();
+            this.btnSelectColor = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.boxColorPreview)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -307,11 +310,31 @@
             this.boxEnableTexture2D.UseVisualStyleBackColor = true;
             this.boxEnableTexture2D.CheckedChanged += new System.EventHandler(this.boxEnableTexture2D_CheckedChanged);
             // 
+            // boxColorPreview
+            // 
+            this.boxColorPreview.Location = new System.Drawing.Point(311, 220);
+            this.boxColorPreview.Name = "boxColorPreview";
+            this.boxColorPreview.Size = new System.Drawing.Size(36, 20);
+            this.boxColorPreview.TabIndex = 17;
+            this.boxColorPreview.TabStop = false;
+            // 
+            // btnSelectColor
+            // 
+            this.btnSelectColor.Location = new System.Drawing.Point(171, 220);
+            this.btnSelectColor.Name = "btnSelectColor";
+            this.btnSelectColor.Size = new System.Drawing.Size(132, 20);
+            this.btnSelectColor.TabIndex = 18;
+            this.btnSelectColor.Text = "Select Color";
+            this.btnSelectColor.UseVisualStyleBackColor = true;
+            this.btnSelectColor.Click += new System.EventHandler(this.btnSelectColor_Click);
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(356, 265);
+            this.Controls.Add(this.btnSelectColor);
+            this.Controls.Add(this.boxColorPreview);
             this.Controls.Add(this.boxEnableTexture2D);
             this.Controls.Add(this.btnOpenSettingsFolder);
             this.Controls.Add(this.boxScaleFactor);
@@ -337,6 +360,7 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.boxColorPreview)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -367,5 +391,7 @@
         private System.Windows.Forms.RadioButton btnViewPack;
         private System.Windows.Forms.Button btnOpenSettingsFolder;
         private System.Windows.Forms.CheckBox boxEnableTexture2D;
+        private System.Windows.Forms.PictureBox boxColorPreview;
+        private System.Windows.Forms.Button btnSelectColor;
     }
 }

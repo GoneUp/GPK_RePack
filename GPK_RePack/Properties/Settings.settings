@@ -44,5 +44,8 @@
     <Setting Name="WorkingDir" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="PreviewColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Transparent</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

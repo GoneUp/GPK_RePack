@@ -54,7 +54,7 @@ namespace GPK_RePack.Forms
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.savepaddingStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.savePaddingStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -148,7 +148,6 @@ namespace GPK_RePack.Forms
             this.treeMain.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeMain_NodeMouseClick);
             this.treeMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeMain_DragDrop);
             this.treeMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.treeMain_DragEnter);
-            this.treeMain.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GUI_KeyDown);
             // 
             // treeContextMenu
             // 
@@ -282,7 +281,7 @@ namespace GPK_RePack.Forms
             this.openToolStripMenuItem,
             this.toolStripSeparator3,
             this.saveToolStripMenuItem,
-            this.savepaddingStripMenuItem1,
+            this.savePaddingStripMenuItem,
             this.replaceSaveToolStripMenuItem,
             this.toolStripSeparator1,
             this.settingsToolStripMenuItem,
@@ -313,12 +312,12 @@ namespace GPK_RePack.Forms
             this.saveToolStripMenuItem.Text = "Save (Rebuild Mode)";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
-            // savepaddingStripMenuItem1
+            // savePaddingStripMenuItem
             // 
-            this.savepaddingStripMenuItem1.Name = "savepaddingStripMenuItem1";
-            this.savepaddingStripMenuItem1.Size = new System.Drawing.Size(290, 24);
-            this.savepaddingStripMenuItem1.Text = "Save (Rebuild Mode, with Padding)";
-            this.savepaddingStripMenuItem1.Click += new System.EventHandler(this.savepaddingStripMenuItem1_Click);
+            this.savePaddingStripMenuItem.Name = "savePaddingStripMenuItem";
+            this.savePaddingStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.savePaddingStripMenuItem.Text = "Save (Rebuild Mode, with Padding)";
+            this.savePaddingStripMenuItem.Click += new System.EventHandler(this.savepaddingStripMenuItem_Click);
             // 
             // replaceSaveToolStripMenuItem
             // 
@@ -630,7 +629,7 @@ namespace GPK_RePack.Forms
             this.tabPropertys.Location = new System.Drawing.Point(4, 22);
             this.tabPropertys.Name = "tabPropertys";
             this.tabPropertys.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPropertys.Size = new System.Drawing.Size(829, 589);
+            this.tabPropertys.Size = new System.Drawing.Size(829, 586);
             this.tabPropertys.TabIndex = 1;
             this.tabPropertys.Text = "Property Details";
             this.tabPropertys.UseVisualStyleBackColor = true;
@@ -652,7 +651,7 @@ namespace GPK_RePack.Forms
             this.gridProps.Location = new System.Drawing.Point(3, 3);
             this.gridProps.MultiSelect = false;
             this.gridProps.Name = "gridProps";
-            this.gridProps.Size = new System.Drawing.Size(823, 551);
+            this.gridProps.Size = new System.Drawing.Size(823, 548);
             this.gridProps.TabIndex = 0;
             this.gridProps.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.gridProps_DefaultValuesNeeded);
             // 
@@ -706,7 +705,7 @@ namespace GPK_RePack.Forms
             this.boxPropertyButtons.Controls.Add(this.btnPropClear, 1, 0);
             this.boxPropertyButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.boxPropertyButtons.Enabled = false;
-            this.boxPropertyButtons.Location = new System.Drawing.Point(3, 554);
+            this.boxPropertyButtons.Location = new System.Drawing.Point(3, 551);
             this.boxPropertyButtons.Name = "boxPropertyButtons";
             this.boxPropertyButtons.RowCount = 1;
             this.boxPropertyButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
@@ -743,18 +742,19 @@ namespace GPK_RePack.Forms
             this.tabTexturePreview.Location = new System.Drawing.Point(4, 22);
             this.tabTexturePreview.Name = "tabTexturePreview";
             this.tabTexturePreview.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTexturePreview.Size = new System.Drawing.Size(829, 589);
+            this.tabTexturePreview.Size = new System.Drawing.Size(829, 586);
             this.tabTexturePreview.TabIndex = 2;
             this.tabTexturePreview.Text = "Texture Preview";
             this.tabTexturePreview.UseVisualStyleBackColor = true;
             // 
             // boxImagePreview
             // 
+            this.boxImagePreview.BackColor = System.Drawing.Color.Gray;
             this.boxImagePreview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.boxImagePreview.Image = ((System.Drawing.Image)(resources.GetObject("boxImagePreview.Image")));
             this.boxImagePreview.Location = new System.Drawing.Point(3, 3);
             this.boxImagePreview.Name = "boxImagePreview";
-            this.boxImagePreview.Size = new System.Drawing.Size(823, 583);
+            this.boxImagePreview.Size = new System.Drawing.Size(823, 580);
             this.boxImagePreview.TabIndex = 0;
             this.boxImagePreview.TabStop = false;
             // 
@@ -919,7 +919,7 @@ namespace GPK_RePack.Forms
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
             this.Name = "GUI";
-            this.Text = "Terahelper 0.12 - by GoneUp";
+            this.Text = "Terahelper 0.13 - by GoneUp";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GUI_FormClosing);
             this.Load += new System.EventHandler(this.GUI_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeMain_DragDrop);
@@ -1036,7 +1036,7 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem pasteToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator6;
         private ToolStripMenuItem previewOGGToolStripMenuItem;
-        private ToolStripMenuItem savepaddingStripMenuItem1;
+        private ToolStripMenuItem savePaddingStripMenuItem;
     }
 }
 
