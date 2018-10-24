@@ -76,22 +76,19 @@
       <HintPath>..\packages\Costura.Fody.1.6.1\lib\dotnet\Costura.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
-      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="DotNetZip, Version=1.11.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.11.0\lib\net20\DotNetZip.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="NAudio">
-      <HintPath>..\packages\NAudio.1.8.0\lib\net35\NAudio.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NAudio, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.8.4\lib\net35\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="NAudio.Vorbis, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.Vorbis.1.0.0.0\lib\net35\NAudio.Vorbis.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NLog">
-      <HintPath>..\packages\NLog.4.4.10\lib\net45\NLog.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.5.10\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="NLog.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.Windows.Forms.4.2.3\lib\net35\NLog.Windows.Forms.dll</HintPath>
@@ -106,6 +103,10 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -279,11 +280,11 @@ foreach (var item in filesToCleanup)
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Costura.Fody.1.6.1\build\dotnet\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.1.6.1\build\dotnet\Costura.Fody.targets'))" />
     <Error Condition="!Exists('..\packages\Fody.2.0.10\build\netstandard1.4\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.0.10\build\netstandard1.4\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Costura.Fody.1.6.1\build\dotnet\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.1.6.1\build\dotnet\Costura.Fody.targets'))" />
   </Target>
-  <Import Project="..\packages\Costura.Fody.1.6.1\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.1\build\dotnet\Costura.Fody.targets')" />
   <Import Project="..\packages\Fody.2.0.10\build\netstandard1.4\Fody.targets" Condition="Exists('..\packages\Fody.2.0.10\build\netstandard1.4\Fody.targets')" />
+  <Import Project="..\packages\Costura.Fody.1.6.1\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.1\build\dotnet\Costura.Fody.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
