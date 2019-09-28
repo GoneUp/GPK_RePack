@@ -50,11 +50,14 @@
     <Setting Name="SaveFileSuffix" Type="System.String" Scope="User">
       <Value Profile="(Default)">_rebuild</Value>
     </Setting>
-    <Setting Name="UpdateUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">lol</Value>
+    <Setting Name="UpdateUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://raw.githubusercontent.com/GoneUp/GPK_RePack/master/versioncode</Value>
     </Setting>
-    <Setting Name="VersionCode" Type="System.Int32" Scope="User">
+    <Setting Name="VersionCode" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="UpdateEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

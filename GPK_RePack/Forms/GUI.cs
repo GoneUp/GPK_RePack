@@ -21,6 +21,7 @@ using GPK_RePack.Model.Interfaces;
 using GPK_RePack.Model.Payload;
 using GPK_RePack.Model.Prop;
 using GPK_RePack.Properties;
+using GPK_RePack.Updater;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -33,7 +34,7 @@ using UpkManager.Dds.Constants;
 
 namespace GPK_RePack.Forms
 {
-    public partial class GUI : Form
+    public partial class GUI : Form, UpdaterCheckCallback
     {
         public GUI()
         {
@@ -103,6 +104,7 @@ namespace GPK_RePack.Forms
 
                 //Our stuff
                 logger.Info("Startup");
+                UpdateCheck.checkForUpdate(this);
                 loadedGpkPackages = new List<GpkPackage>();
                 tempStatusLabel = new TextBoxTempShow(lblStatus, this);
 
@@ -186,6 +188,15 @@ namespace GPK_RePack.Forms
                 waveOut.Dispose();
             }
 
+        }
+
+
+        public void postUpdateResult(bool updateAvailable)
+        {
+            if (updateAvailable)
+            {
+                logger.Info("A newer version is available. Download it at https://github.com/GoneUp/GPK_RePack/releases");
+            }
         }
 
 
@@ -1721,7 +1732,7 @@ namespace GPK_RePack.Forms
 
         #endregion
 
-        #region contexnt menu 
+        #region context menu 
 
         string clickedNode;
         private void treeMain_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -1800,6 +1811,7 @@ namespace GPK_RePack.Forms
                 }
             }));
         }
+
 
 
 

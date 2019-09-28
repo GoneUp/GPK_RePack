@@ -12,7 +12,7 @@ namespace GPK_RePack.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.8.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -215,27 +215,33 @@ namespace GPK_RePack.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("lol")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://raw.githubusercontent.com/GoneUp/GPK_RePack/master/versioncode")]
         public string UpdateUrl {
             get {
                 return ((string)(this["UpdateUrl"]));
             }
-            set {
-                this["UpdateUrl"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("14")]
         public int VersionCode {
             get {
                 return ((int)(this["VersionCode"]));
             }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UpdateEnabled {
+            get {
+                return ((bool)(this["UpdateEnabled"]));
+            }
             set {
-                this["VersionCode"] = value;
+                this["UpdateEnabled"] = value;
             }
         }
     }
