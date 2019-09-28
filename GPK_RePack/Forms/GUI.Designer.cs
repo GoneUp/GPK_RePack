@@ -919,7 +919,7 @@ namespace GPK_RePack.Forms
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
             this.Name = "GUI";
-            this.Text = "Terahelper 0.13 - by GoneUp";
+            this.Text = "Terahelper 0.14 - by GoneUp";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GUI_FormClosing);
             this.Load += new System.EventHandler(this.GUI_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeMain_DragDrop);

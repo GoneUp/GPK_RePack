@@ -202,5 +202,29 @@ namespace GPK_RePack.Properties {
                 this["PreviewColor"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("lol")]
+        public string UpdateUrl {
+            get {
+                return ((string)(this["UpdateUrl"]));
+            }
+            set {
+                this["UpdateUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("14")]
+        public int VersionCode {
+            get {
+                return ((int)(this["VersionCode"]));
+            }
+            set {
+                this["VersionCode"] = value;
+            }
+        }
     }
 }

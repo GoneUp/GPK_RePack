@@ -176,6 +176,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="IO\Writer.cs" />
+    <Compile Include="Updater\UpdateCheck.cs" />
+    <Compile Include="Updater\UpdaterCheckCallback.cs" />
     <EmbeddedResource Include="Forms\GUI.resx">
       <DependentUpon>GUI.cs</DependentUpon>
       <SubType>Designer</SubType>
