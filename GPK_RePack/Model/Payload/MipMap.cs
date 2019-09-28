@@ -64,9 +64,12 @@ namespace GPK_RePack.Model.Payload
 
         public override string ToString()
         {
+            CompressionTypes NoOp = CompressionTypes.Unused | CompressionTypes.StoreInSeparatefile;
+
             StringBuilder info = new StringBuilder();
             info.AppendFormat("Size: {0} x {1} {2}", sizeX, sizeY, Environment.NewLine);
             info.AppendLine("Compression: " + compFlag);
+            if (((CompressionTypes)compFlag & NoOp) != 0) info.AppendLine("Data for this MipMap is stored external!");
             info.AppendLine("Compressed Size: " + compressedSize);
             info.AppendLine("Uncompressed Size: " + uncompressedSize);
             info.AppendLine("Blocks: " + blocks.Count);

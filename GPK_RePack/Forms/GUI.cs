@@ -319,7 +319,7 @@ namespace GPK_RePack.Forms
                     Writer tmpS = new Writer();
                     Task newTask = new Task(delegate ()
                     {
-                        string savepath = package.Path + "_rebuild";
+                        string savepath = package.Path + Settings.Default.SaveFileSuffix;
                         tmpS.SaveGpkPackage(package, savepath, usePadding);
                     });
                     newTask.Start();
@@ -1665,17 +1665,11 @@ namespace GPK_RePack.Forms
         {
             var arrayProp = checkArrayRow();
             if (arrayProp == null || arrayProp.value == null) return;
-            byte[] data = arrayProp.value;
+            byte[] data = new byte[arrayProp.value.Length - 4];
+            Array.Copy(arrayProp.value, 4, data, 0, arrayProp.value.Length - 4); //remove count bytes
 
             String path = MiscFuncs.GenerateSaveDialog(arrayProp.name, ".raw");
             if (path == "") return;
-
-            DialogResult answer = MessageBox.Show("Remove Count bytes?", "TH", MessageBoxButtons.YesNo);
-            if (answer == DialogResult.Yes)
-            {
-                data = new byte[arrayProp.value.Length - 4];
-                Array.Copy(arrayProp.value, 4, data, 0, arrayProp.value.Length - 4);
-            }
 
             DataTools.WriteExportDataFile(path, data);
         }
@@ -1691,15 +1685,11 @@ namespace GPK_RePack.Forms
             if (!File.Exists(path)) return;
 
             byte[] data = File.ReadAllBytes(path);
-            DialogResult answer = MessageBox.Show("Add Count bytes?", "TH", MessageBoxButtons.YesNo);
-            if (answer == DialogResult.Yes)
-            {
-                byte[] tmp = new byte[data.Length + 4];
-                Array.Copy(BitConverter.GetBytes(data.Length), tmp, 4);
-                Array.Copy(data, 0, tmp, 4, data.Length);
-                data = tmp;
-            }
-            arrayProp.value = data;
+            //readd count bytes 
+            arrayProp.value = new byte[data.Length + 4];
+            Array.Copy(BitConverter.GetBytes(data.Length), arrayProp.value, 4);
+            Array.Copy(data, 0, arrayProp.value, 4, data.Length);           
+
             DrawGrid(selectedPackage, selectedExport);
         }
 
@@ -1708,7 +1698,7 @@ namespace GPK_RePack.Forms
             if (selectedExport == null) return null;
             if (gridProps.SelectedRows.Count != 1)
             {
-                logger.Info("select a row");
+                logger.Info("select a complete row (click the arrow in front it)");
                 return null;
             }
 

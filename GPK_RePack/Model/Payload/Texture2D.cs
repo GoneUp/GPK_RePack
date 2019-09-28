@@ -59,31 +59,43 @@ namespace GPK_RePack.Model.Payload
                 //info
                 writer.Write(map.compFlag);
                 writer.Write(map.uncompressedSize);
-                int chunkSize = 16 + map.blocks.Count * 8 + map.compressedSize;
-                if (chunkSize != map.compChunkSize)
+
+                if (((CompressionTypes)map.compFlag & NothingToDo) == 0)
                 {
-                    logger.Info("fixing chunksize for " + objectExport.ObjectName);
-                    map.compChunkSize = chunkSize;
+                    int chunkSize = 16 + map.blocks.Count * 8 + map.compressedSize;
+                    if (chunkSize != map.compChunkSize)
+                    {
+                        logger.Info("fixing chunksize for " + objectExport.ObjectName);
+                        map.compChunkSize = chunkSize;
+                    }
+
+
+                    writer.Write(map.compChunkSize);
+                    writer.Write((int)(writer.BaseStream.Position + 4)); //chunkoffset
+
+                    //header
+                    writer.Write(map.signature);
+                    writer.Write(map.blocksize);
+                    writer.Write(map.compressedSize);
+                    writer.Write(map.uncompressedSize_chunkheader);
+
+                    foreach (var block in map.blocks)
+                    {
+                        writer.Write(block.compressedSize);
+                        writer.Write(block.uncompressedDataSize);
+                    }
+
+                    foreach (var block in map.blocks)
+                    {
+                        writer.Write(block.compressedData);
+                    }
+
                 }
-
-                writer.Write(map.compChunkSize);
-                writer.Write((int)(writer.BaseStream.Position + 4)); //chunkoffset
-
-                //header
-                writer.Write(map.signature);
-                writer.Write(map.blocksize);
-                writer.Write(map.compressedSize);
-                writer.Write(map.uncompressedSize_chunkheader);
-
-                foreach (var block in map.blocks)
+                else
                 {
-                    writer.Write(block.compressedSize);
-                    writer.Write(block.uncompressedDataSize);
-                }
-
-                foreach (var block in map.blocks)
-                {
-                    writer.Write(block.compressedData);
+                    writer.Write((int)-1); //chunksize
+                    writer.Write((int)-1); //chunkoffset
+                    logger.Trace("writing {0}, MipMap {0}, with no data!!", export.ObjectName, map);
                 }
 
                 writer.Write(map.sizeX);
@@ -127,6 +139,7 @@ namespace GPK_RePack.Model.Payload
                 map.uncompressedSize = reader.ReadInt32();
                 map.compChunkSize = reader.ReadInt32();
                 map.compChunkOffset = reader.ReadInt32();
+                var temp = ((CompressionTypes)map.compFlag & NothingToDo);
 
                 if (((CompressionTypes)map.compFlag & NothingToDo) == 0)
                 {
@@ -170,7 +183,7 @@ namespace GPK_RePack.Model.Payload
                 }
                 else
                 {
-                    logger.Trace("{0}, MipMap {0}, data 0", export.ObjectName, i);
+                    logger.Trace("{0}, MipMap {0}, no data!!", export.ObjectName, i);
                 }
 
                 map.sizeX = reader.ReadInt32();

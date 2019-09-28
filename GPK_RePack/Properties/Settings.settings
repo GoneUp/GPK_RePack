@@ -47,6 +47,9 @@
     <Setting Name="PreviewColor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Transparent</Value>
     </Setting>
+    <Setting Name="SaveFileSuffix" Type="System.String" Scope="User">
+      <Value Profile="(Default)">_rebuild</Value>
+    </Setting>
     <Setting Name="UpdateUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">lol</Value>
     </Setting>

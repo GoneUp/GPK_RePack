@@ -73,7 +73,10 @@ namespace GPK_RePack.Forms
             boxScaleFactor.Text = Settings.Default.ScaleFactorHack.ToString();
             boxEnableTexture2D.Checked = Settings.Default.EnableTexture2D;
             boxColorPreview.BackColor = Settings.Default.PreviewColor;
+            boxSavefilePostfix.Text = Settings.Default.SaveFileSuffix;
         }
+
+        
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
         {
@@ -193,6 +196,23 @@ namespace GPK_RePack.Forms
             }
 
 
+        }
+
+        private void boxSavefilePostfix_TextChanged(object sender, EventArgs e)
+        {
+            Settings.Default.SaveFileSuffix = boxSavefilePostfix.Text;
+        }
+
+        private void Options_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (Settings.Default.SaveFileSuffix == "")
+            {
+                var result = MessageBox.Show("WARNING: Suffix is empty! Orginal GPKs will be overwritten if you save now.", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (result == DialogResult.Cancel)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }
