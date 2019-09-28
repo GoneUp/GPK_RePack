@@ -1709,7 +1709,7 @@ namespace GPK_RePack.Forms
             if (selectedExport == null) return null;
             if (gridProps.SelectedRows.Count != 1)
             {
-                logger.Info("select a complete row (click the arrow in front it)");
+                logger.Info("select a complete row (click the arrow in front of it)");
                 return null;
             }
 
