@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GPK_RePack</RootNamespace>
     <AssemblyName>Terahelper</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -73,6 +73,10 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>terahelper_key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Costura, Version=3.1.6.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.3.1.6\lib\net46\Costura.dll</HintPath>
@@ -121,7 +125,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Forms\Helper\TextBoxTempShow.cs" />
+    <Compile Include="Model\GpkCompressedChunkHeader.cs" />
     <Compile Include="Model\Payload\ChunkBlock.cs" />
+    <Compile Include="Model\Payload\CompressionTypesPackage.cs" />
+    <Compile Include="Model\Payload\GenericChunkBlock.cs" />
     <Compile Include="ResourceExtractor.cs" />
     <Compile Include="Model\ExportData\DataLoader.cs" />
     <Compile Include="Model\GpkExport.cs" />

@@ -23,12 +23,12 @@ namespace GPK_RePack.IO
         {
             try
             {
-                Stopwatch watch = new Stopwatch();  
+                Stopwatch watch = new Stopwatch();
                 GpkPackage package = new GpkPackage();
                 stat = new Status();
 
                 watch.Start();
-              
+
                 package.Filename = Path.GetFileName(path);
                 package.Path = path;
                 stat.name = package.Filename;
@@ -36,21 +36,27 @@ namespace GPK_RePack.IO
                 logger = LogManager.GetLogger("[Reader:" + package.Filename + "]");
                 logger.Info("Reading Start");
 
-            
 
-                using (BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read)))
+                BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read));
+                package.OrginalSize = reader.BaseStream.Length;
+
+                //parsing
+                ReadHeader(reader, package);
+                var file = CheckAndDecompress(reader, package);
+                if (file != null)
                 {
-                    package.OrginalSize = reader.BaseStream.Length;
-
-                    ReadHeader(reader, package);
-                    ReadNames(reader, package);
-                    ReadImports(reader, package);
-                    ReadExports(reader, package);
-                    ReadExportData(reader, package);
-
                     reader.Close();
-                    reader.Dispose();
+                    reader = new BinaryReader(new MemoryStream(file));
                 }
+
+                ReadNames(reader, package);
+                ReadImports(reader, package);
+                ReadExports(reader, package);
+                ReadExportData(reader, package);
+
+                reader.Close();
+                reader.Dispose();
+                
 
                 watch.Stop();
                 stat.time = watch.ElapsedMilliseconds;
@@ -130,18 +136,28 @@ namespace GPK_RePack.IO
             }
 
 
-            package.Header.Unk3 = reader.ReadInt32();
-            package.Header.Unk4 = reader.ReadInt32();
-            package.Header.Unk5 = reader.ReadInt32();
-            package.Header.Unk6 = reader.ReadInt32();
-
             package.Header.EngineVersion = reader.ReadInt32();
             package.Header.CookerVersion = reader.ReadInt32();
 
+            package.Header.CompressionFlags = reader.ReadInt32();
+            int chunkCount = reader.ReadInt32();
+
+            for (int i = 0; i < chunkCount; i++)
+            {
+                var chunk = new GpkCompressedChunkHeader();
+                chunk.UncompressedOffset = reader.ReadInt32();
+                chunk.UncompressedSize = reader.ReadInt32();
+                chunk.CompressedOffset = reader.ReadInt32();
+                chunk.CompressedSize = reader.ReadInt32();
+
+                package.Header.ChunkHeaders.Add(chunk);
+            }
+
+
             if (package.Header.EngineVersion == 0xC0FFEE) logger.Info("Found a old brother ;)");
 
-            logger.Debug("Unk3 {0}, Unk4 {1}, Unk5 {2}, Unk6 {3}, EngineVersion {4}, CookerVersion {5}",
-                package.Header.Unk3, package.Header.Unk4, package.Header.Unk5, package.Header.Unk6, package.Header.EngineVersion, package.Header.CookerVersion);
+            logger.Debug("Unk3 {0}, Unk4 {1}, Unk5 {2}, Unk6 {3}, EngineVersion {4}, CookerVersion {5}, compressionFlags {6}",
+            package.Header.Unk3, package.Header.Unk4, package.Header.Unk5, package.Header.Unk6, package.Header.EngineVersion, package.Header.CookerVersion, package.Header.CompressionFlags);
         }
 
         private void CheckSignature(int sig)
@@ -165,6 +181,37 @@ namespace GPK_RePack.IO
             package.Header.NameCount -= package.Header.NameOffset;
         }
 
+
+        private byte[] CheckAndDecompress(BinaryReader reader, GpkPackage package)
+        {
+            logger.Trace("checkAndDecompress start");
+
+            foreach (var header in package.Header.ChunkHeaders)
+            {
+                reader.BaseStream.Seek(header.CompressedOffset, SeekOrigin.Begin);
+                GenericChunkBlock block = new GenericChunkBlock();
+
+    
+                block.signature = reader.ReadInt32();
+                block.blocksize = reader.ReadInt32();
+                block.compressedSize = reader.ReadInt32();
+                block.uncompressedSize_chunkheader = reader.ReadInt32();
+
+                int chunkCount = (block.uncompressedSize_chunkheader + block.blocksize - 1) / block.blocksize;
+                byte[] uncompressedBytes = new byte[header.UncompressedSize];
+
+                block.Decompress(uncompressedBytes, chunkCount, reader, package.Header.CompressionFlags);
+
+                byte[] completeFile = new byte[header.UncompressedSize + header.CompressedOffset]; //should be the complete file size
+                Array.ConstrainedCopy(uncompressedBytes, 0, completeFile, header.UncompressedOffset, header.UncompressedSize);
+
+                return completeFile;
+            }
+
+            return null;
+        }
+
+
         private void ReadNames(BinaryReader reader, GpkPackage package)
         {
             logger.Debug("Reading Namelist at {0}....", package.Header.NameOffset);
@@ -174,7 +221,15 @@ namespace GPK_RePack.IO
             {
                 GpkString tmpString = new GpkString();
                 int len = reader.ReadInt32();
-                tmpString.name = ReadString(reader, len);
+                if (len > 0)
+                {
+                    tmpString.name = Reader.ReadString(reader, len);
+                }
+                else
+                {
+                    tmpString.name = Reader.ReadUnicodeString(reader, (len * -1) * 2);
+                }
+
                 tmpString.flags = reader.ReadInt64();
 
                 package.NameList.Add(i, tmpString);
@@ -335,8 +390,8 @@ namespace GPK_RePack.IO
                             tag = "AOT";
                             export.Data = new byte[toread];
                             export.Data = reader.ReadBytes(toread);
-                            ParsePayload(package, export);  
-                            
+                            ParsePayload(package, export);
+
                             if (export.Payload != null) logger.Debug(export.Payload.ToString());
                         }
                     }
@@ -386,7 +441,7 @@ namespace GPK_RePack.IO
                     {
                         export.Payload = new Texture2D();
                     }
-                    
+
                     break;
             }
 

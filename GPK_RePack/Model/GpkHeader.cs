@@ -29,6 +29,9 @@ namespace GPK_RePack.Model
         public int Unk3, Unk4, Unk5, Unk6;
         public int EngineVersion;
         public int CookerVersion;
+        public int CompressionFlags;
+
+        public List<GpkCompressedChunkHeader> ChunkHeaders = new List<GpkCompressedChunkHeader>();
 
         public void RecalculateCounts(GpkPackage package)
         {

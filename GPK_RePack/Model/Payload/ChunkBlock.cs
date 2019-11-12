@@ -33,7 +33,7 @@ namespace GPK_RePack.Model
                 //uncompressed
                 uncompressedData = (byte[])(compressedData.Clone());
             }
-            else if (((CompressionTypes)compFlag & CompressionTypes.ZLIB) > 0)
+            else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.ZLIB) > 0)
             {
                 try
                 {
@@ -48,11 +48,11 @@ namespace GPK_RePack.Model
                     logger.Error(e);
                 }
             }
-            else if (((CompressionTypes)compFlag & CompressionTypes.LZX) > 0)
+            else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.LZX) > 0)
             {
                 logger.Error("Found COMPRESS_LZX, unsupported!");
             }
-            else if (((CompressionTypes)compFlag & CompressionTypes.LZO) > 0)
+            else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.LZO) > 0)
             {
                 uncompressedData = new byte[uncompressedDataSize];
                 lock (lockObject)
@@ -75,7 +75,7 @@ namespace GPK_RePack.Model
                 //uncompressed
                 compressedData = (byte[])(uncompressedData.Clone());
             }
-            else if (((CompressionTypes)compFlag & CompressionTypes.ZLIB) > 0)
+            else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.ZLIB) > 0)
             {
                 try
                 {
@@ -90,11 +90,11 @@ namespace GPK_RePack.Model
                     logger.Error(e);
                 }
             }
-            else if (((CompressionTypes)compFlag & CompressionTypes.LZX) > 0)
+            else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.LZX) > 0)
             {
                 logger.Error("Found COMPRESS_LZX, unsupported!");
             }
-            else if (((CompressionTypes)compFlag & CompressionTypes.LZO) > 0)
+            else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.LZO) > 0)
             {
                 lock (lockObject)
                 {
