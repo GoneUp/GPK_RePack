@@ -145,7 +145,7 @@ namespace GPK_RePack.Model.Payload
                 {
                     //header
                     map.signature = reader.ReadUInt32(); //0x9e2a83c1
-                    Debug.Assert(map.signature == MipMap.DEFAULT_SIGNATURE);
+                    //Debug.Assert(map.signature == MipMap.DEFAULT_SIGNATURE);
 
                     map.blocksize = reader.ReadInt32();
 
@@ -170,7 +170,7 @@ namespace GPK_RePack.Model.Payload
                     foreach (ChunkBlock block in map.blocks)
                     {
                         block.compressedData = reader.ReadBytes(block.compressedSize);
-                        block.decompress(map.compFlag);
+                        block.decompressTextureFlags(map.compFlag);
 
                         Array.ConstrainedCopy(block.uncompressedData, 0, map.uncompressedData, blockOffset, block.uncompressedDataSize);
                         blockOffset += block.uncompressedDataSize;

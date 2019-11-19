@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GPK_RePack.Model.Payload
 {
-    class GenericChunkBlock
+    class PackageChunkBlock
     {
         public int signature; //0x9e2a83c1
         public int blocksize;
@@ -36,7 +36,7 @@ namespace GPK_RePack.Model.Payload
             foreach (ChunkBlock block in chunkBlocks)
             {
                 block.compressedData = reader.ReadBytes(block.compressedSize);
-                block.decompress(compFlag);
+                block.decompressPackageFlags(compFlag);
 
                 Array.ConstrainedCopy(block.uncompressedData, 0, uncompressedData, blockOffset, block.uncompressedDataSize);
                 blockOffset += block.uncompressedDataSize;

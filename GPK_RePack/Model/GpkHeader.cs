@@ -26,7 +26,6 @@ namespace GPK_RePack.Model
 
         public List<GpkGeneration> Generations = new List<GpkGeneration>();
 
-        public int Unk3, Unk4, Unk5, Unk6;
         public int EngineVersion;
         public int CookerVersion;
         public int CompressionFlags;

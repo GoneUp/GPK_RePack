@@ -25,9 +25,10 @@ namespace GPK_RePack.Model
         public byte[] compressedData;
         public byte[] uncompressedData;
 
-        public void decompress(int compFlag)
-        {
 
+        //this solution sucks, too much duplicate code
+        public void decompressPackageFlags(int compFlag)
+        {
             if (compFlag == 0)
             {
                 //uncompressed
@@ -35,18 +36,7 @@ namespace GPK_RePack.Model
             }
             else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.ZLIB) > 0)
             {
-                try
-                {
-                    var byteStream = new MemoryStream();
-                    var outStream = new ZlibStream(byteStream, CompressionMode.Decompress);
-                    outStream.Write(compressedData, 0, compressedData.Length);
-                    uncompressedData = byteStream.GetBuffer();
-
-                }
-                catch (Exception e)
-                {
-                    logger.Error(e);
-                }
+                decompressZLIB();
             }
             else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.LZX) > 0)
             {
@@ -54,21 +44,68 @@ namespace GPK_RePack.Model
             }
             else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.LZO) > 0)
             {
-                uncompressedData = new byte[uncompressedDataSize];
-                lock (lockObject)
-                {
-                    lzo.Decompress(compressedData, uncompressedData, uncompressedDataSize);
-                }
+                decompressLZO();
             }
 
             if (uncompressedData != null)
             {
                 uncompressedDataSize = uncompressedData.Length;
-                //compressedData = null; //save memory
             }
         }
 
-        public void compress(int compFlag)
+        public void decompressTextureFlags(int compFlag)
+        {
+            if (compFlag == 0)
+            {
+                //uncompressed
+                uncompressedData = (byte[])(compressedData.Clone());
+            }
+            else if (((CompressionTypes)compFlag & CompressionTypes.ZLIB) > 0)
+            {
+                decompressZLIB();
+            }
+            else if (((CompressionTypes)compFlag & CompressionTypes.LZX) > 0)
+            {
+                logger.Error("Found COMPRESS_LZX, unsupported!");
+            }
+            else if (((CompressionTypes)compFlag & CompressionTypes.LZO) > 0)
+            {
+                decompressLZO();
+            }
+
+            if (uncompressedData != null)
+            {
+                uncompressedDataSize = uncompressedData.Length;
+            }
+        }
+
+        private void decompressZLIB()
+        {
+            try
+            {
+                var byteStream = new MemoryStream();
+                var outStream = new ZlibStream(byteStream, CompressionMode.Decompress);
+                outStream.Write(compressedData, 0, compressedData.Length);
+                uncompressedData = byteStream.GetBuffer();
+
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+            }
+        }
+
+        private void decompressLZO()
+        {
+            uncompressedData = new byte[uncompressedDataSize];
+            lock (lockObject)
+            {
+                lzo.Decompress(compressedData, uncompressedData, uncompressedDataSize);
+            }
+        }
+
+
+        public void compressTextureFlags(int compFlag)
         {
             if (compFlag == 0)
             {

@@ -226,7 +226,7 @@ namespace GPK_RePack.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("14")]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
         public int VersionCode {
             get {
                 return ((int)(this["VersionCode"]));

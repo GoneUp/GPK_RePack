@@ -128,14 +128,16 @@ namespace GPK_RePack.IO
                 writer.Write(tmpgen.NetObjectCount);
             }
 
-            writer.Write(package.Header.Unk3);
-            writer.Write(package.Header.Unk4);
-            writer.Write(package.Header.Unk5);
-            writer.Write(package.Header.Unk6);
-
+            //24
             //writer.Write(package.Header.EngineVersion); 
-            writer.Write(0xC0FFEEAA); //my signature ^^
+            writer.Write(0xC0FFEEAA); //my signature 
             writer.Write(package.Header.CookerVersion);
+
+            writer.Write((int)0); //compressionFlags, we dont apply this
+            writer.Write((long)0); //unk
+            writer.Write((int)0); 
+           
+
 
 
             logger.Debug("Wrote header pos " + writer.BaseStream.Position);

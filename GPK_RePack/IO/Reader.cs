@@ -166,8 +166,8 @@ namespace GPK_RePack.IO
 
             if (package.Header.EngineVersion == 0xC0FFEE) logger.Info("Found a old brother ;)");
 
-            logger.Debug("Unk3 {0}, Unk4 {1}, Unk5 {2}, Unk6 {3}, EngineVersion {4}, CookerVersion {5}, compressionFlags {6}",
-            package.Header.Unk3, package.Header.Unk4, package.Header.Unk5, package.Header.Unk6, package.Header.EngineVersion, package.Header.CookerVersion, package.Header.CompressionFlags);
+            logger.Debug("EngineVersion {0}, CookerVersion {1}, compressionFlags {2}, chunkCount {3}",
+           package.Header.EngineVersion, package.Header.CookerVersion, package.Header.CompressionFlags, package.Header.ChunkHeaders.Count);
         }
 
         private void CheckSignature(int sig)
@@ -197,7 +197,7 @@ namespace GPK_RePack.IO
             foreach (var header in package.Header.ChunkHeaders)
             {
                 reader.BaseStream.Seek(header.CompressedOffset, SeekOrigin.Begin);
-                GenericChunkBlock block = new GenericChunkBlock();
+                PackageChunkBlock block = new PackageChunkBlock();
 
                 block.signature = reader.ReadInt32();
                 block.blocksize = reader.ReadInt32();
@@ -446,6 +446,10 @@ namespace GPK_RePack.IO
                 case "Core.Texture2D":
                     if (Settings.Default.EnableTexture2D)
                     {
+                        //GMP Texture Issue Hack
+                        if (package.Filename.EndsWith(".gmp"))
+                            break;
+
                         export.Payload = new Texture2D();
                     }
 

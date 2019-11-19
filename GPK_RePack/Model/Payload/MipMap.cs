@@ -54,7 +54,7 @@ namespace GPK_RePack.Model.Payload
                 block.uncompressedData = new byte[block.uncompressedDataSize];
                 Array.ConstrainedCopy(uncompressedData, blockOffset, block.uncompressedData, 0, block.uncompressedData.Length);
 
-                block.compress(compFlag);
+                block.compressTextureFlags(compFlag);
 
                 compressedSize += block.compressedSize;
                 blocks.Add(block);
