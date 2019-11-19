@@ -220,7 +220,11 @@ namespace GPK_RePack.IO
                 export.SerialOffsetPosition = writer.BaseStream.Position;
                 if (export.SerialSize > 0) writer.Write(export.SerialOffset);
 
-                writer.Write(export.PaddingUnk);
+                writer.Write(export.Unk3);
+                writer.Write(export.UnkHeaderCount);
+                writer.Write(export.Unk4);
+                writer.Write(export.Guid);
+                writer.Write(export.UnkExtraInts);
                 stat.progress++;
             }
 

@@ -15,6 +15,7 @@ namespace GPK_RePack.Model
         public string Filename;
         public string Path;
         public long OrginalSize;
+        public long UncompressedSize;
         public Boolean Changes = false;
 
         public GpkHeader Header;

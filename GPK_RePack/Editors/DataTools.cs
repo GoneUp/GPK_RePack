@@ -17,7 +17,7 @@ namespace GPK_RePack.Editors
             destination.Properties.AddRange(source.Properties.ToArray());
             destination.PropertyPadding = source.PropertyPadding;
             destination.PropertySize = source.PropertySize;
-            destination.PaddingUnk = source.PaddingUnk;
+            destination.PropertyPadding = source.PropertyPadding;
         }
 
         public static void ReplaceData(GpkExport source, GpkExport destination)

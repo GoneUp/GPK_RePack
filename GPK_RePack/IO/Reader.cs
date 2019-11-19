@@ -142,6 +142,7 @@ namespace GPK_RePack.IO
             package.Header.CompressionFlags = reader.ReadInt32();
             int chunkCount = reader.ReadInt32();
 
+
             for (int i = 0; i < chunkCount; i++)
             {
                 var chunk = new GpkCompressedChunkHeader();
@@ -151,6 +152,15 @@ namespace GPK_RePack.IO
                 chunk.CompressedSize = reader.ReadInt32();
 
                 package.Header.ChunkHeaders.Add(chunk);
+
+                if (i == 0)
+                {
+                    package.UncompressedSize = chunk.CompressedOffset + chunk.UncompressedSize; 
+                    //header + chunk 1, assumption is that chunk 1 lays behind header
+                } else
+                {
+                    package.UncompressedSize += chunk.UncompressedSize;
+                }
             }
 
 
@@ -172,12 +182,6 @@ namespace GPK_RePack.IO
         private void FixNameCount(GpkPackage package)
         {
             int t = package.Header.PackageFlags & 8;
-            /*
-            if ((package.Header.PackageFlags & 8) == 8)
-            {
-                package.Header.NameCount -= package.Header.NameOffset;
-            }
-             */
             package.Header.NameCount -= package.Header.NameOffset;
         }
 
@@ -185,13 +189,16 @@ namespace GPK_RePack.IO
         private byte[] CheckAndDecompress(BinaryReader reader, GpkPackage package)
         {
             logger.Trace("checkAndDecompress start");
+            if (package.Header.ChunkHeaders.Count == 0)
+                return null;
 
+
+            byte[] completeFile = new byte[package.UncompressedSize]; //should be the complete file size
             foreach (var header in package.Header.ChunkHeaders)
             {
                 reader.BaseStream.Seek(header.CompressedOffset, SeekOrigin.Begin);
                 GenericChunkBlock block = new GenericChunkBlock();
 
-    
                 block.signature = reader.ReadInt32();
                 block.blocksize = reader.ReadInt32();
                 block.compressedSize = reader.ReadInt32();
@@ -199,16 +206,12 @@ namespace GPK_RePack.IO
 
                 int chunkCount = (block.uncompressedSize_chunkheader + block.blocksize - 1) / block.blocksize;
                 byte[] uncompressedBytes = new byte[header.UncompressedSize];
-
                 block.Decompress(uncompressedBytes, chunkCount, reader, package.Header.CompressionFlags);
-
-                byte[] completeFile = new byte[header.UncompressedSize + header.CompressedOffset]; //should be the complete file size
+          
                 Array.ConstrainedCopy(uncompressedBytes, 0, completeFile, header.UncompressedOffset, header.UncompressedSize);
-
-                return completeFile;
             }
 
-            return null;
+            return completeFile;
         }
 
 
@@ -292,7 +295,11 @@ namespace GPK_RePack.IO
                     export.SerialOffset = reader.ReadInt32();
                 }
 
-                export.PaddingUnk = reader.ReadBytes(28);
+                export.Unk3 = reader.ReadInt32();
+                export.UnkHeaderCount = reader.ReadInt32();
+                export.Unk4 = reader.ReadInt32();
+                export.Guid = reader.ReadBytes(16);
+                export.UnkExtraInts = reader.ReadBytes(export.UnkHeaderCount * 4);
 
                 package.ExportList.Add(i, export);
 

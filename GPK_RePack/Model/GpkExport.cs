@@ -37,7 +37,14 @@ namespace GPK_RePack.Model
         public int NetIndex;
         public string NetIndexName = null;
 
-        public byte[] PaddingUnk = new byte[28];//28 byte byte padding? + 4 vor letztem
+
+        public int Unk3;
+        public int UnkHeaderCount;
+        public int Unk4;
+        public byte[] Guid;
+        public byte[] UnkExtraInts;
+
+
         public byte[] PropertyPadding;
 
         public int PropertySize;
@@ -191,7 +198,8 @@ namespace GPK_RePack.Model
             int tmpSize = 0;
             tmpSize += 36; //static
             if (SerialSize > 0) tmpSize += 4;
-            tmpSize += PaddingUnk.Length;
+            tmpSize += 28; //static after serialoffset
+            tmpSize += UnkExtraInts.Length;
 
             return tmpSize;
 
