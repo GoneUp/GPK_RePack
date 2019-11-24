@@ -73,21 +73,30 @@ namespace GPK_RePack.Model.Payload
                     writer.Write(map.compChunkSize);
                     writer.Write((int)(writer.BaseStream.Position + 4)); //chunkoffset
 
-                    //header
-                    writer.Write(map.signature);
-                    writer.Write(map.blocksize);
-                    writer.Write(map.compressedSize);
-                    writer.Write(map.uncompressedSize_chunkheader);
-
-                    foreach (var block in map.blocks)
+                    if (map.compFlag == 0)
                     {
-                        writer.Write(block.compressedSize);
-                        writer.Write(block.uncompressedDataSize);
-                    }
+                        //uncompressed
+                        writer.Write(map.uncompressedData);
 
-                    foreach (var block in map.blocks)
-                    {
-                        writer.Write(block.compressedData);
+                    } else {
+                        //compressed data
+                        //header
+                        writer.Write(map.signature);
+                        writer.Write(map.blocksize);
+                        writer.Write(map.compressedSize);
+                        writer.Write(map.uncompressedSize_chunkheader);
+
+                        foreach (var block in map.blocks)
+                        {
+                            writer.Write(block.compressedSize);
+                            writer.Write(block.uncompressedDataSize);
+                        }
+
+                        foreach (var block in map.blocks)
+                        {
+                            writer.Write(block.compressedData);
+                        }
+
                     }
 
                 }
@@ -141,11 +150,15 @@ namespace GPK_RePack.Model.Payload
                 map.compChunkOffset = reader.ReadInt32();
                 var temp = ((CompressionTypes)map.compFlag & NothingToDo);
 
-                if (((CompressionTypes)map.compFlag & NothingToDo) == 0)
+                if (map.compFlag == 0 )
+                {
+                    map.uncompressedData = reader.ReadBytes(map.uncompressedSize);
+                }
+                else if (((CompressionTypes)map.compFlag & NothingToDo) == 0)
                 {
                     //header
                     map.signature = reader.ReadUInt32(); //0x9e2a83c1
-                    //Debug.Assert(map.signature == MipMap.DEFAULT_SIGNATURE);
+                    Debug.Assert(map.signature == MipMap.DEFAULT_SIGNATURE);
 
                     map.blocksize = reader.ReadInt32();
 

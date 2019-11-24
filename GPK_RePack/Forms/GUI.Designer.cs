@@ -111,6 +111,7 @@ namespace GPK_RePack.Forms
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
+            this.btnExportProps = new System.Windows.Forms.Button();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -395,7 +396,7 @@ namespace GPK_RePack.Forms
             this.customToolStripMenuItem});
             this.setAllPropertysToolStripMenuItem.Name = "setAllPropertysToolStripMenuItem";
             this.setAllPropertysToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
-            this.setAllPropertysToolStripMenuItem.Text = "Set all Propertys";
+            this.setAllPropertysToolStripMenuItem.Text = "Set all Properties";
             // 
             // setAllVolumeMultipliersToolStripMenuItem
             // 
@@ -470,7 +471,7 @@ namespace GPK_RePack.Forms
             this.tabInfo.Controls.Add(this.boxDataButtons);
             this.tabInfo.Location = new System.Drawing.Point(4, 22);
             this.tabInfo.Name = "tabInfo";
-            this.tabInfo.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabInfo.Padding = new System.Windows.Forms.Padding(3);
             this.tabInfo.Size = new System.Drawing.Size(830, 496);
             this.tabInfo.TabIndex = 0;
             this.tabInfo.Text = "Info";
@@ -630,8 +631,8 @@ namespace GPK_RePack.Forms
             this.tabPropertys.Controls.Add(this.boxPropertyButtons);
             this.tabPropertys.Location = new System.Drawing.Point(4, 22);
             this.tabPropertys.Name = "tabPropertys";
-            this.tabPropertys.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPropertys.Size = new System.Drawing.Size(829, 501);
+            this.tabPropertys.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPropertys.Size = new System.Drawing.Size(830, 496);
             this.tabPropertys.TabIndex = 1;
             this.tabPropertys.Text = "Property Details";
             this.tabPropertys.UseVisualStyleBackColor = true;
@@ -653,7 +654,7 @@ namespace GPK_RePack.Forms
             this.gridProps.Location = new System.Drawing.Point(3, 3);
             this.gridProps.MultiSelect = false;
             this.gridProps.Name = "gridProps";
-            this.gridProps.Size = new System.Drawing.Size(823, 463);
+            this.gridProps.Size = new System.Drawing.Size(824, 458);
             this.gridProps.TabIndex = 0;
             this.gridProps.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.gridProps_DefaultValuesNeeded);
             // 
@@ -700,18 +701,20 @@ namespace GPK_RePack.Forms
             // 
             // boxPropertyButtons
             // 
-            this.boxPropertyButtons.ColumnCount = 2;
-            this.boxPropertyButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.boxPropertyButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.boxPropertyButtons.ColumnCount = 3;
+            this.boxPropertyButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.boxPropertyButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.boxPropertyButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.boxPropertyButtons.Controls.Add(this.btnPropSave, 0, 0);
-            this.boxPropertyButtons.Controls.Add(this.btnPropClear, 1, 0);
+            this.boxPropertyButtons.Controls.Add(this.btnPropClear, 2, 0);
+            this.boxPropertyButtons.Controls.Add(this.btnExportProps, 1, 0);
             this.boxPropertyButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.boxPropertyButtons.Enabled = false;
-            this.boxPropertyButtons.Location = new System.Drawing.Point(3, 466);
+            this.boxPropertyButtons.Location = new System.Drawing.Point(3, 461);
             this.boxPropertyButtons.Name = "boxPropertyButtons";
             this.boxPropertyButtons.RowCount = 1;
             this.boxPropertyButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.boxPropertyButtons.Size = new System.Drawing.Size(823, 32);
+            this.boxPropertyButtons.Size = new System.Drawing.Size(824, 32);
             this.boxPropertyButtons.TabIndex = 6;
             // 
             // btnPropSave
@@ -720,7 +723,7 @@ namespace GPK_RePack.Forms
             this.btnPropSave.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnPropSave.Location = new System.Drawing.Point(3, 3);
             this.btnPropSave.Name = "btnPropSave";
-            this.btnPropSave.Size = new System.Drawing.Size(405, 26);
+            this.btnPropSave.Size = new System.Drawing.Size(268, 26);
             this.btnPropSave.TabIndex = 4;
             this.btnPropSave.Text = "Save Properties";
             this.btnPropSave.UseVisualStyleBackColor = true;
@@ -730,9 +733,9 @@ namespace GPK_RePack.Forms
             // 
             this.btnPropClear.AutoSize = true;
             this.btnPropClear.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnPropClear.Location = new System.Drawing.Point(414, 3);
+            this.btnPropClear.Location = new System.Drawing.Point(551, 3);
             this.btnPropClear.Name = "btnPropClear";
-            this.btnPropClear.Size = new System.Drawing.Size(406, 26);
+            this.btnPropClear.Size = new System.Drawing.Size(270, 26);
             this.btnPropClear.TabIndex = 5;
             this.btnPropClear.Text = "Clear Properties";
             this.btnPropClear.UseVisualStyleBackColor = true;
@@ -743,8 +746,8 @@ namespace GPK_RePack.Forms
             this.tabTexturePreview.Controls.Add(this.boxImagePreview);
             this.tabTexturePreview.Location = new System.Drawing.Point(4, 22);
             this.tabTexturePreview.Name = "tabTexturePreview";
-            this.tabTexturePreview.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabTexturePreview.Size = new System.Drawing.Size(829, 501);
+            this.tabTexturePreview.Padding = new System.Windows.Forms.Padding(3);
+            this.tabTexturePreview.Size = new System.Drawing.Size(830, 496);
             this.tabTexturePreview.TabIndex = 2;
             this.tabTexturePreview.Text = "Texture Preview";
             this.tabTexturePreview.UseVisualStyleBackColor = true;
@@ -756,7 +759,7 @@ namespace GPK_RePack.Forms
             this.boxImagePreview.Image = ((System.Drawing.Image)(resources.GetObject("boxImagePreview.Image")));
             this.boxImagePreview.Location = new System.Drawing.Point(3, 3);
             this.boxImagePreview.Name = "boxImagePreview";
-            this.boxImagePreview.Size = new System.Drawing.Size(823, 495);
+            this.boxImagePreview.Size = new System.Drawing.Size(824, 490);
             this.boxImagePreview.TabIndex = 0;
             this.boxImagePreview.TabStop = false;
             // 
@@ -910,6 +913,18 @@ namespace GPK_RePack.Forms
             this.splitContainerLog_InfoTree.SplitterDistance = 522;
             this.splitContainerLog_InfoTree.TabIndex = 9;
             // 
+            // btnExportProps
+            // 
+            this.btnExportProps.AutoSize = true;
+            this.btnExportProps.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnExportProps.Location = new System.Drawing.Point(277, 3);
+            this.btnExportProps.Name = "btnExportProps";
+            this.btnExportProps.Size = new System.Drawing.Size(268, 26);
+            this.btnExportProps.TabIndex = 6;
+            this.btnExportProps.Text = "Export to File";
+            this.btnExportProps.UseVisualStyleBackColor = true;
+            this.btnExportProps.Click += new System.EventHandler(this.btnExportProps_Click);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -1040,6 +1055,7 @@ namespace GPK_RePack.Forms
         private ToolStripSeparator toolStripSeparator6;
         private ToolStripMenuItem previewOGGToolStripMenuItem;
         private ToolStripMenuItem savePaddingStripMenuItem;
+        private Button btnExportProps;
     }
 }
 

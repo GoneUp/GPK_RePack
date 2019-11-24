@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using GPK_RePack.Model;
 using GPK_RePack.Model.ExportData;
 using GPK_RePack.Model.Interfaces;
@@ -56,7 +57,7 @@ namespace GPK_RePack.IO
 
                 reader.Close();
                 reader.Dispose();
-                
+
 
                 watch.Stop();
                 stat.time = watch.ElapsedMilliseconds;
@@ -155,9 +156,10 @@ namespace GPK_RePack.IO
 
                 if (i == 0)
                 {
-                    package.UncompressedSize = chunk.CompressedOffset + chunk.UncompressedSize; 
+                    package.UncompressedSize = chunk.CompressedOffset + chunk.UncompressedSize;
                     //header + chunk 1, assumption is that chunk 1 lays behind header
-                } else
+                }
+                else
                 {
                     package.UncompressedSize += chunk.UncompressedSize;
                 }
@@ -168,6 +170,12 @@ namespace GPK_RePack.IO
 
             logger.Debug("EngineVersion {0}, CookerVersion {1}, compressionFlags {2}, chunkCount {3}",
            package.Header.EngineVersion, package.Header.CookerVersion, package.Header.CompressionFlags, package.Header.ChunkHeaders.Count);
+
+            logger.Debug("Compressed: {0}, FullyCompressed {1}, PackageFlags {2:X}",
+                ((GpkPackageFlags)package.Header.PackageFlags & GpkPackageFlags.Compressed),
+                ((GpkPackageFlags)package.Header.PackageFlags & GpkPackageFlags.FullyCompressed),
+                package.Header.PackageFlags
+            );
         }
 
         private void CheckSignature(int sig)
@@ -181,7 +189,8 @@ namespace GPK_RePack.IO
 
         private void FixNameCount(GpkPackage package)
         {
-            int t = package.Header.PackageFlags & 8;
+
+            bool t = ((GpkPackageFlags)package.Header.PackageFlags & GpkPackageFlags.BrokenLinks) > 0;
             package.Header.NameCount -= package.Header.NameOffset;
         }
 
@@ -207,9 +216,17 @@ namespace GPK_RePack.IO
                 int chunkCount = (block.uncompressedSize_chunkheader + block.blocksize - 1) / block.blocksize;
                 byte[] uncompressedBytes = new byte[header.UncompressedSize];
                 block.Decompress(uncompressedBytes, chunkCount, reader, package.Header.CompressionFlags);
-          
+
                 Array.ConstrainedCopy(uncompressedBytes, 0, completeFile, header.UncompressedOffset, header.UncompressedSize);
             }
+
+            if (Settings.Default.Debug)
+            {
+                //dump uncompressed file
+                string path = String.Format("{0}\\decomp_{1}", Directory.GetCurrentDirectory(), package.Filename);
+                Task.Factory.StartNew(() => File.WriteAllBytes(path, completeFile));
+            }
+
 
             return completeFile;
         }
@@ -446,8 +463,8 @@ namespace GPK_RePack.IO
                 case "Core.Texture2D":
                     if (Settings.Default.EnableTexture2D)
                     {
-                        //GMP Texture Issue Hack
-                        if (package.Filename.EndsWith(".gmp"))
+                        //gmp hack
+                        if (isStrangeCompressedTexture(export))
                             break;
 
                         export.Payload = new Texture2D();
@@ -458,6 +475,16 @@ namespace GPK_RePack.IO
 
             if (export.Payload != null)
                 export.Payload.ReadData(package, export);
+        }
+
+        public static Boolean isStrangeCompressedTexture(GpkExport export)
+        {
+            foreach (GpkBaseProperty prop in export.Properties)
+            {
+                if (prop.name == "CompressionNoMipmaps" || prop.name == "CompressionNoAlpha")
+                    return true;
+            }
+            return false;
         }
 
         private Boolean ReadPropertyDetails(BinaryReader reader, GpkPackage package, GpkExport export)

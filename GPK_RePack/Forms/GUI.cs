@@ -905,7 +905,7 @@ namespace GPK_RePack.Forms
 
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
         }
-     
+
         protected override bool ProcessCmdKey(ref Message message, Keys keys)
         {
             switch (keys)
@@ -919,7 +919,7 @@ namespace GPK_RePack.Forms
                     btnPaste_Click(btnPaste, new EventArgs());
                     return true;
 
-               //Search
+                //Search
                 case Keys.Control | Keys.F:
                     searchForObjectToolStripMenuItem_Click(null, null);
                     return true;
@@ -953,7 +953,7 @@ namespace GPK_RePack.Forms
                     if (tabControl.TabCount > 2)
                         tabControl.SelectedIndex = 2;
                     return true;
-                
+
             }
 
             // run base implementation
@@ -1699,7 +1699,7 @@ namespace GPK_RePack.Forms
             //readd count bytes 
             arrayProp.value = new byte[data.Length + 4];
             Array.Copy(BitConverter.GetBytes(data.Length), arrayProp.value, 4);
-            Array.Copy(data, 0, arrayProp.value, 4, data.Length);           
+            Array.Copy(data, 0, arrayProp.value, 4, data.Length);
 
             DrawGrid(selectedPackage, selectedExport);
         }
@@ -1728,6 +1728,42 @@ namespace GPK_RePack.Forms
             gridProps.Refresh();
             resizePiutureBox();
         }
+
+
+        private void btnExportProps_Click(object sender, EventArgs e)
+        {
+            //JSON?
+            //CSV?
+            //XML?
+            //Name;Type;Size;ArrayIndex;InnerType;Value
+
+            var builder = new StringBuilder();
+            builder.AppendLine("Name;Type;Size;ArrayIndex;InnerType;Value");
+
+            foreach (DataGridViewRow row in gridProps.Rows)
+            {
+                if (row.IsNewRow || row.Cells["name"].Value == null)
+                    continue;
+
+                string csvRow = String.Format("{0};{1};{2};{3};{4};{5}",
+                    row.Cells["name"].Value.ToString(),
+                    row.Cells["type"].Value.ToString(),
+                    row.Cells["size"].Value.ToString(),
+                    row.Cells["aIndex"].Value.ToString(),
+                    row.Cells["iType"].Value.ToString(),
+                    row.Cells["value"].Value.ToString()
+                    );
+                builder.AppendLine(csvRow);
+            }
+
+
+            var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".csv");
+            if (path == "") return;
+
+            Task.Factory.StartNew(() => File.WriteAllText(path, builder.ToString(), Encoding.UTF8));
+
+        }
+
 
 
         #endregion
