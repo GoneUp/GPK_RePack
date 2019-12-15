@@ -1431,7 +1431,7 @@ namespace GPK_RePack.Forms
                     GpkNameProperty tmpName = (GpkNameProperty)prop;
                     comboCell = new DataGridViewComboBoxCell();
                     comboCell.Items.AddRange(nameQuery.ToArray());
-                    comboCell.Value = tmpName.name;
+                    comboCell.Value = tmpName.value;
 
                 }
                 else if (prop is GpkObjectProperty)
