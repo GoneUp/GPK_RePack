@@ -103,7 +103,9 @@ namespace GPK_RePack.IO
             writer.Write(package.Header.Unk1);
             writer.Write(package.Header.Unk2);
 
-            writer.Write(package.Header.NameCount + package.Header.NameOffset); //tera thing
+            if (package.x64) writer.Write(package.Header.NameCount);
+            else writer.Write(package.Header.NameCount + package.Header.NameOffset); //tera thing
+
             offsetNamePos = writer.BaseStream.Position;
             writer.Write(package.Header.NameOffset);
 
@@ -116,6 +118,8 @@ namespace GPK_RePack.IO
             writer.Write(package.Header.ImportOffset);
 
             writer.Write(package.Header.DependsOffset);
+
+            if(package.x64) writer.Write(package.Header.Unk3);
 
             writer.Write(package.Header.FGUID);
 

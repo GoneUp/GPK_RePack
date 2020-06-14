@@ -85,6 +85,8 @@ namespace GPK_RePack.IO
             package.Header.FileVersion = reader.ReadInt16();
             package.Header.LicenseVersion = reader.ReadInt16();
 
+            package.x64 = package.Header.FileVersion >= 0x381;
+
             package.Header.PackageFlags = reader.ReadInt32();
 
             int len = reader.ReadInt32();
@@ -95,7 +97,7 @@ namespace GPK_RePack.IO
 
             package.Header.NameCount = reader.ReadInt32();
             package.Header.NameOffset = reader.ReadInt32();
-            FixNameCount(package);
+            if (!package.x64) FixNameCount(package);
 
             package.Header.ExportCount = reader.ReadInt32();
             package.Header.ExportOffset = reader.ReadInt32();
@@ -115,6 +117,8 @@ namespace GPK_RePack.IO
             logger.Debug("ImportOffset " + package.Header.ImportOffset);
 
             logger.Debug("DependsOffset " + package.Header.DependsOffset);
+
+            if (package.x64) package.Header.Unk3 = reader.ReadBytes(16);
 
             stat.totalobjects = package.Header.NameCount + package.Header.ImportCount + package.Header.ExportCount * 3; //Export, Export Linking, ExportData = *3
             logger.Info("File Info: NameCount {0}, ImportCount {1}, ExportCount {2}", package.Header.NameCount, package.Header.ImportCount, package.Header.ExportCount);

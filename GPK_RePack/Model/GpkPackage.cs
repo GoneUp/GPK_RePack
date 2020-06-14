@@ -27,6 +27,7 @@ namespace GPK_RePack.Model
         public Dictionary<String, String> UidList;
 
         public readonly int datapuffer = 10;
+        public bool x64;
 
         public GpkPackage()
         {

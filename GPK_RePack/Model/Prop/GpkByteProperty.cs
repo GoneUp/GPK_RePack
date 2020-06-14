@@ -7,6 +7,7 @@ namespace GPK_RePack.Model.Prop
     [Serializable]
     class GpkByteProperty : GpkBaseProperty, IProperty
     {
+        public string enumType = null; //long index
         public string nameValue = null; //long index
         public byte byteValue;
 
@@ -31,6 +32,8 @@ namespace GPK_RePack.Model.Prop
         {
             if (size == 8)
             {
+                if (package.x64) writer.Write(package.GetStringIndex(enumType));
+
                 writer.Write(package.GetStringIndex(nameValue));
             }
             else
@@ -41,8 +44,11 @@ namespace GPK_RePack.Model.Prop
 
         public void ReadData(BinaryReader reader, GpkPackage package)
         {
-            if (size == 8)
-            {
+            if (size == 8) {
+                if (package.x64) {
+                    long structtype = reader.ReadInt64();
+                    enumType = package.GetString(structtype);
+                }
                 long byteIndex = reader.ReadInt64();
                 nameValue = package.GetString(byteIndex);
             }
@@ -54,9 +60,9 @@ namespace GPK_RePack.Model.Prop
 
         public int RecalculateSize()
         {
-            if (nameValue != null)
+            if (nameValue != null) 
             {
-                size = 8;
+                size = enumType != null ? 16 : 8;
             }
             else
             {

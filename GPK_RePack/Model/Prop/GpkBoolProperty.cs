@@ -8,6 +8,7 @@ namespace GPK_RePack.Model.Prop
     class GpkBoolProperty : GpkBaseProperty, IProperty
     {
         public bool value;
+        public byte realSize;
 
         public GpkBoolProperty()
         {
@@ -28,19 +29,26 @@ namespace GPK_RePack.Model.Prop
 
         public void WriteData(BinaryWriter writer, GpkPackage package)
         {
-            writer.Write(Convert.ToInt32(value));
+            if (package.x64) writer.Write(value);
+            else writer.Write(Convert.ToInt32(value));
         }
 
-        public void ReadData(BinaryReader reader, GpkPackage package)
-        {
-            value = Convert.ToBoolean(reader.ReadInt32());
+        public void ReadData(BinaryReader reader, GpkPackage package) {
+            if (package.x64) {
+                realSize = 1;
+                value = reader.ReadBoolean();
+            }
+            else {
+                realSize = 4;
+                value = Convert.ToBoolean(reader.ReadInt32());
+            }
         }
 
         public int RecalculateSize()
         {
             //Seems that it is 0 when writing it to the property 
             //size = 4;
-            return 4;
+            return realSize;
         }
 
         public bool ValidateValue(string input)
