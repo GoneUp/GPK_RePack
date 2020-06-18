@@ -1408,6 +1408,11 @@ namespace GPK_RePack.Forms
                     GpkStructProperty struc = (GpkStructProperty)prop;
                     innerCell.Value = struc.innerType;
                 }
+                else if (prop is GpkByteProperty)
+                {
+                    GpkByteProperty tmpByte = (GpkByteProperty)prop;
+                    innerCell.Value = tmpByte.enumType;
+                }
                 else
                 {
                     innerCell.Value = "None";
@@ -1445,7 +1450,7 @@ namespace GPK_RePack.Forms
                 else if (prop is GpkByteProperty)
                 {
                     GpkByteProperty tmpByte = (GpkByteProperty)prop;
-                    if (tmpByte.size == 8)
+                    if (tmpByte.size == 8 || tmpByte.size == 16)
                     {
                         comboCell = new DataGridViewComboBoxCell();
                         comboCell.Items.AddRange(nameQuery.ToArray());
@@ -1610,6 +1615,10 @@ namespace GPK_RePack.Forms
 
                     if (cellValue.Length > 2)
                     {
+                        if (selectedPackage.x64) {
+                            tmpByte.enumType = row.Cells["iType"].Value.ToString();
+                            selectedPackage.AddString(tmpByte.enumType); //just in case 
+                        }
                         selectedPackage.AddString(cellValue); //just in case 
 
                         tmpByte.nameValue = cellValue;

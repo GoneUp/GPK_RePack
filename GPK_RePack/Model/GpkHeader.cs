@@ -21,7 +21,8 @@ namespace GPK_RePack.Model
         public int ExportCount, ExportOffset;
         public int ImportCount, ImportOffset;
         public int DependsOffset;
-        
+
+        public byte[] Unk3 = new byte[16];//x64 gpk
         public byte[] FGUID = new byte[16];
 
         public List<GpkGeneration> Generations = new List<GpkGeneration>();
@@ -42,7 +43,7 @@ namespace GPK_RePack.Model
 
         public int GetSize()
         {
-            return 109;
+            return FileVersion >= 0x381 ? 125 : 109;
         }
     }
 }
