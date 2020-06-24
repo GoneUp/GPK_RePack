@@ -28,6 +28,11 @@ namespace GPK_RePack.Model
 
         }
 
+        public string ToCompactString()
+        {
+            return String.Format("I;{0};{1};{2};{3}", UID, ObjectName, ClassPackage, ClassName);
+        }
+
         public int GetSize()
         {
             return 28;

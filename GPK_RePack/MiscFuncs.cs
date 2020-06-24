@@ -152,11 +152,12 @@ namespace GPK_RePack
         }
 
         [STAThread]
-        public static String[] GenerateOpenDialog(bool multiselect, Control cnt, bool useWorkingDir = true)
+        public static String[] GenerateOpenDialog(bool multiselect, Control cnt, bool useWorkingDir = true, string filter = "")
         {
             OpenFileDialog open = new OpenFileDialog();
             open.Multiselect = multiselect;
             open.ValidateNames = true;
+            if (filter != "") open.Filter = filter;
             open.InitialDirectory = useWorkingDir ? Settings.Default.WorkingDir : Settings.Default.OpenDir;
             open.ShowDialog();
 

@@ -97,6 +97,7 @@ namespace GPK_RePack.Forms
             this.boxPropertyButtons = new System.Windows.Forms.TableLayoutPanel();
             this.btnPropSave = new System.Windows.Forms.Button();
             this.btnPropClear = new System.Windows.Forms.Button();
+            this.btnExportProps = new System.Windows.Forms.Button();
             this.tabTexturePreview = new System.Windows.Forms.TabPage();
             this.boxImagePreview = new System.Windows.Forms.PictureBox();
             this.boxGeneralButtons = new System.Windows.Forms.TableLayoutPanel();
@@ -111,7 +112,8 @@ namespace GPK_RePack.Forms
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
-            this.btnExportProps = new System.Windows.Forms.Button();
+            this.dumpHeadersMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loggingActiveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -375,6 +377,8 @@ namespace GPK_RePack.Forms
             this.tESTBigBytePropExportToolStripMenuItem,
             this.bigBytePropImportToolStripMenuItem,
             this.addNameToolStripMenuItem,
+            this.dumpHeadersMenuItem,
+            this.loggingActiveMenuItem,
             this.toolStripSeparator4,
             this.searchForObjectToolStripMenuItem,
             this.nextToolStripMenuItem});
@@ -741,6 +745,18 @@ namespace GPK_RePack.Forms
             this.btnPropClear.UseVisualStyleBackColor = true;
             this.btnPropClear.Click += new System.EventHandler(this.btnPropClear_Click);
             // 
+            // btnExportProps
+            // 
+            this.btnExportProps.AutoSize = true;
+            this.btnExportProps.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnExportProps.Location = new System.Drawing.Point(277, 3);
+            this.btnExportProps.Name = "btnExportProps";
+            this.btnExportProps.Size = new System.Drawing.Size(268, 26);
+            this.btnExportProps.TabIndex = 6;
+            this.btnExportProps.Text = "Export to File";
+            this.btnExportProps.UseVisualStyleBackColor = true;
+            this.btnExportProps.Click += new System.EventHandler(this.btnExportProps_Click);
+            // 
             // tabTexturePreview
             // 
             this.tabTexturePreview.Controls.Add(this.boxImagePreview);
@@ -913,17 +929,22 @@ namespace GPK_RePack.Forms
             this.splitContainerLog_InfoTree.SplitterDistance = 522;
             this.splitContainerLog_InfoTree.TabIndex = 9;
             // 
-            // btnExportProps
+            // dumpHeadersMenuItem
             // 
-            this.btnExportProps.AutoSize = true;
-            this.btnExportProps.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnExportProps.Location = new System.Drawing.Point(277, 3);
-            this.btnExportProps.Name = "btnExportProps";
-            this.btnExportProps.Size = new System.Drawing.Size(268, 26);
-            this.btnExportProps.TabIndex = 6;
-            this.btnExportProps.Text = "Export to File";
-            this.btnExportProps.UseVisualStyleBackColor = true;
-            this.btnExportProps.Click += new System.EventHandler(this.btnExportProps_Click);
+            this.dumpHeadersMenuItem.Name = "dumpHeadersMenuItem";
+            this.dumpHeadersMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.dumpHeadersMenuItem.Text = "Dump GPK Headers";
+            this.dumpHeadersMenuItem.Click += new System.EventHandler(this.dumpHeadersMenuItem_Click);
+            // 
+            // loggingActiveMenuItem
+            // 
+            this.loggingActiveMenuItem.Checked = true;
+            this.loggingActiveMenuItem.CheckOnClick = true;
+            this.loggingActiveMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.loggingActiveMenuItem.Name = "loggingActiveMenuItem";
+            this.loggingActiveMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.loggingActiveMenuItem.Text = "Textbox Logging active";
+            this.loggingActiveMenuItem.CheckedChanged += new System.EventHandler(this.loggingActiveMenuItem_CheckedChanged);
             // 
             // GUI
             // 
@@ -1056,6 +1077,8 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem previewOGGToolStripMenuItem;
         private ToolStripMenuItem savePaddingStripMenuItem;
         private Button btnExportProps;
+        private ToolStripMenuItem dumpHeadersMenuItem;
+        private ToolStripMenuItem loggingActiveMenuItem;
     }
 }
 

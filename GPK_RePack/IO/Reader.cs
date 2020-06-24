@@ -20,7 +20,7 @@ namespace GPK_RePack.IO
 
         public Status stat;
 
-        public GpkPackage ReadGpk(string path)
+        public GpkPackage ReadGpk(string path, bool skipData)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace GPK_RePack.IO
                 ReadNames(reader, package);
                 ReadImports(reader, package);
                 ReadExports(reader, package);
-                ReadExportData(reader, package);
+                if (!skipData) ReadExportData(reader, package);
 
                 reader.Close();
                 reader.Dispose();
@@ -205,8 +205,15 @@ namespace GPK_RePack.IO
             if (package.Header.ChunkHeaders.Count == 0)
                 return null;
 
-
             byte[] completeFile = new byte[package.UncompressedSize]; //should be the complete file size
+
+            //copy header
+            var headerSize = (int)reader.BaseStream.Position;
+            reader.BaseStream.Seek(0, SeekOrigin.Begin);
+            byte[] headerbytes = reader.ReadBytes(headerSize);
+            Array.ConstrainedCopy(headerbytes, 0, completeFile, 0, headerSize);
+
+
             foreach (var header in package.Header.ChunkHeaders)
             {
                 reader.BaseStream.Seek(header.CompressedOffset, SeekOrigin.Begin);
@@ -228,7 +235,7 @@ namespace GPK_RePack.IO
             {
                 //dump uncompressed file
                 string path = String.Format("{0}\\decomp_{1}", Directory.GetCurrentDirectory(), package.Filename);
-                Task.Factory.StartNew(() => File.WriteAllBytes(path, completeFile));
+                //Task.Factory.StartNew(() => File.WriteAllBytes(path, completeFile));
             }
 
 

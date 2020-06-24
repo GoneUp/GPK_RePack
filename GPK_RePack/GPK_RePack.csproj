@@ -125,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Forms\Helper\TextBoxTempShow.cs" />
+    <Compile Include="IO\MassDumper.cs" />
     <Compile Include="Model\GpkPackageFlags.cs" />
     <Compile Include="Model\GpkCompressedChunkHeader.cs" />
     <Compile Include="Model\Payload\ChunkBlock.cs" />

@@ -305,6 +305,7 @@ namespace GPK_RePack.Model
             info.AppendLine("Import count: " + ImportList.Count);
             info.AppendLine("Export count: " + ExportList.Count);
             info.AppendLine("UID count: " + UidList.Count);
+            info.AppendLine("Is x64 GPK: " + x64);
             return info.ToString();
         }
     }

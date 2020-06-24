@@ -148,6 +148,11 @@ namespace GPK_RePack.Model
             }
             return info.ToString();
         }
+
+        public string ToCompactString()
+        {
+            return String.Format("E;{0};{1};{2};{3};{4};{5}", UID, ObjectName, ClassName, SuperName, PackageName, SerialOffset) ;
+        }
         public int GetDataSize()
         {
             int size = 0;

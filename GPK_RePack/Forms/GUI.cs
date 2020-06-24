@@ -94,7 +94,6 @@ namespace GPK_RePack.Forms
                     MessageBox.Show("Setting file was missing. Please restart the application.");
                     Environment.Exit(0);
                 }
-                Debug.Print("LOL" + Settings.Default.EnableTexture2D);
 
                 //nlog init
                 NLogConfig.SetDefaultConfig();
@@ -232,7 +231,7 @@ namespace GPK_RePack.Forms
                     {
                         Reader reader = new Reader();
                         runningReaders.Add(reader);
-                        GpkPackage tmpPack = reader.ReadGpk(path);
+                        GpkPackage tmpPack = reader.ReadGpk(path, false);
                         if (tmpPack != null)
                         {
                             if (Settings.Default.Debug)
@@ -1357,6 +1356,34 @@ namespace GPK_RePack.Forms
             searchResultIndex++;
         }
 
+        private void dumpHeadersMenuItem_Click(object sender, EventArgs e)
+        {
+
+            string[] files = MiscFuncs.GenerateOpenDialog(true, this, true, "GPK (*.gpk;*.upk;*.gpk_rebuild)|*.gpk;*.upk;*.gpk_rebuild|All files (*.*)|*.*");
+            if (files.Length == 0) return;
+
+            string outfile = MiscFuncs.GenerateSaveDialog("dump", ".txt");
+
+            new Task(() =>
+            {
+                logger.Info("Dump is running in the background");
+                MassDumper.DumpMassHeaders(outfile, files);
+                logger.Info("Dump done");
+            }).Start();
+
+        }
+
+        private void loggingActiveMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (loggingActiveMenuItem.Checked)
+            {
+                NLogConfig.EnableFormLogging();
+            } else
+            {
+                NLogConfig.DisableFormLogging();
+            }
+        }
+
         #endregion //search
         #endregion //misc
 
@@ -1864,9 +1891,11 @@ namespace GPK_RePack.Forms
 
 
 
+
+
         #endregion
 
-
+    
     }
 }
 
