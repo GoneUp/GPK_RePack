@@ -482,6 +482,9 @@ namespace GPK_RePack.IO
                     }
 
                     break;
+                case "Core.ObjectRedirector":
+                    export.Payload = new ObjectRedirector();
+                    break;
             }
 
             if (export.Payload != null)

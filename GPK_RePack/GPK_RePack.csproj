@@ -131,6 +131,7 @@
     <Compile Include="Model\Payload\ChunkBlock.cs" />
     <Compile Include="Model\Payload\CompressionTypesPackage.cs" />
     <Compile Include="Model\Payload\PackageChunkBlock.cs" />
+    <Compile Include="Model\Payload\ObjectRedirector.cs" />
     <Compile Include="ResourceExtractor.cs" />
     <Compile Include="Model\ExportData\DataLoader.cs" />
     <Compile Include="Model\GpkExport.cs" />
