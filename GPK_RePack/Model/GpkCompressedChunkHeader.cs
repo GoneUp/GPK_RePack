@@ -7,7 +7,7 @@ using GPK_RePack.Model.Interfaces;
 
 namespace GPK_RePack.Model
 {
-
+    [Serializable]
     class GpkCompressedChunkHeader : IGpkPart
     {
         public int GetSize()
@@ -21,4 +21,6 @@ namespace GPK_RePack.Model
         public int CompressedOffset;
         public int CompressedSize;
     }
+
+    
 }

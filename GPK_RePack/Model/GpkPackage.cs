@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,9 @@ namespace GPK_RePack.Model
         public string Path;
         public long OrginalSize;
         public long UncompressedSize;
+
+        public long FileStartOffset;
+        public long EndOfData = 0; 
         public Boolean Changes = false;
 
         public GpkHeader Header;
@@ -28,6 +32,7 @@ namespace GPK_RePack.Model
 
         public readonly int datapuffer = 10;
         public bool x64;
+        public bool CompositeGpk;
 
         public GpkPackage()
         {

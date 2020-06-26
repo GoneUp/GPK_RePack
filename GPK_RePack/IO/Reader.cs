@@ -17,55 +17,75 @@ namespace GPK_RePack.IO
     class Reader : IProgress
     {
         private Logger logger;
-
         public Status stat;
 
-        public GpkPackage ReadGpk(string path, bool skipData)
+        public List<GpkPackage> ReadGpk(string path, bool skipData)
         {
             try
             {
-                Stopwatch watch = new Stopwatch();
-                GpkPackage package = new GpkPackage();
-                stat = new Status();
-
-                watch.Start();
-
-                package.Filename = Path.GetFileName(path);
-                package.Path = path;
-                stat.name = package.Filename;
-
-                logger = LogManager.GetLogger("[Reader:" + package.Filename + "]");
-                logger.Info("Reading Start");
-
-
+                Stopwatch fileWatch = new Stopwatch();
+                List<GpkPackage> returnPackageList = new List<GpkPackage>();
                 BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read));
-                package.OrginalSize = reader.BaseStream.Length;
+                int counter = 0;
 
-                //parsing
-                ReadHeader(reader, package);
-                var file = CheckAndDecompress(reader, package);
-                if (file != null)
+                fileWatch.Start();
+                //Loop is necesarry for composite GPKs were multiple (compressed) GPKs are stacked behind each other
+                //Working with Seek is tricky in Composite GPKs since everything is shifted, also the special case of decompression is there. 
+                //Acutally compression helps us since that keeps inner offsets after the header intact. 
+                do
                 {
+                    GpkPackage package = new GpkPackage();
+                    Stopwatch pkgWatch = new Stopwatch();
+                    stat = new Status();
+
+                    pkgWatch.Start();
+                    package.Filename = String.Format("{0}_{1}", Path.GetFileName(path), counter);
+                    package.Path = path;
+                    stat.name = package.Filename;
+
+                    logger = LogManager.GetLogger("[Reader:" + package.Filename + "]");
+                    logger.Info("Reading Start");
+
+                    package.OrginalSize = reader.BaseStream.Length;
+                    package.FileStartOffset = reader.BaseStream.Position;
+
+                    //parsing
+                    ReadHeader(reader, package);
+                    var file = CheckAndDecompress(reader, package);
+                    if (file != null)
+                    {
+                        reader.Close();
+                        reader = new BinaryReader(new MemoryStream(file));
+                    }
+
+                    ReadNames(reader, package);
+                    ReadImports(reader, package);
+                    ReadExports(reader, package);
+                    if (!skipData) ReadExportData(reader, package);
+
                     reader.Close();
-                    reader = new BinaryReader(new MemoryStream(file));
-                }
+                    reader.Dispose();
 
-                ReadNames(reader, package);
-                ReadImports(reader, package);
-                ReadExports(reader, package);
-                if (!skipData) ReadExportData(reader, package);
+                    returnPackageList.Add(package);
+                    pkgWatch.Stop();
+                    stat.time = pkgWatch.ElapsedMilliseconds;
+                    stat.finished = true;
+                    logger.Info("Reading of package {0} complete, took {1}ms!", package.Filename, pkgWatch.ElapsedMilliseconds);
 
-                reader.Close();
-                reader.Dispose();
+                    //prepare next loop
+                    if (package.EndOfData == 0 || package.EndOfData == package.OrginalSize)
+                        break; //no valid end of data found
+
+                    counter++;
+                    reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read));
+                    reader.BaseStream.Seek(package.FileStartOffset + package.EndOfData, SeekOrigin.Begin); 
+                } while (CheckForAnotherPackage(reader));
 
 
-                watch.Stop();
-                stat.time = watch.ElapsedMilliseconds;
-                stat.finished = true;
-                logger.Info("Reading of {0} complete, took {1}ms!", path, watch.ElapsedMilliseconds);
+                fileWatch.Stop();
+                logger.Info("Reading of file {0} complete, took {1}ms!", path, fileWatch.ElapsedMilliseconds);
 
-
-                return package;
+                return returnPackageList;
             }
             catch (Exception ex)
             {
@@ -167,13 +187,22 @@ namespace GPK_RePack.IO
                 {
                     package.UncompressedSize += chunk.UncompressedSize;
                 }
+
+                int endOfChunk = chunk.CompressedOffset + chunk.CompressedSize;
+                if (endOfChunk > package.EndOfData)
+                    package.EndOfData = endOfChunk;
+
+                logger.Debug("Chunk {0}: UncompressedOffset {1}, UncompressedSize {2}, CompressedOffset {3}, CompressedSize {4}, CompressedEnd {5}",
+                    i, chunk.UncompressedOffset, chunk.UncompressedSize, chunk.CompressedOffset, chunk.CompressedSize, endOfChunk);
+
+                
             }
 
 
             if (package.Header.EngineVersion == 0xC0FFEE) logger.Info("Found a old brother ;)");
 
-            logger.Debug("EngineVersion {0}, CookerVersion {1}, compressionFlags {2}, chunkCount {3}",
-           package.Header.EngineVersion, package.Header.CookerVersion, package.Header.CompressionFlags, package.Header.ChunkHeaders.Count);
+            logger.Debug("EngineVersion {0}, CookerVersion {1}, compressionFlags {2}, chunkCount {3}, PkgUncompressedSize {4}",
+           package.Header.EngineVersion, package.Header.CookerVersion, package.Header.CompressionFlags, package.Header.ChunkHeaders.Count, package.UncompressedSize);
 
             logger.Debug("Compressed: {0}, FullyCompressed {1}, PackageFlags {2:X}",
                 ((GpkPackageFlags)package.Header.PackageFlags & GpkPackageFlags.Compressed),
@@ -191,6 +220,7 @@ namespace GPK_RePack.IO
             }
         }
 
+
         private void FixNameCount(GpkPackage package)
         {
 
@@ -207,16 +237,10 @@ namespace GPK_RePack.IO
 
             byte[] completeFile = new byte[package.UncompressedSize]; //should be the complete file size
 
-            //copy header
-            var headerSize = (int)reader.BaseStream.Position;
-            reader.BaseStream.Seek(0, SeekOrigin.Begin);
-            byte[] headerbytes = reader.ReadBytes(headerSize);
-            Array.ConstrainedCopy(headerbytes, 0, completeFile, 0, headerSize);
-
 
             foreach (var header in package.Header.ChunkHeaders)
             {
-                reader.BaseStream.Seek(header.CompressedOffset, SeekOrigin.Begin);
+                reader.BaseStream.Seek(package.FileStartOffset +  header.CompressedOffset, SeekOrigin.Begin);
                 PackageChunkBlock block = new PackageChunkBlock();
 
                 block.signature = reader.ReadInt32();
@@ -389,7 +413,7 @@ namespace GPK_RePack.IO
                             break;
                         }
 
-                        reader.BaseStream.Seek(reader.BaseStream.Position - 7, SeekOrigin.Begin);
+                        reader.BaseStream.Seek(-7, SeekOrigin.Current);
                     }
                     //bad style :(
                     //logger.Info("First {0} Skip {1}", first, reader.BaseStream.Position - export.SerialOffset);
@@ -649,6 +673,18 @@ namespace GPK_RePack.IO
                 counter++;
             } while (true);
         }
+
+        private bool CheckForAnotherPackage(BinaryReader reader)
+        {
+            //length check
+            if (reader.BaseStream.Position + 4 > reader.BaseStream.Length)
+                return false;
+
+            var sig = reader.ReadUInt32();
+            reader.BaseStream.Seek(-4, SeekOrigin.Current);
+            return sig == 0x9E2A83C1; //0x9E2A83C1  -1641380927
+        }
+
 
         public Status GetStatus()
         {

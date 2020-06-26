@@ -53,10 +53,10 @@ namespace GPK_RePack.IO
                         {
                             Reader reader = new Reader();
                             runningReaders.Add(reader);
-                            GpkPackage tmpPack = reader.ReadGpk(path, true);
+                            var tmpPack = reader.ReadGpk(path, true);
                             if (tmpPack != null)
                             {
-                                loadedGpkPackages.Add(tmpPack);
+                                loadedGpkPackages.AddRange(tmpPack);
                             }
                         });
                         newTask.Start();

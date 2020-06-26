@@ -231,15 +231,10 @@ namespace GPK_RePack.Forms
                     {
                         Reader reader = new Reader();
                         runningReaders.Add(reader);
-                        GpkPackage tmpPack = reader.ReadGpk(path, false);
+                        List<GpkPackage> tmpPack = reader.ReadGpk(path, false);
                         if (tmpPack != null)
                         {
-                            if (Settings.Default.Debug)
-                            {
-                                tmpPack.Changes = true; //tmp, remove after tests
-                            }
-
-                            loadedGpkPackages.Add(tmpPack);
+                            loadedGpkPackages.AddRange(tmpPack);
                         }
                     });
                     newTask.Start();
