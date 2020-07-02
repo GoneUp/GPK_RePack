@@ -70,6 +70,8 @@ namespace GPK_RePack.Forms
             this.tESTBigBytePropExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bigBytePropImportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dumpHeadersMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loggingActiveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.searchForObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -112,8 +114,8 @@ namespace GPK_RePack.Forms
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
-            this.dumpHeadersMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loggingActiveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.compositeGPKToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.decryptionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -273,6 +275,7 @@ namespace GPK_RePack.Forms
             this.menuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mainToolStripMenuItem,
+            this.compositeGPKToolStripMenuItem,
             this.miscToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
@@ -436,6 +439,23 @@ namespace GPK_RePack.Forms
             this.addNameToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
             this.addNameToolStripMenuItem.Text = "Add Name";
             this.addNameToolStripMenuItem.Click += new System.EventHandler(this.addNameToolStripMenuItem_Click);
+            // 
+            // dumpHeadersMenuItem
+            // 
+            this.dumpHeadersMenuItem.Name = "dumpHeadersMenuItem";
+            this.dumpHeadersMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.dumpHeadersMenuItem.Text = "Dump GPK Headers";
+            this.dumpHeadersMenuItem.Click += new System.EventHandler(this.dumpHeadersMenuItem_Click);
+            // 
+            // loggingActiveMenuItem
+            // 
+            this.loggingActiveMenuItem.Checked = true;
+            this.loggingActiveMenuItem.CheckOnClick = true;
+            this.loggingActiveMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.loggingActiveMenuItem.Name = "loggingActiveMenuItem";
+            this.loggingActiveMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.loggingActiveMenuItem.Text = "Textbox Logging active";
+            this.loggingActiveMenuItem.CheckedChanged += new System.EventHandler(this.loggingActiveMenuItem_CheckedChanged);
             // 
             // toolStripSeparator4
             // 
@@ -929,22 +949,20 @@ namespace GPK_RePack.Forms
             this.splitContainerLog_InfoTree.SplitterDistance = 522;
             this.splitContainerLog_InfoTree.TabIndex = 9;
             // 
-            // dumpHeadersMenuItem
+            // compositeGPKToolStripMenuItem
             // 
-            this.dumpHeadersMenuItem.Name = "dumpHeadersMenuItem";
-            this.dumpHeadersMenuItem.Size = new System.Drawing.Size(236, 24);
-            this.dumpHeadersMenuItem.Text = "Dump GPK Headers";
-            this.dumpHeadersMenuItem.Click += new System.EventHandler(this.dumpHeadersMenuItem_Click);
+            this.compositeGPKToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.decryptionToolStripMenuItem});
+            this.compositeGPKToolStripMenuItem.Name = "compositeGPKToolStripMenuItem";
+            this.compositeGPKToolStripMenuItem.Size = new System.Drawing.Size(117, 23);
+            this.compositeGPKToolStripMenuItem.Text = "Composite GPK";
             // 
-            // loggingActiveMenuItem
+            // decryptionToolStripMenuItem
             // 
-            this.loggingActiveMenuItem.Checked = true;
-            this.loggingActiveMenuItem.CheckOnClick = true;
-            this.loggingActiveMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.loggingActiveMenuItem.Name = "loggingActiveMenuItem";
-            this.loggingActiveMenuItem.Size = new System.Drawing.Size(236, 24);
-            this.loggingActiveMenuItem.Text = "Textbox Logging active";
-            this.loggingActiveMenuItem.CheckedChanged += new System.EventHandler(this.loggingActiveMenuItem_CheckedChanged);
+            this.decryptionToolStripMenuItem.Name = "decryptionToolStripMenuItem";
+            this.decryptionToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.decryptionToolStripMenuItem.Text = "Decryption";
+            this.decryptionToolStripMenuItem.Click += new System.EventHandler(this.decryptionToolStripMenuItem_Click);
             // 
             // GUI
             // 
@@ -1079,6 +1097,8 @@ namespace GPK_RePack.Forms
         private Button btnExportProps;
         private ToolStripMenuItem dumpHeadersMenuItem;
         private ToolStripMenuItem loggingActiveMenuItem;
+        private ToolStripMenuItem compositeGPKToolStripMenuItem;
+        private ToolStripMenuItem decryptionToolStripMenuItem;
     }
 }
 

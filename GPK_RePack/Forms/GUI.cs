@@ -1286,6 +1286,39 @@ namespace GPK_RePack.Forms
                 tabControl.TabPages.Remove(tabTexturePreview);
         }
 
+
+        private void dumpHeadersMenuItem_Click(object sender, EventArgs e)
+        {
+            NLogConfig.DisableFormLogging();
+
+            string[] files = MiscFuncs.GenerateOpenDialog(true, this, true, "GPK (*.gpk;*.upk;*.gpk_rebuild)|*.gpk;*.upk;*.gpk_rebuild|All files (*.*)|*.*");
+            if (files.Length == 0) return;
+
+            string outfile = MiscFuncs.GenerateSaveDialog("dump", ".txt");
+
+            new Task(() =>
+            {
+                logger.Info("Dump is running in the background");
+                MassDumper.DumpMassHeaders(outfile, files);
+                logger.Info("Dump done");
+
+                NLogConfig.EnableFormLogging();
+            }).Start();
+
+        }
+
+        private void loggingActiveMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (loggingActiveMenuItem.Checked)
+            {
+                NLogConfig.EnableFormLogging();
+            }
+            else
+            {
+                NLogConfig.DisableFormLogging();
+            }
+        }
+
         #region search
         private void searchForObjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1351,36 +1384,30 @@ namespace GPK_RePack.Forms
             searchResultIndex++;
         }
 
-        private void dumpHeadersMenuItem_Click(object sender, EventArgs e)
-        {
-
-            string[] files = MiscFuncs.GenerateOpenDialog(true, this, true, "GPK (*.gpk;*.upk;*.gpk_rebuild)|*.gpk;*.upk;*.gpk_rebuild|All files (*.*)|*.*");
-            if (files.Length == 0) return;
-
-            string outfile = MiscFuncs.GenerateSaveDialog("dump", ".txt");
-
-            new Task(() =>
-            {
-                logger.Info("Dump is running in the background");
-                MassDumper.DumpMassHeaders(outfile, files);
-                logger.Info("Dump done");
-            }).Start();
-
-        }
-
-        private void loggingActiveMenuItem_CheckedChanged(object sender, EventArgs e)
-        {
-            if (loggingActiveMenuItem.Checked)
-            {
-                NLogConfig.EnableFormLogging();
-            } else
-            {
-                NLogConfig.DisableFormLogging();
-            }
-        }
 
         #endregion //search
         #endregion //misc
+
+        #region composite gpk
+        private void decryptionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string[] files = MiscFuncs.GenerateOpenDialog(false, this, true);
+            if (files.Length == 0) return;
+
+            string outfile = MiscFuncs.GenerateSaveDialog("decrypt", ".txt");
+
+            new Task(() =>
+            {
+                logger.Info("Decryption is running in the background");
+
+                MapperTools.DecryptFile(files[0], outfile);
+
+                logger.Info("Decryption done");
+
+            }).Start();
+        }
+
+        #endregion
 
         #region propgrid
 
@@ -1888,9 +1915,10 @@ namespace GPK_RePack.Forms
 
 
 
+
         #endregion
 
-    
+   
     }
 }
 
