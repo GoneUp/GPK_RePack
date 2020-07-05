@@ -409,6 +409,7 @@ namespace GPK_RePack.Forms
         #region diplaygpk
         public void DrawPackages()
         {
+            treeMain.BeginUpdate();
             treeMain.Nodes.Clear();
 
             for (int i = 0; i < loadedGpkPackages.Count; i++)
@@ -479,6 +480,7 @@ namespace GPK_RePack.Forms
 
             treeMain.TreeViewNodeSorter = new MiscFuncs.NodeSorter();
             treeMain.Sort();
+            treeMain.EndUpdate();
         }
 
 
@@ -1400,11 +1402,29 @@ namespace GPK_RePack.Forms
             {
                 logger.Info("Decryption is running in the background");
 
-                MapperTools.DecryptFile(files[0], outfile);
+                MapperTools.DecryptAndWriteFile(files[0], outfile);
 
                 logger.Info("Decryption done");
 
             }).Start();
+        }
+
+
+        private void loadMappingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dialog = new FolderBrowserDialog();
+            dialog.SelectedPath = Settings.Default.WorkingDir;
+            dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it";
+            dialog.ShowDialog();
+
+            var path = dialog.SelectedPath;
+            var map = MapperTools.ParseMappings(path);
+
+            int subCount = map.Map.Sum(entry => entry.Value.Count);
+            logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", map.Map.Count, subCount);
+
+            var mapperView = new formMapperView(map);
+            mapperView.Show();
         }
 
         #endregion
@@ -1905,6 +1925,7 @@ namespace GPK_RePack.Forms
                 }
             }));
         }
+
 
 
 

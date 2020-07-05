@@ -4,7 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media.TextFormatting;
+using GPK_RePack.Model.Composite;
+using Microsoft.VisualBasic.ApplicationServices;
+using Microsoft.VisualBasic.Logging;
 using NLog;
 
 namespace GPK_RePack.IO
@@ -14,11 +18,26 @@ namespace GPK_RePack.IO
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static void DecryptFile(string input, string output)
+
+        public static void DecryptAndWriteFile(string input, string output)
         {
             try
             {
-                byte[] data = File.ReadAllBytes(input);
+                var data = File.ReadAllBytes(input);
+                DecryptFile(data);
+                File.WriteAllBytes(output, data);
+
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
+        }
+
+        public static void DecryptFile(byte[] data)
+        {
+            try
+            {
                 int offset = 0;
 
                 // Unscramble (1)
@@ -83,14 +102,121 @@ namespace GPK_RePack.IO
                     offset += key.Length;
                 }
 
-                File.WriteAllBytes(output, data);
-
 
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
             }
+        }
+
+
+        public static CompositeMap ParseMappings(string folder)
+        {
+            logger.Debug("ParseMappings for " + folder);
+
+            try
+            {
+                string pkgMapper = folder + "\\PkgMapper.dat";
+                string compMapper = folder + "\\CompositePackageMapper.dat";
+
+                if (!File.Exists(pkgMapper) || !File.Exists(compMapper))
+                {
+                    logger.Info("Not all .dat files found");
+                    return null;
+                }
+
+                var pkgMapperData = File.ReadAllBytes(pkgMapper);
+                DecryptFile(pkgMapperData);
+
+                StreamReader reader = new StreamReader(new MemoryStream(pkgMapperData));
+                var pkgMapperText = reader.ReadToEnd();
+                reader.Close();
+
+                var objectMapperList = new Dictionary<String, String>();
+                var objectEntries = pkgMapperText.Split('|');
+                foreach (var entry in objectEntries)
+                {
+                    var split = entry.Split(',');
+                    if (split.Length < 2)
+                    {
+                        continue;
+                    }
+
+                    var uid = split[0];
+                    var compositeUID = split[1];
+
+                    logger.Debug("entry %s:%s", uid, compositeUID);
+                    objectMapperList.Add(compositeUID, uid);
+                }
+
+                logger.Debug("parsing CompositePackageMapper");
+
+                var compPkgMapper = File.ReadAllBytes(compMapper);
+                DecryptFile(compPkgMapper);
+
+                reader = new StreamReader(new MemoryStream(compPkgMapper));
+                var comppPackMapperText = reader.ReadToEnd();
+                reader.Close();
+
+                var compMap = new CompositeMap();
+                var fileEntries = comppPackMapperText.Split('!');
+                for (int i = 0; i < fileEntries.Length; i += 1)
+                {
+                    var baseSplit = fileEntries[i].Split('?');
+                    if (baseSplit.Length < 2)
+                    {
+                        continue;
+                    }
+
+                    var fileName = baseSplit[0];
+                    var fileContent = baseSplit[1];
+
+                    //Composite UID, Unkown Object ID, Sub-GPK File offset, Sub-GPK File length
+                    //c7a706fb_6a349a6f_1d212.Chat2_dup,c7a706fb_6a349a6f_1d212,92291307,821218,|
+                    var subGPKEntries = baseSplit[1].Split('|');
+
+                    foreach (var entry in subGPKEntries)
+                    {
+                        var split = entry.Split(',');
+                        if (split.Length < 5)
+                        {
+                            continue;
+                        }
+
+                        var tmp = new CompositeMapEntry();
+                        tmp.CompositeUID = split[0];
+                        tmp.UnknownUID = split[1];
+                        tmp.FileOffset = split[2];
+                        tmp.FileLength = split[3];
+
+                        //enrich
+                        tmp.SubGPKName = fileName;
+                        tmp.UID = objectMapperList[tmp.CompositeUID];
+
+                        if (!compMap.Map.ContainsKey(fileName))
+                        {
+                            compMap.Map.Add(fileName, new List<CompositeMapEntry>());
+                        }
+
+                        compMap.Map[fileName].Add(tmp);
+
+                        var unk = split[4];
+                        if (unk != "")
+                        {
+                            logger.Warn("unk not empty!!!!!!! " + unk);
+                        }
+                    }
+                }
+
+                return compMap;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
+
+            return null;
         }
 
     }

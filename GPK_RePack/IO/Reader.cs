@@ -89,7 +89,8 @@ namespace GPK_RePack.IO
             }
             catch (Exception ex)
             {
-                logger.Fatal(ex, "Parse failure! ");
+                logger.Fatal("Parse failure!");
+                logger.Fatal(ex);
             }
 
             return null;

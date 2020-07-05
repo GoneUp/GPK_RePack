@@ -41,7 +41,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>true</Prefer32Bit>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -124,9 +124,20 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\Helper\CompositeTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\MapperView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MapperView.Designer.cs">
+      <DependentUpon>MapperView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Helper\TextBoxTempShow.cs" />
     <Compile Include="IO\MapperTools.cs" />
     <Compile Include="IO\MassDumper.cs" />
+    <Compile Include="Model\Composite\CompositeMap.cs" />
+    <Compile Include="Model\Composite\CompositeMapEntry.cs" />
     <Compile Include="Model\GpkPackageFlags.cs" />
     <Compile Include="Model\GpkCompressedChunkHeader.cs" />
     <Compile Include="Model\Payload\ChunkBlock.cs" />
@@ -189,6 +200,9 @@
     <Compile Include="IO\Writer.cs" />
     <Compile Include="Updater\UpdateCheck.cs" />
     <Compile Include="Updater\UpdaterCheckCallback.cs" />
+    <EmbeddedResource Include="Forms\MapperView.resx">
+      <DependentUpon>MapperView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\GUI.resx">
       <DependentUpon>GUI.cs</DependentUpon>
       <SubType>Designer</SubType>
