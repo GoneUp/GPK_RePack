@@ -248,7 +248,6 @@
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="README.md" />
     <None Include="terahelper_1.pfx" />
     <None Include="terahelper_key.snk" />
   </ItemGroup>
