@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using GPK_RePack.Model;
 using GPK_RePack.Model.ExportData;
 using GPK_RePack.Model.Interfaces;
@@ -25,79 +23,77 @@ namespace GPK_RePack.IO
 
         //Read specific sub-gpk --> extract bytes, pass to parse seprate method
 
-        public List<GpkPackage> ReadGpk(string path, bool skipData)
+        public List<GpkPackage> ReadGpk(string path, bool skipExportData)
         {
             try
             {
                 Stopwatch fileWatch = new Stopwatch();
-                List<GpkPackage> returnPackageList = new List<GpkPackage>();
+                List<GpkPackage> tmpPackageList = new List<GpkPackage>();
                 BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read));
-                int counter = 0;
+
+                //orginalsize len file oder len sub gpk
+                //
 
                 fileWatch.Start();
-                //Loop is necesarry for composite GPKs were multiple (compressed) GPKs are stacked behind each other
-                //Working with Seek is tricky in Composite GPKs since everything is shifted, also the special case of decompression is there. 
-                //Acutally compression helps us since that keeps inner offsets after the header intact. 
                 do
                 {
-                    GpkPackage package = new GpkPackage();
-                    Stopwatch pkgWatch = new Stopwatch();
-                    stat = new Status();
+                    GpkPackage tmpGPK = new GpkPackage();
 
                     var fileID = string.Format("{0}_{1}", Path.GetFileName(path), reader.BaseStream.Position);
-
-                    pkgWatch.Start();
-                    package.Filename = fileID;
-                    package.Path = path;
-                    stat.name = package.Filename;
-
-                    logger = LogManager.GetLogger("[Reader:" + package.Filename + "]");
+                    logger = LogManager.GetLogger("[Reader:" + fileID + "]");
                     logger.Info("Reading Start");
 
-                    package.OrginalSize = reader.BaseStream.Length;
-                    package.CompositeStartOffset = reader.BaseStream.Position;
+                    tmpGPK.Filename = fileID;
+                    tmpGPK.Path = path;
+
+                    tmpGPK.OrginalSize = reader.BaseStream.Length;
+                    tmpGPK.CompositeStartOffset = reader.BaseStream.Position;
 
                     //parsing
-                    ReadHeader(reader, package);
-                    var file = CheckAndDecompress(reader, package);
-                    if (file != null)
+                    //just read header to get length and end of file
+                    ReadHeader(reader, tmpGPK);
+                    tmpPackageList.Add(tmpGPK);
+
+                    //if no compression is found we don't know EndOfFile, so we assume the gpk covers the complete file
+                    if (tmpGPK.CompressedEndOffset == 0)
                     {
-                        reader.Close();
-                        reader = new BinaryReader(new MemoryStream(file));
+                        tmpGPK.CompressedEndOffset = tmpGPK.OrginalSize;
                     }
 
-                    ReadNames(reader, package);
-                    ReadImports(reader, package);
-                    ReadExports(reader, package);
-                    if (!skipData) ReadExportData(reader, package);
-
-                    reader.Close();
-                    reader.Dispose();
-
-                    returnPackageList.Add(package);
-                    pkgWatch.Stop();
-                    stat.time = pkgWatch.ElapsedMilliseconds;
-                    stat.finished = true;
-                    logger.Info("Reading of package {0} complete, took {1}ms!", package.Filename, pkgWatch.ElapsedMilliseconds);
-
                     //prepare next loop
-                    if (package.CompositeEndOffset == 0 || package.CompositeEndOffset == package.OrginalSize)
+                    if (tmpGPK.CompressedEndOffset == tmpGPK.OrginalSize)
                         break; //no valid end of data found
 
-                    counter++;
-                    reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read));
-                    reader.BaseStream.Seek(package.CompositeStartOffset + package.CompositeEndOffset, SeekOrigin.Begin);
+                    //we have a composite gpk but we still want a correct compressed filesize
+                    tmpGPK.OrginalSize = tmpGPK.CompressedEndOffset; 
+
+                    reader.BaseStream.Seek(tmpGPK.CompositeStartOffset + tmpGPK.OrginalSize, SeekOrigin.Begin);
                 } while (CheckForAnotherPackage(reader));
 
 
+
+                //header is read, let us extract the data and read it
+                List<GpkPackage> returnPackageList = new List<GpkPackage>();
+
+                foreach (var subGPK in tmpPackageList)
+                {
+                    stat = new Status();
+                    reader.BaseStream.Seek(subGPK.CompositeStartOffset, SeekOrigin.Begin);
+                    var data = reader.ReadBytes((int)subGPK.OrginalSize);
+
+                    var fullGpk = ReadSubGpkPackage(subGPK, data, skipExportData, stat);
+                    returnPackageList.Add(fullGpk);
+                }
+
+                reader.Close();
                 fileWatch.Stop();
                 logger.Info("Reading of file {0} complete, took {1}ms!", path, fileWatch.ElapsedMilliseconds);
 
-                if (returnPackageList.Count > 0)
+                if (returnPackageList.Count > 1)
                 {
                     returnPackageList.ForEach(val => val.CompositeGpk = true);
                 }
-                return returnPackageList;
+                return tmpPackageList;
             }
             catch (Exception ex)
             {
@@ -108,23 +104,53 @@ namespace GPK_RePack.IO
             return null;
         }
 
-        public GpkPackage ReadSubGpkPackage(byte[] data, bool skipExportData, Status stat, string fileID, string path)
+        public GpkPackage ReadSubGpkFromComposite(string path, string fileID, int fileOffset, int dataLength)
+        {
+            try
+            {
+                logger = LogManager.GetLogger("ReadSubGpkFromComposite: " + fileID);
+
+                var reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read));
+                stat = new Status();
+
+                reader.BaseStream.Seek(fileOffset, SeekOrigin.Begin);
+                var data = reader.ReadBytes(dataLength);
+                reader.Close();
+
+                GpkPackage tmpGPK = new GpkPackage();
+                tmpGPK.Filename = fileID;
+                tmpGPK.Path = path;
+
+                tmpGPK.OrginalSize = dataLength;
+                tmpGPK.CompositeStartOffset = fileOffset;
+
+
+                var fullGpk = ReadSubGpkPackage(tmpGPK, data, false, stat);
+
+                logger.Debug("done ");
+
+                return fullGpk;
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal("Parse failure!");
+                logger.Fatal(ex);
+            }
+
+            return null;
+        }
+
+        private GpkPackage ReadSubGpkPackage(GpkPackage package, byte[] data, bool skipExportData, Status stat)
         {
             try
             {
                 BinaryReader reader = new BinaryReader(new MemoryStream(data));
-                GpkPackage package = new GpkPackage();
+                Stopwatch pkgWatch = new Stopwatch();
 
-
-                package.Filename = fileID;
-                package.Path = path;
-                stat.name = package.Filename;
-
-                logger = LogManager.GetLogger("[Reader:" + package.Filename + "]");
+                logger = LogManager.GetLogger("[ReadSubGpkPackage:" + package.Filename + "]");
                 logger.Info("Reading Start");
-
-                package.OrginalSize = reader.BaseStream.Length;
-                package.CompositeStartOffset = reader.BaseStream.Position;
+                stat.name = package.Filename;
+                pkgWatch.Start();
 
                 //parsing
                 ReadHeader(reader, package);
@@ -142,6 +168,13 @@ namespace GPK_RePack.IO
 
                 reader.Close();
                 reader.Dispose();
+
+                //boring log stuff
+                pkgWatch.Stop();
+                stat.time = pkgWatch.ElapsedMilliseconds;
+                stat.finished = true;
+                logger.Info("Reading of package {0} complete, took {1}ms!", package.Filename, pkgWatch.ElapsedMilliseconds);
+                logger.Info("Reading Done");
 
                 return package;
             }
@@ -208,6 +241,7 @@ namespace GPK_RePack.IO
 
 
             int generation_count = reader.ReadInt32();
+            package.Header.Generations.Clear();
             for (int i = 0; i < generation_count; i++)
             {
                 GpkGeneration tmpgen = new GpkGeneration();
@@ -227,7 +261,7 @@ namespace GPK_RePack.IO
             package.Header.CompressionFlags = reader.ReadInt32();
             int chunkCount = reader.ReadInt32();
 
-
+            package.Header.ChunkHeaders.Clear();
             for (int i = 0; i < chunkCount; i++)
             {
                 var chunk = new GpkCompressedChunkHeader();
@@ -249,8 +283,8 @@ namespace GPK_RePack.IO
                 }
 
                 int endOfChunk = chunk.CompressedOffset + chunk.CompressedSize;
-                if (endOfChunk > package.CompositeEndOffset)
-                    package.CompositeEndOffset = endOfChunk;
+                if (endOfChunk > package.CompressedEndOffset)
+                    package.CompressedEndOffset = endOfChunk;
 
                 logger.Debug("Chunk {0}: UncompressedOffset {1}, UncompressedSize {2}, CompressedOffset {3}, CompressedSize {4}, CompressedEnd {5}",
                     i, chunk.UncompressedOffset, chunk.UncompressedSize, chunk.CompressedOffset, chunk.CompressedSize, endOfChunk);
@@ -300,7 +334,7 @@ namespace GPK_RePack.IO
 
             foreach (var header in package.Header.ChunkHeaders)
             {
-                reader.BaseStream.Seek(package.CompositeStartOffset + header.CompressedOffset, SeekOrigin.Begin);
+                reader.BaseStream.Seek(header.CompressedOffset, SeekOrigin.Begin);
                 PackageChunkBlock block = new PackageChunkBlock();
 
                 block.signature = reader.ReadInt32();

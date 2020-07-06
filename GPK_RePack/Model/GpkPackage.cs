@@ -19,7 +19,7 @@ namespace GPK_RePack.Model
         //Composite
         public bool CompositeGpk;
         public long CompositeStartOffset;
-        public long CompositeEndOffset = 0;
+        public long CompressedEndOffset = 0;
 
         
         public long OrginalSize; //raw compressed size
