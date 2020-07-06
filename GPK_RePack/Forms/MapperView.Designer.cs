@@ -33,6 +33,7 @@ namespace GPK_RePack.Forms
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.boxSearch = new System.Windows.Forms.TextBox();
             this.treeMapperView = new GPK_RePack.Forms.Helper.CompositeTreeView();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -52,9 +53,10 @@ namespace GPK_RePack.Forms
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.label1);
             this.splitContainer1.Panel2.Controls.Add(this.boxSearch);
-            this.splitContainer1.Size = new System.Drawing.Size(386, 569);
-            this.splitContainer1.SplitterDistance = 540;
+            this.splitContainer1.Size = new System.Drawing.Size(584, 480);
+            this.splitContainer1.SplitterDistance = 431;
             this.splitContainer1.TabIndex = 0;
             // 
             // boxSearch
@@ -62,7 +64,7 @@ namespace GPK_RePack.Forms
             this.boxSearch.Dock = System.Windows.Forms.DockStyle.Fill;
             this.boxSearch.Location = new System.Drawing.Point(0, 0);
             this.boxSearch.Name = "boxSearch";
-            this.boxSearch.Size = new System.Drawing.Size(386, 20);
+            this.boxSearch.Size = new System.Drawing.Size(584, 20);
             this.boxSearch.TabIndex = 0;
             this.boxSearch.TextChanged += new System.EventHandler(this.boxSearch_TextChanged);
             // 
@@ -71,17 +73,26 @@ namespace GPK_RePack.Forms
             this.treeMapperView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeMapperView.Location = new System.Drawing.Point(0, 0);
             this.treeMapperView.Name = "treeMapperView";
-            this.treeMapperView.Size = new System.Drawing.Size(386, 540);
+            this.treeMapperView.Size = new System.Drawing.Size(584, 431);
             this.treeMapperView.TabIndex = 0;
             this.treeMapperView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMapperView_AfterSelect);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 23);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(204, 13);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Search here. Caseinsensitive. Length > 3.";
             // 
             // formMapperView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(386, 569);
+            this.ClientSize = new System.Drawing.Size(584, 480);
             this.Controls.Add(this.splitContainer1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "formMapperView";
             this.Text = "MapperView";
             this.Load += new System.EventHandler(this.formMapperView_Load);
@@ -99,5 +110,6 @@ namespace GPK_RePack.Forms
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TextBox boxSearch;
         private CompositeTreeView treeMapperView;
+        private System.Windows.Forms.Label label1;
     }
 }

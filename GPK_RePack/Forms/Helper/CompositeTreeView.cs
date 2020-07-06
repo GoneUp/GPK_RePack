@@ -12,6 +12,7 @@ namespace GPK_RePack.Forms.Helper
     {
         private CompositeMap map;
         private string filter = "";
+        private TreeNode[] fullCachedTree = null;
         public CompositeTreeView()
         {
 
@@ -27,7 +28,7 @@ namespace GPK_RePack.Forms.Helper
 
         public void FilterNodes(string text)
         {
-            filter = text;
+            filter = text.ToLower();
             OnDrawNodes();
         }
 
@@ -36,24 +37,39 @@ namespace GPK_RePack.Forms.Helper
             this.BeginUpdate();
             this.Nodes.Clear();
 
-            foreach (var entry in map.Map)
+            if (filter == "" && fullCachedTree != null)
             {
-                TreeNode filenode = new TreeNode(entry.Key);
-
-
-                foreach (var subGPKs in entry.Value)
+                this.Nodes.AddRange(fullCachedTree);
+            }
+            else
+            {
+                //filter or build cache
+                foreach (var entry in map.Map)
                 {
-                    var text = subGPKs.ToString();
-                    if (filter == "" || text.Contains(filter))
+                    TreeNode filenode = new TreeNode(entry.Key);
+
+
+                    foreach (var subGPKs in entry.Value)
                     {
-                        filenode.Nodes.Add(subGPKs.ToString());
+                        var text = subGPKs.ToString();
+                        if (filter == "" || text.ToLower().Contains(filter))
+                        {
+                            filenode.Nodes.Add(subGPKs.ToString());
+                        }
+                    }
+
+                    if (filenode.Nodes.Count > 0)
+                    {
+                        this.Nodes.Add(filenode);
                     }
                 }
+            }
 
-                if (filenode.Nodes.Count > 0)
-                {
-                    this.Nodes.Add(filenode);
-                }
+
+            if (filter == "" && fullCachedTree == null)
+            {
+                fullCachedTree = new TreeNode[this.Nodes.Count];
+                this.Nodes.CopyTo(fullCachedTree, 0);
             }
 
             this.EndUpdate();

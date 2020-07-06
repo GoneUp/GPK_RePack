@@ -143,19 +143,37 @@ The save menu offers you the option to save as-is and a option with added paddin
 If you want to change the maximum size manually select a the package and use the Misc -&gt; Set Filesize function.
 
 Hotkeys;
-CTRL+C, CTRL+V: Copy Paste
+CTRL+SHIFT+C, CTRL+SHIFT+V: Copy Paste
 CTRL+F, F3: Search, next result
 CTRL+O: Open package
 CTRL+S: Rebuild Save
 CTRL+P: Rebuild Save, with padding
 CTRL+SHIFT+P: Patch save
-1,2,3: Select tabs
+CTRL+1,CTRL+2,CTRL+3: Select tabs
 
 hfgl
--- GoneUp (hstrobel.dev@gmail.com)
+-- GoneUp
 
 Source Code is available on Github: https://github.com/GoneUp/GPK_RePack/  </value>
   </data>
+  <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="type.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="size.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="aIndex.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="iType.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="value.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>

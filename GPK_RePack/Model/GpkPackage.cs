@@ -13,15 +13,22 @@ namespace GPK_RePack.Model
     [Serializable]
     class GpkPackage
     {
-        public string Filename;
         public string Path;
-        public long OrginalSize;
+        public string Filename;
+
+        //Composite
+        public bool CompositeGpk;
+        public long CompositeStartOffset;
+        public long CompositeEndOffset = 0;
+
+        
+        public long OrginalSize; //raw compressed size
         public long UncompressedSize;
 
-        public long FileStartOffset;
-        public long EndOfData = 0; 
+     
         public Boolean Changes = false;
 
+        //data structs
         public GpkHeader Header;
 
         public Dictionary<long, GpkString> NameList;
@@ -32,7 +39,7 @@ namespace GPK_RePack.Model
 
         public readonly int datapuffer = 10;
         public bool x64;
-        public bool CompositeGpk;
+        
 
         public GpkPackage()
         {

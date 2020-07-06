@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using GPK_RePack.Model;
@@ -18,6 +19,11 @@ namespace GPK_RePack.IO
     {
         private Logger logger;
         public Status stat;
+
+        //Read gpk, possible composite gpk
+        //Sane way: read header loop, map existing gpks, extract gpks, pass to parse seprate method
+
+        //Read specific sub-gpk --> extract bytes, pass to parse seprate method
 
         public List<GpkPackage> ReadGpk(string path, bool skipData)
         {
@@ -38,8 +44,10 @@ namespace GPK_RePack.IO
                     Stopwatch pkgWatch = new Stopwatch();
                     stat = new Status();
 
+                    var fileID = string.Format("{0}_{1}", Path.GetFileName(path), reader.BaseStream.Position);
+
                     pkgWatch.Start();
-                    package.Filename = String.Format("{0}_{1}", Path.GetFileName(path), counter);
+                    package.Filename = fileID;
                     package.Path = path;
                     stat.name = package.Filename;
 
@@ -47,7 +55,7 @@ namespace GPK_RePack.IO
                     logger.Info("Reading Start");
 
                     package.OrginalSize = reader.BaseStream.Length;
-                    package.FileStartOffset = reader.BaseStream.Position;
+                    package.CompositeStartOffset = reader.BaseStream.Position;
 
                     //parsing
                     ReadHeader(reader, package);
@@ -73,18 +81,22 @@ namespace GPK_RePack.IO
                     logger.Info("Reading of package {0} complete, took {1}ms!", package.Filename, pkgWatch.ElapsedMilliseconds);
 
                     //prepare next loop
-                    if (package.EndOfData == 0 || package.EndOfData == package.OrginalSize)
+                    if (package.CompositeEndOffset == 0 || package.CompositeEndOffset == package.OrginalSize)
                         break; //no valid end of data found
 
                     counter++;
                     reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read));
-                    reader.BaseStream.Seek(package.FileStartOffset + package.EndOfData, SeekOrigin.Begin); 
+                    reader.BaseStream.Seek(package.CompositeStartOffset + package.CompositeEndOffset, SeekOrigin.Begin);
                 } while (CheckForAnotherPackage(reader));
 
 
                 fileWatch.Stop();
                 logger.Info("Reading of file {0} complete, took {1}ms!", path, fileWatch.ElapsedMilliseconds);
 
+                if (returnPackageList.Count > 0)
+                {
+                    returnPackageList.ForEach(val => val.CompositeGpk = true);
+                }
                 return returnPackageList;
             }
             catch (Exception ex)
@@ -95,6 +107,53 @@ namespace GPK_RePack.IO
 
             return null;
         }
+
+        public GpkPackage ReadSubGpkPackage(byte[] data, bool skipExportData, Status stat, string fileID, string path)
+        {
+            try
+            {
+                BinaryReader reader = new BinaryReader(new MemoryStream(data));
+                GpkPackage package = new GpkPackage();
+
+
+                package.Filename = fileID;
+                package.Path = path;
+                stat.name = package.Filename;
+
+                logger = LogManager.GetLogger("[Reader:" + package.Filename + "]");
+                logger.Info("Reading Start");
+
+                package.OrginalSize = reader.BaseStream.Length;
+                package.CompositeStartOffset = reader.BaseStream.Position;
+
+                //parsing
+                ReadHeader(reader, package);
+                var file = CheckAndDecompress(reader, package);
+                if (file != null)
+                {
+                    reader.Close();
+                    reader = new BinaryReader(new MemoryStream(file));
+                }
+
+                ReadNames(reader, package);
+                ReadImports(reader, package);
+                ReadExports(reader, package);
+                if (!skipExportData) ReadExportData(reader, package);
+
+                reader.Close();
+                reader.Dispose();
+
+                return package;
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal("Parse failure!");
+                logger.Fatal(ex);
+            }
+
+            return null;
+        }
+
 
         private void ReadHeader(BinaryReader reader, GpkPackage package)
         {
@@ -190,13 +249,13 @@ namespace GPK_RePack.IO
                 }
 
                 int endOfChunk = chunk.CompressedOffset + chunk.CompressedSize;
-                if (endOfChunk > package.EndOfData)
-                    package.EndOfData = endOfChunk;
+                if (endOfChunk > package.CompositeEndOffset)
+                    package.CompositeEndOffset = endOfChunk;
 
                 logger.Debug("Chunk {0}: UncompressedOffset {1}, UncompressedSize {2}, CompressedOffset {3}, CompressedSize {4}, CompressedEnd {5}",
                     i, chunk.UncompressedOffset, chunk.UncompressedSize, chunk.CompressedOffset, chunk.CompressedSize, endOfChunk);
 
-                
+
             }
 
 
@@ -241,7 +300,7 @@ namespace GPK_RePack.IO
 
             foreach (var header in package.Header.ChunkHeaders)
             {
-                reader.BaseStream.Seek(package.FileStartOffset +  header.CompressedOffset, SeekOrigin.Begin);
+                reader.BaseStream.Seek(package.CompositeStartOffset + header.CompressedOffset, SeekOrigin.Begin);
                 PackageChunkBlock block = new PackageChunkBlock();
 
                 block.signature = reader.ReadInt32();

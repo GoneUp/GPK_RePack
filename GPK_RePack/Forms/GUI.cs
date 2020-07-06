@@ -907,11 +907,11 @@ namespace GPK_RePack.Forms
             switch (keys)
             {
                 //Copypaste
-                case Keys.Control | Keys.C:
+                case Keys.Control | Keys.Shift | Keys.C:
                     btnCopy_Click(btnCopy, new EventArgs());
                     return true;
 
-                case Keys.Control | Keys.V:
+                case Keys.Control | Keys.Shift | Keys.V:
                     btnPaste_Click(btnPaste, new EventArgs());
                     return true;
 
@@ -938,14 +938,14 @@ namespace GPK_RePack.Forms
                     return true;
 
                 //TABS
-                case Keys.D1:
+                case Keys.Control | Keys.D1:
                     tabControl.SelectedIndex = 0;
                     boxInfo.Select(0, 0); //prevent full text selection
                     return true;
-                case Keys.D2:
+                case Keys.Control | Keys.D2:
                     tabControl.SelectedIndex = 1;
                     return true;
-                case Keys.D3:
+                case Keys.Control | Keys.D3:
                     if (tabControl.TabCount > 2)
                         tabControl.SelectedIndex = 2;
                     return true;

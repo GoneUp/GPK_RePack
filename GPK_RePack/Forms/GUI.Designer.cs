@@ -64,6 +64,7 @@ namespace GPK_RePack.Forms
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compositeGPKToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decryptionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miscToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setFilesizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setAllPropertysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -116,7 +117,6 @@ namespace GPK_RePack.Forms
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
-            this.loadMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -385,9 +385,16 @@ namespace GPK_RePack.Forms
             // decryptionToolStripMenuItem
             // 
             this.decryptionToolStripMenuItem.Name = "decryptionToolStripMenuItem";
-            this.decryptionToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.decryptionToolStripMenuItem.Size = new System.Drawing.Size(172, 24);
             this.decryptionToolStripMenuItem.Text = ".dat Decryption";
             this.decryptionToolStripMenuItem.Click += new System.EventHandler(this.decryptionToolStripMenuItem_Click);
+            // 
+            // loadMappingToolStripMenuItem
+            // 
+            this.loadMappingToolStripMenuItem.Name = "loadMappingToolStripMenuItem";
+            this.loadMappingToolStripMenuItem.Size = new System.Drawing.Size(172, 24);
+            this.loadMappingToolStripMenuItem.Text = "Load Mapping";
+            this.loadMappingToolStripMenuItem.Click += new System.EventHandler(this.loadMappingToolStripMenuItem_Click);
             // 
             // miscToolStripMenuItem
             // 
@@ -965,13 +972,6 @@ namespace GPK_RePack.Forms
             this.splitContainerLog_InfoTree.Size = new System.Drawing.Size(1163, 651);
             this.splitContainerLog_InfoTree.SplitterDistance = 522;
             this.splitContainerLog_InfoTree.TabIndex = 9;
-            // 
-            // loadMappingToolStripMenuItem
-            // 
-            this.loadMappingToolStripMenuItem.Name = "loadMappingToolStripMenuItem";
-            this.loadMappingToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
-            this.loadMappingToolStripMenuItem.Text = "Load Mapping";
-            this.loadMappingToolStripMenuItem.Click += new System.EventHandler(this.loadMappingToolStripMenuItem_Click);
             // 
             // GUI
             // 
