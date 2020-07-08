@@ -22,7 +22,8 @@ namespace GPK_RePack.Model
         public int ImportCount, ImportOffset;
         public int DependsOffset;
 
-        public byte[] Unk3 = new byte[16];//x64 gpk
+        public int HeaderSize; //x64 gpk
+        public byte[] Unk3 = new byte[12];//x64 gpk
         public byte[] FGUID = new byte[16];
 
         public List<GpkGeneration> Generations = new List<GpkGeneration>();

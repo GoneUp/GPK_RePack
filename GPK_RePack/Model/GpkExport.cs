@@ -44,8 +44,9 @@ namespace GPK_RePack.Model
         public byte[] Guid;
         public byte[] UnkExtraInts;
 
-
         public byte[] PropertyPadding;
+
+        public int DependsTableData;
 
         public int PropertySize;
         public List<IProperty> Properties;

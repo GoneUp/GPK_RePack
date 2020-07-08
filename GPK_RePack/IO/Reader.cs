@@ -65,7 +65,7 @@ namespace GPK_RePack.IO
                         break; //no valid end of data found
 
                     //we have a composite gpk but we still want a correct compressed filesize
-                    tmpGPK.OrginalSize = tmpGPK.CompressedEndOffset; 
+                    tmpGPK.OrginalSize = tmpGPK.CompressedEndOffset;
 
                     reader.BaseStream.Seek(tmpGPK.CompositeStartOffset + tmpGPK.OrginalSize, SeekOrigin.Begin);
                 } while (CheckForAnotherPackage(reader));
@@ -164,6 +164,7 @@ namespace GPK_RePack.IO
                 ReadNames(reader, package);
                 ReadImports(reader, package);
                 ReadExports(reader, package);
+                ReadDepends(reader, package);
                 if (!skipExportData) ReadExportData(reader, package);
 
                 reader.Close();
@@ -220,6 +221,8 @@ namespace GPK_RePack.IO
 
             package.Header.DependsOffset = reader.ReadInt32();
 
+            if (package.x64)  package.Header.HeaderSize = reader.ReadInt32();
+
             logger.Debug("NameCount " + package.Header.NameCount);
             logger.Debug("NameOffset " + package.Header.NameOffset);
 
@@ -230,8 +233,9 @@ namespace GPK_RePack.IO
             logger.Debug("ImportOffset " + package.Header.ImportOffset);
 
             logger.Debug("DependsOffset " + package.Header.DependsOffset);
+            logger.Debug("HeaderSize " + package.Header.HeaderSize);
 
-            if (package.x64) package.Header.Unk3 = reader.ReadBytes(16);
+            if (package.x64) package.Header.Unk3 = reader.ReadBytes(12);
 
             stat.totalobjects = package.Header.NameCount + package.Header.ImportCount + package.Header.ExportCount * 3; //Export, Export Linking, ExportData = *3
             logger.Info("File Info: NameCount {0}, ImportCount {1}, ExportCount {2}", package.Header.NameCount, package.Header.ImportCount, package.Header.ExportCount);
@@ -469,6 +473,21 @@ namespace GPK_RePack.IO
                 stat.progress++;
             }
         }
+
+        private void ReadDepends(BinaryReader reader, GpkPackage package)
+        {
+            logger.Debug("Reading Depends at {0}....", package.Header.DependsOffset);
+            reader.BaseStream.Seek(package.Header.DependsOffset, SeekOrigin.Begin);
+
+            for (int i = 0; i < package.Header.ExportCount; i++)
+            {
+                package.ExportList[i].DependsTableData = reader.ReadInt32();
+                string depClass = package.GetObjectName(package.ExportList[i].DependsTableData);
+
+                logger.Trace("Dep for {0} is {1}", package.ExportList[i].UID, depClass);
+            }
+        }
+
 
         private void ReadExportData(BinaryReader reader, GpkPackage package)
         {

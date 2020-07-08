@@ -26,6 +26,7 @@ namespace GPK_RePack.IO
         private long offsetExportPos = 0;
         private long offsetImportPos = 0;
         private long offsetNamePos = 0;
+        private long offsetDependsPos = 0;
 
         public Status stat = new Status();
 
@@ -72,6 +73,7 @@ namespace GPK_RePack.IO
                 WriteNamelist(writer, package);
                 WriteImports(writer, package);
                 WriteExports(writer, package);
+                WriteDepends(writer, package);
                 WriteExportsData(writer, package);
                 if (addPadding)
                 {
@@ -117,8 +119,10 @@ namespace GPK_RePack.IO
             offsetImportPos = writer.BaseStream.Position;
             writer.Write(package.Header.ImportOffset);
 
+            offsetDependsPos = writer.BaseStream.Position;
             writer.Write(package.Header.DependsOffset);
 
+            if(package.x64) writer.Write(package.Header.HeaderSize);
             if(package.x64) writer.Write(package.Header.Unk3);
 
             writer.Write(package.Header.FGUID);
@@ -232,6 +236,27 @@ namespace GPK_RePack.IO
                 writer.Write(export.Guid);
                 writer.Write(export.UnkExtraInts);
                 stat.progress++;
+            }
+
+            logger.Debug("Wrote exports pos " + writer.BaseStream.Position);
+        }
+
+        private void WriteDepends(BinaryWriter writer, GpkPackage package)
+        {
+            if (writer.BaseStream.Position != package.Header.DependsOffset)
+            {
+                package.Header.DependsOffset = (int)writer.BaseStream.Position;
+
+                writer.BaseStream.Seek(offsetDependsPos, SeekOrigin.Begin);
+                writer.Write(package.Header.DependsOffset);
+                writer.BaseStream.Seek(package.Header.DependsOffset, SeekOrigin.Begin);
+
+                logger.Debug("depends offset mismatch, fixed!");
+            }
+
+            foreach (GpkExport export in package.ExportList.Values)
+            {
+                writer.Write(export.DependsTableData);
             }
 
             logger.Debug("Wrote exports pos " + writer.BaseStream.Position);

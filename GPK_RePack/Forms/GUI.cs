@@ -337,6 +337,7 @@ namespace GPK_RePack.Forms
                 }
 
             }
+            
 
             //display info while loading
             while (!Task.WaitAll(runningTasks.ToArray(), 50))
