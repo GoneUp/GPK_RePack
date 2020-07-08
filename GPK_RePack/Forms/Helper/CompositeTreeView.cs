@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GPK_RePack.Model;
 using GPK_RePack.Model.Composite;
 
 namespace GPK_RePack.Forms.Helper
 {
     class CompositeTreeView : TreeView
     {
-        private CompositeMap map;
+        private GpkStore store;
         private string filter = "";
         private TreeNode[] fullCachedTree = null;
         public CompositeTreeView()
@@ -20,9 +21,9 @@ namespace GPK_RePack.Forms.Helper
 
         }
 
-        public void SetMap(CompositeMap map)
+        public void SetStore(GpkStore store)
         {
-            this.map = map;
+            this.store = store;
             OnDrawNodes();
         }
 
@@ -44,17 +45,20 @@ namespace GPK_RePack.Forms.Helper
             else
             {
                 //filter or build cache
-                foreach (var entry in map.Map)
+                foreach (var entry in store.CompositeMap)
                 {
                     TreeNode filenode = new TreeNode(entry.Key);
 
 
-                    foreach (var subGPKs in entry.Value)
+                    foreach (var subGPK in entry.Value)
                     {
-                        var text = subGPKs.ToString();
+                        var text = subGPK.ToString();
                         if (filter == "" || text.ToLower().Contains(filter))
                         {
-                            filenode.Nodes.Add(subGPKs.ToString());
+                            TreeNode subNode = new TreeNode(subGPK.ToString());
+                            subNode.Tag = subGPK;
+                            filenode.Nodes.Add(subNode);
+                            
                         }
                     }
 

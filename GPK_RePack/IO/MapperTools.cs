@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.TextFormatting;
+using GPK_RePack.Model;
 using GPK_RePack.Model.Composite;
 using Microsoft.VisualBasic.ApplicationServices;
 using Microsoft.VisualBasic.Logging;
@@ -111,7 +112,7 @@ namespace GPK_RePack.IO
         }
 
 
-        public static CompositeMap ParseMappings(string folder)
+        public static void ParseMappings(string folder, GpkStore store)
         {
             logger.Debug("ParseMappings for " + folder);
 
@@ -123,7 +124,6 @@ namespace GPK_RePack.IO
                 if (!File.Exists(pkgMapper) || !File.Exists(compMapper))
                 {
                     logger.Info("Not all .dat files found");
-                    return null;
                 }
 
                 var pkgMapperData = File.ReadAllBytes(pkgMapper);
@@ -159,7 +159,7 @@ namespace GPK_RePack.IO
                 var comppPackMapperText = reader.ReadToEnd();
                 reader.Close();
 
-                var compMap = new CompositeMap();
+                store.CompositeMap = new Dictionary<string, List<CompositeMapEntry>>();
                 var fileEntries = comppPackMapperText.Split('!');
                 for (int i = 0; i < fileEntries.Length; i += 1)
                 {
@@ -187,19 +187,19 @@ namespace GPK_RePack.IO
                         var tmp = new CompositeMapEntry();
                         tmp.CompositeUID = split[0];
                         tmp.UnknownUID = split[1];
-                        tmp.FileOffset = split[2];
-                        tmp.FileLength = split[3];
+                        tmp.FileOffset = Convert.ToInt32(split[2]);
+                        tmp.FileLength = Convert.ToInt32(split[3]);
 
                         //enrich
                         tmp.SubGPKName = fileName;
                         tmp.UID = objectMapperList[tmp.CompositeUID];
 
-                        if (!compMap.Map.ContainsKey(fileName))
+                        if (!store.CompositeMap.ContainsKey(fileName))
                         {
-                            compMap.Map.Add(fileName, new List<CompositeMapEntry>());
+                            store.CompositeMap.Add(fileName, new List<CompositeMapEntry>());
                         }
 
-                        compMap.Map[fileName].Add(tmp);
+                        store.CompositeMap[fileName].Add(tmp);
 
                         var unk = split[4];
                         if (unk != "")
@@ -209,14 +209,13 @@ namespace GPK_RePack.IO
                     }
                 }
 
-                return compMap;
             }
             catch (Exception ex)
             {
+                logger.Info("Loading of mappings failed");
                 logger.Error(ex);
             }
 
-            return null;
         }
 
     }

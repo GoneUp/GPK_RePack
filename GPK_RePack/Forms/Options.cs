@@ -76,13 +76,17 @@ namespace GPK_RePack.Forms
             boxSavefilePostfix.Text = Settings.Default.SaveFileSuffix;
         }
 
-        
+
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
         {
             Settings.Default.Save();
-            gui.ResetGUI();
-            gui.DrawPackages();
+
+            new Task(() =>
+            {
+                gui.ResetGUI();
+                gui.DrawPackages();
+            }).Start();
         }
 
 
@@ -176,7 +180,7 @@ namespace GPK_RePack.Forms
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
             var folder = Path.GetDirectoryName(config.FilePath);
             Process.Start("explorer.exe", folder);
-     
+
         }
 
         private void boxEnableTexture2D_CheckedChanged(object sender, EventArgs e)

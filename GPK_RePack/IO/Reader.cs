@@ -387,7 +387,7 @@ namespace GPK_RePack.IO
 
                 package.NameList.Add(i, tmpString);
 
-                logger.Debug("Name {0}: {1}", i, tmpString.name);
+                logger.Trace("Name {0}: {1}", i, tmpString.name);
                 stat.progress++;
             }
 
@@ -415,7 +415,7 @@ namespace GPK_RePack.IO
                 import.UID = GenerateUID(package, import);
                 package.ImportList.Add(i, import);
 
-                logger.Debug("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.ClassName, import.ObjectName);
+                logger.Trace("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.ClassName, import.ObjectName);
                 stat.progress++;
             }
         }
@@ -453,7 +453,7 @@ namespace GPK_RePack.IO
 
                 package.ExportList.Add(i, export);
 
-                logger.Debug("Export {0}: ObjectName: {1}, Data_Size: {2}, Data_Offset {3}, Export_offset {4}", i, export.ObjectName, export.SerialSize, export.SerialOffset, reader.BaseStream.Position);
+                logger.Trace("Export {0}: ObjectName: {1}, Data_Size: {2}, Data_Offset {3}, Export_offset {4}", i, export.ObjectName, export.SerialSize, export.SerialOffset, reader.BaseStream.Position);
                 stat.progress++;
             }
 
@@ -482,9 +482,13 @@ namespace GPK_RePack.IO
             for (int i = 0; i < package.Header.ExportCount; i++)
             {
                 package.ExportList[i].DependsTableData = reader.ReadInt32();
-                string depClass = package.GetObjectName(package.ExportList[i].DependsTableData);
+                if (package.ExportList[i].DependsTableData != 0)
+                {
+                    logger.Debug("DEP != 0");
+                }
 
-                logger.Trace("Dep for {0} is {1}", package.ExportList[i].UID, depClass);
+                //string depClass = package.GetObjectName(package.ExportList[i].DependsTableData);
+                //logger.Trace("Dep for {0} is {1}", package.ExportList[i].UID, depClass);
             }
         }
 
@@ -569,7 +573,7 @@ namespace GPK_RePack.IO
                     }
 
 
-                    logger.Debug(String.Format("Export {0}: Read Data ({1} bytes {2}) and {3} Properties ({4} bytes)", export.ObjectName, toread, tag, export.Properties.Count, export.PropertySize));
+                    logger.Trace(String.Format("Export {0}: Read Data ({1} bytes {2}) and {3} Properties ({4} bytes)", export.ObjectName, toread, tag, export.Properties.Count, export.PropertySize));
 
                     long totalRead = reader.BaseStream.Position - export.SerialOffset;
                     long shouldBe = export.SerialSize;

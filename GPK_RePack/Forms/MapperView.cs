@@ -3,22 +3,28 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GPK_RePack.Model;
 using GPK_RePack.Model.Composite;
+using NLog;
 
 namespace GPK_RePack.Forms
 {
-    public partial class formMapperView : Form
+    partial class formMapperView : Form
     {
-        public formMapperView(CompositeMap map)
+        private GpkStore store;
+        private Logger logger = LogManager.GetCurrentClassLogger();
+        public formMapperView(GpkStore store)
         {
             InitializeComponent();
 
-            this.treeMapperView.SetMap(map);
+            this.store = store;
+            treeMapperView.SetStore(store);
 
             IDisposable subscription = 
                 Observable
@@ -40,7 +46,18 @@ namespace GPK_RePack.Forms
 
         private void treeMapperView_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            if (e.Node == null || e.Node.Tag == null)
+                return;
 
+            CompositeMapEntry entry = (CompositeMapEntry)e.Node.Tag;
+            string path = string.Format("{0}\\{1}.gpk", store.BaseSearchPath, entry.SubGPKName);
+
+            if (!File.Exists(path))
+            {
+                logger.Info("GPK to load not found");
+                return;
+            }
+            store.loadSubGpk(path, entry.UID, entry.FileOffset, entry.FileLength);
         }
 
 

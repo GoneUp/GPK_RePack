@@ -3,6 +3,7 @@ using GPK_RePack.Properties;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using NLog.Targets.Wrappers;
 using NLog.Windows.Forms;
 
 namespace GPK_RePack.Forms
@@ -10,25 +11,30 @@ namespace GPK_RePack.Forms
     class NLogConfig
     {
         private static FileTarget logfile;
-        private static FormControlTarget formTarget;
+        private static AsyncTargetWrapper formTarget;
 
 
         public static void SetDefaultConfig()
         {
             LogManager.ThrowExceptions = true;
             var config = new LoggingConfiguration();  
+            
 
            //Targets
             logfile = new FileTarget(); 
             logfile.FileName = "Terahelper.log";
             logfile.DeleteOldFileOnStartup = true;
-            config.AddTarget("logfile", logfile);
+            logfile.KeepFileOpen = true;
+            AsyncTargetWrapper asyncWrapperLog = new AsyncTargetWrapper(logfile);
+            config.AddTarget("logfile", asyncWrapperLog);
 
-            formTarget = new FormControlTarget();
-            formTarget.Layout = "${date:format=HH\\:mm\\:ss} ${logger} # ${message} ${newline}";
-            formTarget.Append = true;
-            formTarget.ControlName = "boxLog";
-            formTarget.FormName = "GUI";
+            var formTargetSync = new FormControlTarget();
+            formTargetSync.Layout = "${date:format=HH\\:mm\\:ss} ${logger} # ${message} ${newline}";
+            formTargetSync.Append = true;
+            formTargetSync.ControlName = "boxLog";
+            formTargetSync.FormName = "GUI";
+            config.AddTarget("form", formTargetSync);
+            formTarget = new AsyncTargetWrapper(formTargetSync);
             config.AddTarget("form", formTarget);
 
             //Rules
@@ -45,12 +51,13 @@ namespace GPK_RePack.Forms
                     level = LogLevel.Trace;
                     break;
             }
-            var rule1 = new LoggingRule("*", level, logfile);
+            var rule1 = new LoggingRule("*", level, asyncWrapperLog);
             config.LoggingRules.Add(rule1);
 
             var rule2 = new LoggingRule("*", LogLevel.Info, formTarget);
             config.LoggingRules.Add(rule2);
 
+            
             LogManager.Configuration = config;
         }
 

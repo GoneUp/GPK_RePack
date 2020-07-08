@@ -49,7 +49,7 @@ namespace GPK_RePack.Forms
         private GpkExport selectedExport;
         private string selectedClass = "";
 
-        private List<GpkPackage> loadedGpkPackages;
+        private GpkStore gpkStore;
         private List<GpkExport>[] changedExports;
 
         private readonly DataFormats.Format exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
@@ -104,7 +104,8 @@ namespace GPK_RePack.Forms
                 //Our stuff
                 logger.Info("Startup");
                 UpdateCheck.checkForUpdate(this);
-                loadedGpkPackages = new List<GpkPackage>();
+                gpkStore = new GpkStore();
+                gpkStore.PackagesChanged += DrawPackages;
                 tempStatusLabel = new TextBoxTempShow(lblStatus, this);
 
                 //audio
@@ -112,6 +113,8 @@ namespace GPK_RePack.Forms
                 waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
 
                 //other stuff
+                treeMain.TreeViewNodeSorter = new MiscFuncs.NodeSorter();
+
                 if (Settings.Default.SaveDir == "")
                     Settings.Default.SaveDir = Directory.GetCurrentDirectory();
 
@@ -154,8 +157,8 @@ namespace GPK_RePack.Forms
             ResetGUI();
             changedExports = null;
             ResetOggPreview();
-            loadedGpkPackages.Clear();
-            DrawPackages();
+            gpkStore.clearGpkList();
+            //DrawPackages();
             GC.Collect(); //memory cleanup
         }
 
@@ -186,6 +189,7 @@ namespace GPK_RePack.Forms
             {
                 waveOut.Dispose();
             }
+            LogManager.Flush();
 
         }
 
@@ -225,17 +229,11 @@ namespace GPK_RePack.Forms
             {
                 if (File.Exists(path))
                 {
-
-
                     Task newTask = new Task(() =>
                     {
                         Reader reader = new Reader();
+                        gpkStore.loadGpk(path, reader, false);
                         runningReaders.Add(reader);
-                        List<GpkPackage> tmpPack = reader.ReadGpk(path, false);
-                        if (tmpPack != null)
-                        {
-                            loadedGpkPackages.AddRange(tmpPack);
-                        }
                     });
                     newTask.Start();
                     runningTasks.Add(newTask);
@@ -254,13 +252,13 @@ namespace GPK_RePack.Forms
             DisplayStatus(runningReaders, "Loading", start);
 
             //for patchmode
-            Array.Resize(ref changedExports, loadedGpkPackages.Count);
+            Array.Resize(ref changedExports, gpkStore.LoadedGpkPackages.Count);
             for (int i = 0; i < changedExports.Length; i++)
             {
                 changedExports[i] = new List<GpkExport>();
             }
 
-            //gui stuff
+            //gpkstore events don't work good with more than one package
             DrawPackages();
         }
 
@@ -278,7 +276,7 @@ namespace GPK_RePack.Forms
                         try
                         {
                             Writer tmpS = new Writer();
-                            GpkPackage package = loadedGpkPackages[i];
+                            GpkPackage package = gpkStore.LoadedGpkPackages[i];
                             string savepath = package.Path + "_patched";
                             tmpS.SaveReplacedExport(package, savepath, list);
                             logger.Info(string.Format("Saved the changed data of package '{0} to {1}'!",
@@ -314,10 +312,10 @@ namespace GPK_RePack.Forms
             List<Task> runningTasks = new List<Task>();
             bool usePadding = sender == savePaddingStripMenuItem;
 
-            if (loadedGpkPackages.Count == 0)
+            if (gpkStore.LoadedGpkPackages.Count == 0)
                 return;
 
-            foreach (GpkPackage package in loadedGpkPackages)
+            foreach (GpkPackage package in gpkStore.LoadedGpkPackages)
             {
                 try
                 {
@@ -355,6 +353,9 @@ namespace GPK_RePack.Forms
 
         private void DisplayStatus(List<IProgress> list, string tag, DateTime start)
         {
+            if (list.Count == 0)
+                return;
+
             long actual = 0, total = 0, finished = 0;
             foreach (IProgress p in list)
             {
@@ -410,13 +411,22 @@ namespace GPK_RePack.Forms
         #region diplaygpk
         public void DrawPackages()
         {
+            //we may get calls out of gpkStore
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => DrawPackages()));
+                return;
+            }
             treeMain.BeginUpdate();
             treeMain.Nodes.Clear();
 
-            for (int i = 0; i < loadedGpkPackages.Count; i++)
+            for (int i = 0; i < gpkStore.LoadedGpkPackages.Count; i++)
             {
-                GpkPackage package = loadedGpkPackages[i];
-                TreeNode nodeP = treeMain.Nodes.Add(i.ToString(), package.Filename);
+                GpkPackage package = gpkStore.LoadedGpkPackages[i];
+                //TreeNode nodeP = treeMain.Nodes.Add(i.ToString(), package.Filename);
+                TreeNode nodeP = new TreeNode(package.Filename);
+                nodeP.Name = i.ToString(); //Key
+                
 
                 Dictionary<string, TreeNode> classNodes = new Dictionary<string, TreeNode>();
                 TreeNode nodeI = null;
@@ -476,10 +486,12 @@ namespace GPK_RePack.Forms
                     }
 
                 }
+
+                treeMain.Nodes.Add(nodeP);
             }
 
 
-            treeMain.TreeViewNodeSorter = new MiscFuncs.NodeSorter();
+            
             treeMain.Sort();
             treeMain.EndUpdate();
         }
@@ -505,7 +517,7 @@ namespace GPK_RePack.Forms
                 String toAdd = split.Last();
                 split.RemoveAt(split.Count - 1);
                 String left = String.Join(".", split);
-                Debug.Print("toadd {0} left {1}", toAdd, left);
+                //Debug.Print("toadd {0} left {1}", toAdd, left);
 
                 //recursion to add missing nodes
                 if (!classNodes.ContainsKey(left))
@@ -533,12 +545,12 @@ namespace GPK_RePack.Forms
                 boxGeneralButtons.Enabled = true;
                 boxDataButtons.Enabled = true;
 
-                selectedPackage = loadedGpkPackages[Convert.ToInt32(e.Node.Name)];
+                selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Name)];
                 boxInfo.Text = selectedPackage.ToString();
             }
             else if (e.Node.Level == 1 && Settings.Default.ViewMode == "class")
             {
-                selectedPackage = loadedGpkPackages[Convert.ToInt32(e.Node.Parent.Name)];
+                selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Parent.Name)];
                 selectedClass = e.Node.Text;
 
                 boxDataButtons.Enabled = true;
@@ -548,7 +560,7 @@ namespace GPK_RePack.Forms
             else if (e.Node.Level == 2 && Settings.Default.ViewMode == "normal" ||
                  e.Node.Nodes.Count == 0)
             {
-                GpkPackage package = loadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
+                GpkPackage package = gpkStore.LoadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
                 Object selected = package.GetObjectByUID(e.Node.Name);
 
                 if (selected is GpkImport)
@@ -801,8 +813,7 @@ namespace GPK_RePack.Forms
         {
             if (selectedPackage != null && selectedExport == null)
             {
-                loadedGpkPackages.Remove(selectedPackage);
-                DrawPackages();
+                gpkStore.DeleteGpk(selectedPackage);
 
                 logger.Info("Removed package {0}...", selectedPackage.Filename);
 
@@ -1419,12 +1430,13 @@ namespace GPK_RePack.Forms
             dialog.ShowDialog();
 
             var path = dialog.SelectedPath;
-            var map = MapperTools.ParseMappings(path);
+            gpkStore.BaseSearchPath = path;
+            MapperTools.ParseMappings(path, gpkStore);
 
-            int subCount = map.Map.Sum(entry => entry.Value.Count);
-            logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", map.Map.Count, subCount);
+            int subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
+            logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", gpkStore.CompositeMap.Count, subCount);
 
-            var mapperView = new formMapperView(map);
+            var mapperView = new formMapperView(gpkStore);
             mapperView.Show();
         }
 

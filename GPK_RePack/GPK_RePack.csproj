@@ -160,6 +160,7 @@
     <Compile Include="Model\Composite\CompositeMapEntry.cs" />
     <Compile Include="Model\GpkPackageFlags.cs" />
     <Compile Include="Model\GpkCompressedChunkHeader.cs" />
+    <Compile Include="Model\GpkStore.cs" />
     <Compile Include="Model\Payload\ChunkBlock.cs" />
     <Compile Include="Model\Payload\CompressionTypesPackage.cs" />
     <Compile Include="Model\Payload\PackageChunkBlock.cs" />
