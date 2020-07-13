@@ -137,7 +137,7 @@ namespace GPK_RePack.IO
                         //S1UI_Chat2.Chat2,c7a706fb_6a349a6f_1d212.Chat2_dup |
                         //we use this uid from pkgmapper
                         //var imagePath = string.Format("{0}{1}_{2}.dds", fileOutPath, entry.UID, export.UID);
-                        var imagePath = string.Format("{0}{1}.dds", fileOutPath, entry.UID);
+                        var imagePath = string.Format("{0}{1}---{2}.dds", fileOutPath, entry.UID, export.UID);
                         TextureTools.exportTexture(export, imagePath);
 
                         logger.Info("Extracted texture {0} to {1}", entry.UID, imagePath);

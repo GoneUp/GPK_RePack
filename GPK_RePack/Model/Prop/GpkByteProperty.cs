@@ -29,37 +29,35 @@ namespace GPK_RePack.Model.Prop
         }
 
         public void WriteData(BinaryWriter writer, GpkPackage package)
-        {
+        { 
+            if (package.x64) writer.Write(package.GetStringIndex(enumType));
+
             if (size == 1)
             {
                 writer.Write(byteValue);
             }
             else
             {
-                if (package.x64) writer.Write(package.GetStringIndex(enumType));
-
                 writer.Write(package.GetStringIndex(nameValue));
             }
         }
 
         public void ReadData(BinaryReader reader, GpkPackage package)
         {
+            if (package.x64)
+            {
+                long structtype = reader.ReadInt64();
+                enumType = package.GetString(structtype);
+            }
+
             if (size == 1)
             {
                 byteValue = reader.ReadByte();
             }
             else
             {
-                if (package.x64)
-                {
-                    long structtype = reader.ReadInt64();
-                    enumType = package.GetString(structtype);
-                }
                 long byteIndex = reader.ReadInt64();
                 nameValue = package.GetString(byteIndex);
-
-
-
             }
         }
 

@@ -35,6 +35,8 @@ namespace GPK_RePack.Model
                 reader = new Reader();
 
             var gpks = reader.ReadGpk(path, false);
+            if (gpks == null)
+                return;
 
             LoadedGpkPackages.AddRange(gpks);
 
@@ -47,6 +49,8 @@ namespace GPK_RePack.Model
         {
             var reader = new Reader();
             var gpk = reader.ReadSubGpkFromComposite(path, fileID, fileOffset, dataLength);
+            if (gpk == null)
+                return;
 
             LoadedGpkPackages.Add(gpk);
 

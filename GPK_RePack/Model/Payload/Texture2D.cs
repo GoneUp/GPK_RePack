@@ -39,6 +39,7 @@ namespace GPK_RePack.Model.Payload
         public void WriteData(BinaryWriter writer, GpkPackage package, GpkExport export)
         {
             writer.Write(startUnk);
+            writer.Write(Convert.ToInt32(writer.BaseStream.Position + Writer.GetStringBytes(tgaPath, inUnicode))); //mipmapcount file offset
             if (inUnicode)
             {
                 Writer.WriteUnicodeString(writer, tgaPath, true);
@@ -48,6 +49,7 @@ namespace GPK_RePack.Model.Payload
                 Writer.WriteString(writer, tgaPath, true);
             }
 
+            
             writer.Write(maps.Count);
 
             foreach (var map in maps)
@@ -57,10 +59,10 @@ namespace GPK_RePack.Model.Payload
 
                 //chunk
                 //info
-                writer.Write(map.compFlag);
+                writer.Write(map.flags);
                 writer.Write(map.uncompressedSize);
 
-                if (((CompressionTypes)map.compFlag & NothingToDo) == 0)
+                if (((CompressionTypes)map.flags & NothingToDo) == 0)
                 {
                     int chunkSize = 16 + map.blocks.Count * 8 + map.compressedSize;
                     if (chunkSize != map.compChunkSize)
@@ -73,12 +75,14 @@ namespace GPK_RePack.Model.Payload
                     writer.Write(map.compChunkSize);
                     writer.Write((int)(writer.BaseStream.Position + 4)); //chunkoffset
 
-                    if (map.compFlag == 0)
+                    if (map.flags == 0)
                     {
                         //uncompressed
                         writer.Write(map.uncompressedData);
 
-                    } else {
+                    }
+                    else
+                    {
                         //compressed data
                         //header
                         writer.Write(map.signature);
@@ -102,6 +106,7 @@ namespace GPK_RePack.Model.Payload
                 }
                 else
                 {
+                    //TODO: check if this really works? :o
                     writer.Write((int)-1); //chunksize
                     writer.Write((int)-1); //chunkoffset
                     logger.Trace("writing {0}, MipMap {0}, with no data!!", export.ObjectName, map);
@@ -122,7 +127,8 @@ namespace GPK_RePack.Model.Payload
             IProperty formatProp = export.Properties.Find(t => ((GpkBaseProperty)t).name == "Format");
             String format = ((GpkByteProperty)formatProp).nameValue;
 
-            startUnk = reader.ReadBytes(16);
+            startUnk = reader.ReadBytes(12);
+            int mipMapCountOffset = reader.ReadInt32();
             int length = reader.ReadInt32();
             if (length > 0)
             {
@@ -143,56 +149,55 @@ namespace GPK_RePack.Model.Payload
 
                 //chunk
                 //info
-                map.compFlag = reader.ReadInt32();
+                map.flags = reader.ReadInt32();
 
                 map.uncompressedSize = reader.ReadInt32();
                 map.compChunkSize = reader.ReadInt32();
                 map.compChunkOffset = reader.ReadInt32();
-                var temp = ((CompressionTypes)map.compFlag & NothingToDo);
+                var temp = ((CompressionTypes)map.flags & NothingToDo);
 
-                if (map.compFlag == 0 )
+                if (map.flags == 0)
                 {
                     map.uncompressedData = reader.ReadBytes(map.uncompressedSize);
                 }
-                else if (((CompressionTypes)map.compFlag & NothingToDo) == 0)
+                else if (((CompressionTypes)map.flags & CompressionTypes.StoreInSeparatefile) != 0)
                 {
-                    //header
-                    map.signature = reader.ReadUInt32(); //0x9e2a83c1
-                    Debug.Assert(map.signature == MipMap.DEFAULT_SIGNATURE);
+                    //data in texturecache file
+                    //compChunkOffset == offset
+                    //compChunkSize == size
+                    //TextureFileCacheName prop has name
+                    var txtProp = export.Properties.Find(t => ((GpkBaseProperty)t).name == "TextureFileCacheName");
+                    String txtCacheFile = ((GpkNameProperty)txtProp).value;
 
-                    map.blocksize = reader.ReadInt32();
-
-                    map.compressedSize = reader.ReadInt32();
-                    map.uncompressedSize_chunkheader = reader.ReadInt32();
-                    map.uncompressedData = new byte[map.uncompressedSize];
-
-                    int blockCount = (map.uncompressedSize + map.blocksize - 1) / map.blocksize;
-                    int blockOffset = 0;
-
-
-                    for (int j = 0; j < blockCount; ++j)
+                    //assumption: cache in same dir, happens for cookedpc compositegpks
+                    var path = $"{Path.GetDirectoryName(package.Path)}\\{txtCacheFile}.tfc";
+                    if (File.Exists(path))
                     {
-                        var block = new ChunkBlock();
-                        block.compressedSize = reader.ReadInt32();
-                        block.uncompressedDataSize = reader.ReadInt32();
+                        BinaryReader cacheReader = new BinaryReader(new FileStream(path, FileMode.Open));
+                        cacheReader.BaseStream.Seek(map.compChunkOffset, SeekOrigin.Begin);
 
-                        map.blocks.Add(block);
-                    }
+                        map.signature = cacheReader.ReadUInt32(); //0x9e2a83c1
+                        cacheReader.BaseStream.Seek(-4, SeekOrigin.Current);
+                        if (map.signature == MipMap.DEFAULT_SIGNATURE)
+                        {
+                            ReadMipMapFromReader(cacheReader, map);
+                        }
 
-
-                    foreach (ChunkBlock block in map.blocks)
+                        cacheReader.Close();
+                    } else
                     {
-                        block.compressedData = reader.ReadBytes(block.compressedSize);
-                        block.decompressTextureFlags(map.compFlag);
-
-                        Array.ConstrainedCopy(block.uncompressedData, 0, map.uncompressedData, blockOffset, block.uncompressedDataSize);
-                        blockOffset += block.uncompressedDataSize;
-
-                        //save memory
-                        block.uncompressedData = null;
+                        logger.Warn("{0}, MipMap {1}, Cache {2}, CompressionTypes.StoreInSeparatefile, could not find tfc!!", export.ObjectName, i, txtCacheFile);
                     }
-
-
+                }
+                else if (((CompressionTypes)map.flags & CompressionTypes.SeperateData) != 0)
+                {
+                    //data in seprate chunk in gpk
+                    logger.Warn("{0}, MipMap {1}, CompressionTypes.SeperateDatam, could not parse!!", export.ObjectName, i);
+                }
+                else if (((CompressionTypes)map.flags & NothingToDo) == 0)
+                {
+                    //normal in gpk data
+                    ReadMipMapFromReader(reader, map);
                 }
                 else
                 {
@@ -209,6 +214,43 @@ namespace GPK_RePack.Model.Payload
             guid = reader.ReadBytes(16);
         }
 
+        private void ReadMipMapFromReader(BinaryReader reader, MipMap map)
+        {
+            map.signature = reader.ReadUInt32(); //0x9e2a83c1
+            Debug.Assert(map.signature == MipMap.DEFAULT_SIGNATURE);
+
+            map.blocksize = reader.ReadInt32();
+
+            map.compressedSize = reader.ReadInt32();
+            map.uncompressedSize_chunkheader = reader.ReadInt32();
+            map.uncompressedData = new byte[map.uncompressedSize];
+
+            int blockCount = (map.uncompressedSize + map.blocksize - 1) / map.blocksize;
+            int blockOffset = 0;
+
+
+            for (int j = 0; j < blockCount; ++j)
+            {
+                var block = new ChunkBlock();
+                block.compressedSize = reader.ReadInt32();
+                block.uncompressedDataSize = reader.ReadInt32();
+
+                map.blocks.Add(block);
+            }
+
+
+            foreach (ChunkBlock block in map.blocks)
+            {
+                block.compressedData = reader.ReadBytes(block.compressedSize);
+                block.decompressTextureFlags(map.flags);
+
+                Array.ConstrainedCopy(block.uncompressedData, 0, map.uncompressedData, blockOffset, block.uncompressedDataSize);
+                blockOffset += block.uncompressedDataSize;
+
+                //save memory
+                block.uncompressedData = null;
+            }
+        }
 
 
 

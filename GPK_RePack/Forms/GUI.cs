@@ -1431,11 +1431,14 @@ namespace GPK_RePack.Forms
         private void loadMappingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dialog = new FolderBrowserDialog();
-            dialog.SelectedPath = Settings.Default.WorkingDir;
+            if (Settings.Default.CookedPCPath != "") 
+                dialog.SelectedPath = Settings.Default.CookedPCPath;
             dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
-            dialog.ShowDialog();
+            if (dialog.ShowDialog() == DialogResult.Cancel)
+                return;
 
             var path = dialog.SelectedPath;
+            Settings.Default.CookedPCPath = path;
             gpkStore.BaseSearchPath = path;
             MapperTools.ParseMappings(path, gpkStore);
 
@@ -1450,15 +1453,16 @@ namespace GPK_RePack.Forms
         {
             //cookedpc path, outdir path
             var dialog = new FolderBrowserDialog();
-            dialog.SelectedPath = Settings.Default.WorkingDir;
+            if (Settings.Default.CookedPCPath != "")
+                dialog.SelectedPath = Settings.Default.CookedPCPath;
             dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
             if (dialog.ShowDialog() == DialogResult.Cancel)
-            {
                 return;
-            }
+
 
             var path = dialog.SelectedPath;
             gpkStore.BaseSearchPath = path;
+            Settings.Default.CookedPCPath = path;
             MapperTools.ParseMappings(path, gpkStore);
 
             int subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
@@ -1469,11 +1473,9 @@ namespace GPK_RePack.Forms
             dialog.SelectedPath = Settings.Default.WorkingDir;
             dialog.Description = "Select your output dir";
             if (dialog.ShowDialog() == DialogResult.Cancel)
-            {
                 return;
-            }
-            var outDir = dialog.SelectedPath;
 
+            var outDir = dialog.SelectedPath;
             new Task(() => MassDumper.DumpMassTextures(gpkStore, outDir)).Start();
 
         }

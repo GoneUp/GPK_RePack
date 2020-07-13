@@ -21,7 +21,7 @@ namespace GPK_RePack.Model.Payload
         public int sizeX;
         public int sizeY;
 
-        public int compFlag;
+        public int flags;
         public int uncompressedSize;
         public int compChunkSize;
         public int compChunkOffset;
@@ -33,6 +33,8 @@ namespace GPK_RePack.Model.Payload
         public int uncompressedSize_chunkheader;
 
         public byte[] uncompressedData;
+
+        public string loadedFromTextureCache = "";
 
         public List<ChunkBlock> blocks = new List<ChunkBlock>();
 
@@ -54,7 +56,7 @@ namespace GPK_RePack.Model.Payload
                 block.uncompressedData = new byte[block.uncompressedDataSize];
                 Array.ConstrainedCopy(uncompressedData, blockOffset, block.uncompressedData, 0, block.uncompressedData.Length);
 
-                block.compressTextureFlags(compFlag);
+                block.compressTextureFlags(flags);
 
                 compressedSize += block.compressedSize;
                 blocks.Add(block);
@@ -68,8 +70,8 @@ namespace GPK_RePack.Model.Payload
 
             StringBuilder info = new StringBuilder();
             info.AppendFormat("Size: {0} x {1} {2}", sizeX, sizeY, Environment.NewLine);
-            info.AppendLine("Compression: " + compFlag);
-            if (((CompressionTypes)compFlag & NoOp) != 0) info.AppendLine("Data for this MipMap is stored external!");
+            info.AppendLine("Compression: " + flags);
+            if (((CompressionTypes)flags & NoOp) != 0) info.AppendLine("Data for this MipMap is stored external!");
             info.AppendLine("Compressed Size: " + compressedSize);
             info.AppendLine("Uncompressed Size: " + uncompressedSize);
             info.AppendLine("Blocks: " + blocks.Count);
