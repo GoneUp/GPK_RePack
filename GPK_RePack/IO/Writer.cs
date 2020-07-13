@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using GPK_RePack.Model;
 using GPK_RePack.Model.Interfaces;
@@ -27,6 +28,7 @@ namespace GPK_RePack.IO
         private long offsetImportPos = 0;
         private long offsetNamePos = 0;
         private long offsetDependsPos = 0;
+        private long headerSizeOffset = 0;
 
         public Status stat = new Status();
 
@@ -74,6 +76,7 @@ namespace GPK_RePack.IO
                 WriteImports(writer, package);
                 WriteExports(writer, package);
                 WriteDepends(writer, package);
+                WriteHeaderSize(writer, package);
                 WriteExportsData(writer, package);
                 if (addPadding)
                 {
@@ -122,7 +125,8 @@ namespace GPK_RePack.IO
             offsetDependsPos = writer.BaseStream.Position;
             writer.Write(package.Header.DependsOffset);
 
-            if(package.x64) writer.Write(package.Header.HeaderSize);
+            headerSizeOffset = writer.BaseStream.Position;
+            if (package.x64) writer.Write(package.Header.HeaderSize);
             if(package.x64) writer.Write(package.Header.Unk3);
 
             writer.Write(package.Header.FGUID);
@@ -259,7 +263,21 @@ namespace GPK_RePack.IO
                 writer.Write(export.DependsTableData);
             }
 
-            logger.Debug("Wrote exports pos " + writer.BaseStream.Position);
+            logger.Debug("Wrote depends pos " + writer.BaseStream.Position);
+        }
+
+        private void WriteHeaderSize(BinaryWriter writer, GpkPackage package)
+        {
+            if (writer.BaseStream.Position != package.Header.HeaderSize)
+            {
+                package.Header.HeaderSize = (int)writer.BaseStream.Position;
+
+                writer.BaseStream.Seek(headerSizeOffset, SeekOrigin.Begin);
+                writer.Write(package.Header.HeaderSize);
+                writer.BaseStream.Seek(package.Header.HeaderSize, SeekOrigin.Begin);
+
+                logger.Debug("headersize mismatch, fixed!");
+            }
         }
 
         private void WriteExportsData(BinaryWriter writer, GpkPackage package)

@@ -31,9 +31,9 @@ namespace GPK_RePack.Forms
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.boxSearch = new System.Windows.Forms.TextBox();
             this.treeMapperView = new GPK_RePack.Forms.Helper.CompositeTreeView();
             this.label1 = new System.Windows.Forms.Label();
+            this.boxSearch = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -59,15 +59,6 @@ namespace GPK_RePack.Forms
             this.splitContainer1.SplitterDistance = 431;
             this.splitContainer1.TabIndex = 0;
             // 
-            // boxSearch
-            // 
-            this.boxSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.boxSearch.Location = new System.Drawing.Point(0, 0);
-            this.boxSearch.Name = "boxSearch";
-            this.boxSearch.Size = new System.Drawing.Size(584, 20);
-            this.boxSearch.TabIndex = 0;
-            this.boxSearch.TextChanged += new System.EventHandler(this.boxSearch_TextChanged);
-            // 
             // treeMapperView
             // 
             this.treeMapperView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -85,6 +76,15 @@ namespace GPK_RePack.Forms
             this.label1.Size = new System.Drawing.Size(204, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "Search here. Caseinsensitive. Length > 3.";
+            // 
+            // boxSearch
+            // 
+            this.boxSearch.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.boxSearch.Location = new System.Drawing.Point(0, 0);
+            this.boxSearch.Name = "boxSearch";
+            this.boxSearch.Size = new System.Drawing.Size(584, 20);
+            this.boxSearch.TabIndex = 0;
+            this.boxSearch.TextChanged += new System.EventHandler(this.boxSearch_TextChanged);
             // 
             // formMapperView
             // 

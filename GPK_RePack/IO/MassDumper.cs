@@ -6,8 +6,10 @@ using System.ServiceModel.Configuration;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using GPK_RePack.Editors;
 using GPK_RePack.Model;
 using GPK_RePack.Model.Interfaces;
+using GPK_RePack.Model.Payload;
 using NLog;
 
 /*
@@ -97,6 +99,56 @@ namespace GPK_RePack.IO
             {
                 logger.Fatal(ex);
             }
+        }
+
+
+        public static void DumpMassTextures(GpkStore store, String outdir)
+        {
+            logger.Info("Started dumping textures to " + outdir);
+            Directory.CreateDirectory(outdir);
+
+            foreach (var file in store.CompositeMap)
+            {
+                var fileOutPath = string.Format("{0}\\{1}.gpk\\", outdir, file.Key);
+                Directory.CreateDirectory(fileOutPath);
+
+                //limit to 5 threads by default
+                Parallel.ForEach(file.Value, new ParallelOptions {  },
+                //Parallel.ForEach(file.Value, new ParallelOptions { MaxDegreeOfParallelism = 5 },
+                entry =>
+                {
+                    string path = string.Format("{0}\\{1}.gpk", store.BaseSearchPath, entry.SubGPKName);
+
+                    if (!File.Exists(path))
+                    {
+                        logger.Warn("GPK to load not found. Searched for: " + path);
+                        return;
+                    }
+
+                    Reader r = new Reader();
+                    var package = r.ReadSubGpkFromComposite(path, entry.UID, entry.FileOffset, entry.FileLength);
+
+                    //extract
+                    var exports = package.GetExportsByClass("Core.Texture2D");
+
+                    foreach (var export in exports)
+                    {
+                        //UID->Composite UID
+                        //S1UI_Chat2.Chat2,c7a706fb_6a349a6f_1d212.Chat2_dup |
+                        //we use this uid from pkgmapper
+                        //var imagePath = string.Format("{0}{1}_{2}.dds", fileOutPath, entry.UID, export.UID);
+                        var imagePath = string.Format("{0}{1}.dds", fileOutPath, entry.UID);
+                        TextureTools.exportTexture(export, imagePath);
+
+                        logger.Info("Extracted texture {0} to {1}", entry.UID, imagePath);
+                    }
+
+                    package = null;
+                });
+            }
+
+
+            logger.Info("Dumping done");
         }
     }
 }

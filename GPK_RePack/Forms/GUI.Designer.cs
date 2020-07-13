@@ -117,6 +117,7 @@ namespace GPK_RePack.Forms
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
+            this.dumpCompositeTexturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -377,7 +378,8 @@ namespace GPK_RePack.Forms
             // 
             this.compositeGPKToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.decryptionToolStripMenuItem,
-            this.loadMappingToolStripMenuItem});
+            this.loadMappingToolStripMenuItem,
+            this.dumpCompositeTexturesToolStripMenuItem});
             this.compositeGPKToolStripMenuItem.Name = "compositeGPKToolStripMenuItem";
             this.compositeGPKToolStripMenuItem.Size = new System.Drawing.Size(117, 23);
             this.compositeGPKToolStripMenuItem.Text = "Composite GPK";
@@ -385,14 +387,14 @@ namespace GPK_RePack.Forms
             // decryptionToolStripMenuItem
             // 
             this.decryptionToolStripMenuItem.Name = "decryptionToolStripMenuItem";
-            this.decryptionToolStripMenuItem.Size = new System.Drawing.Size(172, 24);
+            this.decryptionToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
             this.decryptionToolStripMenuItem.Text = ".dat Decryption";
             this.decryptionToolStripMenuItem.Click += new System.EventHandler(this.decryptionToolStripMenuItem_Click);
             // 
             // loadMappingToolStripMenuItem
             // 
             this.loadMappingToolStripMenuItem.Name = "loadMappingToolStripMenuItem";
-            this.loadMappingToolStripMenuItem.Size = new System.Drawing.Size(172, 24);
+            this.loadMappingToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
             this.loadMappingToolStripMenuItem.Text = "Load Mapping";
             this.loadMappingToolStripMenuItem.Click += new System.EventHandler(this.loadMappingToolStripMenuItem_Click);
             // 
@@ -973,6 +975,13 @@ namespace GPK_RePack.Forms
             this.splitContainerLog_InfoTree.SplitterDistance = 522;
             this.splitContainerLog_InfoTree.TabIndex = 9;
             // 
+            // dumpCompositeTexturesToolStripMenuItem
+            // 
+            this.dumpCompositeTexturesToolStripMenuItem.Name = "dumpCompositeTexturesToolStripMenuItem";
+            this.dumpCompositeTexturesToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.dumpCompositeTexturesToolStripMenuItem.Text = "Dump CompositeTextures";
+            this.dumpCompositeTexturesToolStripMenuItem.Click += new System.EventHandler(this.dumpCompositeTexturesToolStripMenuItem_Click);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -1109,6 +1118,7 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem compositeGPKToolStripMenuItem;
         private ToolStripMenuItem decryptionToolStripMenuItem;
         private ToolStripMenuItem loadMappingToolStripMenuItem;
+        private ToolStripMenuItem dumpCompositeTexturesToolStripMenuItem;
     }
 }
 

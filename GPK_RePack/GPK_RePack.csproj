@@ -163,6 +163,7 @@
     <Compile Include="Model\GpkStore.cs" />
     <Compile Include="Model\Payload\ChunkBlock.cs" />
     <Compile Include="Model\Payload\CompressionTypesPackage.cs" />
+    <Compile Include="Model\Payload\ObjectReferencer.cs" />
     <Compile Include="Model\Payload\PackageChunkBlock.cs" />
     <Compile Include="Model\Payload\ObjectRedirector.cs" />
     <Compile Include="ResourceExtractor.cs" />

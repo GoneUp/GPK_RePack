@@ -146,7 +146,7 @@ namespace GPK_RePack.IO
                     var uid = split[0];
                     var compositeUID = split[1];
 
-                    logger.Debug("entry %s:%s", uid, compositeUID);
+                    logger.Debug("entry {0}:{1}", uid, compositeUID);
                     objectMapperList.Add(compositeUID, uid);
                 }
 

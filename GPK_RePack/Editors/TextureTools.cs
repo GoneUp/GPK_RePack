@@ -22,10 +22,21 @@ namespace GPK_RePack.Editors
 
         public static void exportTexture(GpkExport export, string file)
         {
-            Texture2D image = (Texture2D)export.Payload;
-            DdsFile ddsFile = new DdsFile();
+            try
+            {
+                Texture2D image = (Texture2D)export.Payload;
+                DdsFile ddsFile = new DdsFile();
 
-            Task.Run(() => image.SaveObject(file, new DdsSaveConfig(image.GetFormat(), 0, 0, false, false)));
+                if (image == null || ddsFile == null)
+                    return;
+
+                image.SaveObject(file, new DdsSaveConfig(image.GetFormat(), 0, 0, false, false));
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to export texture");
+                logger.Error(ex);
+            }
         }
 
         public static void importTexture(GpkExport export, string file)
@@ -62,13 +73,14 @@ namespace GPK_RePack.Editors
                 }
 
                 int mipTailBaseIdx = (int)Math.Log(image.Width > image.Height ? image.Width : image.Height, 2);
-                ((GpkIntProperty) export.GetProperty("MipTailBaseIdx")).SetValue(mipTailBaseIdx.ToString());
+                ((GpkIntProperty)export.GetProperty("MipTailBaseIdx")).SetValue(mipTailBaseIdx.ToString());
 
                 logger.Info("Imported image from {0}, size {1}x{2}, target format {3}, mipTailBaseIdx {4}", file, image.Width, image.Height, config.FileFormat, mipTailBaseIdx);
             }
             catch (Exception ex)
             {
                 logger.Error(ex, "Failed to import texture");
+                logger.Error(ex);
             }
 
         }

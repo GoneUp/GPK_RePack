@@ -164,6 +164,12 @@ namespace GPK_RePack.Forms
 
         public void ResetGUI()
         {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => ResetGUI()));
+                return;
+            }
+
             selectedExport = null;
             selectedPackage = null;
             selectedClass = "";
@@ -1017,7 +1023,7 @@ namespace GPK_RePack.Forms
             var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".dds");
             if (path != "")
             {
-                TextureTools.exportTexture(selectedExport, path);
+                new Task(() => TextureTools.exportTexture(selectedExport, path)).Start();
             }
 
 
@@ -1426,7 +1432,7 @@ namespace GPK_RePack.Forms
         {
             var dialog = new FolderBrowserDialog();
             dialog.SelectedPath = Settings.Default.WorkingDir;
-            dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it";
+            dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
             dialog.ShowDialog();
 
             var path = dialog.SelectedPath;
@@ -1438,6 +1444,38 @@ namespace GPK_RePack.Forms
 
             var mapperView = new formMapperView(gpkStore);
             mapperView.Show();
+        }
+
+        private void dumpCompositeTexturesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //cookedpc path, outdir path
+            var dialog = new FolderBrowserDialog();
+            dialog.SelectedPath = Settings.Default.WorkingDir;
+            dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
+            if (dialog.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            var path = dialog.SelectedPath;
+            gpkStore.BaseSearchPath = path;
+            MapperTools.ParseMappings(path, gpkStore);
+
+            int subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
+            logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", gpkStore.CompositeMap.Count, subCount);
+
+
+            dialog = new FolderBrowserDialog();
+            dialog.SelectedPath = Settings.Default.WorkingDir;
+            dialog.Description = "Select your output dir";
+            if (dialog.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+            var outDir = dialog.SelectedPath;
+
+            new Task(() => MassDumper.DumpMassTextures(gpkStore, outDir)).Start();
+
         }
 
         #endregion
@@ -1950,9 +1988,10 @@ namespace GPK_RePack.Forms
 
 
 
+
         #endregion
 
-   
+     
     }
 }
 

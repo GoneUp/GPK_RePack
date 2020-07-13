@@ -127,7 +127,7 @@ namespace GPK_RePack.IO
 
                 var fullGpk = ReadSubGpkPackage(tmpGPK, data, false, stat);
 
-                logger.Debug("done ");
+                logger.Debug("done");
 
                 return fullGpk;
             }
@@ -549,7 +549,7 @@ namespace GPK_RePack.IO
                     int toread = 0;
                     string tag = "";
 
-                    if (reader.BaseStream.Position < object_end)
+                    if (reader.BaseStream.Position <= object_end)
                     {
                         toread = (int)(object_end - reader.BaseStream.Position);
                         export.DataStart = reader.BaseStream.Position;
@@ -570,7 +570,7 @@ namespace GPK_RePack.IO
 
                             if (export.Payload != null) logger.Debug(export.Payload.ToString());
                         }
-                    }
+                    } 
 
 
                     logger.Trace(String.Format("Export {0}: Read Data ({1} bytes {2}) and {3} Properties ({4} bytes)", export.ObjectName, toread, tag, export.Properties.Count, export.PropertySize));
@@ -625,6 +625,9 @@ namespace GPK_RePack.IO
                     break;
                 case "Core.ObjectRedirector":
                     export.Payload = new ObjectRedirector();
+                    break;
+                case "Core.ObjectReferencer":
+                    export.Payload = new ObjectReferencer();
                     break;
             }
 

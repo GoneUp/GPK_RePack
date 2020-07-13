@@ -57,14 +57,17 @@ namespace GPK_RePack.Model.Prop
                 }
                 long byteIndex = reader.ReadInt64();
                 nameValue = package.GetString(byteIndex);
+
+
+
             }
         }
 
         public int RecalculateSize()
         {
-            if (nameValue != null) 
+            if (nameValue != null)
             {
-                size = enumType != null ? 16 : 8;
+                size = 8;
             }
             else
             {
