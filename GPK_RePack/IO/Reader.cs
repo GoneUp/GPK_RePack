@@ -29,7 +29,7 @@ namespace GPK_RePack.IO
             {
                 Stopwatch fileWatch = new Stopwatch();
                 List<GpkPackage> tmpPackageList = new List<GpkPackage>();
-                BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read));
+                BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
 
                 //orginalsize len file oder len sub gpk
                 //
@@ -110,7 +110,7 @@ namespace GPK_RePack.IO
             {
                 logger = LogManager.GetLogger("ReadSubGpkFromComposite: " + fileID);
 
-                var reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read));
+                var reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
                 stat = new Status();
 
                 reader.BaseStream.Seek(fileOffset, SeekOrigin.Begin);

@@ -173,7 +173,7 @@ namespace GPK_RePack.Model.Payload
                     var path = $"{Path.GetDirectoryName(package.Path)}\\{txtCacheFile}.tfc";
                     if (File.Exists(path))
                     {
-                        BinaryReader cacheReader = new BinaryReader(new FileStream(path, FileMode.Open));
+                        BinaryReader cacheReader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
                         cacheReader.BaseStream.Seek(map.compChunkOffset, SeekOrigin.Begin);
 
                         map.signature = cacheReader.ReadUInt32(); //0x9e2a83c1
