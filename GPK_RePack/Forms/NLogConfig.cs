@@ -12,6 +12,7 @@ namespace GPK_RePack.Forms
     {
         private static FileTarget logfile;
         private static AsyncTargetWrapper formTarget;
+        private static LoggingRule fileLoggingRule;
 
 
         public static void SetDefaultConfig()
@@ -51,14 +52,36 @@ namespace GPK_RePack.Forms
                     level = LogLevel.Trace;
                     break;
             }
-            var rule1 = new LoggingRule("*", level, asyncWrapperLog);
-            config.LoggingRules.Add(rule1);
+            fileLoggingRule = new LoggingRule("*", level, asyncWrapperLog);
+            config.LoggingRules.Add(fileLoggingRule);
 
             var rule2 = new LoggingRule("*", LogLevel.Info, formTarget);
             config.LoggingRules.Add(rule2);
 
             
             LogManager.Configuration = config;
+        }
+
+        public static void ReloadFileLoggingRule()
+        {
+            var level = LogLevel.Trace;
+            switch (Settings.Default.LogLevel)
+            {
+                case "info":
+                    level = LogLevel.Info;
+                    break;
+                case "debug":
+                    level = LogLevel.Debug;
+                    break;
+                case "trace":
+                    level = LogLevel.Trace;
+                    break;
+            }
+
+            LogManager.Configuration.LoggingRules.Remove(fileLoggingRule);
+            fileLoggingRule.SetLoggingLevels(level, LogLevel.Fatal);
+            LogManager.Configuration.LoggingRules.Add(fileLoggingRule);
+
         }
 
         public static void DisableFormLogging()

@@ -1475,9 +1475,13 @@ namespace GPK_RePack.Forms
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
 
+            logger.Info("Disabling logging, dump is running in the background. Consider setting file logging to only info.");
+            NLogConfig.DisableFormLogging();
             var outDir = dialog.SelectedPath;
             new Task(() => MassDumper.DumpMassTextures(gpkStore, outDir)).Start();
 
+
+            NLogConfig.EnableFormLogging();
         }
 
         #endregion

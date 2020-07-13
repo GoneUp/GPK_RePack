@@ -84,6 +84,7 @@ namespace GPK_RePack.Forms
 
             new Task(() =>
             {
+                NLogConfig.ReloadFileLoggingRule();
                 gui.ResetGUI();
                 gui.DrawPackages();
             }).Start();
