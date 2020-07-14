@@ -107,45 +107,53 @@ namespace GPK_RePack.IO
             logger.Info("Started dumping textures to " + outdir);
             Directory.CreateDirectory(outdir);
 
+            List<Task> runningTasks = new List<Task>();
+
             foreach (var file in store.CompositeMap)
             {
                 var fileOutPath = string.Format("{0}\\{1}.gpk\\", outdir, file.Key);
                 Directory.CreateDirectory(fileOutPath);
 
                 //limit to 5 threads by default
-                Parallel.ForEach(file.Value, new ParallelOptions {  },
-                //Parallel.ForEach(file.Value, new ParallelOptions { MaxDegreeOfParallelism = 5 },
-                entry =>
+                foreach (var entry in file.Value)
                 {
-                    string path = string.Format("{0}\\{1}.gpk", store.BaseSearchPath, entry.SubGPKName);
-
-                    if (!File.Exists(path))
+                    Task newTask = new Task(() =>
                     {
-                        logger.Warn("GPK to load not found. Searched for: " + path);
-                        return;
-                    }
+                        string path = string.Format("{0}\\{1}.gpk", store.BaseSearchPath, entry.SubGPKName);
 
-                    Reader r = new Reader();
-                    var package = r.ReadSubGpkFromComposite(path, entry.UID, entry.FileOffset, entry.FileLength);
+                        if (!File.Exists(path))
+                        {
+                            logger.Warn("GPK to load not found. Searched for: " + path);
+                            return;
+                        }
 
-                    //extract
-                    var exports = package.GetExportsByClass("Core.Texture2D");
+                        Reader r = new Reader();
+                        var package = r.ReadSubGpkFromComposite(path, entry.UID, entry.FileOffset, entry.FileLength);
 
-                    foreach (var export in exports)
-                    {
-                        //UID->Composite UID
-                        //S1UI_Chat2.Chat2,c7a706fb_6a349a6f_1d212.Chat2_dup |
-                        //we use this uid from pkgmapper
-                        //var imagePath = string.Format("{0}{1}_{2}.dds", fileOutPath, entry.UID, export.UID);
-                        var imagePath = string.Format("{0}{1}---{2}.dds", fileOutPath, entry.UID, export.UID);
-                        TextureTools.exportTexture(export, imagePath);
+                        //extract
+                        var exports = package.GetExportsByClass("Core.Texture2D");
 
-                        logger.Info("Extracted texture {0} to {1}", entry.UID, imagePath);
-                    }
+                        foreach (var export in exports)
+                        {
+                            //UID->Composite UID
+                            //S1UI_Chat2.Chat2,c7a706fb_6a349a6f_1d212.Chat2_dup |
+                            //we use this uid from pkgmapper
+                            //var imagePath = string.Format("{0}{1}_{2}.dds", fileOutPath, entry.UID, export.UID);
+                            var imagePath = string.Format("{0}{1}---{2}.dds", fileOutPath, entry.UID, export.UID);
+                            TextureTools.exportTexture(export, imagePath);
 
-                    package = null;
-                });
+                            logger.Info("Extracted texture {0} to {1}", entry.UID, imagePath);
+                        }
+
+                        package = null;
+                    });
+
+                    newTask.Start();
+                    runningTasks.Add(newTask);
+                }
             }
+
+            Task.WaitAll(runningTasks.ToArray());
 
 
             logger.Info("Dumping done");
