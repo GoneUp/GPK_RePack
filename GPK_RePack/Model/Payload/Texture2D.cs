@@ -27,6 +27,7 @@ namespace GPK_RePack.Model.Payload
         public bool inUnicode = false;
         public byte[] guid;
 
+
         private const CompressionTypes NothingToDo = CompressionTypes.Unused | CompressionTypes.StoreInSeparatefile;
 
         public List<MipMap> maps = new List<MipMap>();
@@ -49,13 +50,14 @@ namespace GPK_RePack.Model.Payload
                 Writer.WriteString(writer, tgaPath, true);
             }
 
-            
+
             writer.Write(maps.Count);
 
             foreach (var map in maps)
             {
                 //refressh block info, compress blocks
-                //map.generateBlocks();
+                if (map.blocks.Count == 0)
+                    map.generateBlocks();
 
                 //chunk
                 //info
@@ -184,7 +186,8 @@ namespace GPK_RePack.Model.Payload
                         }
 
                         cacheReader.Close();
-                    } else
+                    }
+                    else
                     {
                         logger.Warn("{0}, MipMap {1}, Cache {2}, CompressionTypes.StoreInSeparatefile, could not find tfc!!", export.ObjectName, i, txtCacheFile);
                     }
@@ -214,7 +217,7 @@ namespace GPK_RePack.Model.Payload
             guid = reader.ReadBytes(16);
         }
 
-        private void ReadMipMapFromReader(BinaryReader reader, MipMap map)
+        private void ReadMipMapFromReader(BinaryReader reader, MipMap map, GpkPackage package)
         {
             map.signature = reader.ReadUInt32(); //0x9e2a83c1
             Debug.Assert(map.signature == MipMap.DEFAULT_SIGNATURE);
@@ -225,11 +228,11 @@ namespace GPK_RePack.Model.Payload
             map.uncompressedSize_chunkheader = reader.ReadInt32();
             map.uncompressedData = new byte[map.uncompressedSize];
 
-            int blockCount = (map.uncompressedSize + map.blocksize - 1) / map.blocksize;
+            map.blockCount = (map.uncompressedSize + map.blocksize - 1) / map.blocksize;
             int blockOffset = 0;
 
 
-            for (int j = 0; j < blockCount; ++j)
+            for (int j = 0; j < map.blockCount; ++j)
             {
                 var block = new ChunkBlock();
                 block.compressedSize = reader.ReadInt32();
@@ -250,6 +253,13 @@ namespace GPK_RePack.Model.Payload
                 //save memory
                 block.uncompressedData = null;
             }
+
+            //we clear the compressed chunkblocks, so only uncompressed data is present
+            //blocks need to be rebuild when saving
+            if (package.LowMemMode)
+            {
+                map.blocks.Clear();
+            }
         }
 
 
@@ -264,7 +274,7 @@ namespace GPK_RePack.Model.Payload
             {
                 //header
                 tmpSize += 32;
-                tmpSize += map.blocks.Count * 8 + map.compressedSize;
+                tmpSize += map.blockCount * 8 + map.compressedSize;
                 //sizex, sizey
                 tmpSize += 8;
             }
@@ -305,52 +315,53 @@ namespace GPK_RePack.Model.Payload
         {
             if (maps == null || !maps.Any()) return null;
 
-            FileFormat format;
-
             MipMap mipMap = maps.Where(mm => mm.uncompressedData != null && mm.uncompressedData.Length > 0).OrderByDescending(mm => mm.sizeX > mm.sizeY ? mm.sizeX : mm.sizeY).FirstOrDefault();
+            if (mipMap == null)
+                return null;
 
-            return mipMap == null ? null : buildDdsImage(maps.IndexOf(mipMap), out format);
+            return buildDdsImage(maps.IndexOf(mipMap));
         }
 
-        private Stream buildDdsImage(int mipMapIndex, out FileFormat imageFormat)
+        private Stream buildDdsImage(int mipMapIndex)
         {
             MipMap mipMap = maps[mipMapIndex];
-
-            imageFormat = GetFormat();
-            DdsHeader ddsHeader = new DdsHeader(new DdsSaveConfig(imageFormat, 0, 0, false, false), mipMap.sizeX, mipMap.sizeY);
+            DdsHeader ddsHeader = new DdsHeader(new DdsSaveConfig(GetFormat(), 0, 0, false, false), mipMap.sizeX, mipMap.sizeY);
 
             MemoryStream stream = new MemoryStream();
             BinaryWriter writer = new BinaryWriter(stream);
 
             ddsHeader.Write(writer);
-            stream.Write(mipMap.uncompressedData, 0, mipMap.uncompressedData.Length);
-            stream.Flush();
-            stream.Position = 0;
+            writer.Write(mipMap.uncompressedData);
+            writer.Flush();
+            writer.BaseStream.Position = 0;
 
             return stream;
         }
 
         public void SaveObject(string filename, object configuration)
         {
-            if (maps == null || !maps.Any()) return;
+            FileStream ddsStream = null;
+            try
+            {
+                if (maps == null || !maps.Any()) return;
 
-            DdsSaveConfig config = configuration as DdsSaveConfig ?? new DdsSaveConfig(FileFormat.Unknown, 0, 0, false, false);
-            FileFormat format;
+                DdsSaveConfig config = configuration as DdsSaveConfig ?? new DdsSaveConfig(FileFormat.Unknown, 0, 0, false, false);
+                config.FileFormat = GetFormat();
 
-            MipMap mipMap = maps.Where(mm => mm.uncompressedData != null && mm.uncompressedData.Length > 0).OrderByDescending(mm => mm.sizeX > mm.sizeY ? mm.sizeX : mm.sizeY).FirstOrDefault();
-            if (mipMap == null) return;
+                //parse uncompressed image
+                DdsFile ddsImage = new DdsFile(GetObjectStream());
 
-            Stream memory = buildDdsImage(maps.IndexOf(mipMap), out format);
-            if (memory == null) return;
+                ddsStream = new FileStream(filename, FileMode.Create);
+                ddsImage.Save(ddsStream, config);
 
-            DdsFile ddsImage = new DdsFile(GetObjectStream());
-            FileStream ddsStream = new FileStream(filename, FileMode.Create);
-
-            config.FileFormat = format;
-            ddsImage.Save(ddsStream, config);
-            ddsStream.Close();
-
-            memory.Close();
+                ddsStream.Close();
+                ddsStream.Dispose();
+            }
+            finally
+            {
+                if (ddsStream != null)
+                    ddsStream.Dispose();
+            }
         }
 
     }

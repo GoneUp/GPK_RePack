@@ -37,6 +37,7 @@ namespace GPK_RePack.Model.Payload
         public string loadedFromTextureCache = "";
 
         public List<ChunkBlock> blocks = new List<ChunkBlock>();
+        internal int blockCount;
 
         public void generateBlocks()
         {

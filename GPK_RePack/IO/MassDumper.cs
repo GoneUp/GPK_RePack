@@ -129,6 +129,7 @@ namespace GPK_RePack.IO
 
                         Reader r = new Reader();
                         var package = r.ReadSubGpkFromComposite(path, entry.UID, entry.FileOffset, entry.FileLength);
+                        package.LowMemMode = true;
 
                         //extract
                         var exports = package.GetExportsByClass("Core.Texture2D");

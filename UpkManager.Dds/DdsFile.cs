@@ -377,7 +377,6 @@ namespace UpkManager.Dds
             BinaryWriter writer = new BinaryWriter(output);
 
             header = new DdsHeader(saveConfig, Width, Height);
-
             header.Write(writer);
 
             if (saveConfig.GenerateMipMaps) GenerateMipMaps();

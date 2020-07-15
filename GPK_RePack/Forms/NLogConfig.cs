@@ -29,11 +29,12 @@ namespace GPK_RePack.Forms
             AsyncTargetWrapper asyncWrapperLog = new AsyncTargetWrapper(logfile);
             config.AddTarget("logfile", asyncWrapperLog);
 
-            var formTargetSync = new FormControlTarget();
-            formTargetSync.Layout = "${date:format=HH\\:mm\\:ss} ${logger} # ${message} ${newline}";
-            formTargetSync.Append = true;
+            var formTargetSync = new RichTextBoxTarget();
+            formTargetSync.Layout = "${date:format=HH\\:mm\\:ss} ${logger} # ${message}";
+            formTargetSync.AutoScroll = true;
             formTargetSync.ControlName = "boxLog";
             formTargetSync.FormName = "GUI";
+            formTargetSync.MaxLines = 1000;
             config.AddTarget("form", formTargetSync);
             formTarget = new AsyncTargetWrapper(formTargetSync);
             config.AddTarget("form", formTarget);

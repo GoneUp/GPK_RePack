@@ -106,16 +106,19 @@ namespace GPK_RePack.IO
 
         public GpkPackage ReadSubGpkFromComposite(string path, string fileID, int fileOffset, int dataLength)
         {
+            BinaryReader reader = null;
+
             try
             {
                 logger = LogManager.GetLogger("ReadSubGpkFromComposite: " + fileID);
 
-                var reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
+                reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
                 stat = new Status();
 
                 reader.BaseStream.Seek(fileOffset, SeekOrigin.Begin);
                 var data = reader.ReadBytes(dataLength);
                 reader.Close();
+                reader.Dispose();
 
                 GpkPackage tmpGPK = new GpkPackage();
                 tmpGPK.Filename = fileID;
@@ -127,7 +130,7 @@ namespace GPK_RePack.IO
 
                 var fullGpk = ReadSubGpkPackage(tmpGPK, data, false, stat);
 
-                logger.Debug("done");
+                logger.Debug("Done");
 
                 return fullGpk;
             }
@@ -136,19 +139,26 @@ namespace GPK_RePack.IO
                 logger.Fatal("Parse failure!");
                 logger.Fatal(ex);
             }
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+            }
 
             return null;
         }
 
         private GpkPackage ReadSubGpkPackage(GpkPackage package, byte[] data, bool skipExportData, Status stat)
         {
+            BinaryReader reader = null;
+
             try
             {
-                BinaryReader reader = new BinaryReader(new MemoryStream(data));
+                reader = new BinaryReader(new MemoryStream(data));
                 Stopwatch pkgWatch = new Stopwatch();
 
                 logger = LogManager.GetLogger("[ReadSubGpkPackage:" + package.Filename + "]");
-                logger.Info("Reading Start");
+                logger.Debug("Reading Start");
                 stat.name = package.Filename;
                 pkgWatch.Start();
 
@@ -158,6 +168,7 @@ namespace GPK_RePack.IO
                 if (file != null)
                 {
                     reader.Close();
+                    reader.Dispose();
                     reader = new BinaryReader(new MemoryStream(file));
                 }
 
@@ -175,7 +186,6 @@ namespace GPK_RePack.IO
                 stat.time = pkgWatch.ElapsedMilliseconds;
                 stat.finished = true;
                 logger.Info("Reading of package {0} complete, took {1}ms!", package.Filename, pkgWatch.ElapsedMilliseconds);
-                logger.Info("Reading Done");
 
                 return package;
             }
@@ -183,6 +193,11 @@ namespace GPK_RePack.IO
             {
                 logger.Fatal("Parse failure!");
                 logger.Fatal(ex);
+            }
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
             }
 
             return null;
@@ -221,7 +236,7 @@ namespace GPK_RePack.IO
 
             package.Header.DependsOffset = reader.ReadInt32();
 
-            if (package.x64)  package.Header.HeaderSize = reader.ReadInt32();
+            if (package.x64) package.Header.HeaderSize = reader.ReadInt32();
 
             logger.Debug("NameCount " + package.Header.NameCount);
             logger.Debug("NameOffset " + package.Header.NameOffset);
@@ -570,7 +585,7 @@ namespace GPK_RePack.IO
 
                             if (export.Payload != null) logger.Debug(export.Payload.ToString());
                         }
-                    } 
+                    }
 
 
                     logger.Trace(String.Format("Export {0}: Read Data ({1} bytes {2}) and {3} Properties ({4} bytes)", export.ObjectName, toread, tag, export.Properties.Count, export.PropertySize));

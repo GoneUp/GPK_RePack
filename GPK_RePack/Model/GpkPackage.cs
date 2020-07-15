@@ -25,8 +25,9 @@ namespace GPK_RePack.Model
         public long OrginalSize; //raw compressed size
         public long UncompressedSize;
 
-     
+        //
         public Boolean Changes = false;
+        public Boolean LowMemMode = false;
 
         //data structs
         public GpkHeader Header;

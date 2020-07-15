@@ -146,11 +146,6 @@ namespace GPK_RePack.Forms
             Environment.Exit(0);
         }
 
-        private void boxLog_TextChanged(object sender, EventArgs e)
-        {
-            boxLog.SelectionStart = boxLog.TextLength;
-            boxLog.ScrollToCaret();
-        }
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {

@@ -65,6 +65,7 @@ namespace GPK_RePack.Forms
             this.compositeGPKToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decryptionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dumpCompositeTexturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miscToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setFilesizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setAllPropertysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -110,14 +111,13 @@ namespace GPK_RePack.Forms
             this.btnCopy = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnPaste = new System.Windows.Forms.Button();
-            this.boxLog = new System.Windows.Forms.TextBox();
             this.splitContainerTreeInfo = new System.Windows.Forms.SplitContainer();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.lblFiller = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
-            this.dumpCompositeTexturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.boxLog = new System.Windows.Forms.RichTextBox();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -397,6 +397,13 @@ namespace GPK_RePack.Forms
             this.loadMappingToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
             this.loadMappingToolStripMenuItem.Text = "Load Mapping";
             this.loadMappingToolStripMenuItem.Click += new System.EventHandler(this.loadMappingToolStripMenuItem_Click);
+            // 
+            // dumpCompositeTexturesToolStripMenuItem
+            // 
+            this.dumpCompositeTexturesToolStripMenuItem.Name = "dumpCompositeTexturesToolStripMenuItem";
+            this.dumpCompositeTexturesToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.dumpCompositeTexturesToolStripMenuItem.Text = "Dump CompositeTextures";
+            this.dumpCompositeTexturesToolStripMenuItem.Click += new System.EventHandler(this.dumpCompositeTexturesToolStripMenuItem_Click);
             // 
             // miscToolStripMenuItem
             // 
@@ -895,18 +902,6 @@ namespace GPK_RePack.Forms
             this.btnPaste.UseVisualStyleBackColor = true;
             this.btnPaste.Click += new System.EventHandler(this.btnPaste_Click);
             // 
-            // boxLog
-            // 
-            this.boxLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.boxLog.Location = new System.Drawing.Point(0, 0);
-            this.boxLog.Multiline = true;
-            this.boxLog.Name = "boxLog";
-            this.boxLog.ReadOnly = true;
-            this.boxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.boxLog.Size = new System.Drawing.Size(1163, 125);
-            this.boxLog.TabIndex = 5;
-            this.boxLog.TextChanged += new System.EventHandler(this.boxLog_TextChanged);
-            // 
             // splitContainerTreeInfo
             // 
             this.splitContainerTreeInfo.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -975,12 +970,15 @@ namespace GPK_RePack.Forms
             this.splitContainerLog_InfoTree.SplitterDistance = 522;
             this.splitContainerLog_InfoTree.TabIndex = 9;
             // 
-            // dumpCompositeTexturesToolStripMenuItem
+            // boxLog
             // 
-            this.dumpCompositeTexturesToolStripMenuItem.Name = "dumpCompositeTexturesToolStripMenuItem";
-            this.dumpCompositeTexturesToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
-            this.dumpCompositeTexturesToolStripMenuItem.Text = "Dump CompositeTextures";
-            this.dumpCompositeTexturesToolStripMenuItem.Click += new System.EventHandler(this.dumpCompositeTexturesToolStripMenuItem_Click);
+            this.boxLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.boxLog.Location = new System.Drawing.Point(0, 0);
+            this.boxLog.Name = "boxLog";
+            this.boxLog.ReadOnly = true;
+            this.boxLog.Size = new System.Drawing.Size(1163, 125);
+            this.boxLog.TabIndex = 0;
+            this.boxLog.Text = "";
             // 
             // GUI
             // 
@@ -1023,7 +1021,6 @@ namespace GPK_RePack.Forms
             this.statusStrip.PerformLayout();
             this.splitContainerLog_InfoTree.Panel1.ResumeLayout(false);
             this.splitContainerLog_InfoTree.Panel2.ResumeLayout(false);
-            this.splitContainerLog_InfoTree.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerLog_InfoTree)).EndInit();
             this.splitContainerLog_InfoTree.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -1042,7 +1039,6 @@ namespace GPK_RePack.Forms
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabInfo;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.TextBox boxLog;
         private System.Windows.Forms.TextBox boxInfo;
         private System.Windows.Forms.Button btnImportRaw;
         private System.Windows.Forms.Button btnExportRaw;
@@ -1119,6 +1115,7 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem decryptionToolStripMenuItem;
         private ToolStripMenuItem loadMappingToolStripMenuItem;
         private ToolStripMenuItem dumpCompositeTexturesToolStripMenuItem;
+        private RichTextBox boxLog;
     }
 }
 
