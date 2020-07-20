@@ -69,7 +69,7 @@ namespace GPK_RePack.Model.Payload
                     int chunkSize = 16 + map.blocks.Count * 8 + map.compressedSize;
                     if (chunkSize != map.compChunkSize)
                     {
-                        logger.Info("fixing chunksize for " + objectExport.ObjectName);
+                        logger.Debug("fixing chunksize for " + objectExport.ObjectName);
                         map.compChunkSize = chunkSize;
                     }
 
@@ -182,7 +182,7 @@ namespace GPK_RePack.Model.Payload
                         cacheReader.BaseStream.Seek(-4, SeekOrigin.Current);
                         if (map.signature == MipMap.DEFAULT_SIGNATURE)
                         {
-                            ReadMipMapFromReader(cacheReader, map);
+                            ReadMipMapFromReader(cacheReader, map, package);
                         }
 
                         cacheReader.Close();
@@ -200,7 +200,7 @@ namespace GPK_RePack.Model.Payload
                 else if (((CompressionTypes)map.flags & NothingToDo) == 0)
                 {
                     //normal in gpk data
-                    ReadMipMapFromReader(reader, map);
+                    ReadMipMapFromReader(reader, map, package);
                 }
                 else
                 {

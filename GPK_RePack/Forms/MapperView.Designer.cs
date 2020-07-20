@@ -2,7 +2,7 @@
 
 namespace GPK_RePack.Forms
 {
-    partial class formMapperView
+    partial class FormMapperView
     {
         /// <summary>
         /// Required designer variable.
@@ -32,6 +32,7 @@ namespace GPK_RePack.Forms
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeMapperView = new GPK_RePack.Forms.Helper.CompositeTreeView();
+            this.btnDeleteMapping = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.boxSearch = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -53,6 +54,7 @@ namespace GPK_RePack.Forms
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.btnDeleteMapping);
             this.splitContainer1.Panel2.Controls.Add(this.label1);
             this.splitContainer1.Panel2.Controls.Add(this.boxSearch);
             this.splitContainer1.Size = new System.Drawing.Size(584, 480);
@@ -67,6 +69,16 @@ namespace GPK_RePack.Forms
             this.treeMapperView.Size = new System.Drawing.Size(584, 431);
             this.treeMapperView.TabIndex = 0;
             this.treeMapperView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMapperView_AfterSelect);
+            // 
+            // btnDeleteMapping
+            // 
+            this.btnDeleteMapping.Location = new System.Drawing.Point(478, 22);
+            this.btnDeleteMapping.Name = "btnDeleteMapping";
+            this.btnDeleteMapping.Size = new System.Drawing.Size(106, 23);
+            this.btnDeleteMapping.TabIndex = 2;
+            this.btnDeleteMapping.Text = "Delete Mapping";
+            this.btnDeleteMapping.UseVisualStyleBackColor = true;
+            this.btnDeleteMapping.Click += new System.EventHandler(this.btnDeleteMapping_Click);
             // 
             // label1
             // 
@@ -86,14 +98,14 @@ namespace GPK_RePack.Forms
             this.boxSearch.TabIndex = 0;
             this.boxSearch.TextChanged += new System.EventHandler(this.boxSearch_TextChanged);
             // 
-            // formMapperView
+            // FormMapperView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 480);
             this.Controls.Add(this.splitContainer1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.Name = "formMapperView";
+            this.Name = "FormMapperView";
             this.Text = "MapperView";
             this.Load += new System.EventHandler(this.formMapperView_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -111,5 +123,6 @@ namespace GPK_RePack.Forms
         private System.Windows.Forms.TextBox boxSearch;
         private CompositeTreeView treeMapperView;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnDeleteMapping;
     }
 }

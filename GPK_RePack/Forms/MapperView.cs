@@ -15,11 +15,11 @@ using NLog;
 
 namespace GPK_RePack.Forms
 {
-    partial class formMapperView : Form
+    partial class FormMapperView : Form
     {
         private GpkStore store;
         private Logger logger = LogManager.GetCurrentClassLogger();
-        public formMapperView(GpkStore store)
+        public FormMapperView(GpkStore store)
         {
             InitializeComponent();
 
@@ -72,6 +72,13 @@ namespace GPK_RePack.Forms
         private void boxSearch_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnDeleteMapping_Click(object sender, EventArgs e)
+        {
+            this.Close();
+            this.store.clearCompositeMap();
+            logger.Info("Deleted Mapping Cache");
         }
     }
 }

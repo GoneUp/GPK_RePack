@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using GPK_RePack.Editors;
+using GPK_RePack.Forms;
 using GPK_RePack.Model;
+using GPK_RePack.Model.Composite;
 using GPK_RePack.Model.Interfaces;
 using GPK_RePack.Model.Payload;
 using NLog;
@@ -102,14 +104,14 @@ namespace GPK_RePack.IO
         }
 
 
-        public static void DumpMassTextures(GpkStore store, String outdir)
+        public static void DumpMassTextures(GpkStore store, String outdir, Dictionary<String, List<CompositeMapEntry>> filterList)
         {
             logger.Info("Started dumping textures to " + outdir);
             Directory.CreateDirectory(outdir);
 
             List<Task> runningTasks = new List<Task>();
 
-            foreach (var file in store.CompositeMap)
+            foreach (var file in filterList)
             {
                 var fileOutPath = string.Format("{0}\\{1}.gpk\\", outdir, file.Key);
                 Directory.CreateDirectory(fileOutPath);
@@ -157,6 +159,7 @@ namespace GPK_RePack.IO
             Task.WaitAll(runningTasks.ToArray());
 
 
+            NLogConfig.EnableFormLogging();
             logger.Info("Dumping done");
         }
     }

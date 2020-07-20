@@ -1,22 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using GPK_RePack.IO;
 using GPK_RePack.Model.Composite;
+using GPK_RePack.Model.Interfaces;
+using GPK_RePack.Properties;
+using NLog;
 
 namespace GPK_RePack.Model
 {
     class GpkStore
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public Dictionary<String, List<CompositeMapEntry>> CompositeMap;
         public string BaseSearchPath;
-
         public List<GpkPackage> LoadedGpkPackages { get; } = new List<GpkPackage>();
-
-
 
         //events
         public delegate void GpkListChangeHandler();
@@ -26,8 +29,6 @@ namespace GPK_RePack.Model
         {
             CompositeMap = new Dictionary<string, List<CompositeMapEntry>>();
         }
-
-
 
         public void loadGpk(string path, Reader reader = null, bool triggerEvent = true)
         {
@@ -40,10 +41,9 @@ namespace GPK_RePack.Model
 
             LoadedGpkPackages.AddRange(gpks);
 
-            if (triggerEvent) 
+            if (triggerEvent)
                 PackagesChanged();
         }
-
 
         public void loadSubGpk(string path, string fileID, int fileOffset, int dataLength)
         {
@@ -57,13 +57,37 @@ namespace GPK_RePack.Model
             PackagesChanged();
         }
 
+        public void SaveGpkListToFiles(List<GpkPackage> saveList, bool usePadding, List<IProgress> runningSavers, List<Task> runningTasks)
+        {
+
+            foreach (GpkPackage package in saveList)
+            {
+                try
+                {
+                    Writer tmpS = new Writer();
+                    Task newTask = new Task(() =>
+                    {
+                        string savepath = package.Path + Settings.Default.SaveFileSuffix;
+                        tmpS.SaveGpkPackage(package, savepath, usePadding);
+                    });
+                    newTask.Start();
+                    runningTasks.Add(newTask);
+                    runningSavers.Add(tmpS);
+                }
+                catch (Exception ex)
+                {
+                    logger.Fatal(ex, "Save failure!");
+                }
+
+            }
+        }
+
         public void DeleteGpk(GpkPackage package)
         {
             LoadedGpkPackages.Remove(package);
 
             PackagesChanged();
         }
-
         public void clearGpkList()
         {
             LoadedGpkPackages.Clear();
@@ -71,6 +95,11 @@ namespace GPK_RePack.Model
             PackagesChanged();
         }
 
+        public void clearCompositeMap()
+        {
+            CompositeMap = new Dictionary<string, List<CompositeMapEntry>>();
+            BaseSearchPath = "";
+        }
 
 
     }

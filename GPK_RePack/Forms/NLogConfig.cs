@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 using GPK_RePack.Properties;
 using NLog;
 using NLog.Config;
@@ -11,32 +12,24 @@ namespace GPK_RePack.Forms
     class NLogConfig
     {
         private static FileTarget logfile;
-        private static AsyncTargetWrapper formTarget;
         private static LoggingRule fileLoggingRule;
+        private static LoggingRule formLoggingRule;
 
 
         public static void SetDefaultConfig()
         {
             LogManager.ThrowExceptions = true;
-            var config = new LoggingConfiguration();  
-            
+            var config = new LoggingConfiguration();
 
-           //Targets
-            logfile = new FileTarget(); 
+            //Targets
+            logfile = new FileTarget();
             logfile.FileName = "Terahelper.log";
             logfile.DeleteOldFileOnStartup = true;
             logfile.KeepFileOpen = true;
             AsyncTargetWrapper asyncWrapperLog = new AsyncTargetWrapper(logfile);
             config.AddTarget("logfile", asyncWrapperLog);
 
-            var formTargetSync = new RichTextBoxTarget();
-            formTargetSync.Layout = "${date:format=HH\\:mm\\:ss} ${logger} # ${message}";
-            formTargetSync.AutoScroll = true;
-            formTargetSync.ControlName = "boxLog";
-            formTargetSync.FormName = "GUI";
-            formTargetSync.MaxLines = 1000;
-            config.AddTarget("form", formTargetSync);
-            formTarget = new AsyncTargetWrapper(formTargetSync);
+            var formTarget = getFormTarget();
             config.AddTarget("form", formTarget);
 
             //Rules
@@ -56,10 +49,10 @@ namespace GPK_RePack.Forms
             fileLoggingRule = new LoggingRule("*", level, asyncWrapperLog);
             config.LoggingRules.Add(fileLoggingRule);
 
-            var rule2 = new LoggingRule("*", LogLevel.Info, formTarget);
-            config.LoggingRules.Add(rule2);
+            formLoggingRule = new LoggingRule("*", LogLevel.Info, formTarget);
+            config.LoggingRules.Add(formLoggingRule);
 
-            
+
             LogManager.Configuration = config;
         }
 
@@ -88,11 +81,27 @@ namespace GPK_RePack.Forms
         public static void DisableFormLogging()
         {
             LogManager.Configuration.RemoveTarget("form");
+            LogManager.Configuration.LoggingRules.Remove(formLoggingRule);
         }
 
         public static void EnableFormLogging()
         {
-            LogManager.Configuration.AddTarget("form", formTarget);
+            SetDefaultConfig();
         }
+
+
+        private static AsyncTargetWrapper getFormTarget()
+        {
+            var formTargetSync = new RichTextBoxTarget();
+            formTargetSync.Layout = "${date:format=HH\\:mm\\:ss} ${logger} # ${message}";
+            formTargetSync.AutoScroll = true;
+            formTargetSync.ControlName = "boxLog";
+            formTargetSync.FormName = "GUI";
+            formTargetSync.MaxLines = 1000;
+            var formTarget = new AsyncTargetWrapper(formTargetSync);
+
+            return formTarget;
+        }
+
     }
 }

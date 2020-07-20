@@ -10,6 +10,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using System.Xml;
@@ -17,6 +18,7 @@ using GPK_RePack.Editors;
 using GPK_RePack.Forms.Helper;
 using GPK_RePack.IO;
 using GPK_RePack.Model;
+using GPK_RePack.Model.Composite;
 using GPK_RePack.Model.Interfaces;
 using GPK_RePack.Model.Payload;
 using GPK_RePack.Model.Prop;
@@ -27,6 +29,7 @@ using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
 using NLog.Config;
+using NLog.Filters;
 using NLog.Targets;
 using NLog.Windows.Forms;
 using UpkManager.Dds;
@@ -242,7 +245,7 @@ namespace GPK_RePack.Forms
             }
 
             //display info while loading
-            while (!Task.WaitAll(runningTasks.ToArray(), 50))
+            while (!Task.WaitAll(runningTasks.ToArray(), 500))
             {
                 Application.DoEvents();
                 DisplayStatus(runningReaders, "Loading", start);
@@ -316,34 +319,14 @@ namespace GPK_RePack.Forms
             if (gpkStore.LoadedGpkPackages.Count == 0)
                 return;
 
-            foreach (GpkPackage package in gpkStore.LoadedGpkPackages)
-            {
-                try
-                {
-                    Writer tmpS = new Writer();
-                    Task newTask = new Task(delegate ()
-                    {
-                        string savepath = package.Path + Settings.Default.SaveFileSuffix;
-                        tmpS.SaveGpkPackage(package, savepath, usePadding);
-                    });
-                    newTask.Start();
-                    runningTasks.Add(newTask);
-                    runningSavers.Add(tmpS);
-                }
-                catch (Exception ex)
-                {
-                    logger.Fatal(ex, "Save failure!");
-                }
-
-            }
-            
+            //do it
+            this.gpkStore.SaveGpkListToFiles(gpkStore.LoadedGpkPackages, usePadding, runningSavers, runningTasks);
 
             //display info while loading
             while (!Task.WaitAll(runningTasks.ToArray(), 50))
             {
                 Application.DoEvents();
                 DisplayStatus(runningSavers, "Saving", start);
-                //Thread.Sleep(50);
             }
 
             //Diplay end info
@@ -427,7 +410,7 @@ namespace GPK_RePack.Forms
                 //TreeNode nodeP = treeMain.Nodes.Add(i.ToString(), package.Filename);
                 TreeNode nodeP = new TreeNode(package.Filename);
                 nodeP.Name = i.ToString(); //Key
-                
+
 
                 Dictionary<string, TreeNode> classNodes = new Dictionary<string, TreeNode>();
                 TreeNode nodeI = null;
@@ -492,7 +475,7 @@ namespace GPK_RePack.Forms
             }
 
 
-            
+
             treeMain.Sort();
             treeMain.EndUpdate();
         }
@@ -1425,8 +1408,14 @@ namespace GPK_RePack.Forms
 
         private void loadMappingToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (gpkStore.CompositeMap.Count > 0)
+            {
+                new FormMapperView(gpkStore).Show();
+                return;
+            }
+
             var dialog = new FolderBrowserDialog();
-            if (Settings.Default.CookedPCPath != "") 
+            if (Settings.Default.CookedPCPath != "")
                 dialog.SelectedPath = Settings.Default.CookedPCPath;
             dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
             if (dialog.ShowDialog() == DialogResult.Cancel)
@@ -1440,8 +1429,7 @@ namespace GPK_RePack.Forms
             int subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
             logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", gpkStore.CompositeMap.Count, subCount);
 
-            var mapperView = new formMapperView(gpkStore);
-            mapperView.Show();
+            new FormMapperView(gpkStore).Show();
         }
 
         private void dumpCompositeTexturesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1463,20 +1451,47 @@ namespace GPK_RePack.Forms
             int subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
             logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", gpkStore.CompositeMap.Count, subCount);
 
+            //selection
+            var text = Microsoft.VisualBasic.Interaction.InputBox("Select range of composite gpks to load. Format: n-n [e.g. 1-5] or empty for all."
+                , "Selection", "");
+            var filterList = filterCompositeList(text);
 
+            //save dir
             dialog = new FolderBrowserDialog();
             dialog.SelectedPath = Settings.Default.WorkingDir;
             dialog.Description = "Select your output dir";
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
 
-            logger.Info("Disabling logging, dump is running in the background. Consider setting file logging to only info.");
+            logger.Warn("Warning: This function can be ultra long running (hours) and unstable. Monitor logfile and output folder for progress.");
+            logger.Warn("Disabling logging, dump is running in the background. Consider setting file logging to only info.");
+
             NLogConfig.DisableFormLogging();
             var outDir = dialog.SelectedPath;
-            new Task(() => MassDumper.DumpMassTextures(gpkStore, outDir)).Start();
+            new Task(() => MassDumper.DumpMassTextures(gpkStore, outDir, filterList)).Start();
+        }
 
-
-            NLogConfig.EnableFormLogging();
+        private Dictionary<String, List<CompositeMapEntry>> filterCompositeList(string text)
+        {
+            try
+            {
+                if (text != "" && text.Split('-').Length > 0)
+                {
+                    int start = Convert.ToInt32(text.Split('-')[0]) - 1;
+                    int end = Convert.ToInt32(text.Split('-')[1]) - 1;
+                    var filterCompositeList = gpkStore.CompositeMap.Skip(start).Take(end - start + 1).ToDictionary(k => k.Key, v => v.Value);
+                    logger.Info("Filterd down to {0} GPKs.", end - start + 1);
+                    return filterCompositeList;
+                }
+                else
+                {
+                    return gpkStore.CompositeMap;
+                }
+            }
+            catch (Exception ex)
+            {
+                return gpkStore.CompositeMap;
+            }
         }
 
         #endregion
@@ -1736,7 +1751,8 @@ namespace GPK_RePack.Forms
 
                     if (cellValue.Length > 2)
                     {
-                        if (selectedPackage.x64) {
+                        if (selectedPackage.x64)
+                        {
                             tmpByte.enumType = row.Cells["iType"].Value.ToString();
                             selectedPackage.AddString(tmpByte.enumType); //just in case 
                         }
@@ -1969,6 +1985,10 @@ namespace GPK_RePack.Forms
                 {
                     btnExtractOGG_Click(null, null);
                 }
+                else if (e.ClickedItem == exportPackageToolStripMenuItem)
+                {
+                    saveSingleGpkPackage();
+                }
                 //preview ogg
 
                 else if (e.ClickedItem == previewOGGToolStripMenuItem)
@@ -1978,7 +1998,25 @@ namespace GPK_RePack.Forms
             }));
         }
 
+        private void saveSingleGpkPackage()
+        {
+            if (selectedPackage != null && treeMain.SelectedNode != null && treeMain.SelectedNode.Level == 0)
+            {
+                var packages = new List<GpkPackage>();
+                packages.Add(selectedPackage);
+                var writerList = new List<IProgress>();
+                var taskList = new List<Task>();
 
+                this.gpkStore.SaveGpkListToFiles(packages, false, writerList, taskList);
+
+                //wait
+                while (!Task.WaitAll(taskList.ToArray(), 50))
+                {
+                    Application.DoEvents();
+                }
+                logger.Info("Single export done!");
+            }
+        }
 
 
 
@@ -1992,7 +2030,7 @@ namespace GPK_RePack.Forms
 
         #endregion
 
-     
+
     }
 }
 
