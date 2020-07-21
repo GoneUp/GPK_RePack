@@ -136,10 +136,14 @@ namespace GPK_RePack.Model.Payload
             {
                 tgaPath = Reader.ReadString(reader, length);
             }
-            else
+            else if (length < 0)
             {
                 inUnicode = true;
                 tgaPath = Reader.ReadUnicodeString(reader, (length * -1) * 2);
+            }
+            else
+            {
+                tgaPath = "";
             }
 
 
@@ -169,13 +173,15 @@ namespace GPK_RePack.Model.Payload
                     //compChunkSize == size
                     //TextureFileCacheName prop has name
                     var txtProp = export.Properties.Find(t => ((GpkBaseProperty)t).name == "TextureFileCacheName");
+                    if (txtProp == null)
+                        goto fail;
                     String txtCacheFile = ((GpkNameProperty)txtProp).value;
 
                     //assumption: cache in same dir, happens for cookedpc compositegpks
-                    var path = $"{Path.GetDirectoryName(package.Path)}\\{txtCacheFile}.tfc";
-                    if (File.Exists(path))
+                    map.textureCachePath = $"{Path.GetDirectoryName(package.Path)}\\{txtCacheFile}.tfc";
+                    if (File.Exists(map.textureCachePath))
                     {
-                        BinaryReader cacheReader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
+                        BinaryReader cacheReader = new BinaryReader(new FileStream(map.textureCachePath, FileMode.Open, FileAccess.Read, FileShare.Read));
                         cacheReader.BaseStream.Seek(map.compChunkOffset, SeekOrigin.Begin);
 
                         map.signature = cacheReader.ReadUInt32(); //0x9e2a83c1
@@ -189,7 +195,7 @@ namespace GPK_RePack.Model.Payload
                     }
                     else
                     {
-                        logger.Warn("{0}, MipMap {1}, Cache {2}, CompressionTypes.StoreInSeparatefile, could not find tfc!!", export.ObjectName, i, txtCacheFile);
+                        logger.Debug("{0}, MipMap {1}, Cache {2}, CompressionTypes.StoreInSeparatefile, could not find tfc!!", export.ObjectName, i, txtCacheFile);
                     }
                 }
                 else if (((CompressionTypes)map.flags & CompressionTypes.SeperateData) != 0)
@@ -207,6 +213,7 @@ namespace GPK_RePack.Model.Payload
                     logger.Trace("{0}, MipMap {0}, no data!!", export.ObjectName, i);
                 }
 
+            fail:
                 map.sizeX = reader.ReadInt32();
                 map.sizeY = reader.ReadInt32();
 

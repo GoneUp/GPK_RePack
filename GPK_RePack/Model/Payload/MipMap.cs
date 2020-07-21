@@ -34,7 +34,7 @@ namespace GPK_RePack.Model.Payload
 
         public byte[] uncompressedData;
 
-        public string loadedFromTextureCache = "";
+        public string textureCachePath = "";
 
         public List<ChunkBlock> blocks = new List<ChunkBlock>();
         internal int blockCount;
@@ -47,6 +47,10 @@ namespace GPK_RePack.Model.Payload
             compressedSize = 0;
             for (int i = 0; i < blockCount; i++)
             {
+                //if data was not found, skip
+                if (uncompressedData == null)
+                    continue;
+
                 int blockOffset = i * blocksize;
                 int blockEnd = blockOffset + blocksize;
                 if (blockEnd > uncompressedSize)
@@ -73,6 +77,16 @@ namespace GPK_RePack.Model.Payload
             info.AppendFormat("Size: {0} x {1} {2}", sizeX, sizeY, Environment.NewLine);
             info.AppendLine("Compression: " + flags);
             if (((CompressionTypes)flags & NoOp) != 0) info.AppendLine("Data for this MipMap is stored external!");
+            if (((CompressionTypes)flags & CompressionTypes.StoreInSeparatefile) != 0)
+            {
+                info.AppendLine("Data for this MipMap is stored in tfc");
+                if (compressedSize == 0)
+                {
+                    info.AppendLine("TFC data was not found. Searched for tfc file at " + textureCachePath);
+                }
+            }
+                
+
             info.AppendLine("Compressed Size: " + compressedSize);
             info.AppendLine("Uncompressed Size: " + uncompressedSize);
             info.AppendLine("Blocks: " + blocks.Count);

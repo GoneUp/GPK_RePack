@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.ServiceModel.Configuration;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using GPK_RePack.Editors;
@@ -103,23 +105,34 @@ namespace GPK_RePack.IO
             }
         }
 
-
+        //in thread
         public static void DumpMassTextures(GpkStore store, String outdir, Dictionary<String, List<CompositeMapEntry>> filterList)
         {
             logger.Info("Started dumping textures to " + outdir);
             Directory.CreateDirectory(outdir);
 
-            List<Task> runningTasks = new List<Task>();
+            SynchronizedCollection<Task> runningTasks = new SynchronizedCollection<Task>();
+
+            int MAX_TASKS = 100;
 
             foreach (var file in filterList)
             {
+                //throttle thread creation
+                while (runningTasks.Count > MAX_TASKS)
+                {
+                    Thread.Sleep(1000);
+                }
+
+
+                //create out dir
                 var fileOutPath = string.Format("{0}\\{1}.gpk\\", outdir, file.Key);
                 Directory.CreateDirectory(fileOutPath);
 
                 //limit to 5 threads by default
                 foreach (var entry in file.Value)
                 {
-                    Task newTask = new Task(() =>
+                    Task newTask = null; 
+                    newTask = new Task(() =>
                     {
                         string path = string.Format("{0}\\{1}.gpk", store.BaseSearchPath, entry.SubGPKName);
 
@@ -149,15 +162,19 @@ namespace GPK_RePack.IO
                         }
 
                         package = null;
+                        runningTasks.Remove(newTask);
                     });
+
 
                     newTask.Start();
                     runningTasks.Add(newTask);
-                }
+
+                    
+                }  
             }
 
             Task.WaitAll(runningTasks.ToArray());
-
+            
 
             NLogConfig.EnableFormLogging();
             logger.Info("Dumping done");

@@ -245,7 +245,7 @@ namespace GPK_RePack.Forms
             }
 
             //display info while loading
-            while (!Task.WaitAll(runningTasks.ToArray(), 500))
+            while (!Task.WaitAll(runningTasks.ToArray(), 50))
             {
                 Application.DoEvents();
                 DisplayStatus(runningReaders, "Loading", start);
@@ -344,9 +344,22 @@ namespace GPK_RePack.Forms
             foreach (IProgress p in list)
             {
                 Status stat = p.GetStatus();
-                actual += stat.progress;
-                total += stat.totalobjects;
-                if (stat.finished) finished++;
+                if (stat.subGpkCount > 1)
+                {
+                    //dont show actual objects, just the sub-file count
+                    actual += stat.subGpkDone;
+                    total += stat.subGpkCount;
+                    if (actual == total) finished++;
+                }
+                else
+                {
+                    //normal gpk 
+                    actual += stat.progress;
+                    total += stat.totalobjects;
+                    if (stat.finished) finished++;
+                }
+
+
             }
 
             if (finished < list.Count)
@@ -403,6 +416,7 @@ namespace GPK_RePack.Forms
             }
             treeMain.BeginUpdate();
             treeMain.Nodes.Clear();
+            var toAdd = new List<TreeNode>();
 
             for (int i = 0; i < gpkStore.LoadedGpkPackages.Count; i++)
             {
@@ -471,11 +485,12 @@ namespace GPK_RePack.Forms
 
                 }
 
-                treeMain.Nodes.Add(nodeP);
+                toAdd.Add(nodeP);
+                
             }
 
 
-
+            treeMain.Nodes.AddRange(toAdd.ToArray());
             treeMain.Sort();
             treeMain.EndUpdate();
         }

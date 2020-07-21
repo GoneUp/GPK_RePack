@@ -41,7 +41,7 @@ namespace GPK_RePack.IO
 
                     var fileID = string.Format("{0}_{1}", Path.GetFileName(path), reader.BaseStream.Position);
                     logger = LogManager.GetLogger("[Reader:" + fileID + "]");
-                    logger.Info("Reading Start");
+                    logger.Debug("Reading Start");
 
                     tmpGPK.Filename = fileID;
                     tmpGPK.Path = path;
@@ -74,15 +74,18 @@ namespace GPK_RePack.IO
 
                 //header is read, let us extract the data and read it
                 List<GpkPackage> returnPackageList = new List<GpkPackage>();
+                stat = new Status();
+                stat.subGpkCount = tmpPackageList.Count;
 
                 foreach (var subGPK in tmpPackageList)
                 {
-                    stat = new Status();
+                    
                     reader.BaseStream.Seek(subGPK.CompositeStartOffset, SeekOrigin.Begin);
                     var data = reader.ReadBytes((int)subGPK.OrginalSize);
-
                     var fullGpk = ReadSubGpkPackage(subGPK, data, skipExportData, stat);
                     returnPackageList.Add(fullGpk);
+
+                    stat.subGpkDone++;
                 }
 
                 reader.Close();
@@ -253,7 +256,7 @@ namespace GPK_RePack.IO
             if (package.x64) package.Header.Unk3 = reader.ReadBytes(12);
 
             stat.totalobjects = package.Header.NameCount + package.Header.ImportCount + package.Header.ExportCount * 3; //Export, Export Linking, ExportData = *3
-            logger.Info("File Info: NameCount {0}, ImportCount {1}, ExportCount {2}", package.Header.NameCount, package.Header.ImportCount, package.Header.ExportCount);
+            logger.Debug("File Info: NameCount {0}, ImportCount {1}, ExportCount {2}", package.Header.NameCount, package.Header.ImportCount, package.Header.ExportCount);
 
             package.Header.FGUID = reader.ReadBytes(16);
             //logger.Info("FGUID " + package.Header.FGUID);

@@ -14,6 +14,9 @@ namespace GPK_RePack.IO
 {
     struct Status
     {
+        public int subGpkCount;
+        public int subGpkDone;
+
         public int progress;
         public int totalobjects;
         public long time;
