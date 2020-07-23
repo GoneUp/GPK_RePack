@@ -21,12 +21,11 @@ namespace GPK_RePack.Model.Payload
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public GpkExport objectExport;
         public byte[] startUnk;
         public string tgaPath;
         public bool inUnicode = false;
         public byte[] guid;
-
+        public FileFormat parsedImageFormat;
 
         private const CompressionTypes NothingToDo = CompressionTypes.Unused | CompressionTypes.StoreInSeparatefile;
 
@@ -69,7 +68,7 @@ namespace GPK_RePack.Model.Payload
                     int chunkSize = 16 + map.blocks.Count * 8 + map.compressedSize;
                     if (chunkSize != map.compChunkSize)
                     {
-                        logger.Debug("fixing chunksize for " + objectExport.ObjectName);
+                        logger.Debug("fixing chunksize for " + export.ObjectName);
                         map.compChunkSize = chunkSize;
                     }
 
@@ -124,10 +123,10 @@ namespace GPK_RePack.Model.Payload
 
         public void ReadData(GpkPackage package, GpkExport export)
         {
-            objectExport = export;
             BinaryReader reader = new BinaryReader(new MemoryStream(export.Data));
             IProperty formatProp = export.Properties.Find(t => ((GpkBaseProperty)t).name == "Format");
             String format = ((GpkByteProperty)formatProp).nameValue;
+            SaveFormat(export);
 
             startUnk = reader.ReadBytes(12);
             int mipMapCountOffset = reader.ReadInt32();
@@ -308,14 +307,18 @@ namespace GPK_RePack.Model.Payload
         }
 
 
-        public FileFormat GetFormat()
+        public void SaveFormat(GpkExport export)
         {
-            GpkByteProperty formatProp = objectExport.GetProperty("Format") as GpkByteProperty;
-            if (formatProp == null) return FileFormat.Unknown;
-
-            string format = formatProp.nameValue;
-
-            return DdsPixelFormat.ParseFileFormat(format);
+            GpkByteProperty formatProp = export.GetProperty("Format") as GpkByteProperty;
+            if (formatProp == null)
+            {
+                parsedImageFormat = FileFormat.Unknown;
+            }
+            else
+            {
+                string format = formatProp.nameValue;
+                parsedImageFormat = DdsPixelFormat.ParseFileFormat(format);
+            }
         }
 
         public Stream GetObjectStream()
@@ -332,7 +335,7 @@ namespace GPK_RePack.Model.Payload
         private Stream buildDdsImage(int mipMapIndex)
         {
             MipMap mipMap = maps[mipMapIndex];
-            DdsHeader ddsHeader = new DdsHeader(new DdsSaveConfig(GetFormat(), 0, 0, false, false), mipMap.sizeX, mipMap.sizeY);
+            DdsHeader ddsHeader = new DdsHeader(new DdsSaveConfig(parsedImageFormat, 0, 0, false, false), mipMap.sizeX, mipMap.sizeY);
 
             MemoryStream stream = new MemoryStream();
             BinaryWriter writer = new BinaryWriter(stream);
@@ -353,7 +356,7 @@ namespace GPK_RePack.Model.Payload
                 if (maps == null || !maps.Any()) return;
 
                 DdsSaveConfig config = configuration as DdsSaveConfig ?? new DdsSaveConfig(FileFormat.Unknown, 0, 0, false, false);
-                config.FileFormat = GetFormat();
+                config.FileFormat = parsedImageFormat;
 
                 //parse uncompressed image
                 DdsFile ddsImage = new DdsFile(GetObjectStream());

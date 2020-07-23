@@ -30,7 +30,7 @@ namespace GPK_RePack.Editors
                 if (image == null || ddsFile == null)
                     return;
 
-                image.SaveObject(file, new DdsSaveConfig(image.GetFormat(), 0, 0, false, false));
+                image.SaveObject(file, new DdsSaveConfig(image.parsedImageFormat, 0, 0, false, false));
             }
             catch (Exception ex)
             {
@@ -47,7 +47,7 @@ namespace GPK_RePack.Editors
                 var texture2d = export.Payload as Texture2D;
 
                 var image = new DdsFile();
-                var config = new DdsSaveConfig(texture2d.GetFormat(), 0, 0, false, false);
+                var config = new DdsSaveConfig(texture2d.parsedImageFormat, 0, 0, false, false);
                 image.Load(file);
 
                 if (image.MipMaps.Count == 0 || Settings.Default.GenerateMipMaps)

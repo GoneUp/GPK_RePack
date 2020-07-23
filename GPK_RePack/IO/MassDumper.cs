@@ -161,7 +161,10 @@ namespace GPK_RePack.IO
                             logger.Info("Extracted texture {0} to {1}", entry.UID, imagePath);
                         }
 
+                        //remove ref to ease gc
+                        exports.Clear();
                         package = null;
+
                         runningTasks.Remove(newTask);
                     });
 

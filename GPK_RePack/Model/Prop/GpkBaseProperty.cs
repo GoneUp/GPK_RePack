@@ -9,7 +9,6 @@ namespace GPK_RePack.Model.Prop
         public string type; //long index
         public int size;
         public int arrayIndex;
-        public object value;
 
         public GpkBaseProperty()
         {

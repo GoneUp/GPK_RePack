@@ -1505,6 +1505,7 @@ namespace GPK_RePack.Forms
             }
             catch (Exception ex)
             {
+                logger.Error(ex, "filter fail");
                 return gpkStore.CompositeMap;
             }
         }
