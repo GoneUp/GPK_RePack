@@ -343,7 +343,10 @@ namespace GPK_RePack.Forms
             long actual = 0, total = 0, finished = 0;
             foreach (IProgress p in list)
             {
+                if (p == null) continue;
                 Status stat = p.GetStatus();
+
+
                 if (stat.subGpkCount > 1)
                 {
                     //dont show actual objects, just the sub-file count
@@ -486,7 +489,7 @@ namespace GPK_RePack.Forms
                 }
 
                 toAdd.Add(nodeP);
-                
+
             }
 
 
@@ -539,53 +542,60 @@ namespace GPK_RePack.Forms
             var tabIndex = tabControl.SelectedIndex;
             ResetGUI();
 
-            if (e.Node.Level == 0)
+            try
             {
-                boxGeneralButtons.Enabled = true;
-                boxDataButtons.Enabled = true;
-
-                selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Name)];
-                boxInfo.Text = selectedPackage.ToString();
-            }
-            else if (e.Node.Level == 1 && Settings.Default.ViewMode == "class")
-            {
-                selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Parent.Name)];
-                selectedClass = e.Node.Text;
-
-                boxDataButtons.Enabled = true;
-            }
-
-            //check if we have a leaf
-            else if (e.Node.Level == 2 && Settings.Default.ViewMode == "normal" ||
-                 e.Node.Nodes.Count == 0)
-            {
-                GpkPackage package = gpkStore.LoadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
-                Object selected = package.GetObjectByUID(e.Node.Name);
-
-                if (selected is GpkImport)
+                if (e.Node.Level == 0)
                 {
-                    GpkImport imp = (GpkImport)selected;
-                    boxInfo.Text = imp.ToString();
-
-                }
-                else if (selected is GpkExport)
-                {
-                    GpkExport exp = (GpkExport)selected;
-
-                    //buttons
                     boxGeneralButtons.Enabled = true;
                     boxDataButtons.Enabled = true;
-                    boxPropertyButtons.Enabled = true;
-                    selectedExport = exp;
-                    selectedPackage = package;
 
-                    refreshExportInfo();
+                    selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Name)];
+                    boxInfo.Text = selectedPackage.ToString();
+                }
+                else if (e.Node.Level == 1 && Settings.Default.ViewMode == "class")
+                {
+                    selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Parent.Name)];
+                    selectedClass = e.Node.Text;
+
+                    boxDataButtons.Enabled = true;
+                }
+
+                //check if we have a leaf
+                else if (e.Node.Level == 2 && Settings.Default.ViewMode == "normal" ||
+                     e.Node.Nodes.Count == 0)
+                {
+                    GpkPackage package = gpkStore.LoadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
+                    Object selected = package.GetObjectByUID(e.Node.Name);
+
+                    if (selected is GpkImport)
+                    {
+                        GpkImport imp = (GpkImport)selected;
+                        boxInfo.Text = imp.ToString();
+
+                    }
+                    else if (selected is GpkExport)
+                    {
+                        GpkExport exp = (GpkExport)selected;
+
+                        //buttons
+                        boxGeneralButtons.Enabled = true;
+                        boxDataButtons.Enabled = true;
+                        boxPropertyButtons.Enabled = true;
+                        selectedExport = exp;
+                        selectedPackage = package;
+
+                        refreshExportInfo();
+                    }
+                }
+
+                if (tabIndex < tabControl.TabCount)
+                {
+                    tabControl.SelectedIndex = tabIndex;
                 }
             }
-
-            if (tabIndex < tabControl.TabCount)
+            catch (Exception ex)
             {
-                tabControl.SelectedIndex = tabIndex;
+                logger.Error(ex, "Error while trying to display infotext.");
             }
         }
 
