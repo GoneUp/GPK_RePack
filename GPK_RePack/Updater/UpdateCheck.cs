@@ -18,7 +18,7 @@ namespace GPK_RePack.Updater
         private static Logger logger;
 
         private static string UPDATE_URL = "https://raw.githubusercontent.com/GoneUp/GPK_RePack/master/versioncode";
-        private static int APP_VERSION = 15;
+        private static int APP_VERSION = 16;
 
 
         public static void checkForUpdate(UpdaterCheckCallback callback)

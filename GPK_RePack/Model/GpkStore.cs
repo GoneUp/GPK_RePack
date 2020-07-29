@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -67,7 +68,16 @@ namespace GPK_RePack.Model
                     Writer tmpS = new Writer();
                     Task newTask = new Task(() =>
                     {
-                        string savepath = package.Path + Settings.Default.SaveFileSuffix;
+                        string savepath = null;
+                        if (!package.CompositeGpk)
+                        {
+                            savepath = package.Path + Settings.Default.SaveFileSuffix;
+                        }
+                        else
+                        {
+                            savepath = String.Format("{0}\\{1}{2}",Path.GetDirectoryName(package.Path), package.Filename, Settings.Default.SaveFileSuffix);
+                        }
+
                         tmpS.SaveGpkPackage(package, savepath, usePadding);
                     });
                     newTask.Start();

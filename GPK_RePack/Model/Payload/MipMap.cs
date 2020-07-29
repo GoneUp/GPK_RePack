@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GPK_RePack.Model.Prop;
 using Ionic.Zip;
 using Ionic.Zlib;
 using Lzo64;
@@ -34,6 +35,7 @@ namespace GPK_RePack.Model.Payload
 
         public byte[] uncompressedData;
 
+        public GpkNameProperty textureCacheProp;
         public string textureCachePath = "";
 
         public List<ChunkBlock> blocks = new List<ChunkBlock>();
@@ -76,16 +78,29 @@ namespace GPK_RePack.Model.Payload
             StringBuilder info = new StringBuilder();
             info.AppendFormat("Size: {0} x {1} {2}", sizeX, sizeY, Environment.NewLine);
             info.AppendLine("Compression: " + flags);
-            if (((CompressionTypes)flags & NoOp) != 0) info.AppendLine("Data for this MipMap is stored external!");
+
             if (((CompressionTypes)flags & CompressionTypes.StoreInSeparatefile) != 0)
             {
-                info.AppendLine("Data for this MipMap is stored in tfc");
-                if (compressedSize == 0)
+
+                if (textureCacheProp != null)
                 {
-                    info.AppendLine("TFC data was not found. Searched for tfc file at " + textureCachePath);
+                    info.AppendLine("Data for this MipMap is stored in tfc " + textureCacheProp.value);
                 }
+                else
+                {
+                    info.AppendLine("Data for this MipMap is stored in tfc");
+                }
+
+                if (compressedSize == 0)
+                    info.AppendLine("TFC data was not found. Searched for tfc file at " + textureCachePath);
+
             }
-                
+            else if (((CompressionTypes)flags & NoOp) != 0)
+            {
+                info.AppendLine("Data for this MipMap is stored external!");
+            }
+
+
 
             info.AppendLine("Compressed Size: " + compressedSize);
             info.AppendLine("Uncompressed Size: " + uncompressedSize);

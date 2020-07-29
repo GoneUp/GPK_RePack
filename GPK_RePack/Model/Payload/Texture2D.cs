@@ -107,7 +107,7 @@ namespace GPK_RePack.Model.Payload
                 }
                 else
                 {
-                    //TODO: check if this really works? :o
+                    //TODO: BREAKS TFC files
                     writer.Write((int)-1); //chunksize
                     writer.Write((int)-1); //chunkoffset
                     logger.Trace("writing {0}, MipMap {0}, with no data!!", export.ObjectName, map);
@@ -177,6 +177,7 @@ namespace GPK_RePack.Model.Payload
                     String txtCacheFile = ((GpkNameProperty)txtProp).value;
 
                     //assumption: cache in same dir, happens for cookedpc compositegpks
+                    map.textureCacheProp = ((GpkNameProperty)txtProp);
                     map.textureCachePath = $"{Path.GetDirectoryName(package.Path)}\\{txtCacheFile}.tfc";
                     if (File.Exists(map.textureCachePath))
                     {

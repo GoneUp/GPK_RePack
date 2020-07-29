@@ -47,6 +47,26 @@ namespace GPK_RePack.Model.Payload
 
         }
 
+        /*
+         * 
+         * pkg compression strat
+         * 
+         * if compflag is set reserve chunkblockheader space in header based on sizeestimation
+         * write file
+         * go back to chunkblockheader, generate chunkheaders
+         * allocate subblocks for chunks
+         * compress subblocks
+         * write chunkblockheaders. last action.
+         * ez win
+         * */
+        public void Compress(byte[] uncompressedData, int blockCount, BinaryWriter writer, int compFlag)
+        {
+            //131072 subblocksize
+            //8 subblocks in one block = 1048576
+            //n blocks
+           
+
+        }
 
     }
 }
