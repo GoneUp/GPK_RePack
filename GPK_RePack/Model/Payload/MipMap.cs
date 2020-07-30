@@ -16,9 +16,6 @@ namespace GPK_RePack.Model.Payload
     [Serializable]
     class MipMap
     {
-        public static int DEFAULT_BLOCKSIZE = 131072;
-        public static uint DEFAULT_SIGNATURE = 0x9e2a83c1;
-
         public int sizeX;
         public int sizeY;
 
@@ -27,8 +24,8 @@ namespace GPK_RePack.Model.Payload
         public int compChunkSize;
         public int compChunkOffset;
 
-        public uint signature = DEFAULT_SIGNATURE;
-        public int blocksize = DEFAULT_BLOCKSIZE;
+        public int signature = Constants.DEFAULT_SIGNATURE;
+        public int blocksize = Constants.DEFAULT_BLOCKSIZE;
 
         public int compressedSize;
         public int uncompressedSize_chunkheader;

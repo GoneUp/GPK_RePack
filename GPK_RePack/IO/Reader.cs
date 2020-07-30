@@ -330,7 +330,7 @@ namespace GPK_RePack.IO
         private void CheckSignature(int sig)
         {
             //A quick validty check
-            if (sig != -1641380927) //0x9E2A83C1
+            if (sig != Constants.DEFAULT_SIGNATURE) //0x9E2A83C1
             {
                 throw new Exception("Not a valid GPK File. Signature Check failed!");
             }
@@ -339,8 +339,6 @@ namespace GPK_RePack.IO
 
         private void FixNameCount(GpkPackage package)
         {
-
-            bool t = ((GpkPackageFlags)package.Header.PackageFlags & GpkPackageFlags.BrokenLinks) > 0;
             package.Header.NameCount -= package.Header.NameOffset;
         }
 
@@ -357,16 +355,16 @@ namespace GPK_RePack.IO
             foreach (var header in package.Header.ChunkHeaders)
             {
                 reader.BaseStream.Seek(header.CompressedOffset, SeekOrigin.Begin);
-                PackageChunkBlock block = new PackageChunkBlock();
+                PackageChunkBlock chunk = new PackageChunkBlock();
 
-                block.signature = reader.ReadInt32();
-                block.blocksize = reader.ReadInt32();
-                block.compressedSize = reader.ReadInt32();
-                block.uncompressedSize_chunkheader = reader.ReadInt32();
+                chunk.signature = reader.ReadInt32();
+                chunk.blocksize = reader.ReadInt32();
+                chunk.compressedSize = reader.ReadInt32();
+                chunk.uncompressedSize_chunkheader = reader.ReadInt32();
 
-                int chunkCount = (block.uncompressedSize_chunkheader + block.blocksize - 1) / block.blocksize;
+                int blockCount = Convert.ToInt32(Math.Ceiling(chunk.uncompressedSize_chunkheader / (double)chunk.blocksize));
                 byte[] uncompressedBytes = new byte[header.UncompressedSize];
-                block.Decompress(uncompressedBytes, chunkCount, reader, package.Header.CompressionFlags);
+                chunk.Decompress(uncompressedBytes, blockCount, reader, package.Header.CompressionFlags);
 
                 Array.ConstrainedCopy(uncompressedBytes, 0, completeFile, header.UncompressedOffset, header.UncompressedSize);
             }
@@ -818,9 +816,9 @@ namespace GPK_RePack.IO
             if (reader.BaseStream.Position + 4 > reader.BaseStream.Length)
                 return false;
 
-            var sig = reader.ReadUInt32();
+            var sig = reader.ReadInt32();
             reader.BaseStream.Seek(-4, SeekOrigin.Current);
-            return sig == 0x9E2A83C1; //0x9E2A83C1  -1641380927
+            return sig == Constants.DEFAULT_SIGNATURE; //0x9E2A83C1  -1641380927
         }
 
 

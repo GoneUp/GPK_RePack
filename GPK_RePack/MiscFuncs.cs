@@ -183,7 +183,7 @@ namespace GPK_RePack
                 TreeNode tx = (TreeNode)x;
                 TreeNode ty = (TreeNode)y;
 
-                return String.Compare(tx.Text, ty.Text);
+                return string.Compare(tx.Text, ty.Text);
             }
         }
     }

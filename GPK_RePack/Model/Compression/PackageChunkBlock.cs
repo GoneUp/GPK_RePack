@@ -59,12 +59,18 @@ namespace GPK_RePack.Model.Payload
          * write chunkblockheaders. last action.
          * ez win
          * */
-        public void Compress(byte[] uncompressedData, int blockCount, BinaryWriter writer, int compFlag)
+        public void Compress(byte[] uncompressedData, int blockCount, int compFlag)
         {
             //131072 subblocksize
             //8 subblocks in one block = 1048576
             //n blocks
-           
+
+            for (int j = 0; j < blockCount; j++)
+            {
+                var block = new ChunkBlock();
+
+            }
+
 
         }
 

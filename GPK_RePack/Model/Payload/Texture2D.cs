@@ -105,11 +105,18 @@ namespace GPK_RePack.Model.Payload
                     }
 
                 }
+                else if (((CompressionTypes)map.flags & CompressionTypes.StoreInSeparatefile) != 0)
+                {
+                    //tfc case
+                    //we don't change anything for now
+                    writer.Write(map.compChunkSize);
+                    writer.Write(map.compChunkOffset); 
+                }
                 else
                 {
-                    //TODO: BREAKS TFC files
-                    writer.Write((int)-1); //chunksize
-                    writer.Write((int)-1); //chunkoffset
+                    //what ends here?
+                    writer.Write(map.compChunkSize); //chunksize
+                    writer.Write(map.compChunkOffset); //chunkoffset
                     logger.Trace("writing {0}, MipMap {0}, with no data!!", export.ObjectName, map);
                 }
 
@@ -184,9 +191,9 @@ namespace GPK_RePack.Model.Payload
                         BinaryReader cacheReader = new BinaryReader(new FileStream(map.textureCachePath, FileMode.Open, FileAccess.Read, FileShare.Read));
                         cacheReader.BaseStream.Seek(map.compChunkOffset, SeekOrigin.Begin);
 
-                        map.signature = cacheReader.ReadUInt32(); //0x9e2a83c1
+                        map.signature = cacheReader.ReadInt32(); //0x9e2a83c1
                         cacheReader.BaseStream.Seek(-4, SeekOrigin.Current);
-                        if (map.signature == MipMap.DEFAULT_SIGNATURE)
+                        if (map.signature == Constants.DEFAULT_SIGNATURE)
                         {
                             ReadMipMapFromReader(cacheReader, map, package);
                         }
@@ -226,8 +233,8 @@ namespace GPK_RePack.Model.Payload
 
         private void ReadMipMapFromReader(BinaryReader reader, MipMap map, GpkPackage package)
         {
-            map.signature = reader.ReadUInt32(); //0x9e2a83c1
-            Debug.Assert(map.signature == MipMap.DEFAULT_SIGNATURE);
+            map.signature = reader.ReadInt32(); //0x9e2a83c1
+            Debug.Assert(map.signature == Constants.DEFAULT_SIGNATURE);
 
             map.blocksize = reader.ReadInt32();
 

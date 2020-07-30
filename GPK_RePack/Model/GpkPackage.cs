@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using GPK_RePack.Forms;
 using GPK_RePack.IO;
+using GPK_RePack.Model.Payload;
 using GPK_RePack.Properties;
 
 namespace GPK_RePack.Model
@@ -21,7 +24,7 @@ namespace GPK_RePack.Model
         public long CompositeStartOffset;
         public long CompressedEndOffset = 0;
 
-        
+
         public long OrginalSize; //raw compressed size
         public long UncompressedSize;
 
@@ -40,7 +43,7 @@ namespace GPK_RePack.Model
 
         public readonly int datapuffer = 10;
         public bool x64;
-        
+
 
         public GpkPackage()
         {
@@ -236,7 +239,7 @@ namespace GPK_RePack.Model
 
             throw new Exception(string.Format("Object {0} not found!", uid));
         }
-#endregion
+        #endregion
 
         public List<GpkExport> GetExportsByClass(string className)
         {
@@ -267,6 +270,55 @@ namespace GPK_RePack.Model
             GUI.logger.Debug("Removed {0} unused strings", count);
             Header.RecalculateCounts(this);
             GetSize(true);
+        }
+
+        public int EstimateChunkHeaderCount()
+        {
+            int chunkheadercount = (GetSize(false) / Constants.DEFAULT_CHUNKSIZE) + 1;
+            Header.EstimatedChunkHeaderCount = chunkheadercount;
+            return chunkheadercount;
+        }
+
+        public void GenerateChunkHeaders(int dataSize, int dataStartOffset)
+        {
+            int chunkheadercount = (dataSize / Constants.DEFAULT_CHUNKSIZE) + 1;
+            int oldChunkheadercount = Header.ChunkHeaders.Count();
+
+            Header.ChunkHeaders.Clear();
+
+            int dataOffset = dataStartOffset;
+            for (int i = 0; i < chunkheadercount; i++)
+            {
+                var chunkHeader = new GpkCompressedChunkHeader();
+                chunkHeader.UncompressedOffset = dataOffset;
+                chunkHeader.UncompressedSize = Constants.DEFAULT_CHUNKSIZE;
+
+                var chunkData = new PackageChunkBlock();
+                chunkData.signature = Constants.DEFAULT_SIGNATURE;
+                chunkData.blocksize = Constants.DEFAULT_BLOCKSIZE;
+
+                if (dataOffset + Constants.DEFAULT_CHUNKSIZE > dataSize)
+                {
+                    //ending
+                    chunkData.uncompressedSize_chunkheader = dataSize - dataOffset;
+                }
+                else
+                {
+                    chunkData.uncompressedSize_chunkheader = Constants.DEFAULT_CHUNKSIZE;
+                }
+
+                //chunks has blocks
+                int blockCount = Convert.ToInt32(Math.Ceiling(chunkData.uncompressedSize_chunkheader / (double)chunkData.blocksize));
+                byte[] uncompressedChunkData = new byte[chunkData.uncompressedSize_chunkheader];
+
+
+                chunkData.Compress(null, blockCount, Header.CompressionFlags);
+           
+
+
+                //END
+                dataOffset += chunkData.uncompressedSize_chunkheader;
+            }
         }
 
         public int GetSize(bool fixOffsets)

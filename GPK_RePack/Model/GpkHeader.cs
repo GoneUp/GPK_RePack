@@ -32,6 +32,7 @@ namespace GPK_RePack.Model
         public int CookerVersion;
         public int CompressionFlags;
 
+        public int EstimatedChunkHeaderCount; 
         public List<GpkCompressedChunkHeader> ChunkHeaders = new List<GpkCompressedChunkHeader>();
 
         public void RecalculateCounts(GpkPackage package)

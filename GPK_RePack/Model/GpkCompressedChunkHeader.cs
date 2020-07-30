@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GPK_RePack.Model.Interfaces;
+using GPK_RePack.Model.Payload;
 
 namespace GPK_RePack.Model
 {
@@ -20,6 +21,8 @@ namespace GPK_RePack.Model
         public int UncompressedSize;
         public int CompressedOffset;
         public int CompressedSize;
+
+        public PackageChunkBlock writableChunkblock;
     }
 
     

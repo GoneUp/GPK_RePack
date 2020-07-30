@@ -17,10 +17,6 @@ namespace GPK_RePack.Updater
         //bump version on new release
         private static Logger logger;
 
-        private static string UPDATE_URL = "https://raw.githubusercontent.com/GoneUp/GPK_RePack/master/versioncode";
-        private static int APP_VERSION = 16;
-
-
         public static void checkForUpdate(UpdaterCheckCallback callback)
         {           
 
@@ -32,7 +28,7 @@ namespace GPK_RePack.Updater
                 try
                 {
                     WebClient wc = new WebClient();
-                    output = wc.DownloadString(UPDATE_URL);
+                    output = wc.DownloadString(Constants.UPDATE_URL);
                     onlineVersionCode = Int32.Parse(output);
                 }
                 catch (Exception we)
@@ -42,10 +38,10 @@ namespace GPK_RePack.Updater
                 }
 
                 
-                logger.Debug("Online Versioncode {0}, Appversion {1}", onlineVersionCode, APP_VERSION);
+                logger.Debug("Online Versioncode {0}, Appversion {1}", onlineVersionCode, Constants.APP_VERSION);
                 if (callback != null)
                 {
-                    callback.postUpdateResult(onlineVersionCode > APP_VERSION);
+                    callback.postUpdateResult(onlineVersionCode > Constants.APP_VERSION);
                 }
             });
             newTask.Start();
