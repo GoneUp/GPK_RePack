@@ -279,7 +279,7 @@ namespace GPK_RePack.Model
             return chunkheadercount;
         }
 
-        public void GenerateChunkHeaders(int dataSize, int dataStartOffset)
+        public void GenerateChunkHeaders(int dataSize, int dataStartOffset, byte[] buffer)
         {
             int chunkheadercount = (dataSize / Constants.DEFAULT_CHUNKSIZE) + 1;
             int oldChunkheadercount = Header.ChunkHeaders.Count();
@@ -291,7 +291,7 @@ namespace GPK_RePack.Model
             {
                 var chunkHeader = new GpkCompressedChunkHeader();
                 chunkHeader.UncompressedOffset = dataOffset;
-                chunkHeader.UncompressedSize = Constants.DEFAULT_CHUNKSIZE;
+                
 
                 var chunkData = new PackageChunkBlock();
                 chunkData.signature = Constants.DEFAULT_SIGNATURE;
@@ -310,11 +310,16 @@ namespace GPK_RePack.Model
                 //chunks has blocks
                 int blockCount = Convert.ToInt32(Math.Ceiling(chunkData.uncompressedSize_chunkheader / (double)chunkData.blocksize));
                 byte[] uncompressedChunkData = new byte[chunkData.uncompressedSize_chunkheader];
+                Array.ConstrainedCopy(buffer, dataOffset, uncompressedChunkData, 0, chunkData.uncompressedSize_chunkheader);
 
 
-                chunkData.Compress(null, blockCount, Header.CompressionFlags);
-           
+                chunkData.Compress(uncompressedChunkData, blockCount, Constants.DEFAULT_BLOCKSIZE, Header.CompressionFlags);
 
+                //set final data
+                chunkHeader.writableChunkblock = chunkData;
+                chunkHeader.UncompressedSize = chunkData.uncompressedSize_chunkheader;
+
+                Header.ChunkHeaders.Add(chunkHeader);
 
                 //END
                 dataOffset += chunkData.uncompressedSize_chunkheader;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GPK_RePack.Model.Interfaces;
+using GPK_RePack.Properties;
 
 namespace GPK_RePack.Model
 {
@@ -42,10 +43,18 @@ namespace GPK_RePack.Model
             ImportCount = package.ImportList.Count;
         }
 
+        public bool IsCompressed()
+        {
+            return CompressionFlags != 0;
+        }
+
 
         public int GetSize()
         {
-            return FileVersion >= 0x381 ? 125 : 109;
+            int size = FileVersion >= 0x381 ? 125 : 109;
+            if (Settings.Default.EnableCompression)
+                size += 16 * ChunkHeaders.Count;
+            return size;
         }
     }
 }

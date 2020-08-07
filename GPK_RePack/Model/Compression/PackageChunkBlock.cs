@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace GPK_RePack.Model.Payload
 {
@@ -22,6 +23,7 @@ namespace GPK_RePack.Model.Payload
         public void Decompress(byte[] uncompressedData, int blockCount, BinaryReader reader, int compFlag)
         {
             int blockOffset = 0;
+            chunkBlocks.Clear();
 
             for (int j = 0; j < blockCount; ++j)
             {
@@ -59,16 +61,38 @@ namespace GPK_RePack.Model.Payload
          * write chunkblockheaders. last action.
          * ez win
          * */
-        public void Compress(byte[] uncompressedData, int blockCount, int compFlag)
+        public void Compress(byte[] uncompressedData, int blockCount, int blockSize, int compFlag)
         {
             //131072 subblocksize
             //8 subblocks in one block = 1048576
             //n blocks
 
+            chunkBlocks.Clear();
+            compressedSize = 0;
+            int dataOffset = 0;
             for (int j = 0; j < blockCount; j++)
             {
-                var block = new ChunkBlock();
+                int toCompress = blockSize;
+                if (dataOffset + blockSize > uncompressedData.Length)
+                {
+                    toCompress = uncompressedData.Length - dataOffset;
+                }
 
+
+                var blockBuffer = new byte[toCompress];
+                Array.ConstrainedCopy(uncompressedData, dataOffset, blockBuffer, 0, toCompress);
+
+                var block = new ChunkBlock();
+                block.uncompressedDataSize = toCompress;
+                block.uncompressedData = blockBuffer;
+
+                //do it
+                block.compressPackageFlags(compFlag);
+
+                compressedSize += block.compressedSize;
+                chunkBlocks.Add(block);
+
+                dataOffset += toCompress;
             }
 
 

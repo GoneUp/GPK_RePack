@@ -256,5 +256,17 @@ namespace GPK_RePack.Properties {
                 this["CookedPCPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool EnableCompression {
+            get {
+                return ((bool)(this["EnableCompression"]));
+            }
+            set {
+                this["EnableCompression"] = value;
+            }
+        }
     }
 }

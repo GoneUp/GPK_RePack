@@ -112,20 +112,32 @@ namespace GPK_RePack.Model
                 //uncompressed
                 compressedData = (byte[])(uncompressedData.Clone());
             }
+            else if (((CompressionTypes)compFlag & CompressionTypes.ZLIB) > 0)
+            {
+                compressZLIB();
+            }
+            else if (((CompressionTypes)compFlag & CompressionTypes.LZX) > 0)
+            {
+                logger.Error("Found COMPRESS_LZX, unsupported!");
+            }
+            else if (((CompressionTypes)compFlag & CompressionTypes.LZO) > 0)
+            {
+                compressLZO();
+            }
+
+            compressedSize = compressedData.Length;
+        }
+
+        public void compressPackageFlags(int compFlag)
+        {
+            if (compFlag == 0)
+            {
+                //uncompressed
+                compressedData = (byte[])(uncompressedData.Clone());
+            }
             else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.ZLIB) > 0)
             {
-                try
-                {
-                    var byteStream = new MemoryStream();
-                    var outStream = new ZlibStream(byteStream, CompressionMode.Compress);
-                    outStream.Write(uncompressedData, 0, uncompressedData.Length);
-                    compressedData = byteStream.GetBuffer();
-
-                }
-                catch (Exception e)
-                {
-                    logger.Error(e);
-                }
+                compressZLIB();
             }
             else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.LZX) > 0)
             {
@@ -133,13 +145,34 @@ namespace GPK_RePack.Model
             }
             else if (((CompressionTypesPackage)compFlag & CompressionTypesPackage.LZO) > 0)
             {
-                lock (lockObject)
-                {
-                    compressedData = lzo.Compress(uncompressedData, false);
-                }
+                compressLZO();
             }
 
             compressedSize = compressedData.Length;
+        }
+
+        private void compressZLIB()
+        {
+            try
+            {
+                var byteStream = new MemoryStream();
+                var outStream = new ZlibStream(byteStream, CompressionMode.Compress);
+                outStream.Write(uncompressedData, 0, uncompressedData.Length);
+                compressedData = byteStream.GetBuffer();
+
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+            }
+        }
+
+        private void compressLZO()
+        {
+            lock (lockObject)
+            {
+                compressedData = lzo.Compress(uncompressedData, false);
+            }
         }
     }
 }

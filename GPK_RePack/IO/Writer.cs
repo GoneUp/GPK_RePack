@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Windows.Controls;
 using GPK_RePack.Model;
 using GPK_RePack.Model.Interfaces;
 using GPK_RePack.Model.Prop;
@@ -71,10 +72,21 @@ namespace GPK_RePack.IO
             int compuSize = package.GetSize(false);
 
             stat.totalobjects = package.Header.NameCount + package.Header.ExportCount * 2 + package.Header.ImportCount; //Export, ExportData = x2
+            Stream dataStream;
 
-            using (BinaryWriter writer = new BinaryWriter(new FileStream(savepath, FileMode.Create)))
+            if (Settings.Default.EnableCompression)
             {
-                WriteHeader(writer, package);
+                //write to mem, write empty header, generate final blocks, compress, write to file
+                dataStream = new MemoryStream();
+            }
+            else
+            {
+                dataStream = new FileStream(savepath, FileMode.Create);
+            }
+
+            using (BinaryWriter writer = new BinaryWriter(dataStream))
+            {
+                WriteHeader(writer, package, Settings.Default.EnableCompression);
                 WriteNamelist(writer, package);
                 WriteImports(writer, package);
                 WriteExports(writer, package);
@@ -89,9 +101,32 @@ namespace GPK_RePack.IO
                 {
                     WriteFileEnding(writer, package, compuSize);
                 }
-
-
             }
+
+            if (Settings.Default.EnableCompression)
+            {
+                var data = ((MemoryStream)dataStream).GetBuffer();
+                //only compress data after the header, starting with the namelist
+                package.GenerateChunkHeaders(data.Length - package.Header.NameOffset, package.Header.NameOffset, data);
+                if (package.Header.EstimatedChunkHeaderCount != package.Header.ChunkHeaders.Count)
+                {
+                    logger.Error("ChunkCount estimation was wrong. Estimated {0} vs {1}", package.Header.EstimatedChunkHeaderCount, package.Header.ChunkHeaders.Count);
+                    return;
+                }
+
+                using (BinaryWriter writer = new BinaryWriter(new FileStream(savepath, FileMode.Create)))
+                {
+                    writer.Write(new byte[package.Header.NameOffset]); //reserve header space
+                    WriteChunkContent(writer, package); 
+
+                    writer.Seek(0, SeekOrigin.Begin);
+                    WriteHeader(writer, package, false); //writer header, now with correct offsets of the chunks
+
+                    logger.Debug("Compressed gpk written. Compu Size: {0}, Diff: {1} -", compuSize, writer.BaseStream.Length - compuSize);
+
+                }
+            }
+
 
             watch.Stop();
             stat.time = watch.ElapsedMilliseconds;
@@ -99,7 +134,7 @@ namespace GPK_RePack.IO
             logger.Info(String.Format("Saved the package '{0} to {1}', took {2}ms!", package.Filename, savepath, stat.time));
         }
 
-        private void WriteHeader(BinaryWriter writer, GpkPackage package)
+        private void WriteHeader(BinaryWriter writer, GpkPackage package, bool reserveChunkheaderSize)
         {
             writer.Write(package.Header.Tag);
             writer.Write(package.Header.FileVersion);
@@ -130,7 +165,7 @@ namespace GPK_RePack.IO
 
             headerSizeOffset = writer.BaseStream.Position;
             if (package.x64) writer.Write(package.Header.HeaderSize);
-            if(package.x64) writer.Write(package.Header.Unk3);
+            if (package.x64) writer.Write(package.Header.Unk3);
 
             writer.Write(package.Header.FGUID);
 
@@ -148,10 +183,40 @@ namespace GPK_RePack.IO
             writer.Write(0xC0FFEEAA); //my signature 
             writer.Write(package.Header.CookerVersion);
 
-            writer.Write((int)0); //compressionFlags, we dont apply this
-            writer.Write((long)0); //unk
-            writer.Write((int)0); 
-           
+            if (Settings.Default.EnableCompression)
+            {
+                writer.Write(package.Header.CompressionFlags); //compressionFlags
+                if (reserveChunkheaderSize)
+                {
+                    int headerCount = package.EstimateChunkHeaderCount();
+                    //16 bytes per chunkheader
+                    writer.Write((int)0); //chunkcount;
+                    writer.Write(new byte[16 * headerCount]);
+                }
+                else
+                {
+                    writer.Write(package.Header.ChunkHeaders.Count); //chunkcount;
+                    foreach (var chunk in package.Header.ChunkHeaders)
+                    {
+                        writer.Write(chunk.UncompressedOffset);
+                        writer.Write(chunk.UncompressedSize);
+                        writer.Write(chunk.CompressedOffset);
+                        writer.Write(chunk.CompressedSize);
+                    }
+                }
+
+            }
+            else
+            {
+                writer.Write((int)0); //compressionFlags
+                writer.Write((int)0); //chunkheadercount
+            }
+
+
+
+            writer.Write((int)0); //unk
+            writer.Write((int)0);
+
 
 
 
@@ -421,11 +486,37 @@ namespace GPK_RePack.IO
 
             logger.Debug("New size: {0}, Old size: {1}", final_size, package.OrginalSize);
             logger.Debug("Compu Size: {0}, Diff: {1} -", compuSize, final_size - compuSize);
-
-
-
-
         }
+
+        private void WriteChunkContent(BinaryWriter writer, GpkPackage package)
+        {
+            logger.Debug("WriteChunkBlocks");
+
+            foreach (var chunk in package.Header.ChunkHeaders)
+            {
+                chunk.CompressedOffset = (int)writer.BaseStream.Length;
+                writer.Write(chunk.writableChunkblock.signature);
+                writer.Write(chunk.writableChunkblock.blocksize);
+                writer.Write(chunk.writableChunkblock.compressedSize);
+                writer.Write(chunk.writableChunkblock.uncompressedSize_chunkheader);
+
+                foreach (var block in chunk.writableChunkblock.chunkBlocks)
+                {
+                    writer.Write(block.compressedSize);
+                    writer.Write(block.uncompressedDataSize);
+                }
+
+                foreach (var block in chunk.writableChunkblock.chunkBlocks)
+                {
+                    writer.Write(block.compressedData);
+                }
+
+                chunk.CompressedSize = (int)writer.BaseStream.Length - chunk.CompressedOffset; //?????
+            }
+
+            logger.Debug("WriteChunkBlocks done");
+        }
+
 
         public static int GetStringBytes(string text, bool isUnicode)
         {
