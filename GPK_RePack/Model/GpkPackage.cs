@@ -261,7 +261,7 @@ namespace GPK_RePack.Model
             return tmpList;
         }
 
-        public void PrepareWriting()
+        public void PrepareWriting(bool enableCompression)
         {
             //set new offsets
             //set coutn values on header
@@ -270,6 +270,17 @@ namespace GPK_RePack.Model
             GUI.logger.Debug("Removed {0} unused strings", count);
             Header.RecalculateCounts(this);
             GetSize(true);
+
+            if (enableCompression)
+            {
+                Header.CompressionFlags = (int)CompressionTypesPackage.LZO;
+            }
+            else
+            {
+                Header.CompressionFlags = 0;
+                Header.ChunkHeaders.Clear();
+                Header.EstimatedChunkHeaderCount = 0;
+            }
         }
 
         public int EstimateChunkHeaderCount()
@@ -286,21 +297,22 @@ namespace GPK_RePack.Model
 
             Header.ChunkHeaders.Clear();
 
-            int dataOffset = dataStartOffset;
+            int bufferOffset = dataStartOffset;
+            int endOfData = dataStartOffset + dataSize;
             for (int i = 0; i < chunkheadercount; i++)
             {
                 var chunkHeader = new GpkCompressedChunkHeader();
-                chunkHeader.UncompressedOffset = dataOffset;
-                
+                chunkHeader.UncompressedOffset = bufferOffset;
+
 
                 var chunkData = new PackageChunkBlock();
                 chunkData.signature = Constants.DEFAULT_SIGNATURE;
                 chunkData.blocksize = Constants.DEFAULT_BLOCKSIZE;
 
-                if (dataOffset + Constants.DEFAULT_CHUNKSIZE > dataSize)
+                if (bufferOffset + Constants.DEFAULT_CHUNKSIZE > endOfData)
                 {
                     //ending
-                    chunkData.uncompressedSize_chunkheader = dataSize - dataOffset;
+                    chunkData.uncompressedSize_chunkheader = endOfData - bufferOffset;
                 }
                 else
                 {
@@ -310,7 +322,7 @@ namespace GPK_RePack.Model
                 //chunks has blocks
                 int blockCount = Convert.ToInt32(Math.Ceiling(chunkData.uncompressedSize_chunkheader / (double)chunkData.blocksize));
                 byte[] uncompressedChunkData = new byte[chunkData.uncompressedSize_chunkheader];
-                Array.ConstrainedCopy(buffer, dataOffset, uncompressedChunkData, 0, chunkData.uncompressedSize_chunkheader);
+                Array.ConstrainedCopy(buffer, bufferOffset, uncompressedChunkData, 0, chunkData.uncompressedSize_chunkheader);
 
 
                 chunkData.Compress(uncompressedChunkData, blockCount, Constants.DEFAULT_BLOCKSIZE, Header.CompressionFlags);
@@ -322,7 +334,7 @@ namespace GPK_RePack.Model
                 Header.ChunkHeaders.Add(chunkHeader);
 
                 //END
-                dataOffset += chunkData.uncompressedSize_chunkheader;
+                bufferOffset += chunkData.uncompressedSize_chunkheader;
             }
         }
 

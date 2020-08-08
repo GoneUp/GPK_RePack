@@ -55,6 +55,7 @@
             this.btnSelectColor = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.boxSavefilePostfix = new System.Windows.Forms.TextBox();
+            this.boxCompression = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -66,21 +67,18 @@
             this.groupBox1.Controls.Add(this.btnProperties);
             this.groupBox1.Controls.Add(this.btnData);
             this.groupBox1.Controls.Add(this.btnDataProps);
-            this.groupBox1.Location = new System.Drawing.Point(18, 18);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(230, 151);
+            this.groupBox1.Size = new System.Drawing.Size(153, 98);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Copy Mode";
             // 
             // btnProperties
             // 
-            this.btnProperties.Location = new System.Drawing.Point(9, 100);
-            this.btnProperties.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnProperties.Location = new System.Drawing.Point(6, 65);
             this.btnProperties.Name = "btnProperties";
-            this.btnProperties.Size = new System.Drawing.Size(160, 26);
+            this.btnProperties.Size = new System.Drawing.Size(107, 17);
             this.btnProperties.TabIndex = 2;
             this.btnProperties.TabStop = true;
             this.btnProperties.Text = "Properties";
@@ -89,10 +87,9 @@
             // 
             // btnData
             // 
-            this.btnData.Location = new System.Drawing.Point(9, 65);
-            this.btnData.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnData.Location = new System.Drawing.Point(6, 42);
             this.btnData.Name = "btnData";
-            this.btnData.Size = new System.Drawing.Size(160, 26);
+            this.btnData.Size = new System.Drawing.Size(107, 17);
             this.btnData.TabIndex = 1;
             this.btnData.TabStop = true;
             this.btnData.Text = "Data";
@@ -102,10 +99,9 @@
             // btnDataProps
             // 
             this.btnDataProps.AutoSize = true;
-            this.btnDataProps.Location = new System.Drawing.Point(9, 29);
-            this.btnDataProps.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnDataProps.Location = new System.Drawing.Point(6, 19);
             this.btnDataProps.Name = "btnDataProps";
-            this.btnDataProps.Size = new System.Drawing.Size(158, 24);
+            this.btnDataProps.Size = new System.Drawing.Size(107, 17);
             this.btnDataProps.TabIndex = 0;
             this.btnDataProps.TabStop = true;
             this.btnDataProps.Text = "Data + Properties";
@@ -117,21 +113,18 @@
             this.groupBox2.Controls.Add(this.btnLogTrace);
             this.groupBox2.Controls.Add(this.btnLogInfo);
             this.groupBox2.Controls.Add(this.btnLogDebug);
-            this.groupBox2.Location = new System.Drawing.Point(18, 178);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox2.Location = new System.Drawing.Point(12, 116);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox2.Size = new System.Drawing.Size(230, 151);
+            this.groupBox2.Size = new System.Drawing.Size(153, 98);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Log Level";
             // 
             // btnLogTrace
             // 
-            this.btnLogTrace.Location = new System.Drawing.Point(9, 100);
-            this.btnLogTrace.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnLogTrace.Location = new System.Drawing.Point(6, 65);
             this.btnLogTrace.Name = "btnLogTrace";
-            this.btnLogTrace.Size = new System.Drawing.Size(160, 26);
+            this.btnLogTrace.Size = new System.Drawing.Size(107, 17);
             this.btnLogTrace.TabIndex = 5;
             this.btnLogTrace.TabStop = true;
             this.btnLogTrace.Text = "Trace";
@@ -141,10 +134,9 @@
             // btnLogInfo
             // 
             this.btnLogInfo.AutoSize = true;
-            this.btnLogInfo.Location = new System.Drawing.Point(9, 29);
-            this.btnLogInfo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnLogInfo.Location = new System.Drawing.Point(6, 19);
             this.btnLogInfo.Name = "btnLogInfo";
-            this.btnLogInfo.Size = new System.Drawing.Size(62, 24);
+            this.btnLogInfo.Size = new System.Drawing.Size(43, 17);
             this.btnLogInfo.TabIndex = 3;
             this.btnLogInfo.TabStop = true;
             this.btnLogInfo.Text = "Info";
@@ -153,10 +145,9 @@
             // 
             // btnLogDebug
             // 
-            this.btnLogDebug.Location = new System.Drawing.Point(9, 65);
-            this.btnLogDebug.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnLogDebug.Location = new System.Drawing.Point(6, 42);
             this.btnLogDebug.Name = "btnLogDebug";
-            this.btnLogDebug.Size = new System.Drawing.Size(160, 26);
+            this.btnLogDebug.Size = new System.Drawing.Size(107, 17);
             this.btnLogDebug.TabIndex = 4;
             this.btnLogDebug.TabStop = true;
             this.btnLogDebug.Text = "Debug";
@@ -166,10 +157,9 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 375);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(9, 285);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(269, 20);
+            this.label1.Size = new System.Drawing.Size(182, 13);
             this.label1.TabIndex = 2;
             this.label1.Text = "The settings are saved automatically.";
             // 
@@ -178,21 +168,18 @@
             this.groupBox3.Controls.Add(this.btnViewPack);
             this.groupBox3.Controls.Add(this.btnViewNormal);
             this.groupBox3.Controls.Add(this.btnViewClass);
-            this.groupBox3.Location = new System.Drawing.Point(256, 18);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox3.Location = new System.Drawing.Point(171, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox3.Size = new System.Drawing.Size(264, 151);
+            this.groupBox3.Size = new System.Drawing.Size(176, 98);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "View Mode";
             // 
             // btnViewPack
             // 
-            this.btnViewPack.Location = new System.Drawing.Point(9, 100);
-            this.btnViewPack.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnViewPack.Location = new System.Drawing.Point(6, 65);
             this.btnViewPack.Name = "btnViewPack";
-            this.btnViewPack.Size = new System.Drawing.Size(160, 26);
+            this.btnViewPack.Size = new System.Drawing.Size(107, 17);
             this.btnViewPack.TabIndex = 5;
             this.btnViewPack.TabStop = true;
             this.btnViewPack.Text = "Per Package";
@@ -202,10 +189,9 @@
             // btnViewNormal
             // 
             this.btnViewNormal.AutoSize = true;
-            this.btnViewNormal.Location = new System.Drawing.Point(9, 29);
-            this.btnViewNormal.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnViewNormal.Location = new System.Drawing.Point(6, 19);
             this.btnViewNormal.Name = "btnViewNormal";
-            this.btnViewNormal.Size = new System.Drawing.Size(210, 24);
+            this.btnViewNormal.Size = new System.Drawing.Size(141, 17);
             this.btnViewNormal.TabIndex = 3;
             this.btnViewNormal.TabStop = true;
             this.btnViewNormal.Text = "Normal (Imports/Exports)";
@@ -214,10 +200,9 @@
             // 
             // btnViewClass
             // 
-            this.btnViewClass.Location = new System.Drawing.Point(9, 65);
-            this.btnViewClass.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnViewClass.Location = new System.Drawing.Point(6, 42);
             this.btnViewClass.Name = "btnViewClass";
-            this.btnViewClass.Size = new System.Drawing.Size(160, 26);
+            this.btnViewClass.Size = new System.Drawing.Size(107, 17);
             this.btnViewClass.TabIndex = 4;
             this.btnViewClass.TabStop = true;
             this.btnViewClass.Text = "Per Class";
@@ -227,10 +212,9 @@
             // boxDebug
             // 
             this.boxDebug.AutoSize = true;
-            this.boxDebug.Location = new System.Drawing.Point(256, 226);
-            this.boxDebug.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxDebug.Location = new System.Drawing.Point(171, 147);
             this.boxDebug.Name = "boxDebug";
-            this.boxDebug.Size = new System.Drawing.Size(127, 24);
+            this.boxDebug.Size = new System.Drawing.Size(88, 17);
             this.boxDebug.TabIndex = 7;
             this.boxDebug.Text = "Debug Mode";
             this.boxDebug.UseVisualStyleBackColor = true;
@@ -239,10 +223,9 @@
             // boxImports
             // 
             this.boxImports.AutoSize = true;
-            this.boxImports.Location = new System.Drawing.Point(256, 178);
-            this.boxImports.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxImports.Location = new System.Drawing.Point(171, 116);
             this.boxImports.Name = "boxImports";
-            this.boxImports.Size = new System.Drawing.Size(133, 24);
+            this.boxImports.Size = new System.Drawing.Size(90, 17);
             this.boxImports.TabIndex = 8;
             this.boxImports.Text = "Show Imports";
             this.boxImports.UseVisualStyleBackColor = true;
@@ -251,10 +234,9 @@
             // boxPatchmode
             // 
             this.boxPatchmode.AutoSize = true;
-            this.boxPatchmode.Location = new System.Drawing.Point(256, 202);
-            this.boxPatchmode.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxPatchmode.Location = new System.Drawing.Point(171, 131);
             this.boxPatchmode.Name = "boxPatchmode";
-            this.boxPatchmode.Size = new System.Drawing.Size(116, 24);
+            this.boxPatchmode.Size = new System.Drawing.Size(81, 17);
             this.boxPatchmode.TabIndex = 9;
             this.boxPatchmode.Text = "PatchMode";
             this.boxPatchmode.UseVisualStyleBackColor = true;
@@ -263,10 +245,9 @@
             // boxUseUID
             // 
             this.boxUseUID.AutoSize = true;
-            this.boxUseUID.Location = new System.Drawing.Point(387, 178);
-            this.boxUseUID.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxUseUID.Location = new System.Drawing.Point(258, 116);
             this.boxUseUID.Name = "boxUseUID";
-            this.boxUseUID.Size = new System.Drawing.Size(100, 24);
+            this.boxUseUID.Size = new System.Drawing.Size(70, 17);
             this.boxUseUID.TabIndex = 10;
             this.boxUseUID.Text = "UID Tree";
             this.boxUseUID.UseVisualStyleBackColor = true;
@@ -275,10 +256,9 @@
             // boxJitData
             // 
             this.boxJitData.AutoSize = true;
-            this.boxJitData.Location = new System.Drawing.Point(387, 202);
-            this.boxJitData.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxJitData.Location = new System.Drawing.Point(258, 131);
             this.boxJitData.Name = "boxJitData";
-            this.boxJitData.Size = new System.Drawing.Size(96, 24);
+            this.boxJitData.Size = new System.Drawing.Size(67, 17);
             this.boxJitData.TabIndex = 11;
             this.boxJitData.Text = "JIT Data";
             this.boxJitData.UseVisualStyleBackColor = true;
@@ -286,10 +266,9 @@
             // 
             // boxGenerateMipmaps
             // 
-            this.boxGenerateMipmaps.Location = new System.Drawing.Point(256, 251);
-            this.boxGenerateMipmaps.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxGenerateMipmaps.Location = new System.Drawing.Point(171, 163);
             this.boxGenerateMipmaps.Name = "boxGenerateMipmaps";
-            this.boxGenerateMipmaps.Size = new System.Drawing.Size(201, 26);
+            this.boxGenerateMipmaps.Size = new System.Drawing.Size(134, 17);
             this.boxGenerateMipmaps.TabIndex = 12;
             this.boxGenerateMipmaps.Text = "Generate MipMaps";
             this.boxGenerateMipmaps.UseVisualStyleBackColor = true;
@@ -298,29 +277,26 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(256, 278);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(171, 181);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(195, 20);
+            this.label2.Size = new System.Drawing.Size(132, 13);
             this.label2.TabIndex = 13;
             this.label2.Text = "Font Scaling Factor (x,xx): ";
             // 
             // boxScaleFactor
             // 
-            this.boxScaleFactor.Location = new System.Drawing.Point(453, 274);
-            this.boxScaleFactor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxScaleFactor.Location = new System.Drawing.Point(302, 178);
             this.boxScaleFactor.Name = "boxScaleFactor";
-            this.boxScaleFactor.Size = new System.Drawing.Size(52, 26);
+            this.boxScaleFactor.Size = new System.Drawing.Size(36, 20);
             this.boxScaleFactor.TabIndex = 14;
             this.boxScaleFactor.Text = "1,0";
             this.boxScaleFactor.TextChanged += new System.EventHandler(this.boxScaleFactor_TextChanged);
             // 
             // btnOpenSettingsFolder
             // 
-            this.btnOpenSettingsFolder.Location = new System.Drawing.Point(18, 339);
-            this.btnOpenSettingsFolder.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnOpenSettingsFolder.Location = new System.Drawing.Point(12, 261);
             this.btnOpenSettingsFolder.Name = "btnOpenSettingsFolder";
-            this.btnOpenSettingsFolder.Size = new System.Drawing.Size(220, 31);
+            this.btnOpenSettingsFolder.Size = new System.Drawing.Size(147, 20);
             this.btnOpenSettingsFolder.TabIndex = 15;
             this.btnOpenSettingsFolder.Text = "Open Settings Folder";
             this.btnOpenSettingsFolder.UseVisualStyleBackColor = true;
@@ -329,10 +305,9 @@
             // boxEnableTexture2D
             // 
             this.boxEnableTexture2D.AutoSize = true;
-            this.boxEnableTexture2D.Location = new System.Drawing.Point(387, 226);
-            this.boxEnableTexture2D.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxEnableTexture2D.Location = new System.Drawing.Point(258, 147);
             this.boxEnableTexture2D.Name = "boxEnableTexture2D";
-            this.boxEnableTexture2D.Size = new System.Drawing.Size(149, 24);
+            this.boxEnableTexture2D.Size = new System.Drawing.Size(102, 17);
             this.boxEnableTexture2D.TabIndex = 16;
             this.boxEnableTexture2D.Text = "Texture Support";
             this.boxEnableTexture2D.UseVisualStyleBackColor = true;
@@ -340,19 +315,17 @@
             // 
             // boxColorPreview
             // 
-            this.boxColorPreview.Location = new System.Drawing.Point(457, 339);
-            this.boxColorPreview.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxColorPreview.Location = new System.Drawing.Point(305, 261);
             this.boxColorPreview.Name = "boxColorPreview";
-            this.boxColorPreview.Size = new System.Drawing.Size(54, 31);
+            this.boxColorPreview.Size = new System.Drawing.Size(36, 20);
             this.boxColorPreview.TabIndex = 17;
             this.boxColorPreview.TabStop = false;
             // 
             // btnSelectColor
             // 
-            this.btnSelectColor.Location = new System.Drawing.Point(247, 339);
-            this.btnSelectColor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnSelectColor.Location = new System.Drawing.Point(165, 261);
             this.btnSelectColor.Name = "btnSelectColor";
-            this.btnSelectColor.Size = new System.Drawing.Size(198, 31);
+            this.btnSelectColor.Size = new System.Drawing.Size(132, 20);
             this.btnSelectColor.TabIndex = 18;
             this.btnSelectColor.Text = "Select Image BG Color";
             this.btnSelectColor.UseVisualStyleBackColor = true;
@@ -361,26 +334,37 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(256, 306);
+            this.label3.Location = new System.Drawing.Point(171, 199);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(109, 20);
+            this.label3.Size = new System.Drawing.Size(74, 13);
             this.label3.TabIndex = 19;
             this.label3.Text = "Savefile Suffix";
             // 
             // boxSavefilePostfix
             // 
-            this.boxSavefilePostfix.Location = new System.Drawing.Point(387, 303);
-            this.boxSavefilePostfix.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.boxSavefilePostfix.Location = new System.Drawing.Point(258, 197);
             this.boxSavefilePostfix.Name = "boxSavefilePostfix";
-            this.boxSavefilePostfix.Size = new System.Drawing.Size(118, 26);
+            this.boxSavefilePostfix.Size = new System.Drawing.Size(80, 20);
             this.boxSavefilePostfix.TabIndex = 20;
             this.boxSavefilePostfix.TextChanged += new System.EventHandler(this.boxSavefilePostfix_TextChanged);
             // 
+            // boxCompression
+            // 
+            this.boxCompression.Location = new System.Drawing.Point(12, 220);
+            this.boxCompression.Name = "boxCompression";
+            this.boxCompression.Size = new System.Drawing.Size(153, 17);
+            this.boxCompression.TabIndex = 21;
+            this.boxCompression.Text = "Enable Savecompression";
+            this.boxCompression.UseVisualStyleBackColor = true;
+            this.boxCompression.CheckedChanged += new System.EventHandler(this.boxCompression_CheckedChanged);
+            // 
             // Options
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(534, 401);
+            this.ClientSize = new System.Drawing.Size(364, 309);
+            this.Controls.Add(this.boxCompression);
             this.Controls.Add(this.boxSavefilePostfix);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnSelectColor);
@@ -400,7 +384,6 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Options";
             this.Text = "Options";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Options_FormClosing);
@@ -447,5 +430,6 @@
         private System.Windows.Forms.Button btnSelectColor;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox boxSavefilePostfix;
+        private System.Windows.Forms.CheckBox boxCompression;
     }
 }

@@ -74,6 +74,7 @@ namespace GPK_RePack.Forms
             boxEnableTexture2D.Checked = Settings.Default.EnableTexture2D;
             boxColorPreview.BackColor = Settings.Default.PreviewColor;
             boxSavefilePostfix.Text = Settings.Default.SaveFileSuffix;
+            boxCompression.Checked = Settings.Default.EnableCompression;
         }
 
 
@@ -218,6 +219,11 @@ namespace GPK_RePack.Forms
                     e.Cancel = true;
                 }
             }
+        }
+
+        private void boxCompression_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.EnableCompression = boxCompression.Checked;
         }
     }
 }

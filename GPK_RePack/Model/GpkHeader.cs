@@ -36,6 +36,8 @@ namespace GPK_RePack.Model
         public int EstimatedChunkHeaderCount; 
         public List<GpkCompressedChunkHeader> ChunkHeaders = new List<GpkCompressedChunkHeader>();
 
+        public byte[] HeaderPadding = new byte[0];
+
         public void RecalculateCounts(GpkPackage package)
         {
             NameCount = package.NameList.Count;
@@ -54,6 +56,7 @@ namespace GPK_RePack.Model
             int size = FileVersion >= 0x381 ? 125 : 109;
             if (Settings.Default.EnableCompression)
                 size += 16 * ChunkHeaders.Count;
+            size += HeaderPadding.Length;
             return size;
         }
     }

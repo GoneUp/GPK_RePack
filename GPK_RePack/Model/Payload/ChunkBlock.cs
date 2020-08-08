@@ -86,7 +86,7 @@ namespace GPK_RePack.Model
                 var byteStream = new MemoryStream();
                 var outStream = new ZlibStream(byteStream, CompressionMode.Decompress);
                 outStream.Write(compressedData, 0, compressedData.Length);
-                uncompressedData = byteStream.GetBuffer();
+                uncompressedData = byteStream.ToArray();
 
             }
             catch (Exception e)
@@ -158,7 +158,7 @@ namespace GPK_RePack.Model
                 var byteStream = new MemoryStream();
                 var outStream = new ZlibStream(byteStream, CompressionMode.Compress);
                 outStream.Write(uncompressedData, 0, uncompressedData.Length);
-                compressedData = byteStream.GetBuffer();
+                compressedData = byteStream.ToArray();
 
             }
             catch (Exception e)

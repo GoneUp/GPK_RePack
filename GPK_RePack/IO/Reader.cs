@@ -79,7 +79,7 @@ namespace GPK_RePack.IO
 
                 foreach (var subGPK in tmpPackageList)
                 {
-                    
+
                     reader.BaseStream.Seek(subGPK.CompositeStartOffset, SeekOrigin.Begin);
                     var data = reader.ReadBytes((int)subGPK.OrginalSize);
                     var fullGpk = ReadSubGpkPackage(subGPK, data, skipExportData, stat);
@@ -240,6 +240,7 @@ namespace GPK_RePack.IO
             package.Header.DependsOffset = reader.ReadInt32();
 
             if (package.x64) package.Header.HeaderSize = reader.ReadInt32();
+            //56
 
             logger.Debug("NameCount " + package.Header.NameCount);
             logger.Debug("NameOffset " + package.Header.NameOffset);
@@ -259,8 +260,6 @@ namespace GPK_RePack.IO
             logger.Debug("File Info: NameCount {0}, ImportCount {1}, ExportCount {2}", package.Header.NameCount, package.Header.ImportCount, package.Header.ExportCount);
 
             package.Header.FGUID = reader.ReadBytes(16);
-            //logger.Info("FGUID " + package.Header.FGUID);
-
 
             int generation_count = reader.ReadInt32();
             package.Header.Generations.Clear();
@@ -314,9 +313,6 @@ namespace GPK_RePack.IO
 
             }
 
-
-            if (package.Header.EngineVersion == 0xC0FFEE) logger.Info("Found a old brother ;)");
-
             logger.Debug("EngineVersion {0}, CookerVersion {1}, compressionFlags {2}, chunkCount {3}, PkgUncompressedSize {4}",
            package.Header.EngineVersion, package.Header.CookerVersion, package.Header.CompressionFlags, package.Header.ChunkHeaders.Count, package.UncompressedSize);
 
@@ -325,6 +321,22 @@ namespace GPK_RePack.IO
                 ((GpkPackageFlags)package.Header.PackageFlags & GpkPackageFlags.FullyCompressed),
                 package.Header.PackageFlags
             );
+
+            int paddingSize;
+            if (chunkCount > 0)
+            {
+                // for compressed packages we can calcualte how much extra data there is
+                paddingSize = package.Header.ChunkHeaders[0].CompressedOffset - (int)(reader.BaseStream.Position - package.CompositeStartOffset);
+            }
+            else
+            {
+                //uncompressed, save everythign to the namelist
+                paddingSize = package.Header.NameOffset - (int)(reader.BaseStream.Position - package.CompositeStartOffset);
+            }
+            if (paddingSize > 0) package.Header.HeaderPadding = reader.ReadBytes(paddingSize);
+
+            logger.Debug("End of Header at {0}, paddingSize {1}", reader.BaseStream.Position, package.Header.HeaderPadding.Length);
+
         }
 
         private void CheckSignature(int sig)
@@ -352,8 +364,9 @@ namespace GPK_RePack.IO
             byte[] completeFile = new byte[package.UncompressedSize]; //should be the complete file size
 
 
-            foreach (var header in package.Header.ChunkHeaders)
+            for (int i = 0; i < package.Header.ChunkHeaders.Count; i++)
             {
+                GpkCompressedChunkHeader header = package.Header.ChunkHeaders[i];
                 reader.BaseStream.Seek(header.CompressedOffset, SeekOrigin.Begin);
                 PackageChunkBlock chunk = new PackageChunkBlock();
 
@@ -367,6 +380,9 @@ namespace GPK_RePack.IO
                 chunk.Decompress(uncompressedBytes, blockCount, reader, package.Header.CompressionFlags);
 
                 Array.ConstrainedCopy(uncompressedBytes, 0, completeFile, header.UncompressedOffset, header.UncompressedSize);
+
+                logger.Trace("ChunkData {0}: BlockCount {1}, BlockSize {2}, compressedSize {3}, uncompressedSize_chunkheader {4}",
+                    i, blockCount, chunk.blocksize, chunk.compressedSize, chunk.uncompressedSize_chunkheader);
             }
 
             if (Settings.Default.Debug)
@@ -615,7 +631,7 @@ namespace GPK_RePack.IO
             }
 
             logger.Debug("MAX VALUE " + maxValue);
-            logger.Debug("MAX EXPORT " + maxExp.ObjectName);
+            if (maxExp != null) logger.Debug("MAX EXPORT " + maxExp.ObjectName);
         }
 
         public static void ParsePayload(GpkPackage package, GpkExport export)
