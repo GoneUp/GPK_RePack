@@ -58,8 +58,9 @@ namespace GPK_RePack.Model
             PackagesChanged();
         }
 
-        public void SaveGpkListToFiles(List<GpkPackage> saveList, bool usePadding, List<IProgress> runningSavers, List<Task> runningTasks)
+        public void SaveGpkListToFiles(List<GpkPackage> saveList, bool usePadding, bool patchComposite, List<IProgress> runningSavers, List<Task> runningTasks)
         {
+            //todo: detect if we have modified multiplie gpks from composite and patch them all to a signle output
 
             foreach (GpkPackage package in saveList)
             {
@@ -75,10 +76,28 @@ namespace GPK_RePack.Model
                         }
                         else
                         {
-                            savepath = String.Format("{0}\\{1}{2}",Path.GetDirectoryName(package.Path), package.Filename, Settings.Default.SaveFileSuffix);
+                            savepath = String.Format("{0}\\{1}{2}", Path.GetDirectoryName(package.Path), package.Filename, Settings.Default.SaveFileSuffix);
                         }
 
-                        tmpS.SaveGpkPackage(package, savepath, usePadding);
+                        if (!patchComposite)
+                        {
+                            //simple save
+                            tmpS.SaveGpkPackage(package, savepath, usePadding);
+                        }
+                        else
+                        {
+                            var tmpPath = savepath + "_tmp";
+                            tmpS.SaveGpkPackage(package, tmpPath, usePadding);
+
+                            //ugly and quick, replace with direct memory save
+                            var compositeData = File.ReadAllBytes(package.Path);
+                            var patchData = File.ReadAllBytes(tmpPath);
+                            Array.ConstrainedCopy(patchData, 0, compositeData, (int)package.CompositeStartOffset, patchData.Length);
+
+                            File.WriteAllBytes(savepath, compositeData);
+                        }
+
+
                     });
                     newTask.Start();
                     runningTasks.Add(newTask);

@@ -70,7 +70,6 @@ namespace GPK_RePack.IO
                     }
                 }
 
-
                 Task.WaitAll(runningTasks.ToArray());
 
                 logger.Debug("loading done");

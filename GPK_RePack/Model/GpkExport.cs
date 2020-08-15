@@ -126,6 +126,10 @@ namespace GPK_RePack.Model
                 //loader first, we dont want loading if the data is not really needed
                 info.AppendLine(Loader.ToString());
             }
+            else if (Payload != null)
+            {
+                info.AppendLine("Data_Size: " + Payload.GetSize());
+            }
             else if (Data != null)
             {
                 info.AppendLine("Data_Size: " + Data.Length);

@@ -326,14 +326,19 @@ namespace GPK_RePack.IO
             if (chunkCount > 0)
             {
                 // for compressed packages we can calcualte how much extra data there is
-                paddingSize = package.Header.ChunkHeaders[0].CompressedOffset - (int)(reader.BaseStream.Position - package.CompositeStartOffset);
+                paddingSize = package.Header.ChunkHeaders[0].CompressedOffset - (int)(reader.BaseStream.Position);
             }
             else
             {
                 //uncompressed, save everythign to the namelist
-                paddingSize = package.Header.NameOffset - (int)(reader.BaseStream.Position - package.CompositeStartOffset);
+                paddingSize = package.Header.NameOffset - (int)(reader.BaseStream.Position);
             }
-            if (paddingSize > 0) package.Header.HeaderPadding = reader.ReadBytes(paddingSize);
+            if (paddingSize > 0 && paddingSize < 1024)
+            {
+                //sanity check
+                package.Header.HeaderPadding = reader.ReadBytes(paddingSize);
+            }
+                
 
             logger.Debug("End of Header at {0}, paddingSize {1}", reader.BaseStream.Position, package.Header.HeaderPadding.Length);
 

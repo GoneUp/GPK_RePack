@@ -320,7 +320,7 @@ namespace GPK_RePack.Forms
                 return;
 
             //do it
-            this.gpkStore.SaveGpkListToFiles(gpkStore.LoadedGpkPackages, usePadding, runningSavers, runningTasks);
+            this.gpkStore.SaveGpkListToFiles(gpkStore.LoadedGpkPackages, usePadding, false, runningSavers, runningTasks);
 
             //display info while loading
             while (!Task.WaitAll(runningTasks.ToArray(), 50))
@@ -2033,7 +2033,7 @@ namespace GPK_RePack.Forms
                 var writerList = new List<IProgress>();
                 var taskList = new List<Task>();
 
-                this.gpkStore.SaveGpkListToFiles(packages, false, writerList, taskList);
+                this.gpkStore.SaveGpkListToFiles(packages, true, true, writerList, taskList);
 
                 //wait
                 while (!Task.WaitAll(taskList.ToArray(), 50))

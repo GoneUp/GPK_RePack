@@ -93,7 +93,7 @@ namespace GPK_RePack.IO
                 WriteDepends(writer, package);
                 WriteHeaderSize(writer, package);
                 WriteExportsData(writer, package);
-                if (addPadding)
+                if (addPadding && !Settings.Default.EnableCompression)
                 {
                     WriteFilePadding(writer, package, compuSize);
                 }
@@ -121,11 +121,18 @@ namespace GPK_RePack.IO
                     writer.Write(new byte[package.Header.GetSize()]); //reserve header space
                     WriteChunkContent(writer, package);
 
+                    int endOfData = (int)writer.BaseStream.Position;
                     writer.Seek(0, SeekOrigin.Begin);
                     WriteHeader(writer, package, false); //writer header, now with correct offsets of the chunks
 
                     logger.Debug("Compressed gpk written. Compu Size: {0}, Diff: {1} -", compuSize, writer.BaseStream.Length - compuSize);
 
+
+                    if (addPadding)
+                    {
+                        writer.Seek(endOfData, SeekOrigin.Begin);
+                        WriteFilePadding(writer, package, compuSize);
+                    }
                 }
             }
 
