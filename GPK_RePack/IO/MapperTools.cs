@@ -193,29 +193,6 @@ namespace GPK_RePack.IO
                     }
                 }
 
-
-                /*
-
-                     // Unscramble (2)
-                //int divison, floor it
-                if ((data.Length / 2) > 0)
-                {
-                    var offset1 = 1;
-                    var offset2 = data.Length - 1;
-
-                    for (int i = ((data.Length / 2) + 1) / 2; i > 0; i--)
-                    {
-                        var tmp = data[offset1];
-                        data[offset1] = data[offset2];
-                        data[offset2] = tmp;
-                        offset1 += 2;
-                        offset2 -= 2;
-                    }
-
-                }
-                    */
-
-
             }
             catch (Exception ex)
             {

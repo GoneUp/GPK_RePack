@@ -195,38 +195,6 @@ namespace GPK_RePack.Model
 
             }
 
-
-
-
-
-            /*
-             * 
-             * 
-             
-            long parallelKey = 1;
-            Parallel.ForEach(ImportList, (pair, state) =>
-            {
-                if (pair.Value.UID == text)
-                {
-                    parallelKey = (pair.Key + 1) * -1;
-                    state.Break();
-                }
-            });
-            if (parallelKey != 1) return parallelKey;
-
-            parallelKey = -1;
-            Parallel.ForEach(ExportList, (pair, state) =>
-            {
-                if (pair.Value.UID == text)
-                {
-                    parallelKey = pair.Key + 1;
-                    state.Break();
-                }
-            });
-
-            if (parallelKey != -1) return parallelKey;
-             * */
-
             throw new Exception(string.Format("Object {0} not found!", text));
         }
 

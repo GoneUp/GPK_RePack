@@ -505,13 +505,10 @@ namespace GPK_RePack.Forms
 
                 }
 
-                //toAdd.Add(nodeP);
                 treeMain.Nodes.Add(nodeP);
             }
 
 
-            //treeMain.Nodes.AddRange(toAdd.ToArray());
-            //treeMain.Sort();
             treeMain.EndUpdate();
 
             ws.Stop();
@@ -2061,7 +2058,7 @@ namespace GPK_RePack.Forms
                 }
             }));
         }
-
+       
         private void saveSingleGpkPackage()
         {
             if (selectedPackage != null && treeMain.SelectedNode != null && treeMain.SelectedNode.Level == 0)
