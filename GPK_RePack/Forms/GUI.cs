@@ -7,6 +7,7 @@ using System.Linq;
 using System.Media;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.ServiceModel.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -114,9 +115,6 @@ namespace GPK_RePack.Forms
                 //audio
                 waveOut = new WaveOut();
                 waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
-
-                //other stuff
-                treeMain.TreeViewNodeSorter = new MiscFuncs.NodeSorter();
 
                 if (Settings.Default.SaveDir == "")
                     Settings.Default.SaveDir = Directory.GetCurrentDirectory();
@@ -308,6 +306,10 @@ namespace GPK_RePack.Forms
             saveToolStripMenuItem_Click(sender, e);
         }
 
+        private void btnSavePatchedComposite_Click(object sender, EventArgs e)
+        {
+            saveToolStripMenuItem_Click(sender, e);
+        }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -315,12 +317,18 @@ namespace GPK_RePack.Forms
             List<IProgress> runningSavers = new List<IProgress>();
             List<Task> runningTasks = new List<Task>();
             bool usePadding = sender == savePaddingStripMenuItem;
+            bool patchComposite = false;
+            if (sender == savePatchedCompositeStripMenuItem)
+            {
+                usePadding = true;
+                patchComposite = true;
+            }
 
             if (gpkStore.LoadedGpkPackages.Count == 0)
                 return;
 
             //do it
-            this.gpkStore.SaveGpkListToFiles(gpkStore.LoadedGpkPackages, usePadding, false, runningSavers, runningTasks);
+            this.gpkStore.SaveGpkListToFiles(gpkStore.LoadedGpkPackages, usePadding, patchComposite, runningSavers, runningTasks);
 
             //display info while loading
             while (!Task.WaitAll(runningTasks.ToArray(), 50))
@@ -417,8 +425,17 @@ namespace GPK_RePack.Forms
                 this.Invoke(new Action(() => DrawPackages()));
                 return;
             }
+            Stopwatch ws = new Stopwatch();
+            ws.Start();
+
             treeMain.BeginUpdate();
             treeMain.Nodes.Clear();
+
+            if (Settings.Default.EnableSortTreeNodes)
+            {
+                treeMain.TreeViewNodeSorter = new MiscFuncs.NodeSorter();
+            }
+
             var toAdd = new List<TreeNode>();
 
             for (int i = 0; i < gpkStore.LoadedGpkPackages.Count; i++)
@@ -488,14 +505,17 @@ namespace GPK_RePack.Forms
 
                 }
 
-                toAdd.Add(nodeP);
-
+                //toAdd.Add(nodeP);
+                treeMain.Nodes.Add(nodeP);
             }
 
 
-            treeMain.Nodes.AddRange(toAdd.ToArray());
-            treeMain.Sort();
+            //treeMain.Nodes.AddRange(toAdd.ToArray());
+            //treeMain.Sort();
             treeMain.EndUpdate();
+
+            ws.Stop();
+            logger.Info("stopwatch {0}s ", ws.ElapsedMilliseconds / 1000);
         }
 
 
@@ -1431,6 +1451,24 @@ namespace GPK_RePack.Forms
         }
 
 
+        private void datEncryptionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string[] files = MiscFuncs.GenerateOpenDialog(false, this, true);
+            if (files.Length == 0) return;
+
+            string outfile = MiscFuncs.GenerateSaveDialog("encrypt", ".txt");
+
+            new Task(() =>
+            {
+                logger.Info("Encryption is running in the background");
+
+                MapperTools.EncryptAndWriteFile(files[0], outfile);
+
+                logger.Info("Encryption done");
+
+            }).Start();
+        }
+
         private void loadMappingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (gpkStore.CompositeMap.Count > 0)
@@ -2033,7 +2071,7 @@ namespace GPK_RePack.Forms
                 var writerList = new List<IProgress>();
                 var taskList = new List<Task>();
 
-                this.gpkStore.SaveGpkListToFiles(packages, true, true, writerList, taskList);
+                this.gpkStore.SaveGpkListToFiles(packages, false, false, writerList, taskList);
 
                 //wait
                 while (!Task.WaitAll(taskList.ToArray(), 50))
@@ -2054,9 +2092,11 @@ namespace GPK_RePack.Forms
 
 
 
+
+
         #endregion
 
-
+   
     }
 }
 

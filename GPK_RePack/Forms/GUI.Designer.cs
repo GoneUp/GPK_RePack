@@ -57,6 +57,8 @@ namespace GPK_RePack.Forms
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.savePaddingStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.savePatchedCompositeStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -119,6 +121,7 @@ namespace GPK_RePack.Forms
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
             this.boxLog = new System.Windows.Forms.RichTextBox();
+            this.datEncryptionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -301,6 +304,8 @@ namespace GPK_RePack.Forms
             this.saveToolStripMenuItem,
             this.savePaddingStripMenuItem,
             this.replaceSaveToolStripMenuItem,
+            this.toolStripSeparator7,
+            this.savePatchedCompositeStripMenuItem,
             this.toolStripSeparator1,
             this.settingsToolStripMenuItem,
             this.toolStripSeparator2,
@@ -344,6 +349,18 @@ namespace GPK_RePack.Forms
             this.replaceSaveToolStripMenuItem.Text = "Save patched (not recommend)";
             this.replaceSaveToolStripMenuItem.Click += new System.EventHandler(this.replaceSaveToolStripMenuItem_Click);
             // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(287, 6);
+            // 
+            // savePatchedCompositeStripMenuItem
+            // 
+            this.savePatchedCompositeStripMenuItem.Name = "savePatchedCompositeStripMenuItem";
+            this.savePatchedCompositeStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.savePatchedCompositeStripMenuItem.Text = "Save patched Composite";
+            this.savePatchedCompositeStripMenuItem.Click += new System.EventHandler(this.btnSavePatchedComposite_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -386,6 +403,7 @@ namespace GPK_RePack.Forms
             // 
             this.compositeGPKToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.decryptionToolStripMenuItem,
+            this.datEncryptionToolStripMenuItem,
             this.loadMappingToolStripMenuItem,
             this.dumpCompositeTexturesToolStripMenuItem});
             this.compositeGPKToolStripMenuItem.Name = "compositeGPKToolStripMenuItem";
@@ -988,6 +1006,13 @@ namespace GPK_RePack.Forms
             this.boxLog.TabIndex = 0;
             this.boxLog.Text = "";
             // 
+            // datEncryptionToolStripMenuItem
+            // 
+            this.datEncryptionToolStripMenuItem.Name = "datEncryptionToolStripMenuItem";
+            this.datEncryptionToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.datEncryptionToolStripMenuItem.Text = ".dat Encryption";
+            this.datEncryptionToolStripMenuItem.Click += new System.EventHandler(this.datEncryptionToolStripMenuItem_Click);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -1125,6 +1150,9 @@ namespace GPK_RePack.Forms
         private RichTextBox boxLog;
         private ToolStripMenuItem exportPackageToolStripMenuItem;
         private ToolStripMenuItem addToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator7;
+        private ToolStripMenuItem savePatchedCompositeStripMenuItem;
+        private ToolStripMenuItem datEncryptionToolStripMenuItem;
     }
 }
 

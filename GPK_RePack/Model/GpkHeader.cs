@@ -53,7 +53,8 @@ namespace GPK_RePack.Model
 
         public int GetSize()
         {
-            int size = FileVersion >= 0x381 ? 125 : 109;
+            //must be uber correct, otherwise pkg compression is borked
+            int size = FileVersion >= 0x381 ? 117 : 109;
             if (Settings.Default.EnableCompression)
                 size += 16 * ChunkHeaders.Count;
             size += HeaderPadding.Length;

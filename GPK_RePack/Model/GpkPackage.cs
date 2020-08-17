@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using GPK_RePack.Forms;
 using GPK_RePack.IO;
+using GPK_RePack.Model.Interfaces;
 using GPK_RePack.Model.Payload;
 using GPK_RePack.Properties;
 
@@ -39,7 +40,7 @@ namespace GPK_RePack.Model
         public Dictionary<long, GpkImport> ImportList;
         public Dictionary<long, GpkExport> ExportList;
 
-        public Dictionary<String, String> UidList;
+        public Dictionary<String, IGpkPart> UidList;
 
         public readonly int datapuffer = 10;
         public bool x64;
@@ -47,7 +48,7 @@ namespace GPK_RePack.Model
 
         public GpkPackage()
         {
-            UidList = new Dictionary<string, string>();
+            UidList = new Dictionary<string, IGpkPart>();
             Header = new GpkHeader();
 
             NameList = new Dictionary<long, GpkString>();
@@ -171,6 +172,37 @@ namespace GPK_RePack.Model
         {
             if (text == "none") return 0;
 
+            var gpkObject = UidList[text];
+            if (gpkObject is GpkImport)
+            {
+                foreach (var pair in ImportList)
+                {
+                    if (pair.Value == gpkObject)
+                    {
+                        return (pair.Key + 1) * -1;
+                    }
+                }
+            }
+            else if (gpkObject is GpkExport)
+            {
+                foreach (var pair in ExportList)
+                {
+                    if (pair.Value == gpkObject)
+                    {
+                        return pair.Key + 1;
+                    }
+                }
+
+            }
+
+
+
+
+
+            /*
+             * 
+             * 
+             
             long parallelKey = 1;
             Parallel.ForEach(ImportList, (pair, state) =>
             {
@@ -193,6 +225,7 @@ namespace GPK_RePack.Model
             });
 
             if (parallelKey != -1) return parallelKey;
+             * */
 
             throw new Exception(string.Format("Object {0} not found!", text));
         }

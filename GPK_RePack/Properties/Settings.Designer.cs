@@ -250,5 +250,17 @@ namespace GPK_RePack.Properties {
                 this["EnableCompression"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableSortTreeNodes {
+            get {
+                return ((bool)(this["EnableSortTreeNodes"]));
+            }
+            set {
+                this["EnableSortTreeNodes"] = value;
+            }
+        }
     }
 }

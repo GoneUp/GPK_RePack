@@ -21,6 +21,7 @@ namespace GPK_RePack.Model
         public int UncompressedSize;
         public int CompressedOffset;
         public int CompressedSize;
+        //CompressedSize inlcudes the chunkheader. +16 bytes!
 
         public PackageChunkBlock writableChunkblock;
     }

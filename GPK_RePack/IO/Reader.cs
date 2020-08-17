@@ -799,7 +799,7 @@ namespace GPK_RePack.IO
 
                 if (package.UidList.ContainsKey(tmpName) == false)
                 {
-                    package.UidList.Add(tmpName, "");
+                    package.UidList.Add(tmpName, export);
                     return tmpName;
                 }
 
@@ -823,7 +823,7 @@ namespace GPK_RePack.IO
 
                 if (package.UidList.ContainsKey(tmpName) == false)
                 {
-                    package.UidList.Add(tmpName, "");
+                    package.UidList.Add(tmpName, import);
                     return tmpName;
                 }
 
