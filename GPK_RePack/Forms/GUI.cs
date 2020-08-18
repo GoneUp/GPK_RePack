@@ -1492,6 +1492,21 @@ namespace GPK_RePack.Forms
             new FormMapperView(gpkStore).Show();
         }
 
+
+        private void writeMappingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dialog = new FolderBrowserDialog();
+            if (Settings.Default.WorkingDir != "")
+                dialog.SelectedPath = Settings.Default.WorkingDir;
+            if (dialog.ShowDialog() == DialogResult.Cancel)
+                return;
+
+            var path = dialog.SelectedPath + "\\tmp";
+
+            MapperTools.WriteMappings(path, gpkStore);         
+        }
+
+
         private void dumpCompositeTexturesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //cookedpc path, outdir path
@@ -2091,9 +2106,10 @@ namespace GPK_RePack.Forms
 
 
 
+
         #endregion
 
-   
+    
     }
 }
 

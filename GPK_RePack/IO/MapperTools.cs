@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media.TextFormatting;
 using GPK_RePack.Model;
 using GPK_RePack.Model.Composite;
+using GPK_RePack.Properties;
 using Microsoft.VisualBasic.ApplicationServices;
 using Microsoft.VisualBasic.Logging;
 using NLog;
@@ -212,6 +213,7 @@ namespace GPK_RePack.IO
                 if (!File.Exists(pkgMapper) || !File.Exists(compMapper))
                 {
                     logger.Info("Not all .dat files found");
+                    return;
                 }
 
                 var pkgMapperData = File.ReadAllBytes(pkgMapper);
@@ -296,6 +298,66 @@ namespace GPK_RePack.IO
                         }
                     }
                 }
+
+            }
+            catch (Exception ex)
+            {
+                logger.Info("Loading of mappings failed");
+                logger.Error(ex);
+            }
+
+        }
+
+        public static void WriteMappings(string path, GpkStore store)
+        {
+            logger.Debug("WriteMappings for " + path);
+
+            try
+            {
+                string compMapperPath = path + "_CompositePackageMapper.dat" + Settings.Default.SaveFileSuffix;
+
+
+                //write 
+
+                logger.Debug("parsing CompositePackageMapper");
+                /*
+                 * 
+                  CompositePkgMapper
+
+                  Files are ended by !
+                  File name like this !17d87899_3? -> 17d87899_3.gpk
+                  Entries are always seperated by |
+
+                  Composite UID, Unkown Object ID, Sub-GPK File offset, Sub-GPK File length
+                  c7a706fb_6a349a6f_1d212.Chat2_dup,c7a706fb_6a349a6f_1d212,92291307,821218,|*/
+
+
+                var writer = new StringBuilder();
+
+                foreach (var fileName in store.CompositeMap.Keys)
+                {
+                    writer.Append(fileName + "?");
+
+                    foreach (var entry in store.CompositeMap[fileName])
+                    {
+                        writer.Append(entry.CompositeUID + ",");
+                        writer.Append(entry.UnknownUID + ",");
+                        writer.Append(entry.FileOffset + ",");
+                        writer.Append(entry.FileLength + ",");
+                        writer.Append("|");
+                    }
+
+                    writer.Append("!");
+                }
+
+                File.WriteAllText(compMapperPath + "_decrypt", writer.ToString());
+
+                //encryption magic
+                var data = Encoding.UTF8.GetBytes(writer.ToString());
+                EncryptFile(data);
+                File.WriteAllBytes(compMapperPath, data);
+
+                logger.Info("Wrote CompositePackageMapper to " + compMapperPath);
 
             }
             catch (Exception ex)

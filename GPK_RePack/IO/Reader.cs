@@ -216,16 +216,15 @@ namespace GPK_RePack.IO
 
             package.Header.FileVersion = reader.ReadInt16();
             package.Header.LicenseVersion = reader.ReadInt16();
-
             package.x64 = package.Header.FileVersion >= 0x381;
 
-            package.Header.PackageFlags = reader.ReadInt32();
+            package.Header.HeaderSize = reader.ReadInt32();
 
             int len = reader.ReadInt32();
             package.Header.PackageName = ReadString(reader, len);
 
-            package.Header.Unk1 = reader.ReadInt16();
-            package.Header.Unk2 = reader.ReadInt16();
+            package.Header.PackageFlags = reader.ReadInt32();
+
 
             package.Header.NameCount = reader.ReadInt32();
             package.Header.NameOffset = reader.ReadInt32();
@@ -239,8 +238,8 @@ namespace GPK_RePack.IO
 
             package.Header.DependsOffset = reader.ReadInt32();
 
-            if (package.x64) package.Header.HeaderSize = reader.ReadInt32();
-            //56
+            if (package.x64) package.Header.HeaderSize = reader.ReadInt32(); //seralizedoffset
+            if (package.x64) package.Header.Unk1 = reader.ReadBytes(12);
 
             logger.Debug("NameCount " + package.Header.NameCount);
             logger.Debug("NameOffset " + package.Header.NameOffset);
@@ -254,7 +253,7 @@ namespace GPK_RePack.IO
             logger.Debug("DependsOffset " + package.Header.DependsOffset);
             logger.Debug("HeaderSize " + package.Header.HeaderSize);
 
-            if (package.x64) package.Header.Unk3 = reader.ReadBytes(12);
+            
 
             stat.totalobjects = package.Header.NameCount + package.Header.ImportCount + package.Header.ExportCount * 3; //Export, Export Linking, ExportData = *3
             logger.Debug("File Info: NameCount {0}, ImportCount {1}, ExportCount {2}", package.Header.NameCount, package.Header.ImportCount, package.Header.ExportCount);
@@ -761,7 +760,7 @@ namespace GPK_RePack.IO
 
         public static string ReadString(BinaryReader reader, int length)
         {
-            string text = ASCIIEncoding.ASCII.GetString(reader.ReadBytes(length - 1));
+            string text = Encoding.ASCII.GetString(reader.ReadBytes(length - 1));
             reader.ReadByte(); //text control char 
 
             return text;
@@ -769,7 +768,7 @@ namespace GPK_RePack.IO
 
         public static string ReadUnicodeString(BinaryReader reader, int length)
         {
-            string text = UnicodeEncoding.Unicode.GetString(reader.ReadBytes(length - 2));
+            string text = Encoding.Unicode.GetString(reader.ReadBytes(length - 2));
             reader.ReadBytes(2); //text control char 
 
             return text;

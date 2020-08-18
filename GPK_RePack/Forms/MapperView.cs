@@ -57,7 +57,7 @@ namespace GPK_RePack.Forms
                 logger.Info("GPK to load not found");
                 return;
             }
-            store.loadSubGpk(path, entry.UID, entry.FileOffset, entry.FileLength);
+            store.loadSubGpk(path, entry);
         }
 
 

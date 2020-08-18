@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using GPK_RePack.Forms;
 using GPK_RePack.IO;
+using GPK_RePack.Model.Composite;
 using GPK_RePack.Model.Interfaces;
 using GPK_RePack.Model.Payload;
 using GPK_RePack.Properties;
@@ -24,12 +26,13 @@ namespace GPK_RePack.Model
         public bool CompositeGpk;
         public long CompositeStartOffset;
         public long CompressedEndOffset = 0;
+        public CompositeMapEntry CompositeEntry;
 
-
+        //Info
         public long OrginalSize; //raw compressed size
         public long UncompressedSize;
 
-        //
+        //Edit stuff
         public Boolean Changes = false;
         public Boolean LowMemMode = false;
 
@@ -42,7 +45,7 @@ namespace GPK_RePack.Model
 
         public Dictionary<String, IGpkPart> UidList;
 
-        public readonly int datapuffer = 10;
+        public readonly int datapuffer = 0;
         public bool x64;
 
 
@@ -95,6 +98,7 @@ namespace GPK_RePack.Model
 
         public int RemoveUnusedStrings()
         {
+            //bad idea, we should not do this until we understand the FULL upk struct (which we will never do)
             int removed = 0;
             int count = 0;
 
@@ -266,18 +270,20 @@ namespace GPK_RePack.Model
         {
             //set new offsets
             //set coutn values on header
-            //remove unused strings
-            int count = RemoveUnusedStrings();
-            GUI.logger.Debug("Removed {0} unused strings", count);
+
             Header.RecalculateCounts(this);
             GetSize(true);
 
             if (enableCompression)
             {
+                Header.PackageFlags |= (int)GpkPackageFlags.Compressed;
                 Header.CompressionFlags = (int)CompressionTypesPackage.LZO;
             }
             else
             {
+                //null out compressflags
+                Header.PackageFlags &= ~(int)GpkPackageFlags.Compressed;
+
                 Header.CompressionFlags = 0;
                 Header.ChunkHeaders.Clear();
                 Header.EstimatedChunkHeaderCount = 0;
@@ -358,6 +364,9 @@ namespace GPK_RePack.Model
             {
                 tmpSize += pair.Value.GetSize(); //export list part
             }
+
+            if (fixOffsets) Header.DependsOffset = tmpSize;
+            tmpSize += 4 * ExportList.Count;
 
             tmpSize += datapuffer; //puffer betwwen exportlist and data
 

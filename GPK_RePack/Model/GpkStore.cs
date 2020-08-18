@@ -46,13 +46,14 @@ namespace GPK_RePack.Model
                 PackagesChanged();
         }
 
-        public void loadSubGpk(string path, string fileID, int fileOffset, int dataLength)
+        public void loadSubGpk(string path, CompositeMapEntry entry)
         {
             var reader = new Reader();
-            var gpk = reader.ReadSubGpkFromComposite(path, fileID, fileOffset, dataLength);
+            var gpk = reader.ReadSubGpkFromComposite(path, entry.UID, entry.FileOffset, entry.FileLength);
             if (gpk == null)
                 return;
 
+            gpk.CompositeEntry = entry;
             LoadedGpkPackages.Add(gpk);
 
             PackagesChanged();
@@ -95,6 +96,13 @@ namespace GPK_RePack.Model
                             Array.ConstrainedCopy(patchData, 0, compositeData, (int)package.CompositeStartOffset, patchData.Length);
 
                             File.WriteAllBytes(savepath, compositeData);
+
+                            //patch mapping
+                            if (package.CompositeEntry != null && package.CompositeEntry.FileLength != patchData.Length)
+                            {
+                                package.CompositeEntry.FileLength = patchData.Length;
+                                MapperTools.WriteMappings(savepath, this);
+                            }
                         }
 
 

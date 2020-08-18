@@ -15,16 +15,13 @@ namespace GPK_RePack.Model
         public int PackageFlags;
         public string PackageName;
 
-        public short Unk1;
-        public short Unk2;
-
         public int NameCount, NameOffset;
         public int ExportCount, ExportOffset;
         public int ImportCount, ImportOffset;
         public int DependsOffset;
 
         public int HeaderSize; //x64 gpk
-        public byte[] Unk3 = new byte[12];//x64 gpk
+        public byte[] Unk1 = new byte[12];//x64 gpk
         public byte[] FGUID = new byte[16];
 
         public List<GpkGeneration> Generations = new List<GpkGeneration>();

@@ -148,12 +148,11 @@ namespace GPK_RePack.IO
             writer.Write(package.Header.Tag);
             writer.Write(package.Header.FileVersion);
             writer.Write(package.Header.LicenseVersion);
-            writer.Write(package.Header.PackageFlags);
+            writer.Write(package.Header.HeaderSize);
 
             WriteString(writer, package.Header.PackageName, true);
 
-            writer.Write(package.Header.Unk1);
-            writer.Write(package.Header.Unk2);
+            writer.Write(package.Header.PackageFlags);
 
             if (package.x64) writer.Write(package.Header.NameCount);
             else writer.Write(package.Header.NameCount + package.Header.NameOffset); //tera thing
@@ -174,7 +173,7 @@ namespace GPK_RePack.IO
 
             headerSizeOffset = writer.BaseStream.Position;
             if (package.x64) writer.Write(package.Header.HeaderSize);
-            if (package.x64) writer.Write(package.Header.Unk3);
+            if (package.x64) writer.Write(package.Header.Unk1);
 
             writer.Write(package.Header.FGUID);
 
@@ -360,11 +359,11 @@ namespace GPK_RePack.IO
             {
                 if (export.SerialSize == 0)
                 {
-                    logger.Trace("skipping export data for " + export.ObjectName);
+                    logger.Trace("skipping export data for " + export.UID);
                 }
                 else
                 {
-                    logger.Trace("export data for " + export.ObjectName);
+                    logger.Trace("export data for " + export.UID);
                 }
 
                 long data_start = writer.BaseStream.Position;
@@ -485,7 +484,7 @@ namespace GPK_RePack.IO
         private void WriteFileEnding(BinaryWriter writer, GpkPackage package, int compuSize)
         {
             long final_size = writer.BaseStream.Position + 4;
-            writer.Write((int)final_size);
+            //writer.Write((int)final_size);
 
             logger.Debug("New size: {0}, Old size: {1}", final_size, package.OrginalSize);
             logger.Debug("Compu Size: {0}, Diff: {1} -", compuSize, final_size - compuSize);
