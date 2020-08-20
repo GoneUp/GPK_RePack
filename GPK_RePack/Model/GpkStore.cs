@@ -53,6 +53,7 @@ namespace GPK_RePack.Model
             if (gpk == null)
                 return;
 
+            gpk.CompositeGpk = true;
             gpk.CompositeEntry = entry;
             LoadedGpkPackages.Add(gpk);
 
@@ -77,30 +78,70 @@ namespace GPK_RePack.Model
                         }
                         else
                         {
-                            savepath = String.Format("{0}\\{1}{2}", Path.GetDirectoryName(package.Path), package.Filename, Settings.Default.SaveFileSuffix);
+                            savepath = String.Format("{0}_{1}_{2}", package.Path, package.Filename, Settings.Default.SaveFileSuffix);
+                            //ffe86d35_183.gpk_UID_rebuild
                         }
 
-                        if (!patchComposite)
+                        if (!(patchComposite && package.CompositeGpk))
                         {
                             //simple save
                             tmpS.SaveGpkPackage(package, savepath, usePadding);
                         }
                         else
                         {
-                            var tmpPath = savepath + "_tmp";
+                            var tmpPath = savepath + "_single";
                             tmpS.SaveGpkPackage(package, tmpPath, usePadding);
 
                             //ugly and quick, replace with direct memory save
+                            //patch, move entries
                             var compositeData = File.ReadAllBytes(package.Path);
                             var patchData = File.ReadAllBytes(tmpPath);
-                            Array.ConstrainedCopy(patchData, 0, compositeData, (int)package.CompositeStartOffset, patchData.Length);
+                            var patchDiff = patchData.Length - package.CompositeEntry.FileLength;
+
+                            var compositeSize = compositeData.Length;
+                            var compsiteFileEnd = package.CompositeEntry.FileOffset + package.CompositeEntry.FileLength;
+                            if (patchDiff >= 0)
+                            {
+                                //enlarge
+                                Array.Resize(ref compositeData, compositeSize + patchDiff);
+                            }
+                            //move data up/down
+                            var upperData = new byte[compositeSize - compsiteFileEnd];
+                            Array.ConstrainedCopy(compositeData, compsiteFileEnd, upperData, 0, upperData.Length);
+
+                            //patchdiff could be negative, so data can be moved down
+                            Array.ConstrainedCopy(upperData, 0, compositeData, compsiteFileEnd + patchDiff, upperData.Length);
+
+                            //copy it in
+                            Array.ConstrainedCopy(patchData, 0, compositeData, package.CompositeEntry.FileOffset, patchData.Length);
+
+
+                            if (patchDiff < 0)
+                            {
+                                //shrink
+                                Array.Resize(ref compositeData, compositeSize + patchDiff);
+                            }
+
 
                             File.WriteAllBytes(savepath, compositeData);
 
-                            //patch mapping
+                            //patch mappings
                             if (package.CompositeEntry != null && package.CompositeEntry.FileLength != patchData.Length)
                             {
+
+                                //modify entries accordingly
+                                foreach (var entry in this.CompositeMap[Path.GetFileNameWithoutExtension(package.Path)])
+                                {
+                                    if (entry.FileOffset > package.CompositeEntry.FileOffset)
+                                    {
+                                        entry.FileOffset += patchDiff;
+                                    }
+                                }
+
+                                //modify our entry
                                 package.CompositeEntry.FileLength = patchData.Length;
+                                package.CompositeEntry.FileOffset = compositeSize;
+
                                 MapperTools.WriteMappings(savepath, this);
                             }
                         }

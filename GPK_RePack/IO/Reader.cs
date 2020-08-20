@@ -129,7 +129,7 @@ namespace GPK_RePack.IO
 
                 tmpGPK.OrginalSize = dataLength;
                 tmpGPK.CompositeStartOffset = fileOffset;
-
+                tmpGPK.CompositeGpk = true;
 
                 var fullGpk = ReadSubGpkPackage(tmpGPK, data, false, stat);
 
