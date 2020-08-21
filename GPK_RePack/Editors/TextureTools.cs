@@ -60,8 +60,8 @@ namespace GPK_RePack.Editors
                     byte[] outputData = image.WriteMipMap(mipMap, config);
 
                     var textureMipMap = new MipMap();
-                    //textureMipMap.flags = (int)CompressionTypes.LZO;
-                    textureMipMap.flags = 0;
+                    textureMipMap.flags = (int)CompressionTypes.LZO;
+                    //textureMipMap.flags = 0;
                     textureMipMap.uncompressedData = outputData;
                     textureMipMap.uncompressedSize = outputData.Length;
                     textureMipMap.uncompressedSize_chunkheader = outputData.Length;

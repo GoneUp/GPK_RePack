@@ -24,7 +24,7 @@ namespace GPK_RePack.Model.Payload
         public byte[] startUnk;
         public string tgaPath;
         public bool inUnicode = false;
-        public byte[] guid;
+        public byte[] FooterPaddingUnk;
         public FileFormat parsedImageFormat;
 
         private const CompressionTypes NothingToDo = CompressionTypes.Unused | CompressionTypes.StoreInSeparatefile;
@@ -65,10 +65,12 @@ namespace GPK_RePack.Model.Payload
 
                 if (((CompressionTypes)map.flags & NothingToDo) == 0)
                 {
-                    int chunkSize = 16 + map.blocks.Count * 8 + map.compressedSize;
+                    //fix size of compressed data
+                    int chunkSize = 0;
+                    if (map.flags == 0) chunkSize = map.uncompressedSize;
+                    if (map.flags != 0) chunkSize = 16 + map.blocks.Count * 8 + map.compressedSize;
                     if (chunkSize != map.compChunkSize)
                     {
-                        logger.Debug("fixing chunksize for " + export.ObjectName);
                         map.compChunkSize = chunkSize;
                     }
 
@@ -110,7 +112,7 @@ namespace GPK_RePack.Model.Payload
                     //tfc case
                     //we don't change anything for now
                     writer.Write(map.compChunkSize);
-                    writer.Write(map.compChunkOffset); 
+                    writer.Write(map.compChunkOffset);
                 }
                 else
                 {
@@ -124,7 +126,7 @@ namespace GPK_RePack.Model.Payload
                 writer.Write(map.sizeY);
             }
 
-            writer.Write(guid);
+            writer.Write(FooterPaddingUnk);
         }
 
 
@@ -228,7 +230,8 @@ namespace GPK_RePack.Model.Payload
                 maps.Add(map);
             }
 
-            guid = reader.ReadBytes(16);
+            int toread = (int)(reader.BaseStream.Length - reader.BaseStream.Position);
+            FooterPaddingUnk = reader.ReadBytes(toread);
         }
 
         private void ReadMipMapFromReader(BinaryReader reader, MipMap map, GpkPackage package)
@@ -294,7 +297,7 @@ namespace GPK_RePack.Model.Payload
             }
 
             //guid
-            tmpSize += 16;
+            tmpSize += FooterPaddingUnk.Length;
             return tmpSize;
         }
 

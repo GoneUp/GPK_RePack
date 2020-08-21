@@ -140,7 +140,6 @@ namespace GPK_RePack.Model
 
                                 //modify our entry
                                 package.CompositeEntry.FileLength = patchData.Length;
-                                package.CompositeEntry.FileOffset = compositeSize;
 
                                 MapperTools.WriteMappings(savepath, this);
                             }

@@ -425,8 +425,6 @@ namespace GPK_RePack.Forms
                 this.Invoke(new Action(() => DrawPackages()));
                 return;
             }
-            Stopwatch ws = new Stopwatch();
-            ws.Start();
 
             treeMain.BeginUpdate();
             treeMain.Nodes.Clear();
@@ -510,9 +508,6 @@ namespace GPK_RePack.Forms
 
 
             treeMain.EndUpdate();
-
-            ws.Stop();
-            logger.Info("stopwatch {0}s ", ws.ElapsedMilliseconds / 1000);
         }
 
 
