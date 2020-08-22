@@ -69,6 +69,7 @@ namespace GPK_RePack.Forms
             this.decryptionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.datEncryptionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.writeMappingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dumpCompositeTexturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miscToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setFilesizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -122,7 +123,7 @@ namespace GPK_RePack.Forms
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
             this.boxLog = new System.Windows.Forms.RichTextBox();
-            this.writeMappingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAddedCompositeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -307,6 +308,7 @@ namespace GPK_RePack.Forms
             this.replaceSaveToolStripMenuItem,
             this.toolStripSeparator7,
             this.savePatchedCompositeStripMenuItem,
+            this.saveAddedCompositeToolStripMenuItem,
             this.toolStripSeparator1,
             this.settingsToolStripMenuItem,
             this.toolStripSeparator2,
@@ -432,6 +434,13 @@ namespace GPK_RePack.Forms
             this.loadMappingToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
             this.loadMappingToolStripMenuItem.Text = "Load/Show Mapping";
             this.loadMappingToolStripMenuItem.Click += new System.EventHandler(this.loadMappingToolStripMenuItem_Click);
+            // 
+            // writeMappingsToolStripMenuItem
+            // 
+            this.writeMappingsToolStripMenuItem.Name = "writeMappingsToolStripMenuItem";
+            this.writeMappingsToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.writeMappingsToolStripMenuItem.Text = "Write Mappings";
+            this.writeMappingsToolStripMenuItem.Click += new System.EventHandler(this.writeMappingsToolStripMenuItem_Click);
             // 
             // dumpCompositeTexturesToolStripMenuItem
             // 
@@ -1015,12 +1024,12 @@ namespace GPK_RePack.Forms
             this.boxLog.TabIndex = 0;
             this.boxLog.Text = "";
             // 
-            // writeMappingsToolStripMenuItem
+            // saveAddedCompositeToolStripMenuItem
             // 
-            this.writeMappingsToolStripMenuItem.Name = "writeMappingsToolStripMenuItem";
-            this.writeMappingsToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
-            this.writeMappingsToolStripMenuItem.Text = "Write Mappings";
-            this.writeMappingsToolStripMenuItem.Click += new System.EventHandler(this.writeMappingsToolStripMenuItem_Click);
+            this.saveAddedCompositeToolStripMenuItem.Name = "saveAddedCompositeToolStripMenuItem";
+            this.saveAddedCompositeToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.saveAddedCompositeToolStripMenuItem.Text = "Save added Composite";
+            this.saveAddedCompositeToolStripMenuItem.Click += new System.EventHandler(this.saveAddedCompositeToolStripMenuItem_Click);
             // 
             // GUI
             // 
@@ -1163,6 +1172,7 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem savePatchedCompositeStripMenuItem;
         private ToolStripMenuItem datEncryptionToolStripMenuItem;
         private ToolStripMenuItem writeMappingsToolStripMenuItem;
+        private ToolStripMenuItem saveAddedCompositeToolStripMenuItem;
     }
 }
 

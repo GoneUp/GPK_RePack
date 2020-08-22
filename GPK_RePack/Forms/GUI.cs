@@ -311,6 +311,11 @@ namespace GPK_RePack.Forms
             saveToolStripMenuItem_Click(sender, e);
         }
 
+        private void saveAddedCompositeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveToolStripMenuItem_Click(sender, e);
+        }
+
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DateTime start = DateTime.Now;
@@ -318,17 +323,22 @@ namespace GPK_RePack.Forms
             List<Task> runningTasks = new List<Task>();
             bool usePadding = sender == savePaddingStripMenuItem;
             bool patchComposite = false;
+            bool addComposite = false;
             if (sender == savePatchedCompositeStripMenuItem)
             {
                 usePadding = true;
                 patchComposite = true;
+            }
+            else if (sender == saveAddedCompositeToolStripMenuItem)
+            {
+                addComposite = true;
             }
 
             if (gpkStore.LoadedGpkPackages.Count == 0)
                 return;
 
             //do it
-            this.gpkStore.SaveGpkListToFiles(gpkStore.LoadedGpkPackages, usePadding, patchComposite, runningSavers, runningTasks);
+            this.gpkStore.SaveGpkListToFiles(gpkStore.LoadedGpkPackages, usePadding, patchComposite, addComposite, runningSavers, runningTasks);
 
             //display info while loading
             while (!Task.WaitAll(runningTasks.ToArray(), 50))
@@ -1498,7 +1508,7 @@ namespace GPK_RePack.Forms
 
             var path = dialog.SelectedPath + "\\tmp";
 
-            MapperTools.WriteMappings(path, gpkStore);         
+            MapperTools.WriteMappings(path, gpkStore);
         }
 
 
@@ -2068,7 +2078,7 @@ namespace GPK_RePack.Forms
                 }
             }));
         }
-       
+
         private void saveSingleGpkPackage()
         {
             if (selectedPackage != null && treeMain.SelectedNode != null && treeMain.SelectedNode.Level == 0)
@@ -2078,7 +2088,7 @@ namespace GPK_RePack.Forms
                 var writerList = new List<IProgress>();
                 var taskList = new List<Task>();
 
-                this.gpkStore.SaveGpkListToFiles(packages, false, false, writerList, taskList);
+                this.gpkStore.SaveGpkListToFiles(packages, false, false, false, writerList, taskList);
 
                 //wait
                 while (!Task.WaitAll(taskList.ToArray(), 50))
@@ -2102,9 +2112,10 @@ namespace GPK_RePack.Forms
 
 
 
+
         #endregion
 
-    
+
     }
 }
 
