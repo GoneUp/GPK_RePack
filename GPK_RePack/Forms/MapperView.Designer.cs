@@ -32,6 +32,7 @@ namespace GPK_RePack.Forms
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeMapperView = new GPK_RePack.Forms.Helper.CompositeTreeView();
+            this.btnDeleteEntry = new System.Windows.Forms.Button();
             this.btnDeleteMapping = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.boxSearch = new System.Windows.Forms.TextBox();
@@ -54,6 +55,7 @@ namespace GPK_RePack.Forms
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.btnDeleteEntry);
             this.splitContainer1.Panel2.Controls.Add(this.btnDeleteMapping);
             this.splitContainer1.Panel2.Controls.Add(this.label1);
             this.splitContainer1.Panel2.Controls.Add(this.boxSearch);
@@ -69,6 +71,16 @@ namespace GPK_RePack.Forms
             this.treeMapperView.Size = new System.Drawing.Size(584, 431);
             this.treeMapperView.TabIndex = 0;
             this.treeMapperView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMapperView_AfterSelect);
+            // 
+            // btnDeleteEntry
+            // 
+            this.btnDeleteEntry.Location = new System.Drawing.Point(366, 22);
+            this.btnDeleteEntry.Name = "btnDeleteEntry";
+            this.btnDeleteEntry.Size = new System.Drawing.Size(106, 23);
+            this.btnDeleteEntry.TabIndex = 3;
+            this.btnDeleteEntry.Text = "Delete Entry";
+            this.btnDeleteEntry.UseVisualStyleBackColor = true;
+            this.btnDeleteEntry.Click += new System.EventHandler(this.btnDeleteEntry_Click);
             // 
             // btnDeleteMapping
             // 
@@ -124,5 +136,6 @@ namespace GPK_RePack.Forms
         private CompositeTreeView treeMapperView;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnDeleteMapping;
+        private System.Windows.Forms.Button btnDeleteEntry;
     }
 }

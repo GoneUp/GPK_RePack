@@ -33,7 +33,7 @@ namespace GPK_RePack.Forms.Helper
             OnDrawNodes();
         }
 
-        private void OnDrawNodes()
+        public void OnDrawNodes()
         {
             this.BeginUpdate();
             this.Nodes.Clear();

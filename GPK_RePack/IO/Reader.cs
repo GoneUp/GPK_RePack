@@ -210,6 +210,8 @@ namespace GPK_RePack.IO
         private void ReadHeader(BinaryReader reader, GpkPackage package)
         {
             logger.Trace("Header start");
+            if (reader.BaseStream.Length == 0)
+                throw new Exception("Not a valid GPK File.");
 
             package.Header.Tag = reader.ReadInt32();
             CheckSignature(package.Header.Tag);

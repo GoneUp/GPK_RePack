@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -55,12 +56,12 @@ namespace GPK_RePack.IO
         {
             try
             {
-                int offset = 0;
+                int offset = 0;   
 
                 // Unscramble (1)
-                for (offset = 0; offset < data.Length; offset += 16)
+                for (offset = 0; offset <= data.Length; offset += 16)
                 {
-                    if (offset + 16 < data.Length)
+                    if (offset + 16 <= data.Length)
                     {
                         byte[] copy = new byte[16];
                         Array.ConstrainedCopy(data, offset, copy, 0, 16);
@@ -86,7 +87,7 @@ namespace GPK_RePack.IO
 
                 // Unscramble (2)
                 //int divison, floor it
-                if ((data.Length / 2) > 0)
+                if ((data.Length / 2) > 0) 
                 {
                     var offset1 = 1;
                     var offset2 = data.Length - 1;
@@ -167,10 +168,10 @@ namespace GPK_RePack.IO
                 }
 
 
-                // Unscramble (1)
-                for (offset = 0; offset < data.Length; offset += 16)
+                // Scramble (1)
+                for (offset = 0; offset <= data.Length; offset += 16)
                 {
-                    if (offset + 16 < data.Length)
+                    if (offset + 16 <= data.Length)
                     {
                         byte[] copy = new byte[16];
                         Array.ConstrainedCopy(data, offset, copy, 0, 16);
@@ -279,6 +280,13 @@ namespace GPK_RePack.IO
                         tmp.UnknownUID = split[1];
                         tmp.FileOffset = Convert.ToInt32(split[2]);
                         tmp.FileLength = Convert.ToInt32(split[3]);
+
+                        //sanity
+                        if (!objectMapperList.ContainsKey(tmp.CompositeUID))
+                        {
+                            logger.Error("ObjectMapping for %s not found", tmp.CompositeUID);
+                            continue;
+                        }
 
                         //enrich
                         tmp.SubGPKName = fileName;

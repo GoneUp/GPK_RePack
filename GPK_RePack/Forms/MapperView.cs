@@ -80,5 +80,17 @@ namespace GPK_RePack.Forms
             this.store.clearCompositeMap();
             logger.Info("Deleted Mapping Cache");
         }
+
+        private void btnDeleteEntry_Click(object sender, EventArgs e)
+        {
+            if (treeMapperView.SelectedNode == null || treeMapperView.SelectedNode.Tag == null)
+                return;
+
+            CompositeMapEntry entry = (CompositeMapEntry)treeMapperView.SelectedNode.Tag;
+
+            store.CompositeMap[entry.SubGPKName].Remove(entry);
+            treeMapperView.OnDrawNodes();
+
+    }
     }
 }
