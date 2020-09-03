@@ -1550,7 +1550,37 @@ namespace GPK_RePack.Forms
             var outDir = dialog.SelectedPath;
             new Task(() => MassDumper.DumpMassTextures(gpkStore, outDir, filterList)).Start();
         }
+        private void dumpIconsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //cookedpc path, outdir path
+            var dialog = new FolderBrowserDialog();
+            if (Settings.Default.CookedPCPath != "")
+                dialog.SelectedPath = Settings.Default.CookedPCPath;
+            dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
+            if (dialog.ShowDialog() == DialogResult.Cancel)
+                return;
+            var path = dialog.SelectedPath;
+            gpkStore.BaseSearchPath = path;
+            Settings.Default.CookedPCPath = path;
+            MapperTools.ParseMappings(path, gpkStore);
 
+            int subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
+            logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", gpkStore.CompositeMap.Count, subCount);
+            var list = filterCompositeList("");
+            //save dir
+            dialog = new FolderBrowserDialog();
+            dialog.SelectedPath = Settings.Default.WorkingDir;
+            dialog.Description = "Select your output dir";
+            if (dialog.ShowDialog() == DialogResult.Cancel)
+                return;
+            logger.Warn("Warning: This function can be ultra long running (hours) and unstable. Monitor logfile and output folder for progress.");
+            logger.Warn("Disabling logging, dump is running in the background. Consider setting file logging to only info.");
+
+            NLogConfig.DisableFormLogging();
+            var outDir = dialog.SelectedPath;
+            new Task(() => MassDumper.DumpMassIcons(gpkStore, outDir, list)).Start();
+
+        }
         private Dictionary<String, List<CompositeMapEntry>> filterCompositeList(string text)
         {
             try
@@ -2098,6 +2128,7 @@ namespace GPK_RePack.Forms
                 logger.Info("Single export done!");
             }
         }
+
 
 
 
