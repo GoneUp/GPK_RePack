@@ -116,6 +116,7 @@ namespace GPK_RePack.IO
 
             foreach (var file in filterList)
             {
+
                 //throttle thread creation
                 while (runningTasks.Count > MAX_TASKS)
                 {
@@ -130,10 +131,13 @@ namespace GPK_RePack.IO
                 //limit to 5 threads by default
                 foreach (var entry in file.Value)
                 {
-                    Task newTask = null; 
+
+                    Task newTask = null;
                     newTask = new Task(() =>
                     {
                         string path = string.Format("{0}\\{1}.gpk", store.BaseSearchPath, entry.SubGPKName);
+
+
 
                         if (!File.Exists(path))
                         {
@@ -154,6 +158,7 @@ namespace GPK_RePack.IO
                             //S1UI_Chat2.Chat2,c7a706fb_6a349a6f_1d212.Chat2_dup |
                             //we use this uid from pkgmapper
                             //var imagePath = string.Format("{0}{1}_{2}.dds", fileOutPath, entry.UID, export.UID);
+
                             var imagePath = string.Format("{0}{1}---{2}.dds", fileOutPath, entry.UID, export.UID);
                             TextureTools.exportTexture(export, imagePath);
 
@@ -171,12 +176,96 @@ namespace GPK_RePack.IO
                     newTask.Start();
                     runningTasks.Add(newTask);
 
-                    
-                }  
+
+                }
             }
 
             Task.WaitAll(runningTasks.ToArray());
-            
+
+
+            NLogConfig.EnableFormLogging();
+            logger.Info("Dumping done");
+        }
+        public static void DumpMassIcons(GpkStore store, String outdir, Dictionary<String, List<CompositeMapEntry>> filterList)
+        {
+            logger.Info("Started dumping textures to " + outdir);
+            Directory.CreateDirectory(outdir);
+
+            SynchronizedCollection<Task> runningTasks = new SynchronizedCollection<Task>();
+
+            int MAX_TASKS = 100;
+
+            foreach (var file in filterList)
+            {
+
+                if (!file.Value.Any(x => x.UID.StartsWith("Icon_"))) continue;
+                //throttle thread creation
+                while (runningTasks.Count > MAX_TASKS)
+                {
+                    Thread.Sleep(1000);
+                }
+
+
+
+                //limit to 5 threads by default
+                foreach (var entry in file.Value)
+                {
+                    if (!entry.UID.StartsWith("Icon_")) continue;
+
+                    Task newTask = null;
+                    newTask = new Task(() =>
+                    {
+
+                        string path = string.Format("{0}\\{1}.gpk", store.BaseSearchPath, entry.SubGPKName);
+
+                        var fullName = entry.UID.Split('.');
+                        //create out dir
+                        var fileOutPath = string.Format("{0}\\{1}\\", outdir, fullName[0]);
+                        Directory.CreateDirectory(fileOutPath);
+
+                        if (!File.Exists(path))
+                        {
+                            logger.Warn("GPK to load not found. Searched for: " + path);
+                            return;
+                        }
+
+                        Reader r = new Reader();
+                        var package = r.ReadSubGpkFromComposite(path, entry.UID, entry.FileOffset, entry.FileLength);
+                        package.LowMemMode = true;
+
+                        //extract
+                        var exports = package.GetExportsByClass("Core.Texture2D");
+
+                        foreach (var export in exports)
+                        {
+                            //UID->Composite UID
+                            //S1UI_Chat2.Chat2,c7a706fb_6a349a6f_1d212.Chat2_dup |
+                            //we use this uid from pkgmapper
+                            //var imagePath = string.Format("{0}{1}_{2}.dds", fileOutPath, entry.UID, export.UID);
+
+                            var imagePath = string.Format("{0}{1}.dds", fileOutPath, fullName[1]);
+                            TextureTools.exportTexture(export, imagePath);
+
+                            logger.Info("Extracted texture {0} to {1}", entry.UID, imagePath);
+                        }
+
+                        //remove ref to ease gc
+                        exports.Clear();
+                        package = null;
+
+                        runningTasks.Remove(newTask);
+                    });
+
+
+                    newTask.Start();
+                    runningTasks.Add(newTask);
+
+
+                }
+            }
+
+            Task.WaitAll(runningTasks.ToArray());
+
 
             NLogConfig.EnableFormLogging();
             logger.Info("Dumping done");
