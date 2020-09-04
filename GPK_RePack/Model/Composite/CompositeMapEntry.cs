@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace GPK_RePack.Model.Composite
 {
+    [Serializable]
     public class CompositeMapEntry
     {
         /*
@@ -38,6 +39,13 @@ c7a706fb_6a349a6f_1d212.Chat2_dup,c7a706fb_6a349a6f_1d212,92291307,821218,|
         {
             return String.Format("UID: {0}, CompositeUID: {1}", UID, CompositeUID);
         }
+
+        public string GetObjectName()
+        {
+            return CompositeUID.Split('.')[1];
+        }
+
+
     }
 
 

@@ -14,7 +14,7 @@ namespace GPK_RePack.Model
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        private GpkPackage motherPackage;
+        public GpkPackage motherPackage;
         public string UID;
 
         public int ClassIndex;
@@ -215,11 +215,24 @@ namespace GPK_RePack.Model
 
         }
 
+        internal void CheckNamePresence(GpkPackage package)
+        {
+            package.GetStringIndex(ObjectName);
+
+            foreach (IProperty iProp in Properties)
+            {
+                GpkBaseProperty baseProperty = (GpkBaseProperty)iProp;
+                package.GetStringIndex(baseProperty.name);
+                package.GetStringIndex(baseProperty.type);
+
+                iProp.CheckAndAddNames(package);
+            }
+        }
         public IProperty GetProperty(String name)
         {
             return Properties.Find(x => ((GpkBaseProperty) x).name == name);
         }
 
-
+      
     }
 }

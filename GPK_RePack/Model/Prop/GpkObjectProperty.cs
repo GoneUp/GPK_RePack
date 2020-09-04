@@ -29,7 +29,7 @@ namespace GPK_RePack.Model.Prop
 
         public void WriteData(BinaryWriter writer, GpkPackage package)
         {
-            writer.Write((int)package.GetObjectIndex(objectName));
+            writer.Write(package.GetObjectIndex(objectName));
         }
 
         public void ReadData(BinaryReader reader, GpkPackage package)
@@ -52,6 +52,11 @@ namespace GPK_RePack.Model.Prop
         public bool SetValue(string input)
         {
             return false;
+        }
+
+        public void CheckAndAddNames(GpkPackage package)
+        {
+            throw new NotImplementedException();
         }
     }
 

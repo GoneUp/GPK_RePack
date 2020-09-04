@@ -873,6 +873,18 @@ namespace GPK_RePack.Forms
                 return;
             }
 
+            try
+            {
+                MemoryStream memorystream = new MemoryStream();
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(memorystream, selectedExport);
+            }
+            catch (Exception ex)
+            {
+                logger.Debug(ex);
+                logger.Info("Serialize failed, check debug log");
+                return;
+            }
 
             Clipboard.SetData(exportFormat.Name, selectedExport);
             logger.Info("Made a copy of {0}...", selectedExport.UID);
@@ -922,6 +934,27 @@ namespace GPK_RePack.Forms
             logger.Info("Pasted the {0} of {1} to {2}", option, copyExport.UID, selectedExport.UID);
         }
 
+        private void insertStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selectedPackage == null)
+            {
+                logger.Trace("no selected package to insert");
+                return;
+            }
+            GpkExport copyExport = (GpkExport)Clipboard.GetData(exportFormat.Name);
+
+            if (copyExport == null)
+            {
+                logger.Info("copy paste fail");
+                return;
+            }
+
+            selectedPackage.CopyObjectFromPackage(copyExport.UID, copyExport.motherPackage);
+
+            DrawPackages();
+            logger.Info("Insert done");
+        }
+
         private void btnDeleteData_Click(object sender, EventArgs e)
         {
             if (selectedExport == null)
@@ -944,6 +977,8 @@ namespace GPK_RePack.Forms
 
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
         }
+
+
 
         protected override bool ProcessCmdKey(ref Message message, Keys keys)
         {
@@ -2128,6 +2163,7 @@ namespace GPK_RePack.Forms
                 logger.Info("Single export done!");
             }
         }
+
 
 
 

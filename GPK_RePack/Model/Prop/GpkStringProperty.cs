@@ -86,6 +86,11 @@ namespace GPK_RePack.Model.Prop
         {
             return string.Format("ObjectName: {0} Type: {1} Value: {2}", name, type, value);
         }
+
+        public void CheckAndAddNames(GpkPackage package)
+        {
+            
+        }
     }
 
 }

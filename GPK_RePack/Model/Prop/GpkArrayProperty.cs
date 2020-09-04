@@ -84,6 +84,11 @@ namespace GPK_RePack.Model.Prop
             if(value != null) hex = value.ToHex();
             return hex;
         }
+
+        public void CheckAndAddNames(GpkPackage package)
+        {
+   
+        }
     }
 
 }

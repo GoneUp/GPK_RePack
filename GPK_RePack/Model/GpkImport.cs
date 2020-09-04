@@ -11,10 +11,17 @@ namespace GPK_RePack.Model
 
         public string ClassPackage;
         public string ClassName;
-        public int PackageRef;
+        public int OwnerIndex;
+        public string OwnerObject;
         public string ObjectName;
 
-        public int Unk;
+        public void CheckNamePresence(GpkPackage package)
+        {
+            package.GetStringIndex(ClassPackage);
+            package.GetStringIndex(ClassName);
+            package.GetStringIndex(ObjectName);
+        }
+
 
         public override string ToString()
         {
@@ -24,6 +31,7 @@ namespace GPK_RePack.Model
             info.AppendLine("Object: " + ObjectName);
             info.AppendLine("ClassPackage: " + ClassPackage);
             info.AppendLine("Class: " + ClassName);
+            info.AppendLine("OwnerObject: " + OwnerObject);
             return info.ToString();
 
         }
@@ -36,7 +44,6 @@ namespace GPK_RePack.Model
         public int GetSize()
         {
             return 28;
-
         }
     }
 }

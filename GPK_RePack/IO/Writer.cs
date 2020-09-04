@@ -265,9 +265,8 @@ namespace GPK_RePack.IO
             {
                 writer.Write(package.GetStringIndex(imp.ClassPackage));
                 writer.Write(package.GetStringIndex(imp.ClassName));
-                writer.Write(imp.PackageRef);
-                writer.Write((int)package.GetStringIndex(imp.ObjectName));
-                writer.Write(imp.Unk);
+                writer.Write(package.GetObjectIndex(imp.OwnerObject));
+                writer.Write(package.GetStringIndex(imp.ObjectName));
                 stat.progress++;
             }
 

@@ -60,19 +60,23 @@ namespace GPK_RePack.Model
         }
 
         #region string
-        public void AddString(string text)
+        //returns index
+        public long AddString(string text)
         {
             long maxKey = 0;
             foreach (KeyValuePair<long, GpkString> pair in NameList)
             {
                 if (pair.Key > maxKey) maxKey = pair.Key;
-                if (pair.Value.name == text) return;
+                if (pair.Value.name == text) return pair.Key;
             }
 
             //flag 1970393556451328 is unk
+            var newKey = maxKey + 1;
             GpkString str = new GpkString(text, 1970393556451328, true);
-            NameList.Add(maxKey + 1, str);
+            NameList.Add(newKey, str);
             Header.NameCount++;
+
+            return newKey;
         }
 
         public string GetString(long index)
@@ -93,7 +97,7 @@ namespace GPK_RePack.Model
                 if (pair.Value.name == text) return pair.Key;
             }
 
-            throw new Exception(string.Format("Name {0} not found!", text));
+            return AddString(text);
         }
 
         public int RemoveUnusedStrings()
@@ -130,6 +134,65 @@ namespace GPK_RePack.Model
         #endregion
 
         #region objects
+        public long AddExport(GpkExport export)
+        {
+            var key = ExportList.Max(x => x.Key) + 1;
+
+            ExportList.Add(key, export);
+            Header.ExportCount++;
+
+            Reader.GenerateUID(this, export);
+            export.motherPackage = this;
+            return key;
+        }
+
+        public long AddImport(GpkImport import)
+        {
+            //check for existing
+            foreach (var imp in ImportList)
+            {
+                if (imp.Value.UID == import.UID) return 0;
+            }
+
+            var key = ImportList.Max(x => x.Key) + 1;
+
+            ImportList.Add(key, import);
+            Header.ImportCount++;
+
+            Reader.GenerateUID(this, import);
+            return key;
+        }
+
+        public void CopyObjectFromPackage(string objectname, GpkPackage foreignPackage)
+        {
+            //recurse it down!
+            if (objectname == null || objectname == "none") return;
+
+            object copyObj = foreignPackage.GetObjectByUID(objectname);
+            if (copyObj is GpkImport)
+            {
+                AddImport((GpkImport)copyObj);
+                //resolve owners
+                string owner = ((GpkImport)copyObj).OwnerObject;
+                while (owner != "none")
+                {
+                    GpkImport ownerObj = (GpkImport)foreignPackage.GetObjectByUID(owner);
+                    AddImport(ownerObj);
+
+                    owner = ownerObj.OwnerObject;
+                }
+            } else {
+                var exportObj = (GpkExport)copyObj;
+                AddExport(exportObj);
+
+                CopyObjectFromPackage(exportObj.ClassName, foreignPackage);
+                CopyObjectFromPackage(exportObj.PackageName, foreignPackage);
+                CopyObjectFromPackage(exportObj.SuperName, foreignPackage);
+                CopyObjectFromPackage(exportObj.NetIndexName, foreignPackage);
+            }
+
+        }
+
         public string GetObjectName(int index, bool returnNull = false)
         {
             //Import, Export added due to diffrent files appear to have the same object on import and export list
@@ -172,7 +235,7 @@ namespace GPK_RePack.Model
             throw new Exception(string.Format("Object {0} not found!", index));
         }
 
-        public long GetObjectIndex(string text)
+        public int GetObjectIndex(string text)
         {
             if (text == "none") return 0;
 
@@ -183,7 +246,7 @@ namespace GPK_RePack.Model
                 {
                     if (pair.Value == gpkObject)
                     {
-                        return (pair.Key + 1) * -1;
+                        return (int)(pair.Key + 1) * -1;
                     }
                 }
             }
@@ -193,7 +256,7 @@ namespace GPK_RePack.Model
                 {
                     if (pair.Value == gpkObject)
                     {
-                        return pair.Key + 1;
+                        return (int)pair.Key + 1;
                     }
                 }
 
@@ -204,6 +267,8 @@ namespace GPK_RePack.Model
 
         public long GetObjectKeyByUID(string uid)
         {
+            if (uid == "none") return 0;
+
             foreach (KeyValuePair<long, GpkImport> pair in ImportList)
             {
                 if (pair.Value.UID == uid)
@@ -244,7 +309,7 @@ namespace GPK_RePack.Model
 
             throw new Exception(string.Format("Object {0} not found!", uid));
         }
-        #endregion
+
 
         public List<GpkExport> GetExportsByClass(string className)
         {
@@ -265,14 +330,24 @@ namespace GPK_RePack.Model
             }
             return tmpList;
         }
-
+        #endregion
         public void PrepareWriting(bool enableCompression)
         {
             //set new offsets
             //set coutn values on header
+            //check names
+            foreach (var i in ImportList.Values)
+            {
+                i.CheckNamePresence(this);
+            }
+            foreach (var i in ExportList.Values)
+            {
+                i.CheckNamePresence(this);
+            }
 
-            Header.RecalculateCounts(this);
             GetSize(true);
+            Header.RecalculateCounts(this);
+
 
             if (enableCompression)
             {

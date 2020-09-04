@@ -68,6 +68,11 @@ namespace GPK_RePack.Model.Prop
             value = Convert.ToBoolean(input);
             return true;
         }
+
+        public void CheckAndAddNames(GpkPackage package)
+        {
+
+        }
     }
 
 }

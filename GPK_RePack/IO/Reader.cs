@@ -255,7 +255,7 @@ namespace GPK_RePack.IO
             logger.Debug("DependsOffset " + package.Header.DependsOffset);
             logger.Debug("HeaderSize " + package.Header.HeaderSize);
 
-            
+
 
             stat.totalobjects = package.Header.NameCount + package.Header.ImportCount + package.Header.ExportCount * 3; //Export, Export Linking, ExportData = *3
             logger.Debug("File Info: NameCount {0}, ImportCount {1}, ExportCount {2}", package.Header.NameCount, package.Header.ImportCount, package.Header.ExportCount);
@@ -339,7 +339,7 @@ namespace GPK_RePack.IO
                 //sanity check
                 package.Header.HeaderPadding = reader.ReadBytes(paddingSize);
             }
-                
+
 
             logger.Debug("End of Header at {0}, paddingSize {1}", reader.BaseStream.Position, package.Header.HeaderPadding.Length);
 
@@ -442,9 +442,8 @@ namespace GPK_RePack.IO
                 long package_class_index = reader.ReadInt64();
                 long class_index = reader.ReadInt64();
 
-                import.PackageRef = reader.ReadInt32();
-                long object_index = reader.ReadInt32();
-                import.Unk = reader.ReadInt32();
+                import.OwnerIndex = reader.ReadInt32();
+                long object_index = reader.ReadInt64();
 
                 import.ClassPackage = package.GetString(package_class_index);
                 import.ClassName = package.GetString(class_index);
@@ -455,6 +454,12 @@ namespace GPK_RePack.IO
 
                 logger.Trace("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.ClassName, import.ObjectName);
                 stat.progress++;
+            }
+
+
+            foreach (KeyValuePair<long, GpkImport> pair in package.ImportList)
+            {
+                pair.Value.OwnerObject = package.GetObjectName(pair.Value.OwnerIndex);
             }
         }
 
@@ -483,7 +488,7 @@ namespace GPK_RePack.IO
                     export.SerialOffset = reader.ReadInt32();
                 }
 
-                export.Unk3 = reader.ReadInt32();
+                export.Unk3 = reader.ReadInt32(); //ExportFlags
                 export.UnkHeaderCount = reader.ReadInt32();
                 export.Unk4 = reader.ReadInt32();
                 export.Guid = reader.ReadBytes(16);

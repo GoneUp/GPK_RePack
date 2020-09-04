@@ -89,12 +89,13 @@ namespace GPK_RePack.Model
 
                             PatchComposite(package, savepath, tmpPath);
                         }
-                        else if (addComposite && package.CompositeGpk)
+                        else if (addComposite)
                         {
                             var tmpPath = Path.GetDirectoryName(package.Path) + "\\pack.gpk";
                             tmpS.SaveGpkPackage(package, tmpPath, usePadding);
 
-                            AddCompsite(package, savepath, tmpPath, "pack");
+                            //AddCompsite(package, savepath, tmpPath, "pack");
+                            MultiPatchComposite(package, savepath, tmpPath, "pack");
                         }
                         else
                         {
@@ -156,7 +157,7 @@ namespace GPK_RePack.Model
             {
 
                 //modify entries accordingly
-                foreach (var entry in this.CompositeMap[Path.GetFileNameWithoutExtension(package.Path)])
+                foreach (var entry in CompositeMap[Path.GetFileNameWithoutExtension(package.Path)])
                 {
                     if (entry.FileOffset > package.CompositeEntry.FileOffset)
                     {
@@ -196,6 +197,28 @@ namespace GPK_RePack.Model
             }
         }
 
+        private void MultiPatchComposite(GpkPackage package, string savepath, string tmpPath, string compositeFile)
+        {
+            var patchDataSize = new FileInfo(tmpPath).Length;
+
+            //strat: check all objects and modify the comp entry if it is exiting to point to the new pack
+            foreach(var export in package.ExportList)
+            {
+                var list = FindCompositeMapEntriesForObjectname(export.Value.ObjectName);
+                foreach(var entry in list)
+                {
+                    logger.Info("Patching entry {0} to point to new file for object {1}", entry.CompositeUID, export.Value.UID);
+                    entry.FileLength = (int)patchDataSize;
+                    entry.FileOffset = 0;
+                    entry.SubGPKName = compositeFile;
+                }
+                if (list.Count > 0) break;
+            }
+
+            MapperTools.WriteMappings(savepath, this);
+        }
+
+
         public void DeleteGpk(GpkPackage package)
         {
             LoadedGpkPackages.Remove(package);
@@ -215,6 +238,25 @@ namespace GPK_RePack.Model
             BaseSearchPath = "";
         }
 
+        public List<CompositeMapEntry> FindCompositeMapEntriesForObjectname(string objectName)
+        {
+            var returnList = new List<CompositeMapEntry>();
+
+            foreach (var fileName in CompositeMap.Keys)
+            {
+                foreach (var entry in CompositeMap[fileName])
+                {
+                    if (entry.GetObjectName() == objectName)
+                    {
+                        returnList.Add(entry);
+                    }
+                }
+
+
+            }
+
+            return returnList;
+        }
 
     }
 }

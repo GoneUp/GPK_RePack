@@ -59,6 +59,10 @@ namespace GPK_RePack.Model.Prop
             value = Convert.ToInt32(input);
             return true;
         }
+
+        public void CheckAndAddNames(GpkPackage package)
+        {
+        }
     }
 
 }

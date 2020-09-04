@@ -83,6 +83,12 @@ namespace GPK_RePack.Model.Prop
         {
             return false;
         }
+
+        public void CheckAndAddNames(GpkPackage package)
+        {
+            package.GetStringIndex(enumType);
+            package.GetStringIndex(nameValue);
+        }
     }
 
 }
