@@ -54,7 +54,7 @@ namespace GPK_RePack.Model
         public long DataStart;
         public byte[] DataPadding;
         private byte[] m_data;
-        public IPayload m_payload;
+        private IPayload m_payload;
         public DataLoader Loader;
 
         public byte[] Data

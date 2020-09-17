@@ -36,6 +36,9 @@ namespace GPK_RePack.Forms
                 case "props":
                     btnProperties.Checked = true;
                     break;
+                case "all":
+                    btnRadioAll.Checked = true;
+                    break;
             }
 
             switch (Settings.Default.LogLevel)
@@ -105,6 +108,11 @@ namespace GPK_RePack.Forms
         private void btnProperties_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.CopyMode = "props";
+        }
+
+        private void btnRadioAll_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.CopyMode = "all";
         }
 
         private void btnLogInfo_CheckedChanged(object sender, EventArgs e)
@@ -225,5 +233,7 @@ namespace GPK_RePack.Forms
         {
             Settings.Default.EnableCompression = boxCompression.Checked;
         }
+
+    
     }
 }

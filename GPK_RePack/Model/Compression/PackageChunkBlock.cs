@@ -8,6 +8,7 @@ using System.Windows.Forms;
 
 namespace GPK_RePack.Model.Payload
 {
+    [Serializable]
     class PackageChunkBlock
     {
         public int signature; //0x9e2a83c1

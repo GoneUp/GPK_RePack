@@ -449,7 +449,7 @@ namespace GPK_RePack.IO
                 import.ClassName = package.GetString(class_index);
                 import.ObjectName = package.GetString(object_index);
 
-                import.UID = GenerateUID(package, import);
+                import.UID = package.GenerateUID(import);
                 package.ImportList.Add(i, import);
 
                 logger.Trace("Import {0}: ClassPackage {1} Class: {2} Object: {3}", i, import.ClassPackage, import.ClassName, import.ObjectName);
@@ -510,7 +510,7 @@ namespace GPK_RePack.IO
                     export.ClassName = package.GetObjectName(export.ClassIndex);
                     export.SuperName = package.GetObjectName(export.SuperIndex);
                     export.PackageName = package.GetObjectName(export.PackageIndex);
-                    export.UID = GenerateUID(package, export);
+                    export.UID = package.GenerateUID(export);
                 }
 
                 stat.progress++;
@@ -779,62 +779,6 @@ namespace GPK_RePack.IO
             reader.ReadBytes(2); //text control char 
 
             return text;
-        }
-
-        public static string GenerateUID(GpkPackage package, GpkExport export)
-        {
-
-            string proposedName;
-            if (export.PackageName == "none")
-            {
-                proposedName = export.ObjectName;
-            }
-            else
-            {
-                proposedName = export.PackageName + "." + export.ObjectName;
-            }
-
-            int counter = 0;
-            do
-            {
-                string tmpName = proposedName;
-                if (counter > 0)
-                {
-                    tmpName += ("_" + counter);
-                }
-
-                if (package.UidList.ContainsKey(tmpName) == false)
-                {
-                    package.UidList.Add(tmpName, export);
-                    return tmpName;
-                }
-
-                counter++;
-            } while (true);
-
-        }
-
-        public static string GenerateUID(GpkPackage package, GpkImport import)
-        {
-            string proposedName = import.ClassPackage + "." + import.ObjectName;
-
-            int counter = 0;
-            do
-            {
-                string tmpName = proposedName;
-                if (counter > 0)
-                {
-                    tmpName += ("_" + counter);
-                }
-
-                if (package.UidList.ContainsKey(tmpName) == false)
-                {
-                    package.UidList.Add(tmpName, import);
-                    return tmpName;
-                }
-
-                counter++;
-            } while (true);
         }
 
         private bool CheckForAnotherPackage(BinaryReader reader)

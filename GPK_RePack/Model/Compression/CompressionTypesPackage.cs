@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GPK_RePack.Model.Payload
 {
-
+    [Serializable]
     public enum CompressionTypesPackage : uint
     {
 

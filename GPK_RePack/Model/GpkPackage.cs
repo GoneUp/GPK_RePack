@@ -134,6 +134,60 @@ namespace GPK_RePack.Model
         #endregion
 
         #region objects
+        public string GenerateUID(GpkExport export)
+        {
+            if (export.UID != null && export.UID != "")
+            {
+                UidList.Remove(export.UID);
+            }
+
+            string proposedName;
+            if (export.PackageName == "none")
+            {
+                proposedName = export.ObjectName;
+            }
+            else
+            {
+                proposedName = export.PackageName + "." + export.ObjectName;
+            }
+
+            return GenerateUID(proposedName, export);
+
+        }
+
+        public string GenerateUID(GpkImport import)
+        {
+            if (import.UID != null && import.UID != "")
+            {
+                UidList.Remove(import.UID);
+            }
+
+            string proposedName = import.ClassPackage + "." + import.ObjectName;
+
+            return GenerateUID(proposedName, import);
+        }
+
+        private string GenerateUID(String proposedName, IGpkPart gpkPart)
+        {
+            int counter = 0;
+            do
+            {
+                string tmpName = proposedName;
+                if (counter > 0)
+                {
+                    tmpName += ("_" + counter);
+                }
+
+                if (UidList.ContainsKey(tmpName) == false)
+                {
+                    UidList.Add(tmpName, gpkPart);
+                    return tmpName;
+                }
+
+                counter++;
+            } while (true);
+        }
+
         public long AddExport(GpkExport export)
         {
             var key = ExportList.Max(x => x.Key) + 1;
@@ -141,7 +195,7 @@ namespace GPK_RePack.Model
             ExportList.Add(key, export);
             Header.ExportCount++;
 
-            Reader.GenerateUID(this, export);
+            GenerateUID(export);
             export.motherPackage = this;
             return key;
         }
@@ -159,36 +213,44 @@ namespace GPK_RePack.Model
             ImportList.Add(key, import);
             Header.ImportCount++;
 
-            Reader.GenerateUID(this, import);
+            GenerateUID(import);
             return key;
         }
 
-        public void CopyObjectFromPackage(string objectname, GpkPackage foreignPackage)
+        public string CopyObjectFromPackage(string objectname, GpkPackage foreignPackage, bool replaceDuplicates)
         {
-            //recurse it down!
-            if (objectname == null || objectname == "none") return;
+            //recurse it down! 
+            if (objectname == null || objectname == "none") return "none";
 
             object copyObj = foreignPackage.GetObjectByUID(objectname);
+            object ownObj = GetObjectByUID(objectname);
+
+            //found a dup (likely something such as a common import Core.Core or Core.Engine)
+            if (ownObj != null && replaceDuplicates)
+                return null;
+
             if (copyObj is GpkImport)
             {
-                AddImport((GpkImport)copyObj);
+                var importObj = (GpkImport)copyObj;
+                AddImport(importObj);
                 //resolve owners
-                string owner = ((GpkImport)copyObj).OwnerObject;
-                while (owner != "none")
-                {
-                    GpkImport ownerObj = (GpkImport)foreignPackage.GetObjectByUID(owner);
-                    AddImport(ownerObj);
+                string newOwnerUID = CopyObjectFromPackage(importObj.OwnerObject, foreignPackage, false);
 
-                    owner = ownerObj.OwnerObject;
-                }
-            } else {
+                importObj.OwnerObject = newOwnerUID;
+
+                return importObj.UID;
+            }
+            else
+            {
                 var exportObj = (GpkExport)copyObj;
                 AddExport(exportObj);
 
-                CopyObjectFromPackage(exportObj.ClassName, foreignPackage);
-                CopyObjectFromPackage(exportObj.PackageName, foreignPackage);
-                CopyObjectFromPackage(exportObj.SuperName, foreignPackage);
-                CopyObjectFromPackage(exportObj.NetIndexName, foreignPackage);
+                CopyObjectFromPackage(exportObj.ClassName, foreignPackage, false);
+                CopyObjectFromPackage(exportObj.PackageName, foreignPackage, false);
+                CopyObjectFromPackage(exportObj.SuperName, foreignPackage, false);
+                CopyObjectFromPackage(exportObj.NetIndexName, foreignPackage, false);
+
+                return exportObj.UID;
             }
 
         }
@@ -225,7 +287,7 @@ namespace GPK_RePack.Model
                     export.ClassName = GetObjectName(export.ClassIndex);
                     export.SuperName = GetObjectName(export.SuperIndex);
                     export.PackageName = GetObjectName(export.PackageIndex);
-                    export.UID = Reader.GenerateUID(this, export);
+                    export.UID = GenerateUID(export);
                 }
                 return export.UID;
             }
@@ -307,7 +369,8 @@ namespace GPK_RePack.Model
                 }
             }
 
-            throw new Exception(string.Format("Object {0} not found!", uid));
+            //throw new Exception(string.Format("Object {0} not found!", uid));
+            return null;
         }
 
 

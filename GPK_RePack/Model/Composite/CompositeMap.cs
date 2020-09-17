@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace GPK_RePack.Model.Composite
 {
+    [Serializable]
     public class CompositeMap
     {
         public Dictionary<String, List<CompositeMapEntry>> Map;

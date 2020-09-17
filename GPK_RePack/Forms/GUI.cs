@@ -910,6 +910,10 @@ namespace GPK_RePack.Forms
 
             switch (Settings.Default.CopyMode)
             {
+                case "all":
+                    DataTools.ReplaceAll(copyExport, selectedExport);
+                    option = "everything";
+                    break;
                 case "dataprops":
                     DataTools.ReplaceProperties(copyExport, selectedExport);
                     DataTools.ReplaceData(copyExport, selectedExport);
@@ -949,7 +953,7 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            selectedPackage.CopyObjectFromPackage(copyExport.UID, copyExport.motherPackage);
+            selectedPackage.CopyObjectFromPackage(copyExport.UID, copyExport.motherPackage, true);
 
             DrawPackages();
             logger.Info("Insert done");
@@ -1888,6 +1892,8 @@ namespace GPK_RePack.Forms
                     else
                     {
                         tmpArray.value = (cellValue).ToBytes();
+                        tmpArray.size = tmpArray.value.Length;
+                        tmpArray.RecalculateSize();
                     }
 
                     iProp = tmpArray;

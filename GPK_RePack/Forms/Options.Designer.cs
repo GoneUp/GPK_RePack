@@ -56,6 +56,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.boxSavefilePostfix = new System.Windows.Forms.TextBox();
             this.boxCompression = new System.Windows.Forms.CheckBox();
+            this.btnRadioAll = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -64,12 +65,13 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btnRadioAll);
             this.groupBox1.Controls.Add(this.btnProperties);
             this.groupBox1.Controls.Add(this.btnData);
             this.groupBox1.Controls.Add(this.btnDataProps);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(153, 98);
+            this.groupBox1.Size = new System.Drawing.Size(153, 113);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Copy Mode";
@@ -113,7 +115,7 @@
             this.groupBox2.Controls.Add(this.btnLogTrace);
             this.groupBox2.Controls.Add(this.btnLogInfo);
             this.groupBox2.Controls.Add(this.btnLogDebug);
-            this.groupBox2.Location = new System.Drawing.Point(12, 116);
+            this.groupBox2.Location = new System.Drawing.Point(12, 131);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(153, 98);
             this.groupBox2.TabIndex = 1;
@@ -351,7 +353,7 @@
             // 
             // boxCompression
             // 
-            this.boxCompression.Location = new System.Drawing.Point(12, 220);
+            this.boxCompression.Location = new System.Drawing.Point(12, 238);
             this.boxCompression.Name = "boxCompression";
             this.boxCompression.Size = new System.Drawing.Size(153, 17);
             this.boxCompression.TabIndex = 21;
@@ -359,11 +361,22 @@
             this.boxCompression.UseVisualStyleBackColor = true;
             this.boxCompression.CheckedChanged += new System.EventHandler(this.boxCompression_CheckedChanged);
             // 
+            // btnRadioAll
+            // 
+            this.btnRadioAll.Location = new System.Drawing.Point(6, 88);
+            this.btnRadioAll.Name = "btnRadioAll";
+            this.btnRadioAll.Size = new System.Drawing.Size(107, 17);
+            this.btnRadioAll.TabIndex = 3;
+            this.btnRadioAll.TabStop = true;
+            this.btnRadioAll.Text = "Everything";
+            this.btnRadioAll.UseVisualStyleBackColor = true;
+            this.btnRadioAll.CheckedChanged += new System.EventHandler(this.btnRadioAll_CheckedChanged);
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(364, 309);
+            this.ClientSize = new System.Drawing.Size(364, 322);
             this.Controls.Add(this.boxCompression);
             this.Controls.Add(this.boxSavefilePostfix);
             this.Controls.Add(this.label3);
@@ -431,5 +444,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox boxSavefilePostfix;
         private System.Windows.Forms.CheckBox boxCompression;
+        private System.Windows.Forms.RadioButton btnRadioAll;
     }
 }

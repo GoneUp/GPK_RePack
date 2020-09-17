@@ -11,6 +11,44 @@ namespace GPK_RePack.Editors
     class DataTools
     {
 
+        public static void ReplaceAll(GpkExport source, GpkExport destination)
+        {
+            GpkPackage sourcePackage = source.motherPackage;
+            GpkPackage destinantionPackage = destination.motherPackage;
+
+            //exclude: motherPackage, guid, uid, SerialOffset, SerialOffsetPosition, ObjectName
+            destination.ClassName = source.ClassName;
+            destination.SuperName = source.SuperName;
+            destination.PackageName = source.PackageName;
+            //destination.ObjectName = source.ObjectName;
+
+            destination.Unk1 = source.Unk1;
+            destination.Unk2 = source.Unk2;
+
+            destination.SerialSize = source.SerialSize;
+
+            destination.NetIndex = source.NetIndex;
+            destination.NetIndexName = source.NetIndexName;
+
+            destination.Unk3 = source.Unk3;
+            destination.UnkHeaderCount = source.UnkHeaderCount;
+            destination.Unk4 = source.Unk4;
+            destination.UnkExtraInts = source.UnkExtraInts;
+
+            destination.DependsTableData = source.DependsTableData;
+
+            ReplaceProperties(source, destination);
+            ReplaceData(source, destination);
+
+            //regenerate uid
+            destinantionPackage.GenerateUID(destination);
+
+            //copy deps
+            destinantionPackage.CopyObjectFromPackage(source.ClassName, sourcePackage, false);
+            destinantionPackage.CopyObjectFromPackage(source.PackageName, sourcePackage, false);
+            destinantionPackage.CopyObjectFromPackage(source.SuperName, sourcePackage, false);
+            destinantionPackage.CopyObjectFromPackage(source.NetIndexName, sourcePackage, false);
+        }
         public static void ReplaceProperties(GpkExport source, GpkExport destination)
         {
             destination.Properties.Clear();
