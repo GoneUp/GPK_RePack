@@ -188,7 +188,7 @@ namespace GPK_RePack.Model.Payload
 
                     //assumption: cache in same dir, happens for cookedpc compositegpks
                     map.textureCacheProp = ((GpkNameProperty)txtProp);
-                    map.textureCachePath = $"{Settings.Default.CookedPCPath}\\{txtCacheFile}.tfc";
+                    map.textureCachePath = $"{Settings.Default.CookedPCPath}{txtCacheFile}.tfc";
                     if (File.Exists(map.textureCachePath))
                     {
                         BinaryReader cacheReader = new BinaryReader(new FileStream(map.textureCachePath, FileMode.Open, FileAccess.Read, FileShare.Read));

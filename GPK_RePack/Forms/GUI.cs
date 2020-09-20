@@ -127,6 +127,15 @@ namespace GPK_RePack.Forms
 
                 texturePage = tabTexturePreview;
                 hidePreviewTab();
+
+                //mappings
+                if (Settings.Default.LoadMappingOnStart && Settings.Default.CookedPCPath != "")
+                {
+                    new Task(() =>
+                    {
+                        loadAndParseMapping(Settings.Default.CookedPCPath);
+                    }).Start();
+                }
             }
             catch (Exception ex)
             {
@@ -1536,15 +1545,22 @@ namespace GPK_RePack.Forms
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
 
-            var path = dialog.SelectedPath;
+            var path = dialog.SelectedPath + "\\";
             Settings.Default.CookedPCPath = path;
+
+            loadAndParseMapping(path);
+
+            new FormMapperView(gpkStore).Show();
+        }
+
+        private void loadAndParseMapping(string path)
+        {
+
             gpkStore.BaseSearchPath = path;
             MapperTools.ParseMappings(path, gpkStore);
 
             int subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
             logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", gpkStore.CompositeMap.Count, subCount);
-
-            new FormMapperView(gpkStore).Show();
         }
 
 
@@ -1567,14 +1583,15 @@ namespace GPK_RePack.Forms
             //cookedpc path, outdir path
             var dialog = new FolderBrowserDialog();
             if (Settings.Default.CookedPCPath != "")
-                dialog.SelectedPath = Settings.Default.CookedPCPath;
+                dialog.SelectedPath = Settings.Default.CookedPCPath + "\\";
             dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
 
 
-            var path = dialog.SelectedPath;
+            var path = dialog.SelectedPath + "\\";
             gpkStore.BaseSearchPath = path;
+
             Settings.Default.CookedPCPath = path;
             MapperTools.ParseMappings(path, gpkStore);
 
@@ -1609,6 +1626,7 @@ namespace GPK_RePack.Forms
             dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
+
             var path = dialog.SelectedPath;
             gpkStore.BaseSearchPath = path;
             Settings.Default.CookedPCPath = path;

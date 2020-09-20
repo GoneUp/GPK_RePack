@@ -84,7 +84,7 @@ namespace GPK_RePack.Model
                         }
                         else
                         {
-                            savepath = String.Format("{0}_{1}_{2}", package.Path, package.Filename, Settings.Default.SaveFileSuffix);
+                            savepath = String.Format("{0}_{1}{2}", package.Path, package.Filename, Settings.Default.SaveFileSuffix);
                             //ffe86d35_183.gpk_UID_rebuild
                         }
 
@@ -97,10 +97,12 @@ namespace GPK_RePack.Model
                         }
                         else if (addComposite)
                         {
-                            var tmpPath = Path.GetDirectoryName(package.Path) + "\\pack.gpk";
+                            var packageName = string.Format("{0}{1}", package.GetNormalizedFilename(), Settings.Default.SaveFileSuffix);
+                            var tmpPath = string.Format("{0}\\{1}.gpk", Settings.Default.CookedPCPath, packageName); 
+ 
                             tmpS.SaveGpkPackage(package, tmpPath, usePadding);
 
-                            AddCompsite(package, savepath, tmpPath, "pack");
+                            AddCompsite(package, Settings.Default.CookedPCPath, tmpPath, packageName);
                         }
                         else
                         {
@@ -174,7 +176,7 @@ namespace GPK_RePack.Model
                 //modify our entry
                 package.CompositeEntry.FileLength = patchData.Length;
 
-                MapperTools.WriteMappings(savepath, this, true, false);
+                MapperTools.WriteMappings(Settings.Default.CookedPCPath, this, true, false);
             }
         }
 

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnRadioAll = new System.Windows.Forms.RadioButton();
             this.btnProperties = new System.Windows.Forms.RadioButton();
             this.btnData = new System.Windows.Forms.RadioButton();
             this.btnDataProps = new System.Windows.Forms.RadioButton();
@@ -56,7 +57,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.boxSavefilePostfix = new System.Windows.Forms.TextBox();
             this.boxCompression = new System.Windows.Forms.CheckBox();
-            this.btnRadioAll = new System.Windows.Forms.RadioButton();
+            this.boxLoadMapping = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -75,6 +76,17 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Copy Mode";
+            // 
+            // btnRadioAll
+            // 
+            this.btnRadioAll.Location = new System.Drawing.Point(6, 88);
+            this.btnRadioAll.Name = "btnRadioAll";
+            this.btnRadioAll.Size = new System.Drawing.Size(107, 17);
+            this.btnRadioAll.TabIndex = 3;
+            this.btnRadioAll.TabStop = true;
+            this.btnRadioAll.Text = "Everything";
+            this.btnRadioAll.UseVisualStyleBackColor = true;
+            this.btnRadioAll.CheckedChanged += new System.EventHandler(this.btnRadioAll_CheckedChanged);
             // 
             // btnProperties
             // 
@@ -353,30 +365,30 @@
             // 
             // boxCompression
             // 
-            this.boxCompression.Location = new System.Drawing.Point(12, 238);
+            this.boxCompression.Location = new System.Drawing.Point(12, 235);
             this.boxCompression.Name = "boxCompression";
-            this.boxCompression.Size = new System.Drawing.Size(153, 17);
+            this.boxCompression.Size = new System.Drawing.Size(190, 20);
             this.boxCompression.TabIndex = 21;
-            this.boxCompression.Text = "Enable Savecompression";
+            this.boxCompression.Text = "Enable GPK compression on save";
             this.boxCompression.UseVisualStyleBackColor = true;
             this.boxCompression.CheckedChanged += new System.EventHandler(this.boxCompression_CheckedChanged);
             // 
-            // btnRadioAll
+            // boxLoadMapping
             // 
-            this.btnRadioAll.Location = new System.Drawing.Point(6, 88);
-            this.btnRadioAll.Name = "btnRadioAll";
-            this.btnRadioAll.Size = new System.Drawing.Size(107, 17);
-            this.btnRadioAll.TabIndex = 3;
-            this.btnRadioAll.TabStop = true;
-            this.btnRadioAll.Text = "Everything";
-            this.btnRadioAll.UseVisualStyleBackColor = true;
-            this.btnRadioAll.CheckedChanged += new System.EventHandler(this.btnRadioAll_CheckedChanged);
+            this.boxLoadMapping.Location = new System.Drawing.Point(165, 215);
+            this.boxLoadMapping.Name = "boxLoadMapping";
+            this.boxLoadMapping.Size = new System.Drawing.Size(190, 20);
+            this.boxLoadMapping.TabIndex = 22;
+            this.boxLoadMapping.Text = "Load Mapping on startup";
+            this.boxLoadMapping.UseVisualStyleBackColor = true;
+            this.boxLoadMapping.CheckedChanged += new System.EventHandler(this.boxLoadMapping_CheckedChanged);
             // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(364, 322);
+            this.Controls.Add(this.boxLoadMapping);
             this.Controls.Add(this.boxCompression);
             this.Controls.Add(this.boxSavefilePostfix);
             this.Controls.Add(this.label3);
@@ -445,5 +457,6 @@
         private System.Windows.Forms.TextBox boxSavefilePostfix;
         private System.Windows.Forms.CheckBox boxCompression;
         private System.Windows.Forms.RadioButton btnRadioAll;
+        private System.Windows.Forms.CheckBox boxLoadMapping;
     }
 }

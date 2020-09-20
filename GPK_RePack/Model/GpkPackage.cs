@@ -394,6 +394,8 @@ namespace GPK_RePack.Model
             return tmpList;
         }
         #endregion
+
+        #region writing
         public void PrepareWriting(bool enableCompression)
         {
             //set new offsets
@@ -482,7 +484,13 @@ namespace GPK_RePack.Model
                 bufferOffset += chunkData.uncompressedSize_chunkheader;
             }
         }
+        #endregion
 
+        public string GetNormalizedFilename()
+        {
+            //just wihtout .gpk
+            return Filename.Split('.')[0];
+        }
         public int GetSize(bool fixOffsets)
         {
             int tmpSize = 0;

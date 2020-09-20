@@ -78,6 +78,7 @@ namespace GPK_RePack.Forms
             boxColorPreview.BackColor = Settings.Default.PreviewColor;
             boxSavefilePostfix.Text = Settings.Default.SaveFileSuffix;
             boxCompression.Checked = Settings.Default.EnableCompression;
+            boxLoadMapping.Checked = Settings.Default.LoadMappingOnStart;
         }
 
 
@@ -234,6 +235,9 @@ namespace GPK_RePack.Forms
             Settings.Default.EnableCompression = boxCompression.Checked;
         }
 
-    
+        private void boxLoadMapping_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.LoadMappingOnStart = boxLoadMapping.Checked;
+        }
     }
 }

@@ -262,5 +262,17 @@ namespace GPK_RePack.Properties {
                 this["EnableSortTreeNodes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LoadMappingOnStart {
+            get {
+                return ((bool)(this["LoadMappingOnStart"]));
+            }
+            set {
+                this["LoadMappingOnStart"] = value;
+            }
+        }
     }
 }

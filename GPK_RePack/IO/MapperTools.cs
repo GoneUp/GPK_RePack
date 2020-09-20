@@ -318,9 +318,6 @@ namespace GPK_RePack.IO
 
         public static void WriteMappings(string path, GpkStore store, bool writeCompMapper, bool writePkgMapper)
         {
-            if (!path.EndsWith("\\"))
-                path += "\\";
-
             logger.Debug("WriteMappings for " + path);
 
             try
