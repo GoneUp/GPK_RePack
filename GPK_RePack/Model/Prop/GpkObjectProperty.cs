@@ -56,7 +56,7 @@ namespace GPK_RePack.Model.Prop
 
         public void CheckAndAddNames(GpkPackage package)
         {
-            throw new NotImplementedException();
+           
         }
     }
 

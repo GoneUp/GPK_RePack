@@ -11,6 +11,7 @@ using GPK_RePack.Model.Composite;
 using GPK_RePack.Model.Interfaces;
 using GPK_RePack.Properties;
 using NLog;
+using NLog.LayoutRenderers;
 
 namespace GPK_RePack.Model
 {
@@ -173,7 +174,7 @@ namespace GPK_RePack.Model
                 //modify our entry
                 package.CompositeEntry.FileLength = patchData.Length;
 
-                MapperTools.WriteMappings(savepath, this);
+                MapperTools.WriteMappings(savepath, this, true, false);
             }
         }
 
@@ -199,13 +200,14 @@ namespace GPK_RePack.Model
 
                 CompositeMap[compositeFile].Add(package.CompositeEntry);
 
-                MapperTools.WriteMappings(savepath, this);
+                MapperTools.WriteMappings(savepath, this, true, false);
             }
         }
 
         //patch pkgmapper to not include the modified entrys
         public void MultiPatchObjectMapper(GpkPackage package, string savepath)
         {
+            int count = 0;
             foreach (var export in package.ExportList)
             {
                 //generate name 
@@ -217,10 +219,12 @@ namespace GPK_RePack.Model
                 {
                     ObjectMapperList.Remove(compositeUID);
                     logger.Debug("ObjectMapperList: removing uid " + fullUID);
+                    count++;
                 }
             }
 
-            MapperTools.WriteMappings(savepath, this);
+            logger.Info("Removed the mappings for {0} entries. For details see debug log.", count);
+            MapperTools.WriteMappings(savepath, this, false, true);
         }
 
 

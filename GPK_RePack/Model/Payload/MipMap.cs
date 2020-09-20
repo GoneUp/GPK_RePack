@@ -79,9 +79,9 @@ namespace GPK_RePack.Model.Payload
             if (((CompressionTypes)flags & CompressionTypes.StoreInSeparatefile) != 0)
             {
 
-                if (textureCacheProp != null)
+                if (textureCacheProp != null && textureCachePath != null)
                 {
-                    info.AppendLine("Data for this MipMap is stored in tfc " + textureCacheProp.value);
+                    info.AppendLine(String.Format("Data for this MipMap is stored in tfc {0} @ {1}", textureCacheProp.value, textureCachePath));
                 }
                 else
                 {

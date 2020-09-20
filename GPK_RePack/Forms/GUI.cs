@@ -1558,7 +1558,7 @@ namespace GPK_RePack.Forms
 
             var path = dialog.SelectedPath + "\\";
 
-            MapperTools.WriteMappings(path, gpkStore);
+            MapperTools.WriteMappings(path, gpkStore, true, true);
         }
 
 

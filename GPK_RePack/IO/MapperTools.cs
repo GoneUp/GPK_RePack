@@ -237,7 +237,7 @@ namespace GPK_RePack.IO
                     var uid = split[0];
                     var compositeUID = split[1];
 
-                    logger.Debug("entry {0}:{1}", uid, compositeUID);
+                    logger.Trace("entry {0}:{1}", uid, compositeUID);
                     store.ObjectMapperList.Add(compositeUID, uid);
                 }
 
@@ -284,7 +284,7 @@ namespace GPK_RePack.IO
                         //sanity
                         if (!store.ObjectMapperList.ContainsKey(tmp.CompositeUID))
                         {
-                            logger.Debug("ObjectMapping for %s not found", tmp.CompositeUID);
+                            logger.Debug("ObjectMapping for {0} not found", tmp.CompositeUID);
                             continue;
                         }
 
@@ -316,7 +316,7 @@ namespace GPK_RePack.IO
 
         }
 
-        public static void WriteMappings(string path, GpkStore store)
+        public static void WriteMappings(string path, GpkStore store, bool writeCompMapper, bool writePkgMapper)
         {
             if (!path.EndsWith("\\"))
                 path += "\\";

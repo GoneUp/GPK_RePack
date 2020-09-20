@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GPK_RePack.IO;
 using GPK_RePack.Model.Interfaces;
 using GPK_RePack.Model.Prop;
+using GPK_RePack.Properties;
 using Ionic.Zlib;
 using Lzo64;
 using NLog;
@@ -187,7 +188,7 @@ namespace GPK_RePack.Model.Payload
 
                     //assumption: cache in same dir, happens for cookedpc compositegpks
                     map.textureCacheProp = ((GpkNameProperty)txtProp);
-                    map.textureCachePath = $"{Path.GetDirectoryName(package.Path)}\\{txtCacheFile}.tfc";
+                    map.textureCachePath = $"{Settings.Default.CookedPCPath}\\{txtCacheFile}.tfc";
                     if (File.Exists(map.textureCachePath))
                     {
                         BinaryReader cacheReader = new BinaryReader(new FileStream(map.textureCachePath, FileMode.Open, FileAccess.Read, FileShare.Read));
