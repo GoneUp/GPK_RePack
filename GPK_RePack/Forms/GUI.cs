@@ -301,6 +301,17 @@ namespace GPK_RePack.Forms
             }
         }
 
+        private void patchObjectMapperforSelectedPackageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selectedPackage == null)
+            {
+                logger.Info("No package selected");
+                return;
+            }
+
+            gpkStore.MultiPatchObjectMapper(selectedPackage, Settings.Default.CookedPCPath);
+        }
+
         private void savepaddingStripMenuItem_Click(object sender, EventArgs e)
         {
             saveToolStripMenuItem_Click(sender, e);
@@ -1545,7 +1556,7 @@ namespace GPK_RePack.Forms
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
 
-            var path = dialog.SelectedPath + "\\tmp";
+            var path = dialog.SelectedPath + "\\";
 
             MapperTools.WriteMappings(path, gpkStore);
         }
@@ -2186,9 +2197,10 @@ namespace GPK_RePack.Forms
 
 
 
+
         #endregion
 
-
+    
     }
 }
 

@@ -48,6 +48,7 @@ namespace GPK_RePack.Forms
             this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.insertStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.previewOGGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
@@ -125,7 +126,10 @@ namespace GPK_RePack.Forms
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
             this.boxLog = new System.Windows.Forms.RichTextBox();
-            this.insertStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -179,7 +183,7 @@ namespace GPK_RePack.Forms
             this.toolStripSeparator6,
             this.previewOGGToolStripMenuItem});
             this.treeContextMenu.Name = "treeContextMenu";
-            this.treeContextMenu.Size = new System.Drawing.Size(181, 230);
+            this.treeContextMenu.Size = new System.Drawing.Size(161, 208);
             this.treeContextMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.treeContextMenu_ItemClicked);
             // 
             // importToolStripMenuItem
@@ -189,7 +193,7 @@ namespace GPK_RePack.Forms
             this.importOGGToolStripMenuItem,
             this.importDDSToolStripMenuItem});
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(160, 24);
             this.importToolStripMenuItem.Text = "Import";
             this.importToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.treeContextMenu_ItemClicked);
             // 
@@ -219,7 +223,7 @@ namespace GPK_RePack.Forms
             this.exportDDSToolStripMenuItem,
             this.exportPackageToolStripMenuItem});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(160, 24);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.treeContextMenu_ItemClicked);
             // 
@@ -250,42 +254,49 @@ namespace GPK_RePack.Forms
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(157, 6);
             // 
             // addToolStripMenuItem
             // 
             this.addToolStripMenuItem.Enabled = false;
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(160, 24);
             this.addToolStripMenuItem.Text = "Add";
             // 
             // removeToolStripMenuItem
             // 
             this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
-            this.removeToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(160, 24);
             this.removeToolStripMenuItem.Text = "Remove";
             // 
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(160, 24);
             this.copyToolStripMenuItem.Text = "Copy";
             // 
             // pasteToolStripMenuItem
             // 
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(160, 24);
             this.pasteToolStripMenuItem.Text = "Paste";
+            // 
+            // insertStripMenuItem
+            // 
+            this.insertStripMenuItem.Name = "insertStripMenuItem";
+            this.insertStripMenuItem.Size = new System.Drawing.Size(160, 24);
+            this.insertStripMenuItem.Text = "Insert";
+            this.insertStripMenuItem.Click += new System.EventHandler(this.insertStripMenuItem_Click);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(157, 6);
             // 
             // previewOGGToolStripMenuItem
             // 
             this.previewOGGToolStripMenuItem.Name = "previewOGGToolStripMenuItem";
-            this.previewOGGToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.previewOGGToolStripMenuItem.Size = new System.Drawing.Size(160, 24);
             this.previewOGGToolStripMenuItem.Text = "Preview OGG";
             // 
             // menuStrip
@@ -310,6 +321,10 @@ namespace GPK_RePack.Forms
             this.savePaddingStripMenuItem,
             this.replaceSaveToolStripMenuItem,
             this.toolStripSeparator7,
+            this.toolStripMenuItem1,
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem,
+            this.toolStripSeparator8,
+            this.toolStripMenuItem2,
             this.savePatchedCompositeStripMenuItem,
             this.saveAddedCompositeToolStripMenuItem,
             this.toolStripSeparator1,
@@ -325,90 +340,90 @@ namespace GPK_RePack.Forms
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(287, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(411, 6);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
             this.saveToolStripMenuItem.Text = "Save (Rebuild Mode)";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // savePaddingStripMenuItem
             // 
             this.savePaddingStripMenuItem.Name = "savePaddingStripMenuItem";
-            this.savePaddingStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.savePaddingStripMenuItem.Size = new System.Drawing.Size(414, 24);
             this.savePaddingStripMenuItem.Text = "Save (Rebuild Mode, with Padding)";
             this.savePaddingStripMenuItem.Click += new System.EventHandler(this.savepaddingStripMenuItem_Click);
             // 
             // replaceSaveToolStripMenuItem
             // 
             this.replaceSaveToolStripMenuItem.Name = "replaceSaveToolStripMenuItem";
-            this.replaceSaveToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.replaceSaveToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
             this.replaceSaveToolStripMenuItem.Text = "Save patched (not recommend)";
             this.replaceSaveToolStripMenuItem.Click += new System.EventHandler(this.replaceSaveToolStripMenuItem_Click);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(287, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(411, 6);
             // 
             // savePatchedCompositeStripMenuItem
             // 
             this.savePatchedCompositeStripMenuItem.Name = "savePatchedCompositeStripMenuItem";
-            this.savePatchedCompositeStripMenuItem.Size = new System.Drawing.Size(290, 24);
-            this.savePatchedCompositeStripMenuItem.Text = "Save patched Composite";
+            this.savePatchedCompositeStripMenuItem.Size = new System.Drawing.Size(414, 24);
+            this.savePatchedCompositeStripMenuItem.Text = "Save and patch orginal Composite (not recommended)";
             this.savePatchedCompositeStripMenuItem.Click += new System.EventHandler(this.btnSavePatchedComposite_Click);
             // 
             // saveAddedCompositeToolStripMenuItem
             // 
             this.saveAddedCompositeToolStripMenuItem.Name = "saveAddedCompositeToolStripMenuItem";
-            this.saveAddedCompositeToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
-            this.saveAddedCompositeToolStripMenuItem.Text = "Save added Composite";
+            this.saveAddedCompositeToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
+            this.saveAddedCompositeToolStripMenuItem.Text = "Save and add new Composite GPK (not recommended)";
             this.saveAddedCompositeToolStripMenuItem.Click += new System.EventHandler(this.saveAddedCompositeToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(287, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(411, 6);
             // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(287, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(411, 6);
             // 
             // refreshViewToolStripMenuItem
             // 
             this.refreshViewToolStripMenuItem.Name = "refreshViewToolStripMenuItem";
-            this.refreshViewToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.refreshViewToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
             this.refreshViewToolStripMenuItem.Text = "Refresh View";
             this.refreshViewToolStripMenuItem.Click += new System.EventHandler(this.refreshViewToolStripMenuItem_Click);
             // 
             // clearToolStripMenuItem
             // 
             this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
             this.clearToolStripMenuItem.Text = "Clear";
             this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -751,7 +766,7 @@ namespace GPK_RePack.Forms
             this.tabPropertys.Location = new System.Drawing.Point(4, 22);
             this.tabPropertys.Name = "tabPropertys";
             this.tabPropertys.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPropertys.Size = new System.Drawing.Size(830, 498);
+            this.tabPropertys.Size = new System.Drawing.Size(830, 495);
             this.tabPropertys.TabIndex = 1;
             this.tabPropertys.Text = "Property Details";
             this.tabPropertys.UseVisualStyleBackColor = true;
@@ -773,7 +788,7 @@ namespace GPK_RePack.Forms
             this.gridProps.Location = new System.Drawing.Point(3, 3);
             this.gridProps.MultiSelect = false;
             this.gridProps.Name = "gridProps";
-            this.gridProps.Size = new System.Drawing.Size(824, 460);
+            this.gridProps.Size = new System.Drawing.Size(824, 457);
             this.gridProps.TabIndex = 0;
             this.gridProps.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.gridProps_DefaultValuesNeeded);
             // 
@@ -829,7 +844,7 @@ namespace GPK_RePack.Forms
             this.boxPropertyButtons.Controls.Add(this.btnExportProps, 1, 0);
             this.boxPropertyButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.boxPropertyButtons.Enabled = false;
-            this.boxPropertyButtons.Location = new System.Drawing.Point(3, 463);
+            this.boxPropertyButtons.Location = new System.Drawing.Point(3, 460);
             this.boxPropertyButtons.Name = "boxPropertyButtons";
             this.boxPropertyButtons.RowCount = 1;
             this.boxPropertyButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
@@ -878,7 +893,7 @@ namespace GPK_RePack.Forms
             this.tabTexturePreview.Location = new System.Drawing.Point(4, 22);
             this.tabTexturePreview.Name = "tabTexturePreview";
             this.tabTexturePreview.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTexturePreview.Size = new System.Drawing.Size(830, 498);
+            this.tabTexturePreview.Size = new System.Drawing.Size(830, 495);
             this.tabTexturePreview.TabIndex = 2;
             this.tabTexturePreview.Text = "Texture Preview";
             this.tabTexturePreview.UseVisualStyleBackColor = true;
@@ -890,7 +905,7 @@ namespace GPK_RePack.Forms
             this.boxImagePreview.Image = ((System.Drawing.Image)(resources.GetObject("boxImagePreview.Image")));
             this.boxImagePreview.Location = new System.Drawing.Point(3, 3);
             this.boxImagePreview.Name = "boxImagePreview";
-            this.boxImagePreview.Size = new System.Drawing.Size(824, 492);
+            this.boxImagePreview.Size = new System.Drawing.Size(824, 489);
             this.boxImagePreview.TabIndex = 0;
             this.boxImagePreview.TabStop = false;
             // 
@@ -1042,12 +1057,31 @@ namespace GPK_RePack.Forms
             this.boxLog.TabIndex = 0;
             this.boxLog.Text = "";
             // 
-            // insertStripMenuItem
+            // patchObjectMapperforSelectedPackageToolStripMenuItem
             // 
-            this.insertStripMenuItem.Name = "insertStripMenuItem";
-            this.insertStripMenuItem.Size = new System.Drawing.Size(180, 24);
-            this.insertStripMenuItem.Text = "Insert";
-            this.insertStripMenuItem.Click += new System.EventHandler(this.insertStripMenuItem_Click);
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Name = "patchObjectMapperforSelectedPackageToolStripMenuItem";
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Text = "Patch ObjectMapper (for selected package)";
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Click += new System.EventHandler(this.patchObjectMapperforSelectedPackageToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(411, 6);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Enabled = false;
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(414, 24);
+            this.toolStripMenuItem1.Text = "ObjectMapper.dat Modification";
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Enabled = false;
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(414, 24);
+            this.toolStripMenuItem2.Text = "CompositePackageMapper.dat Modification";
             // 
             // GUI
             // 
@@ -1193,6 +1227,10 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem saveAddedCompositeToolStripMenuItem;
         private ToolStripMenuItem dumpIconsToolStripMenuItem;
         private ToolStripMenuItem insertStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItem1;
+        private ToolStripMenuItem patchObjectMapperforSelectedPackageToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator8;
+        private ToolStripMenuItem toolStripMenuItem2;
     }
 }
 

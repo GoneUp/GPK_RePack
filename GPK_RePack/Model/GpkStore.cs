@@ -18,7 +18,11 @@ namespace GPK_RePack.Model
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public Dictionary<String, List<CompositeMapEntry>> CompositeMap;
+        //PkgMapper
+        public Dictionary<string, string> ObjectMapperList;
+
+        //CompositeMapper
+        public Dictionary<string, List<CompositeMapEntry>> CompositeMap;
         public string BaseSearchPath;
         public List<GpkPackage> LoadedGpkPackages { get; } = new List<GpkPackage>();
 
@@ -29,6 +33,7 @@ namespace GPK_RePack.Model
         public GpkStore()
         {
             CompositeMap = new Dictionary<string, List<CompositeMapEntry>>();
+            ObjectMapperList = new Dictionary<string, string>();
         }
 
         public void loadGpk(string path, Reader reader = null, bool triggerEvent = true)
@@ -94,8 +99,7 @@ namespace GPK_RePack.Model
                             var tmpPath = Path.GetDirectoryName(package.Path) + "\\pack.gpk";
                             tmpS.SaveGpkPackage(package, tmpPath, usePadding);
 
-                            //AddCompsite(package, savepath, tmpPath, "pack");
-                            MultiPatchComposite(package, savepath, tmpPath, "pack");
+                            AddCompsite(package, savepath, tmpPath, "pack");
                         }
                         else
                         {
@@ -117,6 +121,7 @@ namespace GPK_RePack.Model
             }
         }
 
+        //in-sito patch of a composite gpk file, as in modifing the actual game files
         private void PatchComposite(GpkPackage package, string savepath, string tmpPath)
         {
             //ugly and quick, replace with direct memory save
@@ -172,6 +177,7 @@ namespace GPK_RePack.Model
             }
         }
 
+        //added of the gpk, leaving the game files untouched 
         private void AddCompsite(GpkPackage package, string savepath, string tmpPath, string compositeFile)
         {
             var patchDataSize = new FileInfo(tmpPath).Length;
@@ -197,22 +203,21 @@ namespace GPK_RePack.Model
             }
         }
 
-        private void MultiPatchComposite(GpkPackage package, string savepath, string tmpPath, string compositeFile)
+        //patch pkgmapper to not include the modified entrys
+        public void MultiPatchObjectMapper(GpkPackage package, string savepath)
         {
-            var patchDataSize = new FileInfo(tmpPath).Length;
-
-            //strat: check all objects and modify the comp entry if it is exiting to point to the new pack
-            foreach(var export in package.ExportList)
+            foreach (var export in package.ExportList)
             {
-                var list = FindCompositeMapEntriesForObjectname(export.Value.ObjectName);
-                foreach(var entry in list)
+                //generate name 
+                //S1UI_SelectServer.SelectServer_I4
+                var fullUID = $"{package.Filename.Split('.')[0]}.{export.Value.UID}";
+
+                var compositeUID = FindObjectMapperEntryForObjectname(fullUID);
+                if (compositeUID != null)
                 {
-                    logger.Info("Patching entry {0} to point to new file for object {1}", entry.CompositeUID, export.Value.UID);
-                    entry.FileLength = (int)patchDataSize;
-                    entry.FileOffset = 0;
-                    entry.SubGPKName = compositeFile;
+                    ObjectMapperList.Remove(compositeUID);
+                    logger.Debug("ObjectMapperList: removing uid " + fullUID);
                 }
-                if (list.Count > 0) break;
             }
 
             MapperTools.WriteMappings(savepath, this);
@@ -241,7 +246,6 @@ namespace GPK_RePack.Model
         public List<CompositeMapEntry> FindCompositeMapEntriesForObjectname(string objectName)
         {
             var returnList = new List<CompositeMapEntry>();
-
             foreach (var fileName in CompositeMap.Keys)
             {
                 foreach (var entry in CompositeMap[fileName])
@@ -251,12 +255,24 @@ namespace GPK_RePack.Model
                         returnList.Add(entry);
                     }
                 }
-
-
             }
 
             return returnList;
         }
+
+        public string FindObjectMapperEntryForObjectname(string objectUID)
+        {
+            foreach (var entry in ObjectMapperList)
+            {
+                if (entry.Value == objectUID)
+                {
+                    return entry.Key;
+                }
+            }
+
+            return null;
+        }
+
 
     }
 }

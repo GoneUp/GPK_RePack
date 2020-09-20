@@ -56,7 +56,7 @@ namespace GPK_RePack.IO
         {
             try
             {
-                int offset = 0;   
+                int offset = 0;
 
                 // Unscramble (1)
                 for (offset = 0; offset <= data.Length; offset += 16)
@@ -87,7 +87,7 @@ namespace GPK_RePack.IO
 
                 // Unscramble (2)
                 //int divison, floor it
-                if ((data.Length / 2) > 0) 
+                if ((data.Length / 2) > 0)
                 {
                     var offset1 = 1;
                     var offset2 = data.Length - 1;
@@ -224,7 +224,7 @@ namespace GPK_RePack.IO
                 var pkgMapperText = reader.ReadToEnd();
                 reader.Close();
 
-                var objectMapperList = new Dictionary<String, String>();
+                store.ObjectMapperList = new Dictionary<string, string>();
                 var objectEntries = pkgMapperText.Split('|');
                 foreach (var entry in objectEntries)
                 {
@@ -238,7 +238,7 @@ namespace GPK_RePack.IO
                     var compositeUID = split[1];
 
                     logger.Debug("entry {0}:{1}", uid, compositeUID);
-                    objectMapperList.Add(compositeUID, uid);
+                    store.ObjectMapperList.Add(compositeUID, uid);
                 }
 
                 logger.Debug("parsing CompositePackageMapper");
@@ -282,15 +282,15 @@ namespace GPK_RePack.IO
                         tmp.FileLength = Convert.ToInt32(split[3]);
 
                         //sanity
-                        if (!objectMapperList.ContainsKey(tmp.CompositeUID))
+                        if (!store.ObjectMapperList.ContainsKey(tmp.CompositeUID))
                         {
-                            logger.Error("ObjectMapping for %s not found", tmp.CompositeUID);
+                            logger.Debug("ObjectMapping for %s not found", tmp.CompositeUID);
                             continue;
                         }
 
                         //enrich
                         tmp.SubGPKName = fileName;
-                        tmp.UID = objectMapperList[tmp.CompositeUID];
+                        tmp.UID = store.ObjectMapperList[tmp.CompositeUID];
 
                         if (!store.CompositeMap.ContainsKey(fileName))
                         {
@@ -318,29 +318,41 @@ namespace GPK_RePack.IO
 
         public static void WriteMappings(string path, GpkStore store)
         {
+            if (!path.EndsWith("\\"))
+                path += "\\";
+
             logger.Debug("WriteMappings for " + path);
 
             try
             {
-                string compMapperPath = path + "_CompositePackageMapper.dat" + Settings.Default.SaveFileSuffix;
-
-
-                //write 
-
-                logger.Debug("parsing CompositePackageMapper");
-                /*
-                 * 
-                  CompositePkgMapper
-
-                  Files are ended by !
-                  File name like this !17d87899_3? -> 17d87899_3.gpk
-                  Entries are always seperated by |
-
-                  Composite UID, Unkown Object ID, Sub-GPK File offset, Sub-GPK File length
-                  c7a706fb_6a349a6f_1d212.Chat2_dup,c7a706fb_6a349a6f_1d212,92291307,821218,|*/
+                string compMapperPath = path + "CompositePackageMapper.dat" + Settings.Default.SaveFileSuffix;
+                string pkgMapperPath = path + "PkgMapper.dat" + Settings.Default.SaveFileSuffix;
 
 
                 var writer = new StringBuilder();
+
+                foreach (var entry in store.ObjectMapperList)
+                {
+                    //S1UI_SelectServer.SelectServer_I4C,ffe86d35_cb268950_1e082.SelectServer_I4C_dup|
+                    //Key = CompositeUID, Value=Nórmal UID
+                    writer.Append(entry.Value + ",");
+                    writer.Append(entry.Key);
+ 
+                    writer.Append("|");
+
+                }
+
+                File.WriteAllText(pkgMapperPath + "_decrypt", writer.ToString());
+
+                //final output
+                var data = Encoding.UTF8.GetBytes(writer.ToString());
+                EncryptFile(data);
+                File.WriteAllBytes(pkgMapperPath, data);
+
+
+                //--
+                logger.Debug("writing CompositePackageMapper");
+                writer = new StringBuilder();
 
                 foreach (var fileName in store.CompositeMap.Keys)
                 {
@@ -361,10 +373,13 @@ namespace GPK_RePack.IO
                 File.WriteAllText(compMapperPath + "_decrypt", writer.ToString());
 
                 //encryption magic
-                var data = Encoding.UTF8.GetBytes(writer.ToString());
+                data = Encoding.UTF8.GetBytes(writer.ToString());
                 EncryptFile(data);
                 File.WriteAllBytes(compMapperPath, data);
 
+
+
+                logger.Info("Wrote PkgMapper to " + pkgMapperPath);
                 logger.Info("Wrote CompositePackageMapper to " + compMapperPath);
 
             }
