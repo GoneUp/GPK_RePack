@@ -59,6 +59,10 @@ namespace GPK_RePack.Forms
             this.savePaddingStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.savePatchedCompositeStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAddedCompositeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -126,10 +130,9 @@ namespace GPK_RePack.Forms
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
             this.boxLog = new System.Windows.Forms.RichTextBox();
-            this.patchObjectMapperforSelectedPackageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.minimizeGPKToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -375,6 +378,32 @@ namespace GPK_RePack.Forms
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(411, 6);
             // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Enabled = false;
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(414, 24);
+            this.toolStripMenuItem1.Text = "ObjectMapper.dat Modification";
+            // 
+            // patchObjectMapperforSelectedPackageToolStripMenuItem
+            // 
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Name = "patchObjectMapperforSelectedPackageToolStripMenuItem";
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Text = "Patch ObjectMapper (for selected package)";
+            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Click += new System.EventHandler(this.patchObjectMapperforSelectedPackageToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(411, 6);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Enabled = false;
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(414, 24);
+            this.toolStripMenuItem2.Text = "CompositePackageMapper.dat Modification";
+            // 
             // savePatchedCompositeStripMenuItem
             // 
             this.savePatchedCompositeStripMenuItem.Name = "savePatchedCompositeStripMenuItem";
@@ -434,6 +463,9 @@ namespace GPK_RePack.Forms
             this.datEncryptionToolStripMenuItem,
             this.loadMappingToolStripMenuItem,
             this.writeMappingsToolStripMenuItem,
+            this.toolStripSeparator10,
+            this.minimizeGPKToolStripMenuItem,
+            this.toolStripSeparator9,
             this.dumpCompositeTexturesToolStripMenuItem,
             this.dumpIconsToolStripMenuItem});
             this.compositeGPKToolStripMenuItem.Name = "compositeGPKToolStripMenuItem";
@@ -1057,31 +1089,22 @@ namespace GPK_RePack.Forms
             this.boxLog.TabIndex = 0;
             this.boxLog.Text = "";
             // 
-            // patchObjectMapperforSelectedPackageToolStripMenuItem
+            // minimizeGPKToolStripMenuItem
             // 
-            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Name = "patchObjectMapperforSelectedPackageToolStripMenuItem";
-            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Size = new System.Drawing.Size(414, 24);
-            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Text = "Patch ObjectMapper (for selected package)";
-            this.patchObjectMapperforSelectedPackageToolStripMenuItem.Click += new System.EventHandler(this.patchObjectMapperforSelectedPackageToolStripMenuItem_Click);
+            this.minimizeGPKToolStripMenuItem.Name = "minimizeGPKToolStripMenuItem";
+            this.minimizeGPKToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.minimizeGPKToolStripMenuItem.Text = "Minimize GPK";
+            this.minimizeGPKToolStripMenuItem.Click += new System.EventHandler(this.minimizeGPKToolStripMenuItem_Click);
             // 
-            // toolStripSeparator8
+            // toolStripSeparator9
             // 
-            this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(411, 6);
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Size = new System.Drawing.Size(233, 6);
             // 
-            // toolStripMenuItem1
+            // toolStripSeparator10
             // 
-            this.toolStripMenuItem1.Enabled = false;
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(414, 24);
-            this.toolStripMenuItem1.Text = "ObjectMapper.dat Modification";
-            // 
-            // toolStripMenuItem2
-            // 
-            this.toolStripMenuItem2.Enabled = false;
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(414, 24);
-            this.toolStripMenuItem2.Text = "CompositePackageMapper.dat Modification";
+            this.toolStripSeparator10.Name = "toolStripSeparator10";
+            this.toolStripSeparator10.Size = new System.Drawing.Size(233, 6);
             // 
             // GUI
             // 
@@ -1231,6 +1254,9 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem patchObjectMapperforSelectedPackageToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator8;
         private ToolStripMenuItem toolStripMenuItem2;
+        private ToolStripSeparator toolStripSeparator10;
+        private ToolStripMenuItem minimizeGPKToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator9;
     }
 }
 

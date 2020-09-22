@@ -4,12 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using GPK_RePack.Model;
+using NLog;
 
 namespace GPK_RePack.Editors
 {
     class DataTools
     {
+
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public static void ReplaceAll(GpkExport source, GpkExport destination)
         {
@@ -81,6 +85,25 @@ namespace GPK_RePack.Editors
             writer.Close();
             writer.Dispose();
 
+        }
+
+        public static void RemoveObjectRedirects(GpkPackage package)
+        {
+            var keys = new List<long>();
+            foreach (KeyValuePair<long, GpkExport> pair in package.ExportList)
+            {
+                if (pair.Value.ClassName == "Core.ObjectRedirector")
+                {
+                    keys.Add(pair.Key);
+                }
+            }
+
+            foreach (long key in keys)
+            {
+                package.ExportList.Remove(key);
+            }
+
+            logger.Info("Removed {0} exports from package {1}", keys.Count, package.Filename);
         }
 
     }

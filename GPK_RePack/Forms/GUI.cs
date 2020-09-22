@@ -1060,7 +1060,6 @@ namespace GPK_RePack.Forms
 
         #endregion
 
-
         #region image
 
 
@@ -1673,6 +1672,15 @@ namespace GPK_RePack.Forms
             }
         }
 
+        private void minimizeGPKToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!PackageSelected())
+                return;
+
+            DataTools.RemoveObjectRedirects(selectedPackage);
+            DrawPackages();
+        }
+
         #endregion
 
         #region propgrid
@@ -2216,9 +2224,10 @@ namespace GPK_RePack.Forms
 
 
 
+
         #endregion
 
-    
+  
     }
 }
 
