@@ -734,7 +734,7 @@ namespace GPK_RePack.Forms
                     return;
                 }
 
-                var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".raw");
+                var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, "");
                 if (path == "") return;
                 DataTools.WriteExportDataFile(path, selectedExport);
             }
@@ -761,7 +761,7 @@ namespace GPK_RePack.Forms
                     {
                         if (exp.Data != null)
                         {
-                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}.raw", dialog.SelectedPath, exp.ObjectName), exp);
+                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}", dialog.SelectedPath, exp.ObjectName), exp);
                             logger.Trace("save for " + exp.UID);
                         }
                     }
@@ -781,7 +781,7 @@ namespace GPK_RePack.Forms
                     {
                         if (exp.Data != null)
                         {
-                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}\\{2}.raw", dialog.SelectedPath, exp.ClassName, exp.ObjectName), exp);
+                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}\\{2}", dialog.SelectedPath, exp.ClassName, exp.ObjectName), exp);
                             logger.Trace("save for " + exp.UID);
                         }
                     }
@@ -2032,7 +2032,7 @@ namespace GPK_RePack.Forms
             byte[] data = new byte[arrayProp.value.Length - 4];
             Array.Copy(arrayProp.value, 4, data, 0, arrayProp.value.Length - 4); //remove count bytes
 
-            String path = MiscFuncs.GenerateSaveDialog(arrayProp.name, ".raw");
+            String path = MiscFuncs.GenerateSaveDialog(arrayProp.name, "");
             if (path == "") return;
 
             DataTools.WriteExportDataFile(path, data);
@@ -2249,7 +2249,7 @@ namespace GPK_RePack.Forms
 
         #endregion
 
-  
+
     }
 }
 
