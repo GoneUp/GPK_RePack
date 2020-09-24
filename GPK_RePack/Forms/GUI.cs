@@ -734,7 +734,7 @@ namespace GPK_RePack.Forms
                     return;
                 }
 
-                var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".raw");
+                var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, "");
                 if (path == "") return;
                 DataTools.WriteExportDataFile(path, selectedExport);
             }
@@ -761,7 +761,7 @@ namespace GPK_RePack.Forms
                     {
                         if (exp.Data != null)
                         {
-                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}.raw", dialog.SelectedPath, exp.ObjectName), exp);
+                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}", dialog.SelectedPath, exp.ObjectName), exp);
                             logger.Trace("save for " + exp.UID);
                         }
                     }
@@ -781,7 +781,7 @@ namespace GPK_RePack.Forms
                     {
                         if (exp.Data != null)
                         {
-                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}\\{2}.raw", dialog.SelectedPath, exp.ClassName, exp.ObjectName), exp);
+                            DataTools.WriteExportDataFile(String.Format("{0}\\{1}\\{2}", dialog.SelectedPath, exp.ClassName, exp.ObjectName), exp);
                             logger.Trace("save for " + exp.UID);
                         }
                     }
@@ -1748,6 +1748,20 @@ namespace GPK_RePack.Forms
                 {
                     GpkArrayProperty tmpArray = (GpkArrayProperty)prop;
                     valueCell.Value = tmpArray.GetValueHex();
+                    row.ContextMenuStrip = new ContextMenuStrip();
+                    row.ContextMenuStrip.Items.Add(
+                        new ToolStripButton("Export", null,
+                            (sender, args) =>
+                            {
+                                BigBytePropExport(tmpArray);
+                            }));
+                    row.ContextMenuStrip.Items.Add(
+                        new ToolStripButton("Import", null,
+                           (sender, args) =>
+                           {
+                               BigBytePropImport(tmpArray);
+                           })
+                        );
                 }
                 else if (prop is GpkStructProperty)
                 {
@@ -2010,11 +2024,15 @@ namespace GPK_RePack.Forms
         private void BigBytePropExport_Click(object sender, EventArgs e)
         {
             var arrayProp = checkArrayRow();
+            BigBytePropExport(arrayProp);
+        }
+        private void BigBytePropExport(GpkArrayProperty arrayProp)
+        {
             if (arrayProp == null || arrayProp.value == null) return;
             byte[] data = new byte[arrayProp.value.Length - 4];
             Array.Copy(arrayProp.value, 4, data, 0, arrayProp.value.Length - 4); //remove count bytes
 
-            String path = MiscFuncs.GenerateSaveDialog(arrayProp.name, ".raw");
+            String path = MiscFuncs.GenerateSaveDialog(arrayProp.name, "");
             if (path == "") return;
 
             DataTools.WriteExportDataFile(path, data);
@@ -2023,6 +2041,10 @@ namespace GPK_RePack.Forms
         private void BigBytePropImport_Click(object sender, EventArgs e)
         {
             var arrayProp = checkArrayRow();
+            BigBytePropImport(arrayProp);
+        }
+        private void BigBytePropImport(GpkArrayProperty arrayProp)
+        {
             if (arrayProp == null) return;
 
             String[] files = MiscFuncs.GenerateOpenDialog(false, this);
@@ -2227,7 +2249,7 @@ namespace GPK_RePack.Forms
 
         #endregion
 
-  
+
     }
 }
 
