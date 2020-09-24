@@ -20,10 +20,10 @@ namespace GPK_RePack.Editors
             GpkPackage sourcePackage = source.motherPackage;
             GpkPackage destinantionPackage = destination.motherPackage;
 
-            //exclude: motherPackage, guid, uid, SerialOffset, SerialOffsetPosition, ObjectName
+            //exclude: motherPackage, guid, uid, SerialOffset, SerialOffsetPosition, ObjectName, PackageName
             destination.ClassName = source.ClassName;
             destination.SuperName = source.SuperName;
-            destination.PackageName = source.PackageName;
+            //destination.PackageName = source.PackageName;
             //destination.ObjectName = source.ObjectName;
 
             destination.Unk1 = source.Unk1;

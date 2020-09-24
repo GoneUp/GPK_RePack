@@ -88,7 +88,7 @@ namespace GPK_RePack.Forms
             this.btnDeleteMapping.Name = "btnDeleteMapping";
             this.btnDeleteMapping.Size = new System.Drawing.Size(106, 23);
             this.btnDeleteMapping.TabIndex = 2;
-            this.btnDeleteMapping.Text = "Delete Mapping";
+            this.btnDeleteMapping.Text = "Clear Mapping";
             this.btnDeleteMapping.UseVisualStyleBackColor = true;
             this.btnDeleteMapping.Click += new System.EventHandler(this.btnDeleteMapping_Click);
             // 
@@ -97,9 +97,9 @@ namespace GPK_RePack.Forms
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(3, 23);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(204, 13);
+            this.label1.Size = new System.Drawing.Size(332, 13);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Search here. Caseinsensitive. Length > 3.";
+            this.label1.Text = "Search here. Caseinsensitive. Length > 3. Click entry to open a GPK.";
             // 
             // boxSearch
             // 
