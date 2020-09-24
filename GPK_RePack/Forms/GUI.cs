@@ -1748,6 +1748,20 @@ namespace GPK_RePack.Forms
                 {
                     GpkArrayProperty tmpArray = (GpkArrayProperty)prop;
                     valueCell.Value = tmpArray.GetValueHex();
+                    row.ContextMenuStrip = new ContextMenuStrip();
+                    row.ContextMenuStrip.Items.Add(
+                        new ToolStripButton("Export", null,
+                            (sender, args) =>
+                            {
+                                BigBytePropExport(tmpArray);
+                            }));
+                    row.ContextMenuStrip.Items.Add(
+                        new ToolStripButton("Import", null,
+                           (sender, args) =>
+                           {
+                               BigBytePropImport(tmpArray);
+                           })
+                        );
                 }
                 else if (prop is GpkStructProperty)
                 {
@@ -2010,6 +2024,10 @@ namespace GPK_RePack.Forms
         private void BigBytePropExport_Click(object sender, EventArgs e)
         {
             var arrayProp = checkArrayRow();
+            BigBytePropExport(arrayProp);
+        }
+        private void BigBytePropExport(GpkArrayProperty arrayProp)
+        {
             if (arrayProp == null || arrayProp.value == null) return;
             byte[] data = new byte[arrayProp.value.Length - 4];
             Array.Copy(arrayProp.value, 4, data, 0, arrayProp.value.Length - 4); //remove count bytes
@@ -2023,6 +2041,10 @@ namespace GPK_RePack.Forms
         private void BigBytePropImport_Click(object sender, EventArgs e)
         {
             var arrayProp = checkArrayRow();
+            BigBytePropImport(arrayProp);
+        }
+        private void BigBytePropImport(GpkArrayProperty arrayProp)
+        {
             if (arrayProp == null) return;
 
             String[] files = MiscFuncs.GenerateOpenDialog(false, this);
