@@ -28,7 +28,7 @@ namespace GPK_RePack.Core
         public string CookedPCPath { get; set; } = "";
         public bool EnableCompression { get; set; } = false;
         public bool EnableSortTreeNodes { get; set; } = false;
-        public bool LoadMappingOnStart { get; set; } = false;
+        public bool LoadMappingOnStart { get; set; } = true;
 
         public static void Load()
         {
