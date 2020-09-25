@@ -135,7 +135,8 @@
 4 - Saving
 4a) The normal way to save is Main -&gt; Save. The program will rebuild the GPK file from scratch. 
 4b) If the normal way is failing switch select Patch Mode in settings and try to import the data again (only over raw import/export). Save afterwards via Main -&gt; Save patched.
- 
+
+For x64 modding see https://github.com/GoneUp/GPK_RePack/wiki/64-bit-Modding
 
 About Padding: 
 Tera accepts only files with the exact same file size as the orginal file in some cases, for example at soundfiles. You need to test it for the file you want to modify or use a patched datacenter.

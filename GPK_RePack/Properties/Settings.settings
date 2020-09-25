@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="CopyMode" Type="System.String" Scope="User">
-      <Value Profile="(Default)">dataprops</Value>
+      <Value Profile="(Default)">all</Value>
     </Setting>
     <Setting Name="LogLevel" Type="System.String" Scope="User">
       <Value Profile="(Default)">info</Value>
@@ -63,7 +63,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LoadMappingOnStart" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

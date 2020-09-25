@@ -25,7 +25,7 @@ namespace GPK_RePack.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("dataprops")]
+        [global::System.Configuration.DefaultSettingValueAttribute("all")]
         public string CopyMode {
             get {
                 return ((string)(this["CopyMode"]));
@@ -265,7 +265,7 @@ namespace GPK_RePack.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool LoadMappingOnStart {
             get {
                 return ((bool)(this["LoadMappingOnStart"]));
