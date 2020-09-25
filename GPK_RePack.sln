@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lzo64", "lzo64\Lzo64.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpkManager.Dds", "UpkManager.Dds\UpkManager.Dds.csproj", "{63287C47-8658-4401-9C51-D06C2A95AF99}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPK_RePack.Core", "GPK_RePack.Core\GPK_RePack.Core.csproj", "{318F6CD7-A762-49FF-B304-9794007A672B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GPK_RePack_WPF", "GPK_RePack_WPF\GPK_RePack_WPF.csproj", "{2F8980DB-381B-4E22-9132-45EF52060E58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,30 @@ Global
 		{63287C47-8658-4401-9C51-D06C2A95AF99}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{63287C47-8658-4401-9C51-D06C2A95AF99}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{63287C47-8658-4401-9C51-D06C2A95AF99}.Release|x86.ActiveCfg = Release|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Debug|x86.Build.0 = Debug|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Release|x86.ActiveCfg = Release|Any CPU
+		{318F6CD7-A762-49FF-B304-9794007A672B}.Release|x86.Build.0 = Release|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Debug|x86.Build.0 = Debug|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Release|x86.ActiveCfg = Release|Any CPU
+		{2F8980DB-381B-4E22-9132-45EF52060E58}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

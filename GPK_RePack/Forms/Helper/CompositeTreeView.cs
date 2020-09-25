@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using GPK_RePack.Model;
-using GPK_RePack.Model.Composite;
+﻿using System.Windows.Forms;
+using GPK_RePack.Core.Model;
 
 namespace GPK_RePack.Forms.Helper
 {

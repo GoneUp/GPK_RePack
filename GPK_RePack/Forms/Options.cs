@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GPK_RePack.Properties;
+using GPK_RePack.Core;
 
 namespace GPK_RePack.Forms
 {
@@ -25,7 +19,7 @@ namespace GPK_RePack.Forms
 
         private void Options_Load(object sender, EventArgs e)
         {
-            switch (Settings.Default.CopyMode)
+            switch (CoreSettings.Default.CopyMode)
             {
                 case "dataprops":
                     btnDataProps.Checked = true;
@@ -41,7 +35,7 @@ namespace GPK_RePack.Forms
                     break;
             }
 
-            switch (Settings.Default.LogLevel)
+            switch (CoreSettings.Default.LogLevel)
             {
                 case "info":
                     btnLogInfo.Checked = true;
@@ -54,7 +48,7 @@ namespace GPK_RePack.Forms
                     break;
             }
 
-            switch (Settings.Default.ViewMode)
+            switch (CoreSettings.Default.ViewMode)
             {
                 case "normal":
                     btnViewNormal.Checked = true;
@@ -67,25 +61,25 @@ namespace GPK_RePack.Forms
                     break;
             }
 
-            boxDebug.Checked = Settings.Default.Debug;
-            boxImports.Checked = Settings.Default.ShowImports;
-            boxPatchmode.Checked = Settings.Default.PatchMode;
-            boxUseUID.Checked = Settings.Default.UseUID;
-            boxJitData.Checked = Settings.Default.JitData;
-            boxGenerateMipmaps.Checked = Settings.Default.GenerateMipMaps;
-            boxScaleFactor.Text = Settings.Default.ScaleFactorHack.ToString();
-            boxEnableTexture2D.Checked = Settings.Default.EnableTexture2D;
-            boxColorPreview.BackColor = Settings.Default.PreviewColor;
-            boxSavefilePostfix.Text = Settings.Default.SaveFileSuffix;
-            boxCompression.Checked = Settings.Default.EnableCompression;
-            boxLoadMapping.Checked = Settings.Default.LoadMappingOnStart;
+            boxDebug.Checked = CoreSettings.Default.Debug;
+            boxImports.Checked = CoreSettings.Default.ShowImports;
+            boxPatchmode.Checked = CoreSettings.Default.PatchMode;
+            boxUseUID.Checked = CoreSettings.Default.UseUID;
+            boxJitData.Checked = CoreSettings.Default.JitData;
+            boxGenerateMipmaps.Checked = CoreSettings.Default.GenerateMipMaps;
+            boxScaleFactor.Text = CoreSettings.Default.ScaleFactorHack.ToString();
+            boxEnableTexture2D.Checked = CoreSettings.Default.EnableTexture2D;
+            boxColorPreview.BackColor = CoreSettings.Default.PreviewColor;
+            boxSavefilePostfix.Text = CoreSettings.Default.SaveFileSuffix;
+            boxCompression.Checked = CoreSettings.Default.EnableCompression;
+            boxLoadMapping.Checked = CoreSettings.Default.LoadMappingOnStart;
         }
 
 
 
         private void Options_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Settings.Default.Save();
+            CoreSettings.Save();
 
             new Task(() =>
             {
@@ -98,83 +92,83 @@ namespace GPK_RePack.Forms
 
         private void btnDataProps_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.CopyMode = "dataprops";
+            CoreSettings.Default.CopyMode = "dataprops";
         }
 
         private void btnData_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.CopyMode = "data";
+            CoreSettings.Default.CopyMode = "data";
         }
 
         private void btnProperties_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.CopyMode = "props";
+            CoreSettings.Default.CopyMode = "props";
         }
 
         private void btnRadioAll_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.CopyMode = "all";
+            CoreSettings.Default.CopyMode = "all";
         }
 
         private void btnLogInfo_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.LogLevel = "info";
+            CoreSettings.Default.LogLevel = "info";
         }
 
         private void btnLogDebug_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.LogLevel = "debug";
+            CoreSettings.Default.LogLevel = "debug";
         }
 
         private void btnLogTrace_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.LogLevel = "trace";
+            CoreSettings.Default.LogLevel = "trace";
         }
 
 
         private void btnViewNormal_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.ViewMode = "normal";
+            CoreSettings.Default.ViewMode = "normal";
         }
 
         private void btnViewClass_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.ViewMode = "class";
+            CoreSettings.Default.ViewMode = "class";
         }
 
         private void btnViewPack_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.ViewMode = "package";
+            CoreSettings.Default.ViewMode = "package";
         }
 
         private void boxDebug_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.Debug = boxDebug.Checked;
+            CoreSettings.Default.Debug = boxDebug.Checked;
         }
 
         private void boxImports_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.ShowImports = boxImports.Checked;
+            CoreSettings.Default.ShowImports = boxImports.Checked;
         }
 
         private void boxPatchmode_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.PatchMode = boxPatchmode.Checked;
+            CoreSettings.Default.PatchMode = boxPatchmode.Checked;
         }
 
         private void boxUseUID_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.UseUID = boxUseUID.Checked;
+            CoreSettings.Default.UseUID = boxUseUID.Checked;
         }
 
         private void boxJitData_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.JitData = boxJitData.Checked;
+            CoreSettings.Default.JitData = boxJitData.Checked;
         }
 
         private void boxGenerateMipmaps_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.GenerateMipMaps = boxJitData.Checked;
+            CoreSettings.Default.GenerateMipMaps = boxJitData.Checked;
         }
 
         private void boxScaleFactor_TextChanged(object sender, EventArgs e)
@@ -182,7 +176,7 @@ namespace GPK_RePack.Forms
             float result = 1;
             if (float.TryParse(boxScaleFactor.Text, out result))
             {
-                Settings.Default.ScaleFactorHack = result;
+                CoreSettings.Default.ScaleFactorHack = result;
             }
         }
 
@@ -196,17 +190,17 @@ namespace GPK_RePack.Forms
 
         private void boxEnableTexture2D_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.EnableTexture2D = boxEnableTexture2D.Checked;
+            CoreSettings.Default.EnableTexture2D = boxEnableTexture2D.Checked;
         }
 
         private void btnSelectColor_Click(object sender, EventArgs e)
         {
             ColorDialog dialog = new ColorDialog();
-            dialog.Color = Settings.Default.PreviewColor;
+            dialog.Color = CoreSettings.Default.PreviewColor;
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                Settings.Default.PreviewColor = dialog.Color;
+                CoreSettings.Default.PreviewColor = dialog.Color;
                 boxColorPreview.BackColor = dialog.Color;
             }
 
@@ -215,12 +209,12 @@ namespace GPK_RePack.Forms
 
         private void boxSavefilePostfix_TextChanged(object sender, EventArgs e)
         {
-            Settings.Default.SaveFileSuffix = boxSavefilePostfix.Text;
+            CoreSettings.Default.SaveFileSuffix = boxSavefilePostfix.Text;
         }
 
         private void Options_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Settings.Default.SaveFileSuffix == "")
+            if (CoreSettings.Default.SaveFileSuffix == "")
             {
                 var result = MessageBox.Show("WARNING: Suffix is empty! Orginal GPKs will be overwritten if you save now.", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel)
@@ -232,12 +226,12 @@ namespace GPK_RePack.Forms
 
         private void boxCompression_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.EnableCompression = boxCompression.Checked;
+            CoreSettings.Default.EnableCompression = boxCompression.Checked;
         }
 
         private void boxLoadMapping_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.LoadMappingOnStart = boxLoadMapping.Checked;
+            CoreSettings.Default.LoadMappingOnStart = boxLoadMapping.Checked;
         }
     }
 }

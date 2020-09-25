@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using GPK_RePack.Properties;
+﻿using GPK_RePack.Core;
 using NLog;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace GPK_RePack.Updater
 {
