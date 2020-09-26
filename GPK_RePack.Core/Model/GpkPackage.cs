@@ -73,10 +73,13 @@ namespace GPK_RePack.Core.Model
 
         public string GetString(long index)
         {
-            if (NameList.ContainsKey(index))
+            int subID = Convert.ToInt32(index >> 32);
+            int mainID = Convert.ToInt32(index & 0xFFFFFFFF);
+
+            if (NameList.ContainsKey(mainID))
             {
-                NameList[index].used = true;
-                return NameList[index].name;
+                NameList[mainID].used = true;
+                return NameList[mainID].name;
             }
 
             throw new Exception(string.Format("NameIndex {0} not found!", index));
