@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using GPK_RePack.Model;
-using GPK_RePack.Model.Composite;
+using GPK_RePack.Core.Model;
+using GPK_RePack.Core.Model.Composite;
 using NLog;
 
 namespace GPK_RePack.Forms

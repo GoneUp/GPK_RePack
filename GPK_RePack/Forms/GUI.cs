@@ -1,40 +1,29 @@
-﻿using System;
+﻿using GPK_RePack.Forms.Helper;
+using GPK_RePack.Properties;
+using GPK_RePack.Updater;
+using NAudio.Vorbis;
+using NAudio.Wave;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
-using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.ServiceModel.Security;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Forms;
-using System.Windows.Media.Imaging;
-using System.Xml;
-using GPK_RePack.Editors;
-using GPK_RePack.Forms.Helper;
-using GPK_RePack.IO;
-using GPK_RePack.Model;
-using GPK_RePack.Model.Composite;
-using GPK_RePack.Model.Interfaces;
-using GPK_RePack.Model.Payload;
-using GPK_RePack.Model.Prop;
-using GPK_RePack.Properties;
-using GPK_RePack.Updater;
-using NAudio.Vorbis;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
-using NLog;
-using NLog.Config;
-using NLog.Filters;
-using NLog.Targets;
-using NLog.Windows.Forms;
+using GPK_RePack.Core;
+using GPK_RePack.Core.Editors;
+using GPK_RePack.Core.IO;
+using GPK_RePack.Core.Model;
+using GPK_RePack.Core.Model.Composite;
+using GPK_RePack.Core.Model.Interfaces;
+using GPK_RePack.Core.Model.Payload;
+using GPK_RePack.Core.Model.Prop;
 using UpkManager.Dds;
-using UpkManager.Dds.Constants;
 
 namespace GPK_RePack.Forms
 {
@@ -71,15 +60,14 @@ namespace GPK_RePack.Forms
 
         protected override void OnLoad(EventArgs e)
         {
-
             base.OnLoad(e);
         }
 
         private void scaleFont()
         {
             float scaleFactor = 1;
-            if (Settings.Default != null)
-                scaleFactor = Settings.Default.ScaleFactorHack;
+            //if (CoreSettings != null)
+                scaleFactor = CoreSettings.Default.ScaleFactorHack;
 
             Font = new Font(Font.Name, 8.25f * scaleFactor, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
             statusStrip.Font = Font;
@@ -91,13 +79,14 @@ namespace GPK_RePack.Forms
             try
             {
                 //setting file check
-                String config_path = (AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
-                if (!File.Exists(config_path))
-                {
-                    File.WriteAllText(config_path, Resources.Config);
-                    MessageBox.Show("Setting file was missing. Please restart the application.");
-                    Environment.Exit(0);
-                }
+                CoreSettings.Load();
+                //String config_path = (AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+                //if (!File.Exists(config_path))
+                //{
+                //    File.WriteAllText(config_path, Resources.Config);
+                //    MessageBox.Show("Setting file was missing. Please restart the application.");
+                //    Environment.Exit(0);
+                //}
 
                 //nlog init
                 NLogConfig.SetDefaultConfig();
@@ -116,24 +105,24 @@ namespace GPK_RePack.Forms
                 waveOut = new WaveOut();
                 waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
 
-                if (Settings.Default.SaveDir == "")
-                    Settings.Default.SaveDir = Directory.GetCurrentDirectory();
+                if (CoreSettings.Default.SaveDir == "")
+                    CoreSettings.Default.SaveDir = Directory.GetCurrentDirectory();
 
-                if (Settings.Default.OpenDir == "")
-                    Settings.Default.OpenDir = Directory.GetCurrentDirectory();
+                if (CoreSettings.Default.OpenDir == "")
+                    CoreSettings.Default.OpenDir = Directory.GetCurrentDirectory();
 
-                if (Settings.Default.WorkingDir == "")
-                    Settings.Default.WorkingDir = Directory.GetCurrentDirectory();
+                if (CoreSettings.Default.WorkingDir == "")
+                    CoreSettings.Default.WorkingDir = Directory.GetCurrentDirectory();
 
                 texturePage = tabTexturePreview;
                 hidePreviewTab();
 
                 //mappings
-                if (Settings.Default.LoadMappingOnStart && Settings.Default.CookedPCPath != "")
+                if (CoreSettings.Default.LoadMappingOnStart && CoreSettings.Default.CookedPCPath != "")
                 {
                     new Task(() =>
                     {
-                        loadAndParseMapping(Settings.Default.CookedPCPath);
+                        loadAndParseMapping(CoreSettings.Default.CookedPCPath);
                     }).Start();
                 }
             }
@@ -191,7 +180,7 @@ namespace GPK_RePack.Forms
         private void GUI_FormClosing(object sender, FormClosingEventArgs e)
         {
             logger.Info("Shutdown");
-            Settings.Default.Save();
+            CoreSettings.Save();
             if (waveReader != null)
             {
                 waveReader.Dispose();
@@ -318,7 +307,7 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            gpkStore.MultiPatchObjectMapper(selectedPackage, Settings.Default.CookedPCPath);
+            gpkStore.MultiPatchObjectMapper(selectedPackage, CoreSettings.Default.CookedPCPath);
         }
 
         private void savepaddingStripMenuItem_Click(object sender, EventArgs e)
@@ -459,7 +448,7 @@ namespace GPK_RePack.Forms
             treeMain.BeginUpdate();
             treeMain.Nodes.Clear();
 
-            if (Settings.Default.EnableSortTreeNodes)
+            if (CoreSettings.Default.EnableSortTreeNodes)
             {
                 treeMain.TreeViewNodeSorter = new MiscFuncs.NodeSorter();
             }
@@ -478,15 +467,15 @@ namespace GPK_RePack.Forms
                 TreeNode nodeI = null;
                 TreeNode nodeE = null;
 
-                if (Settings.Default.ShowImports)
+                if (CoreSettings.Default.ShowImports)
                 {
                     foreach (var tmp in package.ImportList.OrderByDescending(pair => pair.Value.ObjectName).Reverse())
                     {
                         string key = tmp.Value.UID;
                         string value = tmp.Value.ObjectName;
-                        if (Settings.Default.UseUID) value = key;
+                        if (CoreSettings.Default.UseUID) value = key;
 
-                        switch (Settings.Default.ViewMode)
+                        switch (CoreSettings.Default.ViewMode)
                         {
                             case "normal":
                                 if (nodeI == null)
@@ -508,9 +497,9 @@ namespace GPK_RePack.Forms
                 {
                     string key = tmp.Value.UID;
                     string value = tmp.Value.ObjectName;
-                    if (Settings.Default.UseUID) value = key;
+                    if (CoreSettings.Default.UseUID) value = key;
 
-                    switch (Settings.Default.ViewMode)
+                    switch (CoreSettings.Default.ViewMode)
                     {
                         case "normal":
                             if (nodeE == null)
@@ -594,7 +583,7 @@ namespace GPK_RePack.Forms
                     selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Name)];
                     boxInfo.Text = selectedPackage.ToString();
                 }
-                else if (e.Node.Level == 1 && Settings.Default.ViewMode == "class")
+                else if (e.Node.Level == 1 && CoreSettings.Default.ViewMode == "class")
                 {
                     selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Parent.Name)];
                     selectedClass = e.Node.Text;
@@ -603,7 +592,7 @@ namespace GPK_RePack.Forms
                 }
 
                 //check if we have a leaf
-                else if (e.Node.Level == 2 && Settings.Default.ViewMode == "normal" ||
+                else if (e.Node.Level == 2 && CoreSettings.Default.ViewMode == "normal" ||
                      e.Node.Nodes.Count == 0)
                 {
                     GpkPackage package = gpkStore.LoadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
@@ -688,7 +677,7 @@ namespace GPK_RePack.Forms
                         ddsFile.Load(image.GetObjectStream());
 
                         boxImagePreview.Image = TextureTools.BitmapFromSource(ddsFile.BitmapSource);
-                        boxImagePreview.BackColor = Settings.Default.PreviewColor;
+                        boxImagePreview.BackColor = CoreSettings.Default.PreviewColor;
                         //workaround for a shrinking window
                         scaleFont();
                         resizePiutureBox();
@@ -750,12 +739,12 @@ namespace GPK_RePack.Forms
 
 
                 FolderBrowserDialog dialog = new FolderBrowserDialog();
-                dialog.SelectedPath = Settings.Default.SaveDir;
+                dialog.SelectedPath = CoreSettings.Default.SaveDir;
                 DialogResult result = dialog.ShowDialog();
 
                 if (result == DialogResult.OK)
                 {
-                    Settings.Default.SaveDir = dialog.SelectedPath;
+                    CoreSettings.Default.SaveDir = dialog.SelectedPath;
 
                     foreach (GpkExport exp in exports)
                     {
@@ -770,12 +759,12 @@ namespace GPK_RePack.Forms
             else if (selectedPackage != null)
             {
                 FolderBrowserDialog dialog = new FolderBrowserDialog();
-                dialog.SelectedPath = Settings.Default.SaveDir;
+                dialog.SelectedPath = CoreSettings.Default.SaveDir;
                 DialogResult result = dialog.ShowDialog();
 
                 if (result == DialogResult.OK)
                 {
-                    Settings.Default.SaveDir = dialog.SelectedPath;
+                    CoreSettings.Default.SaveDir = dialog.SelectedPath;
 
                     foreach (GpkExport exp in selectedPackage.ExportList.Values)
                     {
@@ -814,7 +803,7 @@ namespace GPK_RePack.Forms
                 byte[] buffer = File.ReadAllBytes(path);
 
 
-                if (Settings.Default.PatchMode)
+                if (CoreSettings.Default.PatchMode)
                 {
                     if (treeMain.SelectedNode.Parent.Parent == null) return;
                     int packageIndex = Convert.ToInt32(treeMain.SelectedNode.Parent.Parent.Name);
@@ -925,10 +914,10 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            logger.Trace(Settings.Default.CopyMode);
+            logger.Trace(CoreSettings.Default.CopyMode);
             string option = "";
 
-            switch (Settings.Default.CopyMode)
+            switch (CoreSettings.Default.CopyMode)
             {
                 case "all":
                     DataTools.ReplaceAll(copyExport, selectedExport);
@@ -1142,12 +1131,12 @@ namespace GPK_RePack.Forms
                     List<GpkExport> exports = selectedPackage.GetExportsByClass(selectedClass);
 
                     FolderBrowserDialog dialog = new FolderBrowserDialog();
-                    dialog.SelectedPath = Path.GetDirectoryName(Settings.Default.SaveDir);
+                    dialog.SelectedPath = Path.GetDirectoryName(CoreSettings.Default.SaveDir);
                     DialogResult result = dialog.ShowDialog();
 
                     if (result == DialogResult.OK)
                     {
-                        Settings.Default.SaveDir = dialog.SelectedPath;
+                        CoreSettings.Default.SaveDir = dialog.SelectedPath;
 
                         string[] files = Directory.GetFiles(dialog.SelectedPath);
 
@@ -1203,12 +1192,12 @@ namespace GPK_RePack.Forms
 
 
                 FolderBrowserDialog dialog = new FolderBrowserDialog();
-                dialog.SelectedPath = Path.GetDirectoryName(Settings.Default.SaveDir);
+                dialog.SelectedPath = Path.GetDirectoryName(CoreSettings.Default.SaveDir);
                 DialogResult result = dialog.ShowDialog();
 
                 if (result == DialogResult.OK)
                 {
-                    Settings.Default.SaveDir = dialog.SelectedPath;
+                    CoreSettings.Default.SaveDir = dialog.SelectedPath;
 
                     foreach (GpkExport exp in exports)
                     {
@@ -1538,14 +1527,14 @@ namespace GPK_RePack.Forms
             }
 
             var dialog = new FolderBrowserDialog();
-            if (Settings.Default.CookedPCPath != "")
-                dialog.SelectedPath = Settings.Default.CookedPCPath;
+            if (CoreSettings.Default.CookedPCPath != "")
+                dialog.SelectedPath = CoreSettings.Default.CookedPCPath;
             dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
 
             var path = dialog.SelectedPath + "\\";
-            Settings.Default.CookedPCPath = path;
+            CoreSettings.Default.CookedPCPath = path;
 
             loadAndParseMapping(path);
 
@@ -1566,8 +1555,8 @@ namespace GPK_RePack.Forms
         private void writeMappingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dialog = new FolderBrowserDialog();
-            if (Settings.Default.WorkingDir != "")
-                dialog.SelectedPath = Settings.Default.WorkingDir;
+            if (CoreSettings.Default.WorkingDir != "")
+                dialog.SelectedPath = CoreSettings.Default.WorkingDir;
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
 
@@ -1581,8 +1570,8 @@ namespace GPK_RePack.Forms
         {
             //cookedpc path, outdir path
             var dialog = new FolderBrowserDialog();
-            if (Settings.Default.CookedPCPath != "")
-                dialog.SelectedPath = Settings.Default.CookedPCPath + "\\";
+            if (CoreSettings.Default.CookedPCPath != "")
+                dialog.SelectedPath = CoreSettings.Default.CookedPCPath + "\\";
             dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
@@ -1591,7 +1580,7 @@ namespace GPK_RePack.Forms
             var path = dialog.SelectedPath + "\\";
             gpkStore.BaseSearchPath = path;
 
-            Settings.Default.CookedPCPath = path;
+            CoreSettings.Default.CookedPCPath = path;
             MapperTools.ParseMappings(path, gpkStore);
 
             int subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
@@ -1604,7 +1593,7 @@ namespace GPK_RePack.Forms
 
             //save dir
             dialog = new FolderBrowserDialog();
-            dialog.SelectedPath = Settings.Default.WorkingDir;
+            dialog.SelectedPath = CoreSettings.Default.WorkingDir;
             dialog.Description = "Select your output dir";
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
@@ -1620,15 +1609,15 @@ namespace GPK_RePack.Forms
         {
             //cookedpc path, outdir path
             var dialog = new FolderBrowserDialog();
-            if (Settings.Default.CookedPCPath != "")
-                dialog.SelectedPath = Settings.Default.CookedPCPath;
+            if (CoreSettings.Default.CookedPCPath != "")
+                dialog.SelectedPath = CoreSettings.Default.CookedPCPath;
             dialog.Description = "Select a folder with PkgMapper.dat and CompositePackageMapper.dat in it. Normally your CookedPC folder.";
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
 
             var path = dialog.SelectedPath;
             gpkStore.BaseSearchPath = path;
-            Settings.Default.CookedPCPath = path;
+            CoreSettings.Default.CookedPCPath = path;
             MapperTools.ParseMappings(path, gpkStore);
 
             int subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
@@ -1636,7 +1625,7 @@ namespace GPK_RePack.Forms
             var list = filterCompositeList("");
             //save dir
             dialog = new FolderBrowserDialog();
-            dialog.SelectedPath = Settings.Default.WorkingDir;
+            dialog.SelectedPath = CoreSettings.Default.WorkingDir;
             dialog.Description = "Select your output dir";
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
