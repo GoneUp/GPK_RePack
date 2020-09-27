@@ -68,7 +68,7 @@ namespace GPK_RePack.Forms
         {
             float scaleFactor = 1;
             //if (CoreSettings != null)
-                scaleFactor = CoreSettings.Default.ScaleFactorHack;
+            scaleFactor = CoreSettings.Default.ScaleFactorHack;
 
             Font = new Font(Font.Name, 8.25f * scaleFactor, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
             statusStrip.Font = Font;
@@ -569,6 +569,16 @@ namespace GPK_RePack.Forms
 
         }
 
+        private void treeMain_RefreshSelection()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => treeMain_RefreshSelection()));
+                return;
+            }
+
+            treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+        }
 
         private void treeMain_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -599,7 +609,7 @@ namespace GPK_RePack.Forms
                 {
                     GpkPackage package = gpkStore.LoadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
                     Object selected = package.GetObjectByUID(e.Node.Name);
-                    
+
                     if (selected is GpkImport)
                     {
                         GpkImport imp = (GpkImport)selected;
@@ -949,7 +959,7 @@ namespace GPK_RePack.Forms
             selectedExport.GetDataSize();
             selectedExport.motherPackage.CheckAllNamesInObjects();
 
-            treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+            treeMain_RefreshSelection();
             logger.Info("Pasted the {0} of {1} to {2}", option, copyExport.UID, selectedExport.UID);
         }
 
@@ -995,7 +1005,7 @@ namespace GPK_RePack.Forms
             selectedExport.Payload = null;
             selectedExport.GetDataSize();
 
-            treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+            treeMain_RefreshSelection();
         }
 
 
@@ -1033,6 +1043,9 @@ namespace GPK_RePack.Forms
                     return true;
                 case Keys.Control | Keys.Shift | Keys.P:
                     replaceSaveToolStripMenuItem_Click(null, null);
+                    return true;
+                case Keys.Control | Keys.M:
+                    loadMappingToolStripMenuItem_Click(null, null);
                     return true;
 
                 //TABS
@@ -1124,7 +1137,7 @@ namespace GPK_RePack.Forms
                     if (File.Exists(files[0]))
                     {
                         SoundwaveTools.ImportOgg(selectedExport, files[0]);
-                        treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+                        treeMain_RefreshSelection();
                         logger.Info("Import successful.");
                     }
                     else
@@ -1222,7 +1235,7 @@ namespace GPK_RePack.Forms
             if (selectedExport != null)
             {
                 SoundwaveTools.ImportOgg(selectedExport, "fake");
-                treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+                treeMain_RefreshSelection();
             }
         }
 
@@ -1432,7 +1445,8 @@ namespace GPK_RePack.Forms
                 {
                     selectedExport.ObjectName = input;
 
-                } else if (selectedImport != null)
+                }
+                else if (selectedImport != null)
                 {
                     selectedImport.ObjectName = input;
                 }
@@ -1442,7 +1456,7 @@ namespace GPK_RePack.Forms
                 //uid is not renamed to not break internal references. will be regenerated on a new load.
                 logger.Info($"Renamed object to the new name {input}. Experimental, stuff may break.");
             }
-            
+
             DrawPackages();
         }
 
@@ -2150,14 +2164,12 @@ namespace GPK_RePack.Forms
         #endregion
 
         #region context menu 
-
-        string clickedNode;
         private void treeMain_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
                 treeMain.SelectedNode = e.Node;
-                clickedNode = e.Node.Name;
+                string clickedNode = e.Node.Name;
                 treeContextMenu.Show(treeMain, e.Location);
             }
         }
@@ -2191,6 +2203,10 @@ namespace GPK_RePack.Forms
                 else if (e.ClickedItem == pasteToolStripMenuItem)
                 {
                     btnPaste_Click(null, null);
+                }
+                else if (e.ClickedItem == tryToLoadCompositeDataToolStripMenuItem)
+                {
+                    LoadCompositeDataForExport();
                 }
 
                 //import
@@ -2253,28 +2269,57 @@ namespace GPK_RePack.Forms
             }
         }
 
+        private void LoadCompositeDataForExport()
+        {
+            if (!ExportSelected())
+            {
+                return;
+            }
 
+            //strat. find new name in pkgmapper, find comp entry in compmapper, load composite
+            //hook adding of composite, replace all data and popoup a message
 
+            string redirectUID = gpkStore.FindObjectMapperEntryForObjectname(selectedExport.GetNormalizedUID());
+            var compEntry = gpkStore.FindCompositeMapEntriesForCompID(redirectUID);
+            if (compEntry == null)
+                return;
 
+            logger.Info($"Trying to load GPK {compEntry.SubGPKName} for Object {compEntry.CompositeUID}");
 
+            string path = string.Format("{0}{1}.gpk", gpkStore.BaseSearchPath, compEntry.SubGPKName);
 
+            if (!File.Exists(path))
+            {
+                logger.Info("GPK to load not found");
+                return;
+            }
 
+            new Task(() =>
+            {
+                var gpk = gpkStore.loadSubGpk(path, compEntry);
 
+                var obj = gpk.GetObjectByUID(compEntry.GetObjectName());
+                if (!(obj is GpkExport))
+                {
+                    logger.Error("Somehow found obj is not a export");
+                    return;
+                }
+                var exportObj = (GpkExport)obj;
 
+                logger.Info($"Found something! Data to import is in {exportObj.UID}");
 
+                DataTools.ReplaceAll(exportObj, selectedExport);
 
+                selectedExport.GetDataSize();
+                selectedExport.motherPackage.CheckAllNamesInObjects();
+                DrawPackages();
 
-
-
-
-
-
-
-
-
+                logger.Info("Done, succesfully imported composite data!");
+            }).Start();
+        }
         #endregion
 
-     
+
     }
 }
 

@@ -215,6 +215,12 @@ namespace GPK_RePack.Core.Model
 
         }
 
+        //External format, Package.UID
+        public string GetNormalizedUID()
+        {
+            return motherPackage.GetNormalizedFilename() + "." + UID;
+        }
+
         internal void CheckNamePresence(GpkPackage package)
         {
             package.GetStringIndex(ObjectName);

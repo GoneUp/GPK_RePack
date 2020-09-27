@@ -49,6 +49,7 @@ namespace GPK_RePack.Forms
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tryToLoadCompositeDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.previewOGGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
@@ -91,6 +92,7 @@ namespace GPK_RePack.Forms
             this.tESTBigBytePropExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bigBytePropImportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renameObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loggingActiveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.searchForObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -134,7 +136,6 @@ namespace GPK_RePack.Forms
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
             this.boxLog = new System.Windows.Forms.RichTextBox();
-            this.renameObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -185,10 +186,11 @@ namespace GPK_RePack.Forms
             this.copyToolStripMenuItem,
             this.pasteToolStripMenuItem,
             this.insertStripMenuItem,
+            this.tryToLoadCompositeDataToolStripMenuItem,
             this.toolStripSeparator6,
             this.previewOGGToolStripMenuItem});
             this.treeContextMenu.Name = "treeContextMenu";
-            this.treeContextMenu.Size = new System.Drawing.Size(203, 208);
+            this.treeContextMenu.Size = new System.Drawing.Size(247, 232);
             this.treeContextMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.treeContextMenu_ItemClicked);
             // 
             // importToolStripMenuItem
@@ -198,7 +200,7 @@ namespace GPK_RePack.Forms
             this.importOGGToolStripMenuItem,
             this.importDDSToolStripMenuItem});
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(246, 24);
             this.importToolStripMenuItem.Text = "Import";
             this.importToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.treeContextMenu_ItemClicked);
             // 
@@ -228,7 +230,7 @@ namespace GPK_RePack.Forms
             this.exportDDSToolStripMenuItem,
             this.exportPackageToolStripMenuItem});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(246, 24);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.treeContextMenu_ItemClicked);
             // 
@@ -259,49 +261,55 @@ namespace GPK_RePack.Forms
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(199, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(243, 6);
             // 
             // addToolStripMenuItem
             // 
             this.addToolStripMenuItem.Enabled = false;
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(246, 24);
             this.addToolStripMenuItem.Text = "Add";
             // 
             // removeToolStripMenuItem
             // 
             this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
-            this.removeToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(246, 24);
             this.removeToolStripMenuItem.Text = "Remove";
             // 
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(246, 24);
             this.copyToolStripMenuItem.Text = "Copy";
             // 
             // pasteToolStripMenuItem
             // 
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(246, 24);
             this.pasteToolStripMenuItem.Text = "Replace";
             // 
             // insertStripMenuItem
             // 
             this.insertStripMenuItem.Name = "insertStripMenuItem";
-            this.insertStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.insertStripMenuItem.Size = new System.Drawing.Size(246, 24);
             this.insertStripMenuItem.Text = "Insert as new Export";
             this.insertStripMenuItem.Click += new System.EventHandler(this.insertStripMenuItem_Click);
+            // 
+            // tryToLoadCompositeDataToolStripMenuItem
+            // 
+            this.tryToLoadCompositeDataToolStripMenuItem.Name = "tryToLoadCompositeDataToolStripMenuItem";
+            this.tryToLoadCompositeDataToolStripMenuItem.Size = new System.Drawing.Size(246, 24);
+            this.tryToLoadCompositeDataToolStripMenuItem.Text = "Try to load Composite Data";
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(199, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(243, 6);
             // 
             // previewOGGToolStripMenuItem
             // 
             this.previewOGGToolStripMenuItem.Name = "previewOGGToolStripMenuItem";
-            this.previewOGGToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.previewOGGToolStripMenuItem.Size = new System.Drawing.Size(246, 24);
             this.previewOGGToolStripMenuItem.Text = "Preview OGG";
             // 
             // menuStrip
@@ -614,6 +622,13 @@ namespace GPK_RePack.Forms
             this.addNameToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
             this.addNameToolStripMenuItem.Text = "Add Name";
             this.addNameToolStripMenuItem.Click += new System.EventHandler(this.addNameToolStripMenuItem_Click);
+            // 
+            // renameObjectToolStripMenuItem
+            // 
+            this.renameObjectToolStripMenuItem.Name = "renameObjectToolStripMenuItem";
+            this.renameObjectToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.renameObjectToolStripMenuItem.Text = "Rename Object";
+            this.renameObjectToolStripMenuItem.Click += new System.EventHandler(this.renameObjectToolStripMenuItem_Click);
             // 
             // loggingActiveMenuItem
             // 
@@ -1115,13 +1130,6 @@ namespace GPK_RePack.Forms
             this.boxLog.TabIndex = 0;
             this.boxLog.Text = "";
             // 
-            // renameObjectToolStripMenuItem
-            // 
-            this.renameObjectToolStripMenuItem.Name = "renameObjectToolStripMenuItem";
-            this.renameObjectToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
-            this.renameObjectToolStripMenuItem.Text = "Rename Object";
-            this.renameObjectToolStripMenuItem.Click += new System.EventHandler(this.renameObjectToolStripMenuItem_Click);
-            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -1134,7 +1142,7 @@ namespace GPK_RePack.Forms
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
             this.Name = "GUI";
-            this.Text = "Terahelper 1.0 - by GoneUp";
+            this.Text = "Terahelper 1.1 - by GoneUp";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GUI_FormClosing);
             this.Load += new System.EventHandler(this.GUI_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeMain_DragDrop);
@@ -1275,6 +1283,7 @@ namespace GPK_RePack.Forms
         private ToolStripSeparator toolStripSeparator9;
         private ToolStripSeparator toolStripSeparator10;
         private ToolStripMenuItem renameObjectToolStripMenuItem;
+        private ToolStripMenuItem tryToLoadCompositeDataToolStripMenuItem;
     }
 }
 
