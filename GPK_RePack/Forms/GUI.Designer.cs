@@ -136,6 +136,8 @@ namespace GPK_RePack.Forms
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
             this.boxLog = new System.Windows.Forms.RichTextBox();
+            this.tryToLoadAllExportDataFromCompositeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -489,6 +491,8 @@ namespace GPK_RePack.Forms
             this.decryptionToolStripMenuItem,
             this.datEncryptionToolStripMenuItem,
             this.toolStripSeparator10,
+            this.tryToLoadAllExportDataFromCompositeToolStripMenuItem,
+            this.toolStripSeparator12,
             this.dumpCompositeTexturesToolStripMenuItem,
             this.dumpIconsToolStripMenuItem,
             this.dumpGPKObjectsImportsExportsToolStripMenuItem});
@@ -1130,6 +1134,18 @@ namespace GPK_RePack.Forms
             this.boxLog.TabIndex = 0;
             this.boxLog.Text = "";
             // 
+            // tryToLoadAllExportDataFromCompositeToolStripMenuItem
+            // 
+            this.tryToLoadAllExportDataFromCompositeToolStripMenuItem.Name = "tryToLoadAllExportDataFromCompositeToolStripMenuItem";
+            this.tryToLoadAllExportDataFromCompositeToolStripMenuItem.Size = new System.Drawing.Size(334, 24);
+            this.tryToLoadAllExportDataFromCompositeToolStripMenuItem.Text = "Try to load all export data from composite";
+            this.tryToLoadAllExportDataFromCompositeToolStripMenuItem.Click += new System.EventHandler(this.tryToLoadAllExportDataFromCompositeToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator12
+            // 
+            this.toolStripSeparator12.Name = "toolStripSeparator12";
+            this.toolStripSeparator12.Size = new System.Drawing.Size(331, 6);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -1284,6 +1300,8 @@ namespace GPK_RePack.Forms
         private ToolStripSeparator toolStripSeparator10;
         private ToolStripMenuItem renameObjectToolStripMenuItem;
         private ToolStripMenuItem tryToLoadCompositeDataToolStripMenuItem;
+        private ToolStripMenuItem tryToLoadAllExportDataFromCompositeToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator12;
     }
 }
 

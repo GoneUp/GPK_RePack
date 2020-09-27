@@ -2206,7 +2206,7 @@ namespace GPK_RePack.Forms
                 }
                 else if (e.ClickedItem == tryToLoadCompositeDataToolStripMenuItem)
                 {
-                    LoadCompositeDataForExport();
+                    LoadCompositeDataForSelectedExport();
                 }
 
                 //import
@@ -2269,17 +2269,36 @@ namespace GPK_RePack.Forms
             }
         }
 
-        private void LoadCompositeDataForExport()
+
+        private void tryToLoadAllExportDataFromCompositeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!PackageSelected())
+            {
+                return;
+            }
+
+            foreach (GpkExport export in selectedPackage.ExportList.Values)
+            {
+                LoadCompositeDataForExport(export);
+            }
+        }
+
+        private void LoadCompositeDataForSelectedExport()
         {
             if (!ExportSelected())
             {
                 return;
             }
 
+            LoadCompositeDataForExport(selectedExport);
+        }
+        private void LoadCompositeDataForExport(GpkExport export)
+        {
+
             //strat. find new name in pkgmapper, find comp entry in compmapper, load composite
             //hook adding of composite, replace all data and popoup a message
 
-            string redirectUID = gpkStore.FindObjectMapperEntryForObjectname(selectedExport.GetNormalizedUID());
+            string redirectUID = gpkStore.FindObjectMapperEntryForObjectname(export.GetNormalizedUID());
             var compEntry = gpkStore.FindCompositeMapEntriesForCompID(redirectUID);
             if (compEntry == null)
                 return;
@@ -2308,18 +2327,18 @@ namespace GPK_RePack.Forms
 
                 logger.Info($"Found something! Data to import is in {exportObj.UID}");
 
-                DataTools.ReplaceAll(exportObj, selectedExport);
+                DataTools.ReplaceAll(exportObj, export);
 
-                selectedExport.GetDataSize();
-                selectedExport.motherPackage.CheckAllNamesInObjects();
-                DrawPackages();
+                export.GetDataSize();
+                export.motherPackage.CheckAllNamesInObjects();
 
                 logger.Info("Done, succesfully imported composite data!");
             }).Start();
         }
+
         #endregion
 
-
+   
     }
 }
 

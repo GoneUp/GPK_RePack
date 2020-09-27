@@ -26,8 +26,8 @@ namespace GPK_RePack.Core.Model
         public long UncompressedSize;
 
         //Edit stuff
-        public Boolean Changes = false;
-        public Boolean LowMemMode = false;
+        public bool Changes = false;
+        public bool LowMemMode = false;
 
         //data structs
         public GpkHeader Header;
@@ -40,6 +40,11 @@ namespace GPK_RePack.Core.Model
 
         public readonly int datapuffer = 0;
         public bool x64;
+
+        private object nameLock = new object();
+        private object exportLock = new object();
+        private object importLock = new object();
+        private object uidLock = new object();
 
 
         public GpkPackage()
@@ -56,20 +61,26 @@ namespace GPK_RePack.Core.Model
         //returns index
         public long AddString(string text)
         {
-            long maxKey = 0;
-            foreach (KeyValuePair<long, GpkString> pair in NameList)
+            lock (nameLock)
             {
-                if (pair.Key > maxKey) maxKey = pair.Key;
-                if (pair.Value.name == text) return pair.Key;
+                long maxKey = 0;
+                foreach (KeyValuePair<long, GpkString> pair in NameList)
+                {
+                    if (pair.Key > maxKey)
+                        maxKey = pair.Key;
+
+                    if (pair.Value.name == text)
+                        return pair.Key;
+                }
+
+                //flag 1970393556451328 is unk
+                var newKey = maxKey + 1;
+                GpkString str = new GpkString(text, 1970393556451328, true);
+                NameList.Add(newKey, str);
+                Header.NameCount++;
+
+                return newKey;
             }
-
-            //flag 1970393556451328 is unk
-            var newKey = maxKey + 1;
-            GpkString str = new GpkString(text, 1970393556451328, true);
-            NameList.Add(newKey, str);
-            Header.NameCount++;
-
-            return newKey;
         }
 
         public string GetString(long index)
@@ -97,7 +108,8 @@ namespace GPK_RePack.Core.Model
         {
             foreach (KeyValuePair<long, GpkString> pair in NameList)
             {
-                if (pair.Value.name == text) return pair.Key;
+                if (pair.Value.name == text)
+                    return pair.Key;
             }
 
             return AddString(text);
@@ -172,52 +184,62 @@ namespace GPK_RePack.Core.Model
 
         private string GenerateUID(String proposedName, IGpkPart gpkPart)
         {
-            int counter = 0;
-            do
+            lock (uidLock)
             {
-                string tmpName = proposedName;
-                if (counter > 0)
+                int counter = 0;
+                do
                 {
-                    tmpName += ("_" + counter);
-                }
+                    string tmpName = proposedName;
+                    if (counter > 0)
+                    {
+                        tmpName += ("_" + counter);
+                    }
 
-                if (UidList.ContainsKey(tmpName) == false)
-                {
-                    UidList.Add(tmpName, gpkPart);
-                    return tmpName;
-                }
+                    if (UidList.ContainsKey(tmpName) == false)
+                    {
+                        UidList.Add(tmpName, gpkPart);
+                        return tmpName;
+                    }
 
-                counter++;
-            } while (true);
+                    counter++;
+                } while (true);
+            }
+
         }
 
         public long AddExport(GpkExport export)
         {
-            var key = ExportList.Max(x => x.Key) + 1;
+            lock (exportLock)
+            {
+                var key = ExportList.Max(x => x.Key) + 1;
 
-            ExportList.Add(key, export);
-            Header.ExportCount++;
+                ExportList.Add(key, export);
+                Header.ExportCount++;
 
-            GenerateUID(export);
-            export.motherPackage = this;
-            return key;
+                GenerateUID(export);
+                export.motherPackage = this;
+                return key;
+            }
         }
 
         public long AddImport(GpkImport import)
         {
-            //check for existing
-            foreach (var imp in ImportList)
+            lock (importLock)
             {
-                if (imp.Value.UID == import.UID) return 0;
+                //check for existing
+                foreach (var imp in ImportList)
+                {
+                    if (imp.Value.UID == import.UID) return 0;
+                }
+
+                var key = ImportList.Max(x => x.Key) + 1;
+
+                ImportList.Add(key, import);
+                Header.ImportCount++;
+
+                GenerateUID(import);
+                return key;
             }
-
-            var key = ImportList.Max(x => x.Key) + 1;
-
-            ImportList.Add(key, import);
-            Header.ImportCount++;
-
-            GenerateUID(import);
-            return key;
         }
 
         public string CopyObjectFromPackage(string objectname, GpkPackage foreignPackage, bool replaceDuplicates)
