@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using GPK_RePack.Core.Model.Composite;
 using GPK_RePack.Core.Model.Compression;
 using GPK_RePack.Core.Model.Interfaces;
@@ -73,13 +74,20 @@ namespace GPK_RePack.Core.Model
 
         public string GetString(long index)
         {
-            int subID = Convert.ToInt32(index >> 32);
-            int mainID = Convert.ToInt32(index & 0xFFFFFFFF);
+            int nameIndex = Convert.ToInt32(index & 0xFFFFFFFF);
+            int number = Convert.ToInt32(index >> 32);
 
-            if (NameList.ContainsKey(mainID))
+
+            if (NameList.ContainsKey(nameIndex))
             {
-                NameList[mainID].used = true;
-                return NameList[mainID].name;
+                NameList[nameIndex].used = true;
+                string name = NameList[nameIndex].name;
+                if (number > 0)
+                {
+                    name += "_" + number;
+                }
+
+                return name;
             }
 
             throw new Exception(string.Format("NameIndex {0} not found!", index));
@@ -391,11 +399,9 @@ namespace GPK_RePack.Core.Model
         #endregion
 
         #region writing
-        public void PrepareWriting(bool enableCompression)
+        public void CheckAllNamesInObjects()
         {
-            //set new offsets
-            //set coutn values on header
-            //check names
+            //checks and adds all referenced names to namelist
             foreach (var i in ImportList.Values)
             {
                 i.CheckNamePresence(this);
@@ -404,6 +410,14 @@ namespace GPK_RePack.Core.Model
             {
                 i.CheckNamePresence(this);
             }
+        }
+
+        public void PrepareWriting(bool enableCompression)
+        {
+            //set new offsets
+            //set coutn values on header
+            //check names
+            CheckAllNamesInObjects();
 
             GetSize(true);
             Header.RecalculateCounts(this);

@@ -942,7 +942,9 @@ namespace GPK_RePack.Forms
 
             }
 
-            copyExport.GetDataSize();
+            selectedExport.GetDataSize();
+            selectedExport.motherPackage.CheckAllNamesInObjects();
+
             treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
             logger.Info("Pasted the {0} of {1} to {2}", option, copyExport.UID, selectedExport.UID);
         }
@@ -963,6 +965,7 @@ namespace GPK_RePack.Forms
             }
 
             selectedPackage.CopyObjectFromPackage(copyExport.UID, copyExport.motherPackage, true);
+            selectedPackage.CheckAllNamesInObjects();
 
             DrawPackages();
             logger.Info("Insert done");
