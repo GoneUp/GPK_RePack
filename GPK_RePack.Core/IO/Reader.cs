@@ -672,6 +672,9 @@ namespace GPK_RePack.Core.IO
                 case "Core.ObjectReferencer":
                     export.Payload = new ObjectReferencer();
                     break;
+                case "Core.GFxMovieInfo":
+                    export.Payload = new GfxMovieInfo();
+                    break;
             }
 
             if (export.Payload != null)

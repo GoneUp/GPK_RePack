@@ -118,6 +118,7 @@
     <Compile Include="Model\Payload\CompressionTypes.cs" />
     <Compile Include="Model\Payload\MipMap.cs" />
     <Compile Include="Model\Payload\ObjectRedirector.cs" />
+    <Compile Include="Model\Payload\GfxMovieInfo.cs" />
     <Compile Include="Model\Payload\ObjectReferencer.cs" />
     <Compile Include="Model\Payload\SoundCue.cs" />
     <Compile Include="Model\Payload\SoundCueObject.cs" />

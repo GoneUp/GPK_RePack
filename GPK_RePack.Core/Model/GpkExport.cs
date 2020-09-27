@@ -118,6 +118,7 @@ namespace GPK_RePack.Core.Model
             info.AppendLine("Super: " + SuperName);
             info.AppendLine("Package: " + PackageName);
             info.AppendLine("Netindex: " + NetIndex);
+            info.AppendLine("Ref ObjectIndex: " + motherPackage.GetObjectIndex(UID));
             if (NetIndexName != null) info.AppendLine("NetindexObject: " + NetIndexName);
 
             info.AppendLine("Data_Offset: " + SerialOffset);

@@ -36,11 +36,12 @@ namespace GPK_RePack.Core.Model
         public Dictionary<long, GpkImport> ImportList;
         public Dictionary<long, GpkExport> ExportList;
 
-        public Dictionary<String, IGpkPart> UidList;
+        public Dictionary<string, IGpkPart> UidList;
 
         public readonly int datapuffer = 0;
         public bool x64;
 
+        //too much race conditions
         private object nameLock = new object();
         private object exportLock = new object();
         private object importLock = new object();
