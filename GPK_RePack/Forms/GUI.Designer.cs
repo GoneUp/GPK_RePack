@@ -134,6 +134,7 @@ namespace GPK_RePack.Forms
             this.ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainerLog_InfoTree = new System.Windows.Forms.SplitContainer();
             this.boxLog = new System.Windows.Forms.RichTextBox();
+            this.renameObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeContextMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -554,6 +555,7 @@ namespace GPK_RePack.Forms
             this.tESTBigBytePropExportToolStripMenuItem,
             this.bigBytePropImportToolStripMenuItem,
             this.addNameToolStripMenuItem,
+            this.renameObjectToolStripMenuItem,
             this.loggingActiveMenuItem,
             this.toolStripSeparator4,
             this.searchForObjectToolStripMenuItem,
@@ -1113,6 +1115,13 @@ namespace GPK_RePack.Forms
             this.boxLog.TabIndex = 0;
             this.boxLog.Text = "";
             // 
+            // renameObjectToolStripMenuItem
+            // 
+            this.renameObjectToolStripMenuItem.Name = "renameObjectToolStripMenuItem";
+            this.renameObjectToolStripMenuItem.Size = new System.Drawing.Size(236, 24);
+            this.renameObjectToolStripMenuItem.Text = "Rename Object";
+            this.renameObjectToolStripMenuItem.Click += new System.EventHandler(this.renameObjectToolStripMenuItem_Click);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -1265,6 +1274,7 @@ namespace GPK_RePack.Forms
         private ToolStripMenuItem minimizeGPKForToolboxToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator9;
         private ToolStripSeparator toolStripSeparator10;
+        private ToolStripMenuItem renameObjectToolStripMenuItem;
     }
 }
 

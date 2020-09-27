@@ -40,6 +40,7 @@ namespace GPK_RePack.Forms
 
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
+        private GpkImport selectedImport;
         private string selectedClass = "";
 
         private GpkStore gpkStore;
@@ -166,6 +167,7 @@ namespace GPK_RePack.Forms
 
             selectedExport = null;
             selectedPackage = null;
+            selectedImport = null;
             selectedClass = "";
             boxInfo.Text = "";
             boxGeneralButtons.Enabled = false;
@@ -597,12 +599,14 @@ namespace GPK_RePack.Forms
                 {
                     GpkPackage package = gpkStore.LoadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
                     Object selected = package.GetObjectByUID(e.Node.Name);
-
+                    
                     if (selected is GpkImport)
                     {
                         GpkImport imp = (GpkImport)selected;
                         boxInfo.Text = imp.ToString();
 
+                        selectedImport = imp;
+                        selectedPackage = package;
                     }
                     else if (selected is GpkExport)
                     {
@@ -1412,6 +1416,34 @@ namespace GPK_RePack.Forms
             {
                 NLogConfig.DisableFormLogging();
             }
+        }
+
+        private void renameObjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selectedExport == null && selectedImport == null)
+            {
+                logger.Info("Select a import or export to rename");
+            }
+
+            string input = Microsoft.VisualBasic.Interaction.InputBox("New name?", "Rename");
+            if (input != "")
+            {
+                if (selectedExport != null)
+                {
+                    selectedExport.ObjectName = input;
+
+                } else if (selectedImport != null)
+                {
+                    selectedImport.ObjectName = input;
+                }
+
+                selectedPackage.CheckAllNamesInObjects();
+
+                //uid is not renamed to not break internal references. will be regenerated on a new load.
+                logger.Info($"Renamed object to the new name {input}. Experimental, stuff may break.");
+            }
+            
+            DrawPackages();
         }
 
         #region search
@@ -2239,9 +2271,10 @@ namespace GPK_RePack.Forms
 
 
 
+
         #endregion
 
-
+     
     }
 }
 

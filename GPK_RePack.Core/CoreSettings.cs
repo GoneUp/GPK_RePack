@@ -9,7 +9,7 @@ namespace GPK_RePack.Core
         [JsonIgnore]
         public static CoreSettings Default { get; private set; }
 
-        public string CopyMode { get; set; } = "dataprops";
+        public string CopyMode { get; set; } = "all";
         public string LogLevel { get; set; } = "info";
         public bool Debug { get; set; } = false;
         public string ViewMode { get; set; } = "class";
