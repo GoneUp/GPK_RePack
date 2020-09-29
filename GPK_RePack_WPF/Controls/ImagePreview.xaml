@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="GPK_RePack_WPF.Controls.ImagePreview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:GPK_RePack_WPF.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Border x:Name="ImageContainer" MouseWheel="OnImageMouseWheel"
+                BorderBrush="{StaticResource BorderBrush}" Margin="-2 0" BorderThickness="1"
+                Background="{StaticResource BackgroundBrushDark}">
+            <Grid MouseWheel="OnImageMouseWheel" ClipToBounds="True">
+                <Rectangle IsHitTestVisible="False" Opacity=".2">
+                    <Rectangle.Fill>
+                        <DrawingBrush Stretch="Fill"
+                                      TileMode="Tile"
+                                      Viewport="0 0 15 15"
+                                      ViewportUnits="Absolute">
+
+                            <!-- a drawing of 4 checkerboard tiles -->
+                            <DrawingBrush.Drawing>
+                                <DrawingGroup>
+
+                                    <!-- checkerboard background -->
+                                    <GeometryDrawing Brush="Transparent">
+                                        <GeometryDrawing.Geometry>
+                                            <RectangleGeometry Rect="0 0 2 2" />
+                                        </GeometryDrawing.Geometry>
+                                    </GeometryDrawing>
+
+                                    <!-- two checkerboard foreground tiles -->
+                                    <GeometryDrawing Brush="{StaticResource SelectionBrush}">
+                                        <GeometryDrawing.Geometry>
+                                            <GeometryGroup>
+                                                <RectangleGeometry Rect="0 0 1 1" />
+                                                <RectangleGeometry Rect="1 1 1 1" />
+                                            </GeometryGroup>
+                                        </GeometryDrawing.Geometry>
+                                    </GeometryDrawing>
+
+                                </DrawingGroup>
+                            </DrawingBrush.Drawing>
+                        </DrawingBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Image x:Name="ImageCtrl"
+                       VerticalAlignment="Stretch"
+                       HorizontalAlignment="Stretch"
+                       MouseLeftButtonDown="OnImageMouseLeftButtonDown"
+                       MouseLeftButtonUp="OnImageMouseLeftButtonUp"
+                       MouseMove="OnImageMouseMove"
+                       MouseWheel="OnImageMouseWheel"
+                       StretchDirection="DownOnly"
+                       Source="{Binding Image, RelativeSource={RelativeSource AncestorType=local:ImagePreview}}"
+                       Stretch="Uniform" RenderTransformOrigin=".5 .5">
+                    <Image.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform />
+                            <TranslateTransform />
+                        </TransformGroup>
+                    </Image.RenderTransform>
+                </Image>
+            </Grid>
+
+        </Border>
+        <Button Style="{StaticResource ButtonContentOpacityStyle}"
+                FocusVisualStyle="{StaticResource EmptyFocusVisual}"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                Padding="5"
+                ToolTip="Reset"
+                Width="30" Height="30"
+                VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0 25"
+                Click="OnResetImageButtonClick">
+            <Path Fill="White" Data="{StaticResource SvgReload}" />
+        </Button>
+        <Border Visibility="{Binding Image, RelativeSource={RelativeSource AncestorType=local:ImagePreview}, Converter={StaticResource NullToVisibilty}}"
+                Background="#2000" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" IsHitTestVisible="False">
+            <Grid>
+                <TextBlock Foreground="White" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <Run Text="Name:" Foreground="#5fff" />
+                    <Run Text="{Binding ImageName, RelativeSource={RelativeSource AncestorType=local:ImagePreview}, Mode=OneWay}" />
+                </TextBlock>
+                <TextBlock Foreground="White" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <Run Text="Format:" Foreground="#5fff" />
+                    <Run Text="{Binding ImageFormat, RelativeSource={RelativeSource AncestorType=local:ImagePreview}, Mode=OneWay}" />
+                    <Run Text="-" Foreground="#9fff" />
+                    <Run Text="Size:" Foreground="#5fff" />
+                    <Run Text="{Binding PreviewImageWidth, RelativeSource={RelativeSource AncestorType=local:ImagePreview}, Mode=OneWay}" />
+                    <Run Text="x" Foreground="#9fff" />
+                    <Run Text="{Binding PreviewImageHeight, RelativeSource={RelativeSource AncestorType=local:ImagePreview}, Mode=OneWay}" />
+                </TextBlock>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

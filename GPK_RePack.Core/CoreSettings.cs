@@ -1,18 +1,36 @@
 ﻿using Newtonsoft.Json;
 using System.Drawing;
 using System.IO;
+using System.Windows;
+using Size = System.Windows.Size;
 
 namespace GPK_RePack.Core
 {
+    public enum ViewMode
+    {
+        Normal,
+        Class,
+        Package
+    }
+
+    public enum CopyMode
+    {
+        DataProps,
+        Data,
+        Props,
+        All
+    }
+
+
     public class CoreSettings
     {
         [JsonIgnore]
         public static CoreSettings Default { get; private set; }
 
-        public string CopyMode { get; set; } = "dataprops";
+        public CopyMode CopyMode { get; set; } = CopyMode.DataProps;
         public string LogLevel { get; set; } = "info";
         public bool Debug { get; set; } = false;
-        public string ViewMode { get; set; } = "class";
+        public ViewMode ViewMode { get; set; } = ViewMode.Class;
         public string SaveDir { get; set; } = "";
         public string OpenDir { get; set; } = "";
         public bool ShowImports { get; set; } = false;
@@ -29,6 +47,13 @@ namespace GPK_RePack.Core
         public bool EnableCompression { get; set; } = false;
         public bool EnableSortTreeNodes { get; set; } = false;
         public bool LoadMappingOnStart { get; set; } = true;
+        public GridLength LogSize { get; set; } = new GridLength(1, GridUnitType.Star);
+        public GridLength TopSize { get; set; } = new GridLength(2, GridUnitType.Star);
+        public GridLength TreeViewSize { get; set; } = new GridLength(1, GridUnitType.Star);
+        public GridLength PropViewSize { get; set; } = new GridLength(2, GridUnitType.Star);
+        public Size WindowSize { get; set; } = new Size(1300, 800);
+        public WindowState WindowState { get; set; } = WindowState.Normal;
+        public bool LogToUI { get; set; } = true;
 
         public static void Load()
         {

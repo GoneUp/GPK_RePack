@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPK_RePack", "GPK_RePack\GPK_RePack.csproj", "{242D4D28-DE0E-4238-85A4-9B1AE6AD6410}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{A2551F8E-23C9-44DF-BBE3-B3AC95D9E226}"
+	ProjectSection(SolutionItems) = preProject
+		GPK_RePack_WPF\Windows\MainWindow.xaml.cs = GPK_RePack_WPF\Windows\MainWindow.xaml.cs
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lzo64", "lzo64\Lzo64.csproj", "{730FEFD9-D8AC-4978-9434-3066C54FC25D}"
 EndProject

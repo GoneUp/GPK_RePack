@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nostrum" Version="1.2.10" />
+    <PackageReference Include="NAudio" Version="1.10.0" />
+    <PackageReference Include="NAudio.Vorbis" Version="1.2.0" />
+    <PackageReference Include="NLog" Version="4.7.2" />
+    <PackageReference Include="Nostrum" Version="1.2.12" />
   </ItemGroup>
 
   <ItemGroup>

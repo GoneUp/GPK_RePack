@@ -173,8 +173,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Updater\UpdateCheck.cs" />
-    <Compile Include="Updater\UpdaterCheckCallback.cs" />
     <EmbeddedResource Include="Forms\MapperView.resx">
       <DependentUpon>MapperView.cs</DependentUpon>
     </EmbeddedResource>
