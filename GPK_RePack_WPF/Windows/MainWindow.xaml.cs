@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -24,7 +25,7 @@ namespace GPK_RePack_WPF.Windows
         public MainWindow()
         {
             InitializeComponent();
-            
+
 
             logger = LogManager.GetLogger("GUI");
 
@@ -48,13 +49,7 @@ namespace GPK_RePack_WPF.Windows
             });
 
             DataContext = new MainViewModel();
-            ((TSPropertyChanged)DataContext).PropertyChanged += OnDcPropChanged; // todo: make a custom auto-scroll textbox control and remove this
             StateChanged += OnStateChanged;
-        }
-
-        private void OnDcPropChanged(object sender, PropertyChangedEventArgs e)
-        {
-
         }
 
 

@@ -2,12 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Documents;
 using GPK_RePack.Core.Model;
 using Nostrum;
 
 namespace GPK_RePack_WPF
 {
-    public class GpkTreeNode
+    public class GpkTreeNode : TSPropertyChanged
     {
         // ugly ref for binding
         public MainViewModel MainVM => MainViewModel.Instance;
@@ -34,6 +35,30 @@ namespace GPK_RePack_WPF
         public IComparer TreeViewNodeSorter { get; set; }
         public GpkTreeNode Parent { get; set; }
 
+        private bool _isSelected;
+        private bool _isExpanded;
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected == value) return;
+                _isSelected = value;
+                N();
+            }
+        }
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set
+            {
+                if (_isExpanded == value) return;
+                _isExpanded = value;
+                N();
+            }
+        }
+
         public int Level
         {
             get
@@ -45,6 +70,29 @@ namespace GPK_RePack_WPF
 
         public bool IsLeaf => Children.Count == 0;
         public GpkPackage SourcePackage { get; }
+
+        public List<GpkTreeNode> ParentsToPackage
+        {
+            get
+            {
+                var ret = new List<GpkTreeNode>();
+
+                ret.Add(this);
+                if (this.IsPackage)
+                {
+                    return ret;
+                }
+
+                ret.AddRange(Parent.ParentsToPackage);
+
+                return ret;
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"[{Level}] {Key}";
+        }
 
         public GpkTreeNode(string name)
         {
@@ -111,6 +159,21 @@ namespace GPK_RePack_WPF
         {
             Children.Clear();
             this.Parent.Children.Remove(this);
+        }
+
+        /// <summary>
+        /// Returns all the descendants of this node.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<GpkTreeNode> Collect()
+        {
+            foreach (var node in Children)
+            {
+                yield return node;
+
+                foreach (var child in node.Collect())
+                    yield return child;
+            }
         }
     }
 }

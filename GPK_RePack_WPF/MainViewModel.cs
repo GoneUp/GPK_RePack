@@ -2,10 +2,12 @@
 using GPK_RePack.Core.Editors;
 using GPK_RePack.Core.IO;
 using GPK_RePack.Core.Model;
+using GPK_RePack.Core.Model.Composite;
 using GPK_RePack.Core.Model.Interfaces;
 using GPK_RePack.Core.Model.Payload;
 using GPK_RePack.Core.Model.Prop;
 using GPK_RePack.Core.Updater;
+using GPK_RePack_WPF.Windows;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using NLog;
@@ -15,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,26 +25,36 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using GPK_RePack.Core.Model.Composite;
-using GPK_RePack_WPF.Windows;
 using UpkManager.Dds;
+using WaveFormRendererLib;
 using Clipboard = System.Windows.Clipboard;
 using DataFormats = System.Windows.Forms.DataFormats;
+using Image = System.Drawing.Image;
+using Size = System.Windows.Size;
 
 namespace GPK_RePack_WPF
 {
-    public enum Tab : int
+
+    public static class ColorExtensions
     {
-        Info = 0,
-        Properties = 1,
-        Texture = 2
+        public static System.Windows.Media.Color ToMediaColor(this System.Drawing.Color color)
+        {
+            return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
+        public static System.Drawing.Color ToDrawingColor(this System.Windows.Media.Color color)
+        {
+            return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
     }
+
     public class MainViewModel : TSPropertyChanged, IUpdaterCheckCallback, IDisposable
     {
         // not actually a singleton, just a reference for contextmenu command binding
         public static MainViewModel Instance { get; private set; }
 
+        //todo: turn this into an enum
         public static List<string> PropertyTypes = new List<string>
         {
             "ArrayProperty",
@@ -53,44 +66,29 @@ namespace GPK_RePack_WPF
             "ObjectProperty",
             "StrProperty",
             "StructProperty"
-        }; //todo: turn this into an enum
+        };
         private readonly DataFormats.Format exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
 
-        private readonly Logger logger;
-        private readonly GpkStore gpkStore;
-        private readonly WaveOut waveOut;
-        private List<GpkExport>[] changedExports;
-        private GpkPackage selectedPackage;
-        private GpkExport selectedExport;
-        private string selectedClass = "";
-        private VorbisWaveReader waveReader;
+        private readonly Logger _logger;
+        private readonly GpkStore _gpkStore;
+        private List<GpkExport>[] _changedExports;
+        private GpkPackage _selectedPackage;
+        private GpkExport _selectedExport;
+        private string _selectedClass = "";
 
         private bool _isTextureTabVisible;
+        private bool _isSoundTabVisible;
         private string _logText;
         private string _statusBarText;
         private string _infoText;
         private string _oggPreviewButtonText;
         private bool _generalButtonsEnabled;
         private bool _dataButtonsEnabled;
-        private bool _propertyButtonsEnabled;
         private int _progressValue;
         private readonly LogBuffer _logBuffer;
         private Tab _selectedTab = 0;
-        private GpkTreeNode _selectedNode;
         private PropertyViewModel _selectedProperty;
-
-
-        public PropertyViewModel SelectedProperty
-        {
-            get => _selectedProperty;
-            set
-            {
-                if (_selectedProperty == value) return;
-                _selectedProperty = value;
-                N();
-            }
-        }
-
+        public SoundPreviewManager SoundPreviewManager { get; }
 
 
         public bool LogToUI
@@ -131,9 +129,9 @@ namespace GPK_RePack_WPF
                 N();
             }
         }
-
-        public bool PropertyButtonsEnabled => selectedExport != null && _selectedTab == Tab.Properties;
-        public bool ImageButtonsEnabled => selectedExport != null && _selectedTab == Tab.Texture && IsTextureTabVisible;
+        public bool PropertyButtonsEnabled => _selectedExport != null && _selectedTab == Tab.Properties;
+        public bool ImageButtonsEnabled => _selectedExport != null && _selectedTab == Tab.Texture && IsTextureTabVisible;
+        public bool SoundButtonsEnabled => _selectedExport != null && _selectedTab == Tab.Sound && IsSoundTabVisible;
         public bool IsTextureTabVisible
         {
             get => _isTextureTabVisible;
@@ -143,6 +141,17 @@ namespace GPK_RePack_WPF
                 _isTextureTabVisible = value;
                 N();
                 if (value == false && _selectedTab == Tab.Texture) SelectedTabIndex = (int)Tab.Info;
+            }
+        }
+        public bool IsSoundTabVisible
+        {
+            get => _isSoundTabVisible;
+            set
+            {
+                if (_isSoundTabVisible == value) return;
+                _isSoundTabVisible = value;
+                N();
+                if (value == false && _selectedTab == Tab.Sound) SelectedTabIndex = (int)Tab.Info;
             }
         }
         public string LogText
@@ -175,17 +184,6 @@ namespace GPK_RePack_WPF
                 N();
             }
         }
-        public string OggPreviewButtonText
-        {
-            get => _oggPreviewButtonText;
-            set
-            {
-                if (_oggPreviewButtonText == value) return;
-                _oggPreviewButtonText = value;
-                N();
-            }
-        }
-
         public int SelectedTabIndex
         {
             get => (int)_selectedTab;
@@ -196,10 +194,10 @@ namespace GPK_RePack_WPF
                 N();
                 N(nameof(PropertyButtonsEnabled));
                 N(nameof(ImageButtonsEnabled));
+                N(nameof(SoundButtonsEnabled));
 
             }
         }
-
         public int ProgressValue
         {
             get => _progressValue;
@@ -207,13 +205,22 @@ namespace GPK_RePack_WPF
             {
                 if (_progressValue == value) return;
                 _progressValue = value;
-                Debug.WriteLine(_progressValue);
-
+                N();
+            }
+        }
+        public GpkTreeNode TreeMain { get; }
+        public PropertyViewModel SelectedProperty
+        {
+            get => _selectedProperty;
+            set
+            {
+                if (_selectedProperty == value) return;
+                _selectedProperty = value;
                 N();
             }
         }
 
-        //todo: move preview image stuff to its own class
+        //todo: move preview image stuff to its own class ?
         #region PreviewImage
         private ImageSource _previewImage;
         private string _previewImageFormat;
@@ -252,6 +259,7 @@ namespace GPK_RePack_WPF
 
         #endregion
 
+        #region Commands
         public ICommand OpenCommand { get; }
         public ICommand ClearCommand { get; }
         public ICommand SaveCommand { get; }
@@ -277,6 +285,7 @@ namespace GPK_RePack_WPF
         public ICommand ImportDDSCommand { get; }
         public ICommand ExportOGGCommand { get; }
         public ICommand ImportOGGCommand { get; }
+        public ICommand AddEmptyOGGCommand { get; }
 
         public ICommand DecryptDatCommand { get; }
         public ICommand EncryptDatCommand { get; }
@@ -294,7 +303,13 @@ namespace GPK_RePack_WPF
         public ICommand BigBytePropImportCommand { get; }
         public ICommand BigBytePropExportCommand { get; }
 
-        public GpkTreeNode TreeMain { get; }
+        public ICommand SearchCommand { get; }
+        public ICommand SearchNextCommand { get; }
+
+        public ICommand PlayStopSoundCommand { get; }
+
+        #endregion
+
 
         #region WindowParameters
 
@@ -364,19 +379,17 @@ namespace GPK_RePack_WPF
             _logBuffer = new LogBuffer();
             _logBuffer.LinesFlushed += LogMessages;
             CustomEventTarget.LogMessageWritten += _logBuffer.AppendLine;
-            logger = LogManager.GetLogger("GUI");
-            logger.Info("Startup");
+            _logger = LogManager.GetLogger("GUI");
+            _logger.Info("Startup");
 
             //
             UpdateCheck.checkForUpdate(this);
-            gpkStore = new GpkStore();
-            gpkStore.PackagesChanged += OnPackagesChanged;
+            _gpkStore = new GpkStore();
+            _gpkStore.PackagesChanged += OnPackagesChanged;
             TreeMain = new GpkTreeNode("");
             Properties = new TSObservableCollection<PropertyViewModel>();
-            // audio
-            waveOut = new WaveOut();
-            waveOut.PlaybackStopped += OnPlaybackStopped;
-
+            _searchResultNodes = new List<GpkTreeNode>();
+            SoundPreviewManager = new SoundPreviewManager();
             if (CoreSettings.Default.SaveDir == "")
                 CoreSettings.Default.SaveDir = Directory.GetCurrentDirectory();
 
@@ -420,6 +433,7 @@ namespace GPK_RePack_WPF
             ExportDDSCommand = new RelayCommand(ExportDDS);
             ImportOGGCommand = new RelayCommand(ImportOGG);
             ExportOGGCommand = new RelayCommand(ExportOGG);
+            AddEmptyOGGCommand = new RelayCommand(AddEmptyOGG);
 
             SaveSingleGpkCommand = new RelayCommand(SaveSingleGpk);
 
@@ -442,6 +456,10 @@ namespace GPK_RePack_WPF
             BigBytePropImportCommand = new RelayCommand(BigBytePropImport);
             BigBytePropExportCommand = new RelayCommand(BigBytePropExport);
 
+            SearchCommand = new RelayCommand(Search);
+            SearchNextCommand = new RelayCommand(prev => SelectNextSearchResult());
+
+            PlayStopSoundCommand = new RelayCommand(PlayStopSound);
         }
 
 
@@ -486,13 +504,13 @@ namespace GPK_RePack_WPF
             var runningTasks = new List<Task>();
 
 
-            if (gpkStore.LoadedGpkPackages.Count == 0)
+            if (_gpkStore.LoadedGpkPackages.Count == 0)
                 return;
 
             //do it
             try
             {
-                this.gpkStore.SaveGpkListToFiles(gpkStore.LoadedGpkPackages, usePadding, patchComposite, addComposite, runningSavers, runningTasks);
+                this._gpkStore.SaveGpkListToFiles(_gpkStore.LoadedGpkPackages, usePadding, patchComposite, addComposite, runningSavers, runningTasks);
                 //display info while loading
                 while (!Task.WaitAll(runningTasks.ToArray(), 50))
                 {
@@ -502,50 +520,50 @@ namespace GPK_RePack_WPF
                 //Diplay end info
                 DisplayStatus(runningSavers, "Saving", start);
 
-                logger.Info("Saving done!");
+                _logger.Info("Saving done!");
             }
             catch (Exception ex)
             {
-                logger.Fatal(ex, "Save failure!");
+                _logger.Fatal(ex, "Save failure!");
             }
 
             void SavePatched()
             {
                 var save = false;
-                if (changedExports != null)
+                if (_changedExports != null)
                 {
-                    for (var i = 0; i < changedExports.Length; i++)
+                    for (var i = 0; i < _changedExports.Length; i++)
                     {
-                        var list = changedExports[i];
+                        var list = _changedExports[i];
                         if (list.Count <= 0) continue;
                         try
                         {
                             var tmpS = new Writer();
-                            var package = gpkStore.LoadedGpkPackages[i];
+                            var package = _gpkStore.LoadedGpkPackages[i];
                             var savepath = package.Path + "_patched";
                             tmpS.SaveReplacedExport(package, savepath, list);
-                            logger.Info($"Saved the changed data of package '{package.Filename} to {savepath}'!");
+                            _logger.Info($"Saved the changed data of package '{package.Filename} to {savepath}'!");
                             save = true;
                         }
                         catch (Exception ex)
                         {
-                            logger.Fatal(ex, "Save failure! ");
+                            _logger.Fatal(ex, "Save failure! ");
                         }
                     }
                 }
 
                 if (!save)
                 {
-                    logger.Info("Nothing to save in PatchMode!");
+                    _logger.Info("Nothing to save in PatchMode!");
                 }
             }
         }
         private void Clear()
         {
             Reset();
-            changedExports = null;
-            ResetOggPreview();
-            gpkStore.clearGpkList();
+            _changedExports = null;
+            SoundPreviewManager.ResetOggPreview();
+            _gpkStore.clearGpkList();
         }
         private void Open(string[] providedFiles = null)
         {
@@ -565,7 +583,7 @@ namespace GPK_RePack_WPF
                 {
                     var reader = new Reader();
                     runningReaders.Add(reader);
-                    gpkStore.loadGpk(path, reader, false);
+                    _gpkStore.loadGpk(path, reader, false);
                 });
                 runningTasks.Add(newTask);
                 newTask.Start();
@@ -583,10 +601,10 @@ namespace GPK_RePack_WPF
             }).ContinueWith(t =>
             {
                 //for patchmode
-                Array.Resize(ref changedExports, gpkStore.LoadedGpkPackages.Count);
-                for (var i = 0; i < changedExports.Length; i++)
+                Array.Resize(ref _changedExports, _gpkStore.LoadedGpkPackages.Count);
+                for (var i = 0; i < _changedExports.Length; i++)
                 {
-                    changedExports[i] = new List<GpkExport>();
+                    _changedExports[i] = new List<GpkExport>();
                 }
                 //Diplay end info
                 DisplayStatus(runningReaders, "Loading", start);
@@ -627,7 +645,7 @@ namespace GPK_RePack_WPF
 
             if (finished < list.Count)
             {
-                if (total > 0) ProgressValue = (int)(((double)actual / (double)total) * 100);
+                if (total > 0) ProgressValue = (int)((actual / (double)total) * 100);
                 StatusBarText = $"[{tag}] Finished {finished}/{list.Count}";
             }
             else
@@ -657,7 +675,7 @@ namespace GPK_RePack_WPF
         {
             if (updateAvailable)
             {
-                logger.Info("A newer version is available. Download it at https://github.com/GoneUp/GPK_RePack/releases");
+                _logger.Info("A newer version is available. Download it at https://github.com/GoneUp/GPK_RePack/releases");
             }
         }
         private void LogMessages(string msg)
@@ -666,16 +684,18 @@ namespace GPK_RePack_WPF
         }
         private void Reset()
         {
-            selectedExport = null;
-            selectedPackage = null;
-            _selectedNode = null;
-            selectedClass = "";
+            _selectedExport = null;
+            _selectedPackage = null;
+            SelectedNode = null;
+            _selectedClass = "";
             InfoText = "";
             StatusBarText = "Ready";
             GeneralButtonsEnabled = false;
             DataButtonsEnabled = false;
             IsTextureTabVisible = false;
             N(nameof(PropertyButtonsEnabled));
+            N(nameof(ImageButtonsEnabled));
+            N(nameof(SoundButtonsEnabled));
             ProgressValue = 0;
             PreviewImage = null;
             TreeMain.Children.Clear();
@@ -683,8 +703,8 @@ namespace GPK_RePack_WPF
         }
         public void Dispose()
         {
-            waveOut?.Dispose();
-            waveReader?.Dispose();
+            SoundPreviewManager.Dispose();
+
         }
 
         private void DrawPackages()
@@ -706,7 +726,7 @@ namespace GPK_RePack_WPF
             //var total = gpkStore.LoadedGpkPackages.Count;
             //var done = 0;
             ProgressValue = 0;
-            foreach (var package in gpkStore.LoadedGpkPackages)
+            foreach (var package in _gpkStore.LoadedGpkPackages)
             {
                 //Task.Run(() =>
                 //{
@@ -716,7 +736,7 @@ namespace GPK_RePack_WPF
                 var packageNode = new GpkTreeNode(package.Filename, package)
                 {
                     IsPackage = true,
-                    Index = gpkStore.LoadedGpkPackages.IndexOf(package)
+                    Index = _gpkStore.LoadedGpkPackages.IndexOf(package)
                 };
 
                 var classNodes = new Dictionary<string, GpkTreeNode>();
@@ -802,27 +822,27 @@ namespace GPK_RePack_WPF
             {
                 GeneralButtonsEnabled = true;
                 DataButtonsEnabled = true;
-                selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(node.Index)];
+                _selectedPackage = _gpkStore.LoadedGpkPackages[Convert.ToInt32(node.Index)];
                 try
                 {
-                    InfoText = selectedPackage.ToString();
+                    InfoText = _selectedPackage.ToString();
                 }
                 catch (Exception ex)
                 {
-                    logger.Fatal(ex, "Failed to show package info.");
+                    _logger.Fatal(ex, "Failed to show package info.");
                     InfoText = $"Failed to show package info: \n{ex}";
                 }
             }
             else if (node.Level == 2 && CoreSettings.Default.ViewMode == ViewMode.Class)
             {
-                selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(node.FindPackageNode().Index)];
-                selectedClass = node.Key;
+                _selectedPackage = _gpkStore.LoadedGpkPackages[Convert.ToInt32(node.FindPackageNode().Index)];
+                _selectedClass = node.Key;
 
                 DataButtonsEnabled = true;
             }
             else if (node.Level == 3 && CoreSettings.Default.ViewMode == ViewMode.Normal || node.IsLeaf)
             {
-                var package = gpkStore.LoadedGpkPackages[Convert.ToInt32(node.FindPackageNode().Index)];
+                var package = _gpkStore.LoadedGpkPackages[Convert.ToInt32(node.FindPackageNode().Index)];
                 var selected = package.GetObjectByUID(node.Key);
 
                 if (selected is GpkImport imp)
@@ -834,67 +854,80 @@ namespace GPK_RePack_WPF
                     //buttons
                     GeneralButtonsEnabled = true;
                     DataButtonsEnabled = true;
-                    selectedExport = exp;
-                    selectedPackage = package;
+                    var exportChanged = _selectedExport == exp;
+                    _selectedExport = exp;
+                    _selectedPackage = package;
 
                     N(nameof(PropertyButtonsEnabled));
-                    RefreshExportInfo();
+                    RefreshExportInfo(exportChanged);
                 }
             }
-
-            _selectedNode = node;
+            SelectedNode = node;
         }
-        private void RefreshExportInfo()
+        private void RefreshExportInfo(bool exportChanged)
         {
             //tabs
-            InfoText = selectedExport.ToString();
-            DrawGrid(selectedPackage, selectedExport);
+            InfoText = _selectedExport.ToString();
+            DrawGrid(_selectedPackage, _selectedExport);
 
             PreviewImage = null;
-            if (selectedExport.Payload != null && selectedExport.Payload is Texture2D)
+            switch (_selectedExport.Payload)
             {
-                IsTextureTabVisible = true;
-                var image = (Texture2D)selectedExport.Payload;
-                var ddsFile = new DdsFile();
-                var imageStream = image.GetObjectStream();
-                if (imageStream != null)
+                case Texture2D texture:
                 {
-                    ddsFile.Load(image.GetObjectStream());
+                    IsTextureTabVisible = true;
+                    IsSoundTabVisible = false;
+                    var image = texture;
+                    var ddsFile = new DdsFile();
+                    var imageStream = image.GetObjectStream();
+                    if (imageStream != null)
+                    {
+                        ddsFile.Load(image.GetObjectStream());
 
-                    PreviewImage = ddsFile.BitmapSource; //= TextureTools.BitmapFromSource(ddsFile.BitmapSource);
-                    PreviewImageFormat = image.parsedImageFormat.ToString();
-                    PreviewImageName = selectedExport.ObjectName;
-                    //boxImagePreview.BackColor = CoreSettings.Default.PreviewColor; //TODO add bg in xaml
+                        PreviewImage = ddsFile.BitmapSource;
+                        PreviewImageFormat = image.parsedImageFormat.ToString();
+                        PreviewImageName = _selectedExport.ObjectName;
+                    }
 
-                    //workaround for a shrinking window
-                    //scaleFont(); //todo?
-                    //resizePiutureBox(); //todo?
+                    break;
                 }
+                case Soundwave sw:
+                    SoundPreviewManager.Setup(sw.oggdata);
+                    IsSoundTabVisible = true;
+                    IsTextureTabVisible = false;
+                    break;
+                default:
+                    IsTextureTabVisible = false;
+                    IsSoundTabVisible = false;
+
+                    break;
             }
-            else
+
+            if (exportChanged)
             {
-                IsTextureTabVisible = false;
+                SoundPreviewManager.ResetOggPreview();
             }
         }
         public TSObservableCollection<PropertyViewModel> Properties { get; }
+        public GpkTreeNode SelectedNode { get; set; }
+
+
         private void SaveSingleGpk()
         {
-            if (selectedPackage == null || _selectedNode == null || !_selectedNode.IsPackage) return;
-            var packages = new List<GpkPackage> { selectedPackage };
+            if (_selectedPackage == null || SelectedNode == null || !SelectedNode.IsPackage) return;
+            var packages = new List<GpkPackage> { _selectedPackage };
             var writerList = new List<IProgress>();
             var taskList = new List<Task>();
 
-            this.gpkStore.SaveGpkListToFiles(packages, false, false, false, writerList, taskList);
+            this._gpkStore.SaveGpkListToFiles(packages, false, false, false, writerList, taskList);
 
             //wait
             while (!Task.WaitAll(taskList.ToArray(), 50))
             {
 
             }
-            logger.Info("Single export done!");
+            _logger.Info("Single export done!");
         }
-
-
         private void DrawGrid(GpkPackage package, GpkExport export)
         {
             Properties.Clear();
@@ -941,16 +974,16 @@ namespace GPK_RePack_WPF
                         row.Value = tmpStruct.GetValueHex();
                         break;
                     case GpkNameProperty tmpName:
-                        row.Value = tmpName.value; 
+                        row.Value = tmpName.value;
                         row.EditAsEnum = true;
                         break;
                     case GpkObjectProperty tmpObj:
-                        row.Value = tmpObj.objectName; 
+                        row.Value = tmpObj.objectName;
                         row.EditAsEnum = true;
                         break;
                     case GpkByteProperty tmpByte when tmpByte.size == 8 || tmpByte.size == 16:
                         row.InnerType = tmpByte.enumType;
-                        row.Value = tmpByte.nameValue; 
+                        row.Value = tmpByte.nameValue;
                         row.EditAsEnum = true;
                         break;
                     case GpkByteProperty tmpByte:
@@ -970,7 +1003,7 @@ namespace GPK_RePack_WPF
                         row.Value = tmpBool.value;
                         break;
                     default:
-                        logger.Info("Unk Prop?!?");
+                        _logger.Info("Unk Prop?!?");
                         break;
                 }
 
@@ -989,9 +1022,9 @@ namespace GPK_RePack_WPF
             //1. compare and alter
             //or 2. read and rebuild  -- this. we skip to the next in case of user input error.
 
-            if (selectedExport == null || selectedPackage == null)
+            if (_selectedExport == null || _selectedPackage == null)
             {
-                logger.Info("save failed");
+                _logger.Info("save failed");
                 return;
             }
 
@@ -1000,30 +1033,30 @@ namespace GPK_RePack_WPF
             {
                 try
                 {
-                    list.Add(prop.GetIProperty(selectedPackage));
+                    list.Add(prop.GetIProperty(_selectedPackage));
                 }
                 catch (Exception ex)
                 {
 
-                    logger.Info("Failed to save row {0}, {1}!", Properties.IndexOf(prop), ex);
+                    _logger.Info("Failed to save row {0}, {1}!", Properties.IndexOf(prop), ex);
                 }
 
             }
 
-            selectedExport.Properties = list;
-            logger.Info("Saved properties of export {0}.", selectedExport.UID);
+            _selectedExport.Properties = list;
+            _logger.Info("Saved properties of export {0}.", _selectedExport.UID);
         }
         private void ClearProperties()
         {
-            if (selectedExport == null || selectedPackage == null)
+            if (_selectedExport == null || _selectedPackage == null)
             {
-                logger.Info("save failed");
+                _logger.Info("save failed");
                 return;
             }
 
-            selectedExport.Properties.Clear();
-            DrawGrid(selectedPackage, selectedExport);
-            logger.Info("Cleared!");
+            _selectedExport.Properties.Clear();
+            DrawGrid(_selectedPackage, _selectedExport);
+            _logger.Info("Cleared!");
         }
         private void ExportPropertiesToCsv()
         {
@@ -1040,51 +1073,39 @@ namespace GPK_RePack_WPF
                 if (/*row.IsNewRow ||*/ row.Name == null)
                     continue;
 
-                var csvRow = string.Format("{0};{1};{2};{3};{4};{5}",
-                    row.Name,
-                    row.PropertyType,
-                    row.Size,
-                    row.ArrayIndex,
-                    row.InnerType,
-                    row.Value.ToString()
-                );
+                var csvRow =
+                    $"{row.Name};{row.PropertyType};{row.Size};{row.ArrayIndex};{row.InnerType};{row.Value}";
                 builder.AppendLine(csvRow);
             }
 
 
-            var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".csv");
+            var path = MiscFuncs.GenerateSaveDialog(_selectedExport.ObjectName, ".csv");
             if (path == "") return;
 
             Task.Factory.StartNew(() => File.WriteAllText(path, builder.ToString(), Encoding.UTF8));
         }
 
-        // main - done
-        // load/save - done
-        // displaygpk - done
-        // editgpk - done
-        // image - done
-
         private void ExportRawData()
         {
-            if (selectedExport != null)
+            if (_selectedExport != null)
             {
-                if (selectedExport.Data == null)
+                if (_selectedExport.Data == null)
                 {
-                    logger.Info("Length is zero. Nothing to export");
+                    _logger.Info("Length is zero. Nothing to export");
                     return;
                 }
 
-                var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, "");
+                var path = MiscFuncs.GenerateSaveDialog(_selectedExport.ObjectName, "");
                 if (path == "") return;
-                DataTools.WriteExportDataFile(path, selectedExport);
+                DataTools.WriteExportDataFile(path, _selectedExport);
             }
-            else if (selectedPackage != null && selectedClass != "")
+            else if (_selectedPackage != null && _selectedClass != "")
             {
-                var exports = selectedPackage.GetExportsByClass(selectedClass);
+                var exports = _selectedPackage.GetExportsByClass(_selectedClass);
 
                 if (exports.Count == 0)
                 {
-                    logger.Info("No exports found for class {0}.", selectedClass);
+                    _logger.Info("No exports found for class {0}.", _selectedClass);
                     return;
                 }
 
@@ -1100,11 +1121,11 @@ namespace GPK_RePack_WPF
                     {
                         if (exp.Data == null) continue;
                         DataTools.WriteExportDataFile($"{dialog.SelectedPath}\\{exp.ObjectName}", exp);
-                        logger.Trace("save for " + exp.UID);
+                        _logger.Trace("save for " + exp.UID);
                     }
                 }
             }
-            else if (selectedPackage != null)
+            else if (_selectedPackage != null)
             {
                 var dialog = new FolderBrowserDialog { SelectedPath = CoreSettings.Default.SaveDir };
                 var result = dialog.ShowDialog();
@@ -1113,27 +1134,27 @@ namespace GPK_RePack_WPF
                 {
                     CoreSettings.Default.SaveDir = dialog.SelectedPath;
 
-                    foreach (var exp in selectedPackage.ExportList.Values)
+                    foreach (var exp in _selectedPackage.ExportList.Values)
                     {
                         if (exp.Data == null) continue;
                         DataTools.WriteExportDataFile($"{dialog.SelectedPath}\\{exp.ClassName}\\{exp.ObjectName}", exp);
-                        logger.Trace("save for " + exp.UID);
+                        _logger.Trace("save for " + exp.UID);
                     }
                 }
             }
 
-            logger.Info("Data was saved!");
+            _logger.Info("Data was saved!");
         }
         private void ImportRawData()
         {
-            if (selectedExport == null)
+            if (_selectedExport == null)
             {
-                logger.Trace("no selected export");
+                _logger.Trace("no selected export");
                 return;
             }
-            if (selectedExport.Data == null)
+            if (_selectedExport.Data == null)
             {
-                logger.Trace("no export data");
+                _logger.Trace("no export data");
                 return;
             }
 
@@ -1149,63 +1170,63 @@ namespace GPK_RePack_WPF
             {
                 //if (treeMain.SelectedNode.Parent.Parent == null) return;
                 //var packageIndex = Convert.ToInt32(treeMain.SelectedNode.Parent.Parent.Name);
-                var package = _selectedNode.FindPackageNode();
+                var package = SelectedNode.FindPackageNode();
                 var packageIndex = package.Index;
-                if (buffer.Length > selectedExport.Data.Length)
+                if (buffer.Length > _selectedExport.Data.Length)
                 {
                     //Too long, not possible without rebuiling the gpk
-                    logger.Info("File size too big for PatchMode. Size: " + buffer.Length + " Maximum Size: " +
-                                selectedExport.Data.Length);
+                    _logger.Info("File size too big for PatchMode. Size: " + buffer.Length + " Maximum Size: " +
+                                _selectedExport.Data.Length);
                     return;
                 }
 
                 //selectedExport.data = buffer;
-                Array.Copy(buffer, selectedExport.Data, buffer.Length);
+                Array.Copy(buffer, _selectedExport.Data, buffer.Length);
 
-                changedExports[packageIndex].Add(selectedExport);
+                _changedExports[packageIndex].Add(_selectedExport);
 
             }
             else
             {
                 //Rebuild Mode
                 //We force the rebuilder to recalculate the size. (atm we dont know how big the propertys are)
-                logger.Trace($"rebuild mode old size {selectedExport.Data.Length} new size {buffer.Length}");
+                _logger.Trace($"rebuild mode old size {_selectedExport.Data.Length} new size {buffer.Length}");
 
-                selectedExport.Data = buffer;
-                selectedExport.GetDataSize();
-                selectedPackage.Changes = true;
+                _selectedExport.Data = buffer;
+                _selectedExport.GetDataSize();
+                _selectedPackage.Changes = true;
             }
 
 
-            logger.Info($"Replaced the data of {selectedExport.ObjectName} successfully! Dont forget to save.");
+            _logger.Info($"Replaced the data of {_selectedExport.ObjectName} successfully! Dont forget to save.");
 
 
 
         }
         private void RemoveObject()
         {
-            if (selectedPackage != null && selectedExport == null)
+            if (_selectedPackage != null && _selectedExport == null)
             {
-                gpkStore.DeleteGpk(selectedPackage);
+                _gpkStore.DeleteGpk(_selectedPackage);
 
-                logger.Info("Removed package {0}...", selectedPackage.Filename);
+                _logger.Info("Removed package {0}...", _selectedPackage.Filename);
 
-                TreeMain.Children.Remove(_selectedNode);
-                selectedPackage = null;
+                TreeMain.Children.Remove(SelectedNode);
+                _selectedPackage = null;
                 GeneralButtonsEnabled = false;
                 RefreshIndexes();
                 //GC.Collect(); //memory 
             }
-            else if (selectedPackage != null && selectedExport != null)
+            else if (_selectedPackage != null && _selectedExport != null)
             {
-                selectedPackage.ExportList.Remove(selectedPackage.GetObjectKeyByUID(selectedExport.UID));
+                _selectedPackage.ExportList.Remove(_selectedPackage.GetObjectKeyByUID(_selectedExport.UID));
 
-                logger.Info("Removed object {0}...", selectedExport.UID);
+                _logger.Info("Removed object {0}...", _selectedExport.UID);
 
-                selectedExport = null;
+                _selectedExport = null;
 
-                _selectedNode.Remove();
-                _selectedNode = null;
+                SelectedNode.Remove();
+                SelectedNode = null;
             }
         }
 
@@ -1217,7 +1238,7 @@ namespace GPK_RePack_WPF
                 {
                     Dispatcher.InvokeAsync(() =>
                     {
-                        pkgNode.Index = gpkStore.LoadedGpkPackages.IndexOf(pkgNode.SourcePackage);
+                        pkgNode.Index = _gpkStore.LoadedGpkPackages.IndexOf(pkgNode.SourcePackage);
                     }, DispatcherPriority.Background);
                 }
             });
@@ -1225,9 +1246,9 @@ namespace GPK_RePack_WPF
 
         private void CopyObject()
         {
-            if (selectedExport == null)
+            if (_selectedExport == null)
             {
-                logger.Trace("no selected export");
+                _logger.Trace("no selected export");
                 return;
             }
 
@@ -1235,91 +1256,91 @@ namespace GPK_RePack_WPF
             {
                 var memorystream = new MemoryStream();
                 var bf = new BinaryFormatter();
-                bf.Serialize(memorystream, selectedExport);
+                bf.Serialize(memorystream, _selectedExport);
             }
             catch (Exception ex)
             {
-                logger.Debug(ex);
-                logger.Info("Serialize failed, check debug log");
+                _logger.Debug(ex);
+                _logger.Info("Serialize failed, check debug log");
                 return;
             }
 
-            Clipboard.SetData(exportFormat.Name, selectedExport);
-            logger.Info("Made a copy of {0}...", selectedExport.UID);
+            Clipboard.SetData(exportFormat.Name, _selectedExport);
+            _logger.Info("Made a copy of {0}...", _selectedExport.UID);
         }
         private void PasteObject()
         {
-            if (selectedExport == null)
+            if (_selectedExport == null)
             {
-                logger.Trace("no selected export");
+                _logger.Trace("no selected export");
                 return;
             }
             var copyExport = (GpkExport)Clipboard.GetData(exportFormat.Name);
 
             if (copyExport == null)
             {
-                logger.Info("copy paste fail");
+                _logger.Info("copy paste fail");
                 return;
             }
 
-            logger.Trace(CoreSettings.Default.CopyMode);
+            _logger.Trace(CoreSettings.Default.CopyMode);
             var option = "";
 
             switch (CoreSettings.Default.CopyMode)
             {
                 case CopyMode.All:
-                    DataTools.ReplaceAll(copyExport, selectedExport);
+                    DataTools.ReplaceAll(copyExport, _selectedExport);
                     option = "everything";
                     break;
                 case CopyMode.DataProps:
-                    DataTools.ReplaceProperties(copyExport, selectedExport);
-                    DataTools.ReplaceData(copyExport, selectedExport);
+                    DataTools.ReplaceProperties(copyExport, _selectedExport);
+                    DataTools.ReplaceData(copyExport, _selectedExport);
                     option = "data and properties";
                     break;
                 case CopyMode.Data:
-                    DataTools.ReplaceData(copyExport, selectedExport);
+                    DataTools.ReplaceData(copyExport, _selectedExport);
                     option = "data";
                     break;
                 case CopyMode.Props:
-                    DataTools.ReplaceProperties(copyExport, selectedExport);
+                    DataTools.ReplaceProperties(copyExport, _selectedExport);
                     option = "properties";
                     break;
                 default:
-                    logger.Info("Your setting file is broken. Go to settings windows and select a copymode.");
+                    _logger.Info("Your setting file is broken. Go to settings windows and select a copymode.");
                     break;
 
             }
 
             copyExport.GetDataSize();
-            SelectNode(_selectedNode);
-            logger.Info("Pasted the {0} of {1} to {2}", option, copyExport.UID, selectedExport.UID);
+            SelectNode(SelectedNode);
+            _logger.Info("Pasted the {0} of {1} to {2}", option, copyExport.UID, _selectedExport.UID);
         }
         private void InsertObject()
         {
-            if (selectedPackage == null)
+            if (_selectedPackage == null)
             {
-                logger.Trace("no selected package to insert");
+                _logger.Trace("no selected package to insert");
                 return;
             }
             var copyExport = (GpkExport)Clipboard.GetData(exportFormat.Name);
 
             if (copyExport == null)
             {
-                logger.Info("copy paste fail");
+                _logger.Info("copy paste fail");
                 return;
             }
 
-            selectedPackage.CopyObjectFromPackage(copyExport.UID, copyExport.motherPackage, true);
+            _selectedPackage.CopyObjectFromPackage(copyExport.UID, copyExport.motherPackage, true);
 
-            RedrawPackage(TreeMain.Children.FirstOrDefault(p => p.SourcePackage == selectedPackage));
-            logger.Info("Insert done");
+            RedrawPackage(TreeMain.Children.FirstOrDefault(p => p.SourcePackage == _selectedPackage));
+            _logger.Info("Insert done");
         }
 
         private void RedrawPackage(GpkTreeNode packageNode)
         {
             var package = packageNode.SourcePackage;
             packageNode.Children.Clear();
-            packageNode.Index = gpkStore.LoadedGpkPackages.IndexOf(package);
+            packageNode.Index = _gpkStore.LoadedGpkPackages.IndexOf(package);
             //var packageNode = new GpkTreeNode(package.Filename, package)
             //{
             //    IsPackage = true,
@@ -1400,38 +1421,38 @@ namespace GPK_RePack_WPF
 
         private void DeleteData()
         {
-            if (selectedExport == null)
+            if (_selectedExport == null)
             {
-                logger.Trace("no selected export");
+                _logger.Trace("no selected export");
                 return;
             }
 
-            if (selectedExport.Data == null)
+            if (_selectedExport.Data == null)
             {
-                logger.Trace("no export data");
+                _logger.Trace("no export data");
                 return;
             }
 
-            selectedExport.Loader = null;
-            selectedExport.Data = null;
-            selectedExport.DataPadding = null;
-            selectedExport.Payload = null;
-            selectedExport.GetDataSize();
+            _selectedExport.Loader = null;
+            _selectedExport.Data = null;
+            _selectedExport.DataPadding = null;
+            _selectedExport.Payload = null;
+            _selectedExport.GetDataSize();
 
-            SelectNode(_selectedNode);
+            SelectNode(SelectedNode);
         }
 
         private void ImportDDS()
         {
-            if (selectedExport == null)
+            if (_selectedExport == null)
             {
-                logger.Trace("no selected export");
+                _logger.Trace("no selected export");
                 return;
             }
 
-            if (selectedExport.Payload == null || !(selectedExport.Payload is Texture2D))
+            if (!(_selectedExport.Payload is Texture2D))
             {
-                logger.Info("Not a Texture2D object");
+                _logger.Info("Not a Texture2D object");
                 return;
             }
 
@@ -1440,28 +1461,28 @@ namespace GPK_RePack_WPF
 
             if (files[0] != "" && File.Exists(files[0]))
             {
-                TextureTools.importTexture(selectedExport, files[0]);
-                RefreshExportInfo();
+                TextureTools.importTexture(_selectedExport, files[0]);
+                RefreshExportInfo(false);
             }
         }
         private void ExportDDS()
         {
-            if (selectedExport == null)
+            if (_selectedExport == null)
             {
-                logger.Trace("no selected export");
+                _logger.Trace("no selected export");
                 return;
             }
 
-            if (selectedExport.Payload == null || !(selectedExport.Payload is Texture2D))
+            if (!(_selectedExport.Payload is Texture2D))
             {
-                logger.Info("Not a Texture2D object");
+                _logger.Info("Not a Texture2D object");
                 return;
             }
 
-            var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".dds");
+            var path = MiscFuncs.GenerateSaveDialog(_selectedExport.ObjectName, ".dds");
             if (path != "")
             {
-                new Task(() => TextureTools.exportTexture(selectedExport, path)).Start();
+                new Task(() => TextureTools.exportTexture(_selectedExport, path)).Start();
             }
 
 
@@ -1471,29 +1492,31 @@ namespace GPK_RePack_WPF
         {
             try
             {
-                if (selectedExport != null)
+                if (_selectedExport != null)
                 {
                     var files = MiscFuncs.GenerateOpenDialog(false);
                     if (files.Length == 0) return;
 
                     if (File.Exists(files[0]))
                     {
-                        SoundwaveTools.ImportOgg(selectedExport, files[0]);
-                        SelectNode(_selectedNode);
-                        logger.Info("Import successful.");
+                        SoundwaveTools.ImportOgg(_selectedExport, files[0]);
+                        SelectNode(SelectedNode);
+                        _logger.Info("Import successful.");
                     }
                     else
                     {
-                        logger.Info("File not found.");
+                        _logger.Info("File not found.");
                     }
 
                 }
-                else if (selectedPackage != null && selectedClass == "Core.SoundNodeWave")
+                else if (_selectedPackage != null && _selectedClass == "Core.SoundNodeWave")
                 {
-                    var exports = selectedPackage.GetExportsByClass(selectedClass);
+                    var exports = _selectedPackage.GetExportsByClass(_selectedClass);
 
-                    var dialog = new FolderBrowserDialog();
-                    dialog.SelectedPath = Path.GetDirectoryName(CoreSettings.Default.SaveDir);
+                    var dialog = new FolderBrowserDialog
+                    {
+                        SelectedPath = Path.GetDirectoryName(CoreSettings.Default.SaveDir)
+                    };
                     var result = dialog.ShowDialog();
 
                     if (result == DialogResult.OK)
@@ -1514,7 +1537,7 @@ namespace GPK_RePack_WPF
                                 if (exp.ObjectName == oggname)
                                 {
                                     SoundwaveTools.ImportOgg(exp, file);
-                                    logger.Trace("Matched file {0} to export {1}!", filename, exp.ObjectName);
+                                    _logger.Trace("Matched file {0} to export {1}!", filename, exp.ObjectName);
                                     break;
                                 }
                             }
@@ -1523,37 +1546,39 @@ namespace GPK_RePack_WPF
                         }
 
 
-                        logger.Info("Mass import to {0} was successful.", dialog.SelectedPath);
+                        _logger.Info("Mass import to {0} was successful.", dialog.SelectedPath);
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.Fatal(ex, "Import failure!");
+                _logger.Fatal(ex, "Import failure!");
             }
         }
         private void ExportOGG()
         {
 
-            if (selectedExport != null && selectedExport.ClassName == "Core.SoundNodeWave")
+            if (_selectedExport != null && _selectedExport.ClassName == "Core.SoundNodeWave")
             {
-                var path = MiscFuncs.GenerateSaveDialog(selectedExport.ObjectName, ".ogg");
+                var path = MiscFuncs.GenerateSaveDialog(_selectedExport.ObjectName, ".ogg");
                 if (path != "")
-                    SoundwaveTools.ExportOgg(selectedExport, path);
+                    SoundwaveTools.ExportOgg(_selectedExport, path);
             }
-            else if (selectedPackage != null && selectedClass == "Core.SoundNodeWave")
+            else if (_selectedPackage != null && _selectedClass == "Core.SoundNodeWave")
             {
-                var exports = selectedPackage.GetExportsByClass(selectedClass);
+                var exports = _selectedPackage.GetExportsByClass(_selectedClass);
 
                 if (exports.Count == 0)
                 {
-                    logger.Info("No oggs found for class {0}.", selectedClass);
+                    _logger.Info("No oggs found for class {0}.", _selectedClass);
                     return;
                 }
 
 
-                var dialog = new FolderBrowserDialog();
-                dialog.SelectedPath = Path.GetDirectoryName(CoreSettings.Default.SaveDir);
+                var dialog = new FolderBrowserDialog
+                {
+                    SelectedPath = Path.GetDirectoryName(CoreSettings.Default.SaveDir)
+                };
                 var result = dialog.ShowDialog();
 
                 if (result == DialogResult.OK)
@@ -1562,110 +1587,92 @@ namespace GPK_RePack_WPF
 
                     foreach (var exp in exports)
                     {
-                        SoundwaveTools.ExportOgg(exp, string.Format("{0}\\{1}.ogg", dialog.SelectedPath, exp.ObjectName));
-                        logger.Trace("ogg save for " + exp.UID);
+                        SoundwaveTools.ExportOgg(exp, $"{dialog.SelectedPath}\\{exp.ObjectName}.ogg");
+                        _logger.Trace("ogg save for " + exp.UID);
                     }
 
-                    logger.Info("Mass export to {0} was successful.", dialog.SelectedPath);
+                    _logger.Info("Mass export to {0} was successful.", dialog.SelectedPath);
                 }
             }
         }
         private void AddEmptyOGG()
         {
-            if (selectedExport != null)
+            if (_selectedExport != null)
             {
-                SoundwaveTools.ImportOgg(selectedExport, "fake");
-                SelectNode(_selectedNode);
+                SoundwaveTools.ImportOgg(_selectedExport, "fake");
+                SelectNode(SelectedNode);
             }
         }
 
-        //todo: wrap ogg preview stuff in its own class and add seeking support
-        private void btnOggPreview_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (selectedExport != null && selectedExport.Payload is Soundwave && waveOut.PlaybackState == PlaybackState.Stopped)
-                {
-                    var wave = (Soundwave)selectedExport.Payload;
-                    waveReader = new VorbisWaveReader(new MemoryStream(wave.oggdata));
-                    waveOut.Init(waveReader);
-                    waveOut.Play();
-                    OggPreviewButtonText = "Stop Preview";
-                }
-                else if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
-                {
-                    ResetOggPreview();
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex, "Playback Error");
-            }
-        }
-        private void OnPlaybackStopped(object sender, StoppedEventArgs e)
-        {
-            ResetOggPreview();
-        }
-        private void ResetOggPreview()
-        {
-            if (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
-            {
-                waveOut.Stop();
-                waveReader.Close();
-                waveReader.Dispose();
-            }
-
-            waveReader = null;
-            OggPreviewButtonText = "Ogg Preview";
-        }
 
         private void PatchObjectMapperForSelectedPackage()
         {
             if (!IsPackageSelected()) return;
 
-            gpkStore.MultiPatchObjectMapper(selectedPackage, CoreSettings.Default.CookedPCPath);
+            _gpkStore.MultiPatchObjectMapper(_selectedPackage, CoreSettings.Default.CookedPCPath);
         }
+
+
+        private void PlayStopSound()
+        {
+            try
+            {
+                if (SoundPreviewManager.PlaybackState == PlaybackState.Stopped || SoundPreviewManager.PlaybackState == PlaybackState.Paused)
+                {
+                    SoundPreviewManager.PlaySound();
+                }
+                else if (SoundPreviewManager.PlaybackState == PlaybackState.Playing)
+                {
+                    SoundPreviewManager.PauseSound();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Playback Error");
+            }
+        }
+
 
         #region composite gpk
         private void DecryptDat()
         {
-            var files = MiscFuncs.GenerateOpenDialog(false, true);
+            var files = MiscFuncs.GenerateOpenDialog(false);
             if (files.Length == 0) return;
 
             var outfile = MiscFuncs.GenerateSaveDialog("decrypt", ".txt");
 
             new Task(() =>
             {
-                logger.Info("Decryption is running in the background");
+                _logger.Info("Decryption is running in the background");
 
                 MapperTools.DecryptAndWriteFile(files[0], outfile);
 
-                logger.Info("Decryption done");
+                _logger.Info("Decryption done");
 
             }).Start();
         }
         private void EncryptDat()
         {
-            var files = MiscFuncs.GenerateOpenDialog(false, true);
+            var files = MiscFuncs.GenerateOpenDialog(false);
             if (files.Length == 0) return;
 
             var outfile = MiscFuncs.GenerateSaveDialog("encrypt", ".txt");
 
             new Task(() =>
             {
-                logger.Info("Encryption is running in the background");
+                _logger.Info("Encryption is running in the background");
 
                 MapperTools.EncryptAndWriteFile(files[0], outfile);
 
-                logger.Info("Encryption done");
+                _logger.Info("Encryption done");
 
             }).Start();
         }
         private void LoadMapping()
         {
-            if (gpkStore.CompositeMap.Count > 0)
+            if (_gpkStore.CompositeMap.Count > 0)
             {
-                new MapperWindow(gpkStore).Show();
+                new MapperWindow(_gpkStore).Show();
                 return;
             }
 
@@ -1681,7 +1688,7 @@ namespace GPK_RePack_WPF
 
             LoadAndParseMapping(path);
 
-            new MapperWindow(gpkStore).Show();
+            new MapperWindow(_gpkStore).Show();
         }
         private void WriteMapping()
         {
@@ -1693,7 +1700,7 @@ namespace GPK_RePack_WPF
 
             var path = dialog.SelectedPath + "\\";
 
-            MapperTools.WriteMappings(path, gpkStore, true, true);
+            MapperTools.WriteMappings(path, _gpkStore, true, true);
         }
         private void DumpAllTextures()
         {
@@ -1707,13 +1714,13 @@ namespace GPK_RePack_WPF
 
 
             var path = dialog.SelectedPath + "\\";
-            gpkStore.BaseSearchPath = path;
+            _gpkStore.BaseSearchPath = path;
 
             CoreSettings.Default.CookedPCPath = path;
-            MapperTools.ParseMappings(path, gpkStore);
+            MapperTools.ParseMappings(path, _gpkStore);
 
-            var subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
-            logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", gpkStore.CompositeMap.Count, subCount);
+            var subCount = _gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
+            _logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", _gpkStore.CompositeMap.Count, subCount);
 
             //selection
             var text = "";//todo Microsoft.VisualBasic.Interaction.InputBox("Select range of composite gpks to load. Format: n-n [e.g. 1-5] or empty for all.", "Selection", "");
@@ -1728,12 +1735,12 @@ namespace GPK_RePack_WPF
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
 
-            logger.Warn("Warning: This function can be ultra long running (hours) and unstable. Monitor logfile and output folder for progress.");
-            logger.Warn("Disabling logging, dump is running in the background. Consider setting file logging to only info.");
+            _logger.Warn("Warning: This function can be ultra long running (hours) and unstable. Monitor logfile and output folder for progress.");
+            _logger.Warn("Disabling logging, dump is running in the background. Consider setting file logging to only info.");
 
             NLogConfig.DisableFormLogging();
             var outDir = dialog.SelectedPath;
-            new Task(() => MassDumper.DumpMassTextures(gpkStore, outDir, filterList)).Start();
+            new Task(() => MassDumper.DumpMassTextures(_gpkStore, outDir, filterList)).Start();
         }
         private void DumpIcons()
         {
@@ -1746,12 +1753,12 @@ namespace GPK_RePack_WPF
                 return;
 
             var path = dialog.SelectedPath;
-            gpkStore.BaseSearchPath = path;
+            _gpkStore.BaseSearchPath = path;
             CoreSettings.Default.CookedPCPath = path;
-            MapperTools.ParseMappings(path, gpkStore);
+            MapperTools.ParseMappings(path, _gpkStore);
 
-            var subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
-            logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", gpkStore.CompositeMap.Count, subCount);
+            var subCount = _gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
+            _logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", _gpkStore.CompositeMap.Count, subCount);
             var list = FilterCompositeList("");
             //save dir
             dialog = new FolderBrowserDialog
@@ -1761,12 +1768,12 @@ namespace GPK_RePack_WPF
             };
             if (dialog.ShowDialog() == DialogResult.Cancel)
                 return;
-            logger.Warn("Warning: This function can be ultra long running (hours) and unstable. Monitor logfile and output folder for progress.");
-            logger.Warn("Disabling logging, dump is running in the background. Consider setting file logging to only info.");
+            _logger.Warn("Warning: This function can be ultra long running (hours) and unstable. Monitor logfile and output folder for progress.");
+            _logger.Warn("Disabling logging, dump is running in the background. Consider setting file logging to only info.");
 
             NLogConfig.DisableFormLogging();
             var outDir = dialog.SelectedPath;
-            new Task(() => MassDumper.DumpMassIcons(gpkStore, outDir, list)).Start();
+            new Task(() => MassDumper.DumpMassIcons(_gpkStore, outDir, list)).Start();
 
         }
         private Dictionary<string, List<CompositeMapEntry>> FilterCompositeList(string text)
@@ -1777,38 +1784,38 @@ namespace GPK_RePack_WPF
                 {
                     var start = Convert.ToInt32(text.Split('-')[0]) - 1;
                     var end = Convert.ToInt32(text.Split('-')[1]) - 1;
-                    var filterCompositeList = gpkStore.CompositeMap.Skip(start).Take(end - start + 1).ToDictionary(k => k.Key, v => v.Value);
-                    logger.Info("Filterd down to {0} GPKs.", end - start + 1);
+                    var filterCompositeList = _gpkStore.CompositeMap.Skip(start).Take(end - start + 1).ToDictionary(k => k.Key, v => v.Value);
+                    _logger.Info("Filterd down to {0} GPKs.", end - start + 1);
                     return filterCompositeList;
                 }
                 else
                 {
-                    return gpkStore.CompositeMap;
+                    return _gpkStore.CompositeMap;
                 }
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "filter fail");
-                return gpkStore.CompositeMap;
+                _logger.Error(ex, "filter fail");
+                return _gpkStore.CompositeMap;
             }
         }
         private void MinimizeGPK()
         {
             if (!IsPackageSelected()) return;
 
-            DataTools.RemoveObjectRedirects(selectedPackage);
-            if (_selectedNode?.SourcePackage == selectedPackage)
-                RedrawPackage(_selectedNode);
+            DataTools.RemoveObjectRedirects(_selectedPackage);
+            if (SelectedNode?.SourcePackage == _selectedPackage)
+                RedrawPackage(SelectedNode);
             else
                 DrawPackages(); //shouldn't happen, just in case
         }
         private void LoadAndParseMapping(string path)
         {
-            gpkStore.BaseSearchPath = path;
-            MapperTools.ParseMappings(path, gpkStore);
+            _gpkStore.BaseSearchPath = path;
+            MapperTools.ParseMappings(path, _gpkStore);
 
-            var subCount = gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
-            logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", gpkStore.CompositeMap.Count, subCount);
+            var subCount = _gpkStore.CompositeMap.Sum(entry => entry.Value.Count);
+            _logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", _gpkStore.CompositeMap.Count, subCount);
         }
 
         #endregion
@@ -1818,17 +1825,17 @@ namespace GPK_RePack_WPF
         {
             if (!IsPackageSelected()) return;
 
-            var input =  new InputBoxWindow($"New filesize for {selectedPackage.Filename}? Old: {selectedPackage.OrginalSize}").ShowDialog();
+            var input = new InputBoxWindow($"New filesize for {_selectedPackage.Filename}? Old: {_selectedPackage.OrginalSize}").ShowDialog();
 
             if (input == "" || !int.TryParse(input, out var num))
             {
-                logger.Info("No/Invalid input");
+                _logger.Info("No/Invalid input");
             }
             else
             {
-                logger.Trace(num);
-                selectedPackage.OrginalSize = num;
-                logger.Info("Set filesize for {0} to {1}", selectedPackage.Filename, selectedPackage.OrginalSize);
+                _logger.Trace(num);
+                _selectedPackage.OrginalSize = num;
+                _logger.Info("Set filesize for {0} to {1}", _selectedPackage.Filename, _selectedPackage.OrginalSize);
             }
 
         }
@@ -1843,15 +1850,15 @@ namespace GPK_RePack_WPF
                 var propName = new InputBoxWindow("Proprty Name to edit?").ShowDialog();
                 var propValue = new InputBoxWindow("Proprty Value:").ShowDialog();
 
-                var exports = selectedPackage.GetExportsByClass(className);
+                var exports = _selectedPackage.GetExportsByClass(className);
 
                 SoundwaveTools.SetPropertyDetails(exports, propName, propValue);
 
-                logger.Info("Custom set success for {0} Objects.", exports.Count);
+                _logger.Info("Custom set success for {0} Objects.", exports.Count);
             }
             catch (Exception ex)
             {
-                logger.Fatal("Custom update fail. Ex " + ex);
+                _logger.Fatal("Custom update fail. Ex " + ex);
             }
 
 
@@ -1861,17 +1868,17 @@ namespace GPK_RePack_WPF
         {
             if (!IsPackageSelected()) return;
 
-            var input = new InputBoxWindow($"New VolumeMultiplier for all SoundCues in {selectedPackage.Filename}: \nFormat: x,xx").ShowDialog();
+            var input = new InputBoxWindow($"New VolumeMultiplier for all SoundCues in {_selectedPackage.Filename}: \nFormat: x,xx").ShowDialog();
 
             if (input == "" || !float.TryParse(input, out var num))
             {
-                logger.Info("No/Invalid input");
+                _logger.Info("No/Invalid input");
             }
             else
             {
-                logger.Trace(num);
-                SoundwaveTools.SetAllVolumes(selectedPackage, num);
-                logger.Info("Set Volumes for {0} to {1}.", selectedPackage.Filename, num);
+                _logger.Trace(num);
+                SoundwaveTools.SetAllVolumes(_selectedPackage, num);
+                _logger.Info("Set Volumes for {0} to {1}.", _selectedPackage.Filename, num);
             }
         }
 
@@ -1881,16 +1888,16 @@ namespace GPK_RePack_WPF
 
             var input = new InputBoxWindow("Add a new name to the package:").ShowDialog();
             if (input == "") return;
-            selectedPackage.AddString(input);
-            if (selectedExport != null)
-                DrawGrid(selectedPackage, selectedExport);
+            _selectedPackage.AddString(input);
+            if (_selectedExport != null)
+                DrawGrid(_selectedPackage, _selectedExport);
         }
 
 
         private bool IsPackageSelected()
         {
-            if (selectedPackage != null) return true;
-            logger.Info("Select a package!");
+            if (_selectedPackage != null) return true;
+            _logger.Info("Select a package!");
             return false;
 
         }
@@ -1906,9 +1913,9 @@ namespace GPK_RePack_WPF
 
             new Task(() =>
             {
-                logger.Info("Dump is running in the background");
+                _logger.Info("Dump is running in the background");
                 MassDumper.DumpMassHeaders(outfile, files);
-                logger.Info("Dump done");
+                _logger.Info("Dump done");
 
                 NLogConfig.EnableFormLogging();
             }).Start();
@@ -1918,7 +1925,7 @@ namespace GPK_RePack_WPF
         {
             var arrayProp = CheckArrayRow();
 
-            if (arrayProp == null || arrayProp.value == null) return;
+            if (arrayProp?.value == null) return;
             var data = new byte[arrayProp.value.Length - 4];
             Array.Copy(arrayProp.value, 4, data, 0, arrayProp.value.Length - 4); //remove count bytes
 
@@ -1945,96 +1952,315 @@ namespace GPK_RePack_WPF
             Array.Copy(BitConverter.GetBytes(data.Length), arrayProp.value, 4);
             Array.Copy(data, 0, arrayProp.value, 4, data.Length);
 
-            DrawGrid(selectedPackage, selectedExport);
+            DrawGrid(_selectedPackage, _selectedExport);
         }
 
         private GpkArrayProperty CheckArrayRow()
         {
-            if (selectedExport == null) return null;
+            if (_selectedExport == null) return null;
             if (SelectedProperty == null)//(gridProps.SelectedRows.Count != 1)
             {
-                logger.Info("select a complete row (click the arrow in front of it)");
+                _logger.Info("select a complete row (click the arrow in front of it)");
                 return null;
             }
 
             //var row = gridProps.SelectedRows[0];
             if (/*row.Cells["type"].Value.ToString() */ SelectedProperty.PropertyType != "ArrayProperty")
             {
-                logger.Info("select a arrayproperty row");
+                _logger.Info("select a arrayproperty row");
                 return null;
             }
 
-            return (GpkArrayProperty)SelectedProperty.GetIProperty(selectedPackage);
+            return (GpkArrayProperty)SelectedProperty.GetIProperty(_selectedPackage);
         }
 
-        //#region search
-        //private void searchForObjectToolStripMenuItem_Click(object sender, EventArgs e)
-        //{
-        //    string input = Microsoft.VisualBasic.Interaction.InputBox("String to search?", "Search");
+        private readonly List<GpkTreeNode> _searchResultNodes;
+        private int searchResultIndex;
 
-        //    if (string.IsNullOrEmpty(input))
-        //        return;
+        #region search
+        private void Search()
+        {
+            var input = new InputBoxWindow("String to search?").ShowDialog();
 
-        //    searchResultNodes.Clear();
-        //    searchResultIndex = 0;
+            if (string.IsNullOrEmpty(input))
+                return;
 
-        //    foreach (var node in Collect(treeMain.Nodes))
-        //    {
-        //        if (node.Text.ToLowerInvariant().Contains(input.ToLowerInvariant().Trim()))
-        //        {
-        //            searchResultNodes.Add(node);
-        //        }
-        //    }
+            _searchResultNodes.Clear();
+            searchResultIndex = 0;
 
-        //    if (searchResultNodes.Count > 0)
-        //    {
-        //        tryToSelectNextSearchResult();
-        //    }
-        //    else
-        //    {
-        //        logger.Info(string.Format("Nothing found for '{0}'!", input));
-        //    }
+            foreach (var node in TreeMain.Collect())
+            {
+                if (node.Key.ToLowerInvariant().Contains(input.ToLowerInvariant().Trim()))
+                {
+                    _searchResultNodes.Add(node);
+                }
+            }
 
-
-        //}
-
-        //IEnumerable<TreeNode> Collect(TreeNodeCollection nodes)
-        //{
-        //    foreach (TreeNode node in nodes)
-        //    {
-        //        yield return node;
-
-        //        foreach (var child in Collect(node.Nodes))
-        //            yield return child;
-        //    }
-        //}
-
-        //private void nextToolStripMenuItem_Click(object sender, EventArgs e)
-        //{
-        //    tryToSelectNextSearchResult();
-        //}
-
-        //private void tryToSelectNextSearchResult()
-        //{
-        //    if (searchResultNodes.Count == 0 || searchResultIndex >= searchResultNodes.Count)
-        //    {
-        //        SystemSounds.Asterisk.Play();
-        //        searchResultIndex = 0;
-        //        tempStatusLabel.StartTimer("Ready", string.Format("End reached, searching from start.", searchResultIndex, searchResultNodes.Count), 2000);
-        //        return;
-
-        //    }
-
-        //    treeMain.SelectedNode = searchResultNodes[searchResultIndex];
-        //    treeMain_AfterSelect(this, new TreeViewEventArgs(searchResultNodes[searchResultIndex]));
-        //    tempStatusLabel.StartTimer("Ready", string.Format("Result {0}/{1}", searchResultIndex + 1, searchResultNodes.Count), 2000);
-
-        //    searchResultIndex++;
-        //}
+            if (_searchResultNodes.Count > 0)
+            {
+                SelectNextSearchResult();
+            }
+            else
+            {
+                _logger.Info($"Nothing found for '{input}'!");
+            }
 
 
-        //#endregion //search
+        }
+
+
+        private void SelectNextSearchResult(bool previous = false)
+        {
+            if (!CheckSearch()) return;
+
+            SelectNode(_searchResultNodes[searchResultIndex]);
+            _searchResultNodes[searchResultIndex].ParentsToPackage.ForEach(p => p.IsExpanded = true);
+            _searchResultNodes[searchResultIndex].IsSelected = true;
+            if (!previous)
+            {
+
+                StatusBarText = $"Result {searchResultIndex + 1}/{_searchResultNodes.Count}";
+                searchResultIndex++;
+            }
+            else
+            {
+                StatusBarText = $"Result {searchResultIndex - 1}/{_searchResultNodes.Count}";
+                searchResultIndex--;
+            }
+
+
+            bool CheckSearch()
+            {
+                var found = true;
+                var msg = "";
+                if (_searchResultNodes.Count == 0)
+                {
+                    searchResultIndex = 0;
+                    msg = "No items found.";
+                    found = false;
+                }
+
+                if (!previous && searchResultIndex >= _searchResultNodes.Count)
+                {
+                    searchResultIndex = 0;
+                    msg = "End reached, searching from start.";
+                    found = false;
+                }
+
+                if (previous && searchResultIndex == 0)
+                {
+                    searchResultIndex = _searchResultNodes.Count - 1;
+                    msg = "Start reached, searching from end.";
+                    found = false;
+                }
+
+                if (found) return true;
+
+                SystemSounds.Asterisk.Play();
+                StatusBarText = msg;
+
+                return false;
+            }
+
+        }
+
+
+        #endregion //search
         #endregion //misc
 
+    }
+
+    public class SoundPreviewManager : TSPropertyChanged, IDisposable
+    {
+        private VorbisWaveReader _waveReader;
+        private readonly WaveOut _waveOut;
+        private readonly Timer _timer;
+        private readonly WaveFormRenderer _renderer;
+        private Image _bmp;
+        private ImageSource _waveForm;
+        private DateTime _startTime;
+
+        public ImageSource WaveForm
+        {
+            get => _waveForm;
+            set
+            {
+                if (_waveForm == value) return;
+                _waveForm = value;
+                N();
+            }
+        }
+
+        public double CurrentPosition
+        {
+            get
+            {
+                if (_waveReader == null) return 0;
+                //if (_waveReader != null)
+                //    return _waveReader.CurrentTime.TotalMilliseconds / _waveReader.TotalTime.TotalMilliseconds;
+                return (DateTime.Now - _startTime).TotalMilliseconds*1000 / _waveReader.TotalTime.TotalMilliseconds;
+                //return 0;
+            }
+            set
+            {
+                if (_waveReader == null) return;
+                var totalMs = _waveReader.TotalTime.TotalMilliseconds;
+                var setMs = (value/1000D) * totalMs;
+                if (setMs < totalMs)
+                {
+                    _waveOut.Pause();
+                    _waveReader.CurrentTime = TimeSpan.FromMilliseconds(setMs);
+                    _waveOut.Play();
+                }
+                else
+                {
+                    _waveOut.Stop();
+                }
+                N();
+                N(nameof(CurrentTime));
+                _startTime = DateTime.Now - _waveReader.CurrentTime;
+            }
+        }
+
+        public string CurrentTime
+        {
+            get
+            {
+                if (_waveReader == null) return TimeSpan.Zero.ToString(@"mm\:ss\.ff");
+                return (DateTime.Now - _startTime).ToString(@"mm\:ss\.ff");
+            }
+        }
+
+        public PlaybackState PlaybackState => _waveOut.PlaybackState;
+
+        public SoundPreviewManager()
+        {
+            Dispatcher = Dispatcher.CurrentDispatcher;
+            _waveOut = new WaveOut();
+            _waveOut.PlaybackStopped += OnPlaybackStopped;
+            _timer = new Timer { Interval = 10 };
+            _timer.Tick += OnTimerTick;
+            //https://github.com/naudio/NAudio.WaveFormRenderer
+            _renderer = new WaveFormRenderer();
+
+        }
+
+        private void OnTimerTick(object sender, EventArgs e)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                N(nameof(CurrentPosition));
+                N(nameof(CurrentTime));
+
+            }, DispatcherPriority.DataBind);
+            if((DateTime.Now - _startTime).TotalMilliseconds >= _waveReader.TotalTime.TotalMilliseconds) _waveOut.Stop();
+            if (PlaybackState == PlaybackState.Playing) return;
+            _timer.Stop();
+
+        }
+
+        private void OnPlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            _timer.Stop();
+            _startTime = DateTime.Now;
+            N(nameof(CurrentPosition));
+            N(nameof(CurrentTime));
+
+            //ResetOggPreview();
+        }
+
+        public void Setup(byte[] soundwave)
+        {
+            ResetOggPreview();
+            _waveReader = new VorbisWaveReader(new MemoryStream(soundwave));
+            RenderWaveForm();
+            _waveOut.Init(_waveReader);
+        }
+
+        private void RenderWaveForm()
+        {
+            Task.Run(() =>
+            {
+                var col = ((System.Windows.Media.Color)App.Current.FindResource("SelectionColor")).ToDrawingColor();
+                var rendererSettings = new StandardWaveFormRendererSettings
+                {
+                    Width = 1200,
+                    TopHeight = 128,
+                    BottomHeight = 128,
+                    BackgroundColor = System.Drawing.Color.Transparent,
+                    TopPeakPen = new System.Drawing.Pen(col),
+                    BottomPeakPen = new System.Drawing.Pen(col)
+                };
+                var maxPeakProvider = new RmsPeakProvider(200);
+                this._bmp = _renderer.Render(_waveReader, maxPeakProvider, rendererSettings);
+
+                Dispatcher.InvokeAsync(() =>
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        _bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        ms.Position = 0;
+
+                        var bi = new BitmapImage();
+                        bi.BeginInit();
+                        bi.CacheOption = BitmapCacheOption.OnLoad;
+                        bi.StreamSource = ms;
+                        bi.EndInit();
+                        WaveForm = bi;
+                    }
+                    _waveReader.Position = 0;
+                });
+
+            });
+        }
+
+        public void PlaySound()
+        {
+            if (PlaybackState == PlaybackState.Paused)
+            {
+                _startTime = DateTime.Now - _waveReader.CurrentTime;
+                _waveOut.Resume();
+            }
+            else
+            {
+                _startTime = DateTime.Now;
+                _waveReader.Position = 0;
+                _waveOut.Play();
+            }
+            _timer.Start();
+            //OggPreviewButtonText = "Stop Preview";
+        }
+
+        public void ResetOggPreview()
+        {
+            if (_waveOut != null && _waveOut.PlaybackState == PlaybackState.Playing)
+            {
+                _waveOut.Stop();
+                _waveReader?.Close();
+                _waveReader?.Dispose();
+                WaveForm = null;
+            }
+
+            _waveReader = null;
+            _bmp?.Dispose();
+            //OggPreviewButtonText = "Ogg Preview";
+        }
+
+        public void Dispose()
+        {
+            _waveReader?.Dispose();
+            _waveOut?.Dispose();
+            _bmp?.Dispose();
+        }
+
+        public void PauseSound()
+        {
+            if (PlaybackState == PlaybackState.Playing)
+            {
+                _waveOut?.Pause();
+                _timer.Stop();
+
+            }
+        }
     }
 }

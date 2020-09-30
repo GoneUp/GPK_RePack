@@ -19,21 +19,33 @@
         WindowState="{Binding WindowState, Mode=TwoWay}"
         d:DataContext="{d:DesignInstance wpf:MainViewModel}">
     <Window.InputBindings>
-        <KeyBinding Command="{Binding OpenCommand}"        Modifiers="Control"       Key="O"  />
-        <KeyBinding Command="{Binding SaveCommand}"        Modifiers="Control"       Key="S"  CommandParameter="{x:Static wpf:SaveMode.Rebuild}"/>
-        <KeyBinding Command="{Binding SaveCommand}"        Modifiers="Control"       Key="P"  CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}"/>
-        <KeyBinding Command="{Binding SaveCommand}"        Modifiers="Control+Shift" Key="P"  CommandParameter="{x:Static wpf:SaveMode.Patched}"/>
-                                                           
-        <KeyBinding Command="{Binding RefreshCommand}"     Modifiers="Control"       Key="R"  />
-        <KeyBinding Command="{Binding ClearCommand}"       Modifiers="Control"       Key="N"  />
-                                                           
-        <KeyBinding Command="{Binding SwitchTabCommand}"   Modifiers="Control"       Key="D1" CommandParameter="{x:Static wpf:Tab.Info}"/>
-        <KeyBinding Command="{Binding SwitchTabCommand}"   Modifiers="Control"       Key="D2" CommandParameter="{x:Static wpf:Tab.Properties}"/>
-        <KeyBinding Command="{Binding SwitchTabCommand}"   Modifiers="Control"       Key="D3" CommandParameter="{x:Static wpf:Tab.Texture}"/>
+        <KeyBinding Command="{Binding OpenCommand}" Modifiers="Control" Key="O" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="S"
+                    CommandParameter="{x:Static wpf:SaveMode.Rebuild}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="P"
+                    CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control+Shift" Key="P"
+                    CommandParameter="{x:Static wpf:SaveMode.Patched}" />
 
-        <KeyBinding Command="{Binding LoadMappingCommand}" Modifiers="Control"     Key="M"  />
+        <KeyBinding Command="{Binding RefreshCommand}" Modifiers="Control" Key="R" />
+        <KeyBinding Command="{Binding ClearCommand}" Modifiers="Control" Key="N" />
 
-        <KeyBinding Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}" Modifiers="Ctrl+Alt" Key="S"  />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D1"
+                    CommandParameter="{x:Static wpf:Tab.Info}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D2"
+                    CommandParameter="{x:Static wpf:Tab.Properties}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D3"
+                    CommandParameter="{x:Static wpf:Tab.Texture}" />
+
+        <KeyBinding Command="{Binding LoadMappingCommand}" Modifiers="Control" Key="M" />
+
+        <KeyBinding Command="{Binding SearchCommand}" Modifiers="Control" Key="F" />
+        <KeyBinding Command="{Binding SearchNextCommand}" Modifiers="Shift" Key="F3" CommandParameter="True" />
+        <KeyBinding Command="{Binding SearchNextCommand}" Key="F3" CommandParameter="False" />
+
+        <KeyBinding
+            Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
+            Modifiers="Ctrl+Alt" Key="S" />
         <!--todo-->
         <KeyBinding Modifiers="Control" Key="F" />
         <KeyBinding Key="F3" />
@@ -64,18 +76,18 @@
         </Style>
 
         <Style TargetType="Path" x:Key="TabItemIconStyle">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Stretch" Value="Uniform"/>
-            <Setter Property="Fill" Value="#5fff"/>
-            <Setter Property="Margin" Value="3"/>
-            <Setter Property="Width" Value="16"/>
-            <Setter Property="Height" Value="16"/>
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Stretch" Value="Uniform" />
+            <Setter Property="Fill" Value="#5fff" />
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
         </Style>
         <Style TargetType="TextBlock" x:Key="TabItemLabelStyle">
-            <Setter Property="Grid.Row" Value="1"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="#5fff"/>
-            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Grid.Row" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="#5fff" />
+            <Setter Property="FontSize" Value="10" />
 
         </Style>
 
@@ -173,24 +185,38 @@
 
         <Style x:Key="TreeViewItemContainerStyle" TargetType="TreeViewItem">
             <Setter Property="Padding" Value="4 2" />
+            <!-- ReSharper disable Xaml.BindingWithContextNotResolved -->
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <!-- ReSharper restore Xaml.BindingWithContextNotResolved -->
         </Style>
 
         <HierarchicalDataTemplate x:Key="TreeItemTemplate" DataType="wpf:GpkTreeNode" ItemsSource="{Binding Children}">
             <Grid PreviewMouseDown="OnTreeNodeMouseButtonDown">
                 <Grid.ContextMenu>
-                    <ContextMenu x:Name="NodeCtxMenu" >
-                        <MenuItem x:Name="SaveGpkBtn"    Header="Save GPK (rebuild)" Command="{Binding MainVM.SaveSingleGpkCommand}" Visibility="Collapsed"/>
-                        <MenuItem x:Name="ExportRawBtn"  Header="Export raw" Command="{Binding MainVM.ExportRawDataCommand}" />
-                        <MenuItem x:Name="ImportRawBtn"  Header="Import raw" Command="{Binding MainVM.ImportRawDataCommand}"/>
-                        <MenuItem x:Name="DeleteDataBtn" Header="Delete data" Command="{Binding MainVM.DeleteDataCommand}"/>
-                        <MenuItem x:Name="ExportOggBtn"  Header="Export OGG" Command="{Binding MainVM.ExportOGGCommand}" Visibility="Collapsed"/>
-                        <MenuItem x:Name="ImportOggBtn"  Header="Import OGG" Command="{Binding MainVM.ImportOGGCommand}" Visibility="Collapsed"/>
-                        <MenuItem x:Name="ExportDdsBtn"  Header="Export DDS" Command="{Binding MainVM.ExportDDSCommand}" Visibility="Collapsed"/>
-                        <MenuItem x:Name="ImportDdsBtn"  Header="Import DDS" Command="{Binding MainVM.ImportDDSCommand}" Visibility="Collapsed"/>
-                        <MenuItem x:Name="CopyBtn"       Header="Copy"  Command="{Binding MainVM.CopyObjectCommand}"/>
-                        <MenuItem x:Name="PasteBtn"      Header="Paste/Replace" Command="{Binding MainVM.PasteObjectCommand}"/>
-                        <MenuItem x:Name="InsertBtn"     Header="Insert" Command="{Binding MainVM.InsertObjectCommand}" Visibility="Collapsed"/>
-                        <MenuItem x:Name="RemoveBtn"     Header="Remove" Command="{Binding MainVM.RemoveObjectCommand}"/>
+                    <ContextMenu x:Name="NodeCtxMenu">
+                        <MenuItem x:Name="SaveGpkBtn" Header="Save GPK (rebuild)"
+                                  Command="{Binding MainVM.SaveSingleGpkCommand}" Visibility="Collapsed" />
+                        <MenuItem x:Name="ExportRawBtn" Header="Export raw"
+                                  Command="{Binding MainVM.ExportRawDataCommand}" />
+                        <MenuItem x:Name="ImportRawBtn" Header="Import raw"
+                                  Command="{Binding MainVM.ImportRawDataCommand}" />
+                        <MenuItem x:Name="DeleteDataBtn" Header="Delete data"
+                                  Command="{Binding MainVM.DeleteDataCommand}" />
+                        <MenuItem x:Name="ExportOggBtn" Header="Export OGG" Command="{Binding MainVM.ExportOGGCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="ImportOggBtn" Header="Import OGG" Command="{Binding MainVM.ImportOGGCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="ExportDdsBtn" Header="Export DDS" Command="{Binding MainVM.ExportDDSCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="ImportDdsBtn" Header="Import DDS" Command="{Binding MainVM.ImportDDSCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="CopyBtn" Header="Copy" Command="{Binding MainVM.CopyObjectCommand}" />
+                        <MenuItem x:Name="PasteBtn" Header="Paste/Replace"
+                                  Command="{Binding MainVM.PasteObjectCommand}" />
+                        <MenuItem x:Name="InsertBtn" Header="Insert" Command="{Binding MainVM.InsertObjectCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="RemoveBtn" Header="Remove" Command="{Binding MainVM.RemoveObjectCommand}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <Grid.ColumnDefinitions>
@@ -232,8 +258,8 @@
                     </Path.Style>
                 </Path>
                 <TextBlock Grid.Column="1" Foreground="White">
-                                    <Run Text="{Binding Name,Mode=OneWay}" />
-                                    <Run Text="{Binding KeyNoName,Mode=OneWay}" Foreground="#5fff" FontSize="10" />
+                    <Run Text="{Binding Name,Mode=OneWay}" />
+                    <Run Text="{Binding KeyNoName,Mode=OneWay}" Foreground="#5fff" FontSize="10" />
                 </TextBlock>
             </Grid>
             <HierarchicalDataTemplate.Triggers>
@@ -325,76 +351,83 @@
                     <MenuItem Header="Save all (rebuild mode)"
                               Command="{Binding SaveCommand}"
                               CommandParameter="{x:Static wpf:SaveMode.Rebuild}"
-                              InputGestureText="Ctrl+S"/>
+                              InputGestureText="Ctrl+S" />
                     <MenuItem Header="Save all (rebuild mode with padding)"
                               Command="{Binding SaveCommand}"
-                              CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}" 
-                              InputGestureText="Ctrl+P"/>
+                              CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}"
+                              InputGestureText="Ctrl+P" />
                     <MenuItem Header="Save all (patched, not recommended)"
                               Command="{Binding SaveCommand}"
-                              CommandParameter="{x:Static wpf:SaveMode.Patched}" 
-                              InputGestureText="Ctrl+Shift+P"/>
+                              CommandParameter="{x:Static wpf:SaveMode.Patched}"
+                              InputGestureText="Ctrl+Shift+P" />
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
                     <!--<MenuItem Header="ObjectMapper.dat modification" IsEnabled="False" />-->
                     <MenuItem Header="Patch ObjectMapper for selected package"
-                              Command="{Binding PatchObjectMapperForSelectedPackageCommand}"/>
+                              Command="{Binding PatchObjectMapperForSelectedPackageCommand}" />
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
                     <!--<MenuItem Header="CompositePackageMapper.dat modification" IsEnabled="False" />-->
                     <MenuItem Header="Save and patch original Composite (not recommended)"
                               Command="{Binding SaveCommand}"
-                              CommandParameter="{x:Static wpf:SaveMode.PatchedComposite}"/>
+                              CommandParameter="{x:Static wpf:SaveMode.PatchedComposite}" />
                     <MenuItem Header="Save and add new composite GPK (not recommended)"
                               Command="{Binding SaveCommand}"
-                              CommandParameter="{x:Static wpf:SaveMode.AddedComposite}"/>
+                              CommandParameter="{x:Static wpf:SaveMode.AddedComposite}" />
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
-                    <MenuItem Header="Settings" Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}" InputGestureText="Ctrl+Alt+S"/>
+                    <MenuItem Header="Settings"
+                              Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
+                              InputGestureText="Ctrl+Alt+S" />
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
-                    <MenuItem Header="Refresh view" Command="{Binding RefreshCommand}" InputGestureText="Ctrl+R"/>
-                    <MenuItem Header="Clear" Command="{Binding ClearCommand}" InputGestureText="Ctrl+N"/>
-                    <MenuItem Header="Exit" Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}" InputGestureText="Alt+F4"/>
+                    <MenuItem Header="Refresh view" Command="{Binding RefreshCommand}" InputGestureText="Ctrl+R" />
+                    <MenuItem Header="Clear" Command="{Binding ClearCommand}" InputGestureText="Ctrl+N" />
+                    <MenuItem Header="Exit"
+                              Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
+                              InputGestureText="Alt+F4" />
                 </MenuItem>
 
                 <MenuItem Header="Composite GPK">
-                    <MenuItem Header=".dat decryption" Command="{Binding DecryptDatCommand}"/>
-                    <MenuItem Header=".dat encryption" Command="{Binding EncryptDatCommand}"/>
-                    <MenuItem Header="Load/show mapping" Command="{Binding LoadMappingCommand}" InputGestureText="Ctrl+M"/>
+                    <MenuItem Header=".dat decryption" Command="{Binding DecryptDatCommand}" />
+                    <MenuItem Header=".dat encryption" Command="{Binding EncryptDatCommand}" />
+                    <MenuItem Header="Load/show mapping" Command="{Binding LoadMappingCommand}"
+                              InputGestureText="Ctrl+M" />
                     <MenuItem Header="Write mappings" Command="{Binding WriteMappingCommand}" />
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
-                    <MenuItem Header="Minimize selected GPK" Command="{Binding MinimizeGpkCommand}"/>
+                    <MenuItem Header="Minimize selected GPK" Command="{Binding MinimizeGpkCommand}" />
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
-                    <MenuItem Header="Dump composite textures" Command="{Binding DumpAllTexturesCommand}"/>
-                    <MenuItem Header="Dump icons" Command="{Binding DumpIconsCommand}"/>
-                    <MenuItem Header="Dump GPK objects" Command="{Binding DumpGPKObjectsCommand}"/>
+                    <MenuItem Header="Dump composite textures" Command="{Binding DumpAllTexturesCommand}" />
+                    <MenuItem Header="Dump icons" Command="{Binding DumpIconsCommand}" />
+                    <MenuItem Header="Dump GPK objects" Command="{Binding DumpGPKObjectsCommand}" />
                 </MenuItem>
 
                 <MenuItem Header="Misc">
-                    <MenuItem Header="Set file size" Command="{Binding SetFileSizeCommand}"/>
+                    <MenuItem Header="Set file size" Command="{Binding SetFileSizeCommand}" />
                     <MenuItem Header="Set all properties">
-                        <MenuItem Header="Custom" Command="{Binding SetPropsCustomCommand}"/>
-                        <MenuItem Header="Set all volume multipliers" Command="{Binding SetVolumeMultipliersCommand}"/>
+                        <MenuItem Header="Custom" Command="{Binding SetPropsCustomCommand}" />
+                        <MenuItem Header="Set all volume multipliers" Command="{Binding SetVolumeMultipliersCommand}" />
                     </MenuItem>
-                    <MenuItem Header="Export big ByteProp" Command="{Binding BigBytePropExportCommand}"/>
-                    <MenuItem Header="Import big ByteProp" Command="{Binding BigBytePropImportCommand}"/>
-                    <MenuItem Header="Add name" Command="{Binding AddNameCommand}"/>
-                    <MenuItem Header="Dump GPK headers" Command="{Binding DumpGPKObjectsCommand}"/>
+                    <MenuItem Header="Export big ByteProp" Command="{Binding BigBytePropExportCommand}" />
+                    <MenuItem Header="Import big ByteProp" Command="{Binding BigBytePropImportCommand}" />
+                    <MenuItem Header="Add name" Command="{Binding AddNameCommand}" />
+                    <MenuItem Header="Dump GPK headers" Command="{Binding DumpGPKObjectsCommand}" />
                     <MenuItem Header="Log to textbox" IsCheckable="True" IsChecked="{Binding LogToUI, Mode=TwoWay}" />
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
-                    <MenuItem Header="Search for object" InputGestureText="Ctrl+F" />
-                    <MenuItem Header="Next result" InputGestureText="F3" />
+                    <MenuItem Header="Search for object" InputGestureText="Ctrl+F" Command="{Binding SearchCommand}" />
+                    <MenuItem Header="Next result" InputGestureText="F3" Command="{Binding SearchNextCommand}" />
+                    <MenuItem Header="Previous result" InputGestureText="Shift+F3" Command="{Binding SearchCommand}"
+                              CommandParameter="true" />
 
                 </MenuItem>
             </Menu>
@@ -415,18 +448,17 @@
                 </Grid.ColumnDefinitions>
                 <!--Tree-->
                 <!--todo: style TreeView arrows-->
-                <TreeView x:Name="TreeView" 
+                <TreeView x:Name="TreeView"
                           ItemsSource="{Binding TreeMain.Children}"
-                          AllowDrop="True" 
-                          Margin="3 5 6 5" 
+                          AllowDrop="True"
+                          Margin="3 5 6 5"
                           HorizontalAlignment="Stretch"
                           Background="{StaticResource BackgroundBrushDark}"
                           BorderBrush="{StaticResource BorderBrush}"
                           ItemContainerStyle="{StaticResource TreeViewItemContainerStyle}"
                           ItemTemplate="{StaticResource TreeItemTemplate}"
-                          Drop="OnTreeViewDrop" 
-                          SelectedItemChanged="OnSelectedNodeChanged"
-                          >
+                          Drop="OnTreeViewDrop"
+                          SelectedItemChanged="OnSelectedNodeChanged">
                     <TreeView.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
                                          Color="{StaticResource SelectionColor}" />
@@ -438,8 +470,8 @@
 
                 </TreeView>
 
-                <GridSplitter Width="2" Height="30" 
-                              Background="{StaticResource SelectionBrush}" 
+                <GridSplitter Width="2" Height="30"
+                              Background="{StaticResource SelectionBrush}"
                               ResizeDirection="Columns"
                               Margin="0 20 -1 20" />
 
@@ -608,14 +640,58 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <Path Style="{StaticResource TabItemIconStyle}" Data="{StaticResource SvgImage}" Fill="DarkOrange"/>
+                                <Path Style="{StaticResource TabItemIconStyle}" Data="{StaticResource SvgImage}"
+                                      Fill="DarkOrange" />
                                 <TextBlock Style="{StaticResource TabItemLabelStyle}" Text="Img" />
                             </Grid>
                         </TabItem.Header>
-                        <!--todo: move all of this to a new ImageViewControl, move data to a new ImageInfoViewModel class-->
                         <controls:ImagePreview Image="{Binding PreviewImage}"
                                                ImageFormat="{Binding PreviewImageFormat}"
-                                               ImageName="{Binding PreviewImageName}"/>
+                                               ImageName="{Binding PreviewImageName}" />
+                    </TabItem>
+                    <TabItem Visibility="{Binding IsSoundTabVisible, Converter={StaticResource BoolToVisibility}}">
+                        <TabItem.Header>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Path Style="{StaticResource TabItemIconStyle}" Data="{StaticResource SvgMusicNote}"
+                                      Fill="DarkOrange" />
+                                <TextBlock Style="{StaticResource TabItemLabelStyle}" Text="Snd" />
+                            </Grid>
+                        </TabItem.Header>
+                            <!--todo: style this better-->
+                        <Grid >
+                            <Border Background="{StaticResource BackgroundBrushDark}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    Margin="-2 0" />
+                            <Grid VerticalAlignment="Top" Background="#2000">
+                            <Image  Source="{Binding SoundPreviewManager.WaveForm}" Stretch="Uniform" Margin="15 0" x:Name="waveform"/>
+                            <Slider  Margin="10 10"
+                                    Height="{Binding ElementName=waveform, Path=ActualHeight}"
+                                    Foreground="{StaticResource AccentBrush}"
+                                    Minimum="0"
+                                    FocusVisualStyle="{StaticResource EmptyFocusVisual}"
+                                    Maximum="1000"
+                                    HorizontalAlignment="Stretch" Width="Auto"
+                                    Value="{Binding SoundPreviewManager.CurrentPosition, Mode=TwoWay}"
+                                    Style="{DynamicResource SeekSliderStyle}" />
+</Grid>
+                            <TextBlock Text="{Binding SoundPreviewManager.CurrentTime}"
+                                       VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       Margin="0 100 0 0" />
+                            <TextBlock Text="{Binding SelectedNode.Name}"
+                                       VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       Margin="0 60 0 0" />
+                            <Button Style="{StaticResource ToolbarButtonStyle}"
+                                    Margin="0 20"
+                                    Command="{Binding PlayStopSoundCommand}"
+                                    VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                                <Path Data="{StaticResource SvgPlay}" />
+                            </Button>
+                        </Grid>
                     </TabItem>
                 </TabControl>
 

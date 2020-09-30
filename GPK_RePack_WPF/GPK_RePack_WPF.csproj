@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GPK_RePack.Core\GPK_RePack.Core.csproj" />
+    <ProjectReference Include="..\WaveFormRendererLib\WaveFormRendererLib.csproj" />
   </ItemGroup>
 
 </Project>
