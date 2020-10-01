@@ -24,9 +24,9 @@ c7a706fb_6a349a6f_1d212.Chat2_dup,c7a706fb_6a349a6f_1d212,92291307,821218,|
 
          * 
          * */
-        public string UID;
+        public string UID; //og uid from pkgmapper
         public string CompositeUID;
-        public string UnknownUID;
+        public string CompPackageName;
         public string SubGPKName;
         public int FileOffset;
         public int FileLength;

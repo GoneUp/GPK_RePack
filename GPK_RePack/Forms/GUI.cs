@@ -1,5 +1,6 @@
 ﻿using GPK_RePack.Forms.Helper;
 using GPK_RePack.Properties;
+using GPK_RePack.Updater;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using NLog;
@@ -22,12 +23,11 @@ using GPK_RePack.Core.Model.Composite;
 using GPK_RePack.Core.Model.Interfaces;
 using GPK_RePack.Core.Model.Payload;
 using GPK_RePack.Core.Model.Prop;
-using GPK_RePack.Core.Updater;
 using UpkManager.Dds;
 
 namespace GPK_RePack.Forms
 {
-    public partial class GUI : Form, IUpdaterCheckCallback
+    public partial class GUI : Form, UpdaterCheckCallback
     {
         public GUI()
         {
@@ -40,6 +40,7 @@ namespace GPK_RePack.Forms
 
         private GpkPackage selectedPackage;
         private GpkExport selectedExport;
+        private GpkImport selectedImport;
         private string selectedClass = "";
 
         private GpkStore gpkStore;
@@ -63,6 +64,17 @@ namespace GPK_RePack.Forms
             base.OnLoad(e);
         }
 
+        private void scaleFont()
+        {
+            float scaleFactor = 1;
+            //if (CoreSettings != null)
+            scaleFactor = CoreSettings.Default.ScaleFactorHack;
+
+            Font = new Font(Font.Name, 8.25f * scaleFactor, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
+            statusStrip.Font = Font;
+            menuStrip.Font = Font;
+        }
+
         private void GUI_Load(object sender, EventArgs e)
         {
             try
@@ -78,7 +90,7 @@ namespace GPK_RePack.Forms
                 //}
 
                 //nlog init
-                NLogConfig.SetDefaultConfig(NLogConfig.NlogFormConfig.WinForms);
+                NLogConfig.SetDefaultConfig();
                 logger = LogManager.GetLogger("GUI");
                 Debug.Assert(logger != null);
 
@@ -155,6 +167,7 @@ namespace GPK_RePack.Forms
 
             selectedExport = null;
             selectedPackage = null;
+            selectedImport = null;
             selectedClass = "";
             boxInfo.Text = "";
             boxGeneralButtons.Enabled = false;
@@ -183,7 +196,7 @@ namespace GPK_RePack.Forms
         }
 
 
-        public void PostUpdateResult(bool updateAvailable)
+        public void postUpdateResult(bool updateAvailable)
         {
             if (updateAvailable)
             {
@@ -204,7 +217,7 @@ namespace GPK_RePack.Forms
             }
             else
             {
-                files = MiscFuncs.GenerateOpenDialog(true, false);
+                files = MiscFuncs.GenerateOpenDialog(true, this, false);
             }
 
             if (files.Length == 0) return;
@@ -251,6 +264,7 @@ namespace GPK_RePack.Forms
             DrawPackages();
         }
 
+
         private void replaceSaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             bool save = false;
@@ -277,6 +291,8 @@ namespace GPK_RePack.Forms
                         }
                     }
                 }
+
+
             }
 
             if (!save)
@@ -463,13 +479,13 @@ namespace GPK_RePack.Forms
 
                         switch (CoreSettings.Default.ViewMode)
                         {
-                            case ViewMode.Normal:
+                            case "normal":
                                 if (nodeI == null)
                                     nodeI = nodeP.Nodes.Add("Imports");
 
                                 nodeI.Nodes.Add(key, value);
                                 break;
-                            case ViewMode.Class:
+                            case "class":
                                 CheckClassNode(tmp.Value.ClassName, classNodes, nodeP);
                                 classNodes[tmp.Value.ClassName].Nodes.Add(key, value);
                                 break;
@@ -487,17 +503,19 @@ namespace GPK_RePack.Forms
 
                     switch (CoreSettings.Default.ViewMode)
                     {
-                        case ViewMode.Normal:
+                        case "normal":
                             if (nodeE == null)
                                 nodeE = nodeP.Nodes.Add("Exports");
+
+
                             nodeE.Nodes.Add(key, value);
                             break;
-                        case ViewMode.Class:
+                        case "class":
                             CheckClassNode(tmp.Value.ClassName, classNodes, nodeP);
                             classNodes[tmp.Value.ClassName].Nodes.Add(key, value);
                             break;
 
-                        case ViewMode.Package:
+                        case "package":
                             CheckClassNode(tmp.Value.PackageName, classNodes, nodeP);
                             classNodes[tmp.Value.PackageName].Nodes.Add(key, value);
                             break;
@@ -551,6 +569,16 @@ namespace GPK_RePack.Forms
 
         }
 
+        private void treeMain_RefreshSelection()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => treeMain_RefreshSelection()));
+                return;
+            }
+
+            treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+        }
 
         private void treeMain_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -567,7 +595,7 @@ namespace GPK_RePack.Forms
                     selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Name)];
                     boxInfo.Text = selectedPackage.ToString();
                 }
-                else if (e.Node.Level == 1 && CoreSettings.Default.ViewMode == ViewMode.Class)
+                else if (e.Node.Level == 1 && CoreSettings.Default.ViewMode == "class")
                 {
                     selectedPackage = gpkStore.LoadedGpkPackages[Convert.ToInt32(e.Node.Parent.Name)];
                     selectedClass = e.Node.Text;
@@ -576,7 +604,8 @@ namespace GPK_RePack.Forms
                 }
 
                 //check if we have a leaf
-                else if (e.Node.Level == 2 && CoreSettings.Default.ViewMode == ViewMode.Normal || e.Node.Nodes.Count == 0)
+                else if (e.Node.Level == 2 && CoreSettings.Default.ViewMode == "normal" ||
+                     e.Node.Nodes.Count == 0)
                 {
                     GpkPackage package = gpkStore.LoadedGpkPackages[Convert.ToInt32(getRootNode().Name)];
                     Object selected = package.GetObjectByUID(e.Node.Name);
@@ -586,6 +615,8 @@ namespace GPK_RePack.Forms
                         GpkImport imp = (GpkImport)selected;
                         boxInfo.Text = imp.ToString();
 
+                        selectedImport = imp;
+                        selectedPackage = package;
                     }
                     else if (selected is GpkExport)
                     {
@@ -667,19 +698,8 @@ namespace GPK_RePack.Forms
                     }
                 }
             }
+
         }
-
-        private void scaleFont()
-        {
-            float scaleFactor = 1;
-            //if (CoreSettings != null)
-            scaleFactor = CoreSettings.Default.ScaleFactorHack;
-
-            Font = new Font(Font.Name, 8.25f * scaleFactor, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
-            statusStrip.Font = Font;
-            menuStrip.Font = Font;
-        }
-
 
         private void resizePiutureBox()
         {
@@ -788,7 +808,7 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            String[] files = MiscFuncs.GenerateOpenDialog(false);
+            String[] files = MiscFuncs.GenerateOpenDialog(false, this);
             if (files.Length == 0) return;
             string path = files[0];
 
@@ -913,20 +933,20 @@ namespace GPK_RePack.Forms
 
             switch (CoreSettings.Default.CopyMode)
             {
-                case CopyMode.All:
+                case "all":
                     DataTools.ReplaceAll(copyExport, selectedExport);
                     option = "everything";
                     break;
-                case CopyMode.DataProps:
+                case "dataprops":
                     DataTools.ReplaceProperties(copyExport, selectedExport);
                     DataTools.ReplaceData(copyExport, selectedExport);
                     option = "data and properties";
                     break;
-                case CopyMode.Data:
+                case "data":
                     DataTools.ReplaceData(copyExport, selectedExport);
                     option = "data";
                     break;
-                case CopyMode.Props:
+                case "props":
                     DataTools.ReplaceProperties(copyExport, selectedExport);
                     option = "properties";
                     break;
@@ -936,8 +956,10 @@ namespace GPK_RePack.Forms
 
             }
 
-            copyExport.GetDataSize();
-            treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+            selectedExport.GetDataSize();
+            selectedExport.motherPackage.CheckAllNamesInObjects();
+
+            treeMain_RefreshSelection();
             logger.Info("Pasted the {0} of {1} to {2}", option, copyExport.UID, selectedExport.UID);
         }
 
@@ -957,6 +979,7 @@ namespace GPK_RePack.Forms
             }
 
             selectedPackage.CopyObjectFromPackage(copyExport.UID, copyExport.motherPackage, true);
+            selectedPackage.CheckAllNamesInObjects();
 
             DrawPackages();
             logger.Info("Insert done");
@@ -982,11 +1005,8 @@ namespace GPK_RePack.Forms
             selectedExport.Payload = null;
             selectedExport.GetDataSize();
 
-            treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+            treeMain_RefreshSelection();
         }
-
-        #endregion
-
 
 
 
@@ -1024,6 +1044,9 @@ namespace GPK_RePack.Forms
                 case Keys.Control | Keys.Shift | Keys.P:
                     replaceSaveToolStripMenuItem_Click(null, null);
                     return true;
+                case Keys.Control | Keys.M:
+                    loadMappingToolStripMenuItem_Click(null, null);
+                    return true;
 
                 //TABS
                 case Keys.Control | Keys.D1:
@@ -1043,6 +1066,9 @@ namespace GPK_RePack.Forms
             // run base implementation
             return base.ProcessCmdKey(ref message, keys);
         }
+
+        #endregion
+
         #region image
 
 
@@ -1061,7 +1087,7 @@ namespace GPK_RePack.Forms
                 return;
             }
 
-            string[] files = MiscFuncs.GenerateOpenDialog(false);
+            string[] files = MiscFuncs.GenerateOpenDialog(false, this);
             if (files.Length == 0) return;
 
             if (files[0] != "" && File.Exists(files[0]))
@@ -1105,13 +1131,13 @@ namespace GPK_RePack.Forms
             {
                 if (selectedExport != null)
                 {
-                    String[] files = MiscFuncs.GenerateOpenDialog(false);
+                    String[] files = MiscFuncs.GenerateOpenDialog(false, this);
                     if (files.Length == 0) return;
 
                     if (File.Exists(files[0]))
                     {
                         SoundwaveTools.ImportOgg(selectedExport, files[0]);
-                        treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+                        treeMain_RefreshSelection();
                         logger.Info("Import successful.");
                     }
                     else
@@ -1209,7 +1235,7 @@ namespace GPK_RePack.Forms
             if (selectedExport != null)
             {
                 SoundwaveTools.ImportOgg(selectedExport, "fake");
-                treeMain_AfterSelect(treeMain, new TreeViewEventArgs(treeMain.SelectedNode));
+                treeMain_RefreshSelection();
             }
         }
 
@@ -1377,7 +1403,7 @@ namespace GPK_RePack.Forms
         {
             NLogConfig.DisableFormLogging();
 
-            string[] files = MiscFuncs.GenerateOpenDialog(true, true, "GPK (*.gpk;*.upk;*.gpk_rebuild)|*.gpk;*.upk;*.gpk_rebuild|All files (*.*)|*.*");
+            string[] files = MiscFuncs.GenerateOpenDialog(true, this, true, "GPK (*.gpk;*.upk;*.gpk_rebuild)|*.gpk;*.upk;*.gpk_rebuild|All files (*.*)|*.*");
             if (files.Length == 0) return;
 
             string outfile = MiscFuncs.GenerateSaveDialog("dump", ".txt");
@@ -1403,6 +1429,35 @@ namespace GPK_RePack.Forms
             {
                 NLogConfig.DisableFormLogging();
             }
+        }
+
+        private void renameObjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selectedExport == null && selectedImport == null)
+            {
+                logger.Info("Select a import or export to rename");
+            }
+
+            string input = Microsoft.VisualBasic.Interaction.InputBox("New name?", "Rename");
+            if (input != "")
+            {
+                if (selectedExport != null)
+                {
+                    selectedExport.ObjectName = input;
+
+                }
+                else if (selectedImport != null)
+                {
+                    selectedImport.ObjectName = input;
+                }
+
+                selectedPackage.CheckAllNamesInObjects();
+
+                //uid is not renamed to not break internal references. will be regenerated on a new load.
+                logger.Info($"Renamed object to the new name {input}. Experimental, stuff may break.");
+            }
+
+            DrawPackages();
         }
 
         #region search
@@ -1477,7 +1532,7 @@ namespace GPK_RePack.Forms
         #region composite gpk
         private void decryptionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string[] files = MiscFuncs.GenerateOpenDialog(false, true);
+            string[] files = MiscFuncs.GenerateOpenDialog(false, this, true);
             if (files.Length == 0) return;
 
             string outfile = MiscFuncs.GenerateSaveDialog("decrypt", ".txt");
@@ -1496,7 +1551,7 @@ namespace GPK_RePack.Forms
 
         private void datEncryptionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string[] files = MiscFuncs.GenerateOpenDialog(false, true);
+            string[] files = MiscFuncs.GenerateOpenDialog(false, this, true);
             if (files.Length == 0) return;
 
             string outfile = MiscFuncs.GenerateSaveDialog("encrypt", ".txt");
@@ -2030,7 +2085,7 @@ namespace GPK_RePack.Forms
         {
             if (arrayProp == null) return;
 
-            String[] files = MiscFuncs.GenerateOpenDialog(false);
+            String[] files = MiscFuncs.GenerateOpenDialog(false, this);
             if (files.Length == 0) return;
             string path = files[0];
             if (!File.Exists(path)) return;
@@ -2109,14 +2164,12 @@ namespace GPK_RePack.Forms
         #endregion
 
         #region context menu 
-
-        string clickedNode;
         private void treeMain_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
                 treeMain.SelectedNode = e.Node;
-                clickedNode = e.Node.Name;
+                string clickedNode = e.Node.Name;
                 treeContextMenu.Show(treeMain, e.Location);
             }
         }
@@ -2150,6 +2203,10 @@ namespace GPK_RePack.Forms
                 else if (e.ClickedItem == pasteToolStripMenuItem)
                 {
                     btnPaste_Click(null, null);
+                }
+                else if (e.ClickedItem == tryToLoadCompositeDataToolStripMenuItem)
+                {
+                    LoadCompositeDataForSelectedExport();
                 }
 
                 //import
@@ -2213,26 +2270,75 @@ namespace GPK_RePack.Forms
         }
 
 
+        private void tryToLoadAllExportDataFromCompositeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!PackageSelected())
+            {
+                return;
+            }
 
+            foreach (GpkExport export in selectedPackage.ExportList.Values)
+            {
+                LoadCompositeDataForExport(export);
+            }
+        }
 
+        private void LoadCompositeDataForSelectedExport()
+        {
+            if (!ExportSelected())
+            {
+                return;
+            }
 
+            LoadCompositeDataForExport(selectedExport);
+        }
+        private void LoadCompositeDataForExport(GpkExport export)
+        {
 
+            //strat. find new name in pkgmapper, find comp entry in compmapper, load composite
+            //hook adding of composite, replace all data and popoup a message
 
+            string redirectUID = gpkStore.FindObjectMapperEntryForObjectname(export.GetNormalizedUID());
+            var compEntry = gpkStore.FindCompositeMapEntriesForCompID(redirectUID);
+            if (compEntry == null)
+                return;
 
+            logger.Info($"Trying to load GPK {compEntry.SubGPKName} for Object {compEntry.CompositeUID}");
 
+            string path = string.Format("{0}{1}.gpk", gpkStore.BaseSearchPath, compEntry.SubGPKName);
 
+            if (!File.Exists(path))
+            {
+                logger.Info("GPK to load not found");
+                return;
+            }
 
+            new Task(() =>
+            {
+                var gpk = gpkStore.loadSubGpk(path, compEntry);
 
+                var obj = gpk.GetObjectByUID(compEntry.GetObjectName());
+                if (!(obj is GpkExport))
+                {
+                    logger.Error("Somehow found obj is not a export");
+                    return;
+                }
+                var exportObj = (GpkExport)obj;
 
+                logger.Info($"Found something! Data to import is in {exportObj.UID}");
 
+                DataTools.ReplaceAll(exportObj, export);
 
+                export.GetDataSize();
+                export.motherPackage.CheckAllNamesInObjects();
 
-
-
+                logger.Info("Done, succesfully imported composite data!");
+            }).Start();
+        }
 
         #endregion
 
-
+   
     }
 }
 

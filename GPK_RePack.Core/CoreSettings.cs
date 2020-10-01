@@ -27,7 +27,7 @@ namespace GPK_RePack.Core
         [JsonIgnore]
         public static CoreSettings Default { get; private set; }
 
-        public CopyMode CopyMode { get; set; } = CopyMode.DataProps;
+        public CopyMode CopyMode { get; set; } = CopyMode.All;
         public string LogLevel { get; set; } = "info";
         public bool Debug { get; set; } = false;
         public ViewMode ViewMode { get; set; } = ViewMode.Class;

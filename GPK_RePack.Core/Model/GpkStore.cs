@@ -46,18 +46,19 @@ namespace GPK_RePack.Core.Model
                 PackagesChanged();
         }
 
-        public void loadSubGpk(string path, CompositeMapEntry entry)
+        public GpkPackage loadSubGpk(string path, CompositeMapEntry entry)
         {
             var reader = new Reader();
             var gpk = reader.ReadSubGpkFromComposite(path, entry.UID, entry.FileOffset, entry.FileLength);
             if (gpk == null)
-                return;
+                return null;
 
             gpk.CompositeGpk = true;
             gpk.CompositeEntry = entry;
             LoadedGpkPackages.Add(gpk);
 
             PackagesChanged();
+            return gpk;
         }
 
         public void SaveGpkListToFiles(List<GpkPackage> saveList, bool usePadding, bool patchComposite, bool addComposite, List<IProgress> runningSavers, List<Task> runningTasks)
@@ -258,6 +259,23 @@ namespace GPK_RePack.Core.Model
             }
 
             return returnList;
+        }
+
+
+        public CompositeMapEntry FindCompositeMapEntriesForCompID(string compID)
+        {
+            foreach (var fileName in CompositeMap.Keys)
+            {
+                foreach (var entry in CompositeMap[fileName])
+                {
+                    if (entry.CompositeUID == compID)
+                    {
+                        return entry;
+                    }
+                }
+            }
+
+            return null;
         }
 
         public string FindObjectMapperEntryForObjectname(string objectUID)

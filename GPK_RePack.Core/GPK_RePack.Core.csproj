@@ -53,7 +53,6 @@
       <HintPath>..\packages\NVorbis.0.10.1\lib\net45\NVorbis.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
@@ -92,9 +91,6 @@
     <Compile Include="Editors\DataTools.cs" />
     <Compile Include="Editors\SoundwaveTools.cs" />
     <Compile Include="Editors\TextureTools.cs" />
-    <Compile Include="Helper\WpfRichTextBoxRowColoringRule.cs" />
-    <Compile Include="Helper\WpfRichTextBoxTarget.cs" />
-    <Compile Include="Helper\WpfRichTextBoxWordColoringRule.cs" />
     <Compile Include="IO\MapperTools.cs" />
     <Compile Include="IO\MassDumper.cs" />
     <Compile Include="IO\Reader.cs" />
@@ -122,6 +118,7 @@
     <Compile Include="Model\Payload\CompressionTypes.cs" />
     <Compile Include="Model\Payload\MipMap.cs" />
     <Compile Include="Model\Payload\ObjectRedirector.cs" />
+    <Compile Include="Model\Payload\GfxMovieInfo.cs" />
     <Compile Include="Model\Payload\ObjectReferencer.cs" />
     <Compile Include="Model\Payload\SoundCue.cs" />
     <Compile Include="Model\Payload\SoundCueObject.cs" />
@@ -141,8 +138,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceExtractor.cs" />
     <Compile Include="CoreSettings.cs" />
-    <Compile Include="Updater\UpdateCheck.cs" />
-    <Compile Include="Updater\IUpdaterCheckCallback.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\lzo64\Lzo64.csproj">
@@ -171,9 +166,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="FodyWeavers.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Helper\README_NLog_WpfRichTextBox.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

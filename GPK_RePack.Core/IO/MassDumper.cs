@@ -26,8 +26,6 @@ namespace GPK_RePack.Core.IO
         {
             try
             {
-
-
                 if (gpkFiles.Length == 0) return;
 
                 DateTime start = DateTime.Now;

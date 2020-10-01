@@ -269,7 +269,7 @@ namespace GPK_RePack.Core.IO
 
                         var tmp = new CompositeMapEntry();
                         tmp.CompositeUID = split[0];
-                        tmp.UnknownUID = split[1];
+                        tmp.CompPackageName = split[1];
                         tmp.FileOffset = Convert.ToInt32(split[2]);
                         tmp.FileLength = Convert.ToInt32(split[3]);
 
@@ -350,7 +350,7 @@ namespace GPK_RePack.Core.IO
                     foreach (var entry in store.CompositeMap[fileName])
                     {
                         writer.Append(entry.CompositeUID + ",");
-                        writer.Append(entry.UnknownUID + ",");
+                        writer.Append(entry.CompPackageName + ",");
                         writer.Append(entry.FileOffset + ",");
                         writer.Append(entry.FileLength + ",");
                         writer.Append("|");
