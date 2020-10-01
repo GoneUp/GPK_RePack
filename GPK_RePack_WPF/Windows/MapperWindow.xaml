@@ -5,8 +5,103 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GPK_RePack_WPF.Windows"
         mc:Ignorable="d"
-        Title="MapperWindow" Height="450" Width="800">
+        BorderThickness="1"
+        WindowStartupLocation="CenterScreen"
+        BorderBrush="{StaticResource BorderBrush}"
+        UseLayoutRounding="True"
+        Background="{StaticResource BackgroundBrush}"
+
+        Title="Tera Helper 2 - Mapper view" Height="450" Width="800" d:DataContext="{d:DesignInstance local:MapperViewModel}">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="7 3 7 7"
+                      GlassFrameThickness="0 0 0 1"
+                      CornerRadius="0" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+    <HierarchicalDataTemplate x:Key="TreeViewItemDataTemplate" ItemsSource="{Binding SubGpkList}" DataType="local:CompositeMapEntryViewModel">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Path Stretch="Uniform"
+                  x:Name="Icon"
+                  Width="12"
+                  Height="12"
+                  Margin="2 2 6 2">
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Setter Property="Data" Value="{StaticResource SvgPackage}" />
+                        <Setter Property="Fill" Value="{StaticResource RedBrush}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSubGpk}" Value="True">
+                                <Setter Property="Fill" Value="{StaticResource AccentBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+
+                    </Style>
+                </Path.Style>
+            </Path>
+            <TextBlock Text="{Binding UID}" 
+                  Foreground="White"
+
+                  Grid.Column="1"/>
+
+</Grid>
+    </HierarchicalDataTemplate>
+</Window.Resources>
+        <Grid>
     <Grid>
-        
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="26"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <!--Title bar-->
+            <Grid MouseLeftButtonDown="Drag" Background="{StaticResource BackgroundBrush}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="26" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--Window icon-->
+                <Path Style="{StaticResource TitleBarButtonContentStyle}"
+                  Data="{StaticResource SvgAddCircle}"
+                  Fill="{StaticResource AccentBrush}"
+                  VerticalAlignment="Center"
+                  Width="16" Height="16" />
+                <!--Window title-->
+                <TextBlock VerticalAlignment="Center"
+                       Text="Tera Helper 2 - Mapper view"
+                       Margin="10 0"
+                       Grid.Column="1" Foreground="#4fff"
+                       FontSize="13" />
+                <!--Minimize-->
+                <Button Style="{StaticResource TitleBarButtonStyle}" Grid.Column="3"
+                    Command="{Binding MinimizeCommand, RelativeSource={RelativeSource AncestorType=local:MapperWindow}}">
+                    <Path Style="{StaticResource TitleBarButtonContentStyle}" Data="{StaticResource SvgMinimize}" />
+                </Button>
+                <!--Close-->
+                <Button Style="{StaticResource TitleBarButtonStyle}" Grid.Column="4"
+                    Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=local:MapperWindow}}">
+                    <Path Style="{StaticResource TitleBarButtonContentStyle}" Data="{StaticResource SvgClose}"
+                      Fill="{StaticResource RedBrush}" />
+                </Button>
+            </Grid>
+            <!--Window content-->
+
+            <TreeView ItemsSource="{Binding GpkListView}"
+                      Background="{StaticResource BackgroundBrushDark}"
+                      BorderBrush="{StaticResource BorderBrush}"
+                      FocusVisualStyle="{StaticResource EmptyFocusVisual}"
+                      BorderThickness="1"
+                      Grid.Row="1"
+                      ItemTemplate="{StaticResource TreeViewItemDataTemplate}"/>
+        </Grid>
     </Grid>
 </Window>

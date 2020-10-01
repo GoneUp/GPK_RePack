@@ -160,21 +160,7 @@
             </Setter>
         </Style>
 
-        <Style x:Key="TitleBarButtonContentStyle" TargetType="Path">
-            <Setter Property="Width" Value="14" />
-            <Setter Property="Height" Value="14" />
-            <Setter Property="Fill" Value="White" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="Stretch" Value="Uniform" />
 
-        </Style>
-        <Style x:Key="TitleBarButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonMainStyle}">
-            <Setter Property="Width" Value="40" />
-            <Setter Property="Height" Value="26" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Cursor" Value="Arrow" />
-        </Style>
 
         <Style x:Key="TreeViewItemContainerStyle" TargetType="TreeViewItem">
             <Setter Property="Padding" Value="4 2" />
@@ -305,7 +291,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <!--Title bar-->
-        <Grid MouseLeftButtonDown="Drag" Background="{StaticResource BackgroundBrushDark}">
+        <Grid MouseLeftButtonDown="Drag" Background="{StaticResource BackgroundBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="26" />
                 <ColumnDefinition Width="Auto" />

@@ -40,6 +40,22 @@
     <PathGeometry x:Key="SvgSaveAll">M17,7V3H7V7H17M14,17A3,3 0 0,0 17,14A3,3 0 0,0 14,11A3,3 0 0,0 11,14A3,3 0 0,0 14,17M19,1L23,5V17A2,2 0 0,1 21,19H7C5.89,19 5,18.1 5,17V3A2,2 0 0,1 7,1H19M1,7H3V21H17V23H3A2,2 0 0,1 1,21V7Z</PathGeometry>
 
 
+    <Style x:Key="TitleBarButtonContentStyle" TargetType="Path">
+        <Setter Property="Width" Value="14" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Fill" Value="White" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Stretch" Value="Uniform" />
+
+    </Style>
+    <Style x:Key="TitleBarButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonMainStyle}">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+
     <!--Scrollbar Thumbs-->
     <Style x:Key="ScrollThumbs" TargetType="{x:Type Thumb}">
         <Setter Property="Template">
