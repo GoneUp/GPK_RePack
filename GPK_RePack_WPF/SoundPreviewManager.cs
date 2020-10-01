@@ -52,9 +52,10 @@ namespace GPK_RePack_WPF
                 var setMs = (value / 1000D) * totalMs;
                 if (setMs < totalMs)
                 {
+                    var wasPlaying = _waveOut.PlaybackState == PlaybackState.Playing;
                     _waveOut.Pause();
                     _waveReader.CurrentTime = TimeSpan.FromMilliseconds(setMs);
-                    _waveOut.Play();
+                    if(wasPlaying) _waveOut.Play();
                 }
                 else
                 {
