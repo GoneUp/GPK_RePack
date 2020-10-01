@@ -6,6 +6,7 @@
         xmlns:wpf="clr-namespace:GPK_RePack_WPF"
         xmlns:controls="clr-namespace:GPK_RePack_WPF.Controls"
         xmlns:windows="clr-namespace:GPK_RePack_WPF.Windows"
+        xmlns:extensions="clr-namespace:Nostrum.Extensions;assembly=Nostrum"
         WindowStyle="SingleBorderWindow"
         BorderThickness="1"
         WindowStartupLocation="CenterScreen"
@@ -20,22 +21,16 @@
         d:DataContext="{d:DesignInstance wpf:MainViewModel}">
     <Window.InputBindings>
         <KeyBinding Command="{Binding OpenCommand}" Modifiers="Control" Key="O" />
-        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="S"
-                    CommandParameter="{x:Static wpf:SaveMode.Rebuild}" />
-        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="P"
-                    CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}" />
-        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control+Shift" Key="P"
-                    CommandParameter="{x:Static wpf:SaveMode.Patched}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="S" CommandParameter="{x:Static wpf:SaveMode.Rebuild}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="P" CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control+Shift" Key="P" CommandParameter="{x:Static wpf:SaveMode.Patched}" />
 
         <KeyBinding Command="{Binding RefreshCommand}" Modifiers="Control" Key="R" />
         <KeyBinding Command="{Binding ClearCommand}" Modifiers="Control" Key="N" />
 
-        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D1"
-                    CommandParameter="{x:Static wpf:Tab.Info}" />
-        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D2"
-                    CommandParameter="{x:Static wpf:Tab.Properties}" />
-        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D3"
-                    CommandParameter="{x:Static wpf:Tab.Texture}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D1" CommandParameter="{x:Static wpf:Tab.Info}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D2" CommandParameter="{x:Static wpf:Tab.Properties}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D3" CommandParameter="{x:Static wpf:Tab.Texture}" />
 
         <KeyBinding Command="{Binding LoadMappingCommand}" Modifiers="Control" Key="M" />
 
@@ -43,12 +38,10 @@
         <KeyBinding Command="{Binding SearchNextCommand}" Modifiers="Shift" Key="F3" CommandParameter="True" />
         <KeyBinding Command="{Binding SearchNextCommand}" Key="F3" CommandParameter="False" />
 
-        <KeyBinding
-            Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
-            Modifiers="Ctrl+Alt" Key="S" />
-        <!--todo-->
-        <KeyBinding Modifiers="Control" Key="F" />
-        <KeyBinding Key="F3" />
+        <KeyBinding Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}" Modifiers="Ctrl+Alt" Key="S" />
+        <KeyBinding Modifiers="Control" Key="F" Command="{Binding SearchCommand}"/>
+        <KeyBinding Key="F3" Command="{Binding SearchNextCommand}"/>
+        <KeyBinding Modifiers="Shift" Key="F3" Command="{Binding SearchNextCommand}" CommandParameter="True"/>
 
     </Window.InputBindings>
     <Window.Style>
@@ -212,11 +205,12 @@
                         <MenuItem x:Name="ImportDdsBtn" Header="Import DDS" Command="{Binding MainVM.ImportDDSCommand}"
                                   Visibility="Collapsed" />
                         <MenuItem x:Name="CopyBtn" Header="Copy" Command="{Binding MainVM.CopyObjectCommand}" />
-                        <MenuItem x:Name="PasteBtn" Header="Paste/Replace"
-                                  Command="{Binding MainVM.PasteObjectCommand}" />
-                        <MenuItem x:Name="InsertBtn" Header="Insert" Command="{Binding MainVM.InsertObjectCommand}"
+                        <MenuItem x:Name="PasteBtn" Header="Replace" Command="{Binding MainVM.PasteObjectCommand}" />
+                        <MenuItem x:Name="LoadCompDataBtn" Header="Try to load composite data" Command="{Binding MainVM.LoadCompositeDataForSelectedExportCommand}" />
+                        <MenuItem x:Name="InsertBtn" Header="Insert as new Export" Command="{Binding MainVM.InsertObjectCommand}"
                                   Visibility="Collapsed" />
                         <MenuItem x:Name="RemoveBtn" Header="Remove" Command="{Binding MainVM.RemoveObjectCommand}" />
+                        <MenuItem x:Name="RenameBtn" Header="Rename" Command="{Binding MainVM.RenameObjectCommand}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <Grid.ColumnDefinitions>
@@ -268,7 +262,9 @@
                     <Setter TargetName="ExportRawBtn" Property="Visibility" Value="Collapsed" />
                     <Setter TargetName="CopyBtn" Property="Visibility" Value="Collapsed" />
                     <Setter TargetName="PasteBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="LoadCompDataBtn" Property="Visibility" Value="Collapsed" />
                     <Setter TargetName="RemoveBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="RenameBtn" Property="Visibility" Value="Collapsed" />
                     <Setter TargetName="DeleteDataBtn" Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Class}" Value="Core.Texture2D">
@@ -281,7 +277,9 @@
                     <Setter TargetName="InsertBtn" Property="Visibility" Value="Visible" />
                     <Setter TargetName="CopyBtn" Property="Visibility" Value="Collapsed" />
                     <Setter TargetName="PasteBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="LoadCompDataBtn" Property="Visibility" Value="Collapsed" />
                     <Setter TargetName="RemoveBtn" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="RenameBtn" Property="Visibility" Value="Visible" />
                     <Setter TargetName="SaveGpkBtn" Property="Visibility" Value="Visible" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Class}" Value="Core.SoundNodeWave">
@@ -402,6 +400,7 @@
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
                     <MenuItem Header="Minimize selected GPK" Command="{Binding MinimizeGpkCommand}" />
+                    <MenuItem Header="Try to load all export data from composite" Command="{Binding TryToLoadAllExportDataFromCompositeCommand}" />
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
@@ -419,6 +418,7 @@
                     <MenuItem Header="Export big ByteProp" Command="{Binding BigBytePropExportCommand}" />
                     <MenuItem Header="Import big ByteProp" Command="{Binding BigBytePropImportCommand}" />
                     <MenuItem Header="Add name" Command="{Binding AddNameCommand}" />
+                    <MenuItem Header="Rename object" Command="{Binding RenameObjectCommand}" />
                     <MenuItem Header="Dump GPK headers" Command="{Binding DumpGPKObjectsCommand}" />
                     <MenuItem Header="Log to textbox" IsCheckable="True" IsChecked="{Binding LogToUI, Mode=TwoWay}" />
 
@@ -718,8 +718,7 @@
                      Text="{Binding LogText, Mode=OneWay}"
                      Foreground="#fff"
                      Padding="2"
-                     controls:TextBoxExtensions.AutoScrollEnabled="true"
-
+                     extensions:TextBoxExtensions.AutoScrollEnabled="true"
                      BorderBrush="{StaticResource BorderBrush}"
                      Background="{StaticResource BackgroundBrushDark}"
                      IsReadOnly="True" />

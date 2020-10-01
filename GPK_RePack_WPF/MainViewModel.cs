@@ -8,7 +8,6 @@ using GPK_RePack.Core.Model.Payload;
 using GPK_RePack.Core.Model.Prop;
 using GPK_RePack.Core.Updater;
 using GPK_RePack_WPF.Windows;
-using NAudio.Vorbis;
 using NAudio.Wave;
 using NLog;
 using Nostrum;
@@ -25,37 +24,23 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using UpkManager.Dds;
-using WaveFormRendererLib;
 using Clipboard = System.Windows.Clipboard;
 using DataFormats = System.Windows.Forms.DataFormats;
-using Image = System.Drawing.Image;
 using Size = System.Windows.Size;
 
 namespace GPK_RePack_WPF
 {
 
-    public static class ColorExtensions
-    {
-        public static System.Windows.Media.Color ToMediaColor(this System.Drawing.Color color)
-        {
-            return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
-        }
-        public static System.Drawing.Color ToDrawingColor(this System.Windows.Media.Color color)
-        {
-            return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
-        }
-    }
-
     public class MainViewModel : TSPropertyChanged, IUpdaterCheckCallback, IDisposable
     {
+        #region Properties
         // not actually a singleton, just a reference for contextmenu command binding
         public static MainViewModel Instance { get; private set; }
 
-        //todo: turn this into an enum
-        public static List<string> PropertyTypes = new List<string>
+        // ReSharper disable once CollectionNeverQueried.Global
+        public static readonly List<string> PropertyTypes = new List<string>
         {
             "ArrayProperty",
             "BoolProperty",
@@ -67,30 +52,37 @@ namespace GPK_RePack_WPF
             "StrProperty",
             "StructProperty"
         };
-        private readonly DataFormats.Format exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
 
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        private readonly LogBuffer _logBuffer;
+        private readonly DataFormats.Format _exportFormat = DataFormats.GetFormat(typeof(GpkExport).FullName);
         private readonly Logger _logger;
         private readonly GpkStore _gpkStore;
         private List<GpkExport>[] _changedExports;
         private GpkPackage _selectedPackage;
         private GpkExport _selectedExport;
+        private GpkImport _selectedImport;
         private string _selectedClass = "";
+        private PropertyViewModel _selectedProperty;
 
         private bool _isTextureTabVisible;
         private bool _isSoundTabVisible;
         private string _logText;
         private string _statusBarText;
         private string _infoText;
-        private string _oggPreviewButtonText;
         private bool _generalButtonsEnabled;
         private bool _dataButtonsEnabled;
         private int _progressValue;
-        private readonly LogBuffer _logBuffer;
         private Tab _selectedTab = 0;
-        private PropertyViewModel _selectedProperty;
+        
+        private ImageSource _previewImage;
+        private string _previewImageFormat;
+        private string _previewImageName;
+
+        private readonly List<GpkTreeNode> _searchResultNodes;
+        private int _searchResultIndex;
+
         public SoundPreviewManager SoundPreviewManager { get; }
-
-
         public bool LogToUI
         {
             get => CoreSettings.Default.LogToUI;
@@ -219,13 +211,8 @@ namespace GPK_RePack_WPF
                 N();
             }
         }
-
-        //todo: move preview image stuff to its own class ?
-        #region PreviewImage
-        private ImageSource _previewImage;
-        private string _previewImageFormat;
-        private string _previewImageName;
-
+        public TSObservableCollection<PropertyViewModel> Properties { get; }
+        public GpkTreeNode SelectedNode { get; set; }
         public ImageSource PreviewImage
         {
             get => _previewImage;
@@ -256,61 +243,6 @@ namespace GPK_RePack_WPF
                 N();
             }
         }
-
-        #endregion
-
-        #region Commands
-        public ICommand OpenCommand { get; }
-        public ICommand ClearCommand { get; }
-        public ICommand SaveCommand { get; }
-        public ICommand RefreshCommand { get; }
-
-        public ICommand SwitchTabCommand { get; }
-
-        public ICommand SavePropertiesCommand { get; }
-        public ICommand ClearPropertiesCommand { get; }
-        public ICommand ExportPropertiesToCsvCommand { get; }
-
-        public ICommand ExportRawDataCommand { get; }
-        public ICommand ImportRawDataCommand { get; }
-        public ICommand RemoveObjectCommand { get; }
-        public ICommand CopyObjectCommand { get; }
-        public ICommand PasteObjectCommand { get; }
-        public ICommand InsertObjectCommand { get; }
-        public ICommand DeleteDataCommand { get; }
-        public ICommand SaveSingleGpkCommand { get; }
-        public ICommand PatchObjectMapperForSelectedPackageCommand { get; }
-
-        public ICommand ExportDDSCommand { get; }
-        public ICommand ImportDDSCommand { get; }
-        public ICommand ExportOGGCommand { get; }
-        public ICommand ImportOGGCommand { get; }
-        public ICommand AddEmptyOGGCommand { get; }
-
-        public ICommand DecryptDatCommand { get; }
-        public ICommand EncryptDatCommand { get; }
-        public ICommand LoadMappingCommand { get; }
-        public ICommand WriteMappingCommand { get; }
-        public ICommand DumpAllTexturesCommand { get; }
-        public ICommand DumpIconsCommand { get; }
-        public ICommand DumpGPKObjectsCommand { get; }
-        public ICommand MinimizeGpkCommand { get; }
-
-        public ICommand SetPropsCustomCommand { get; }
-        public ICommand SetFileSizeCommand { get; }
-        public ICommand SetVolumeMultipliersCommand { get; }
-        public ICommand AddNameCommand { get; }
-        public ICommand BigBytePropImportCommand { get; }
-        public ICommand BigBytePropExportCommand { get; }
-
-        public ICommand SearchCommand { get; }
-        public ICommand SearchNextCommand { get; }
-
-        public ICommand PlayStopSoundCommand { get; }
-
-        #endregion
-
-
         #region WindowParameters
 
         public GridLength LogSize
@@ -369,6 +301,64 @@ namespace GPK_RePack_WPF
         }
 
         #endregion
+        #endregion
+
+        #region Commands
+        public ICommand OpenCommand { get; }
+        public ICommand ClearCommand { get; }
+        public ICommand SaveCommand { get; }
+        public ICommand RefreshCommand { get; }
+
+        public ICommand SwitchTabCommand { get; }
+
+        public ICommand SavePropertiesCommand { get; }
+        public ICommand ClearPropertiesCommand { get; }
+        public ICommand ExportPropertiesToCsvCommand { get; }
+
+        public ICommand ExportRawDataCommand { get; }
+        public ICommand ImportRawDataCommand { get; }
+        public ICommand RemoveObjectCommand { get; }
+        public ICommand CopyObjectCommand { get; }
+        public ICommand PasteObjectCommand { get; }
+        public ICommand InsertObjectCommand { get; }
+        public ICommand DeleteDataCommand { get; }
+        public ICommand SaveSingleGpkCommand { get; }
+        public ICommand PatchObjectMapperForSelectedPackageCommand { get; }
+
+        public ICommand ExportDDSCommand { get; }
+        public ICommand ImportDDSCommand { get; }
+        public ICommand ExportOGGCommand { get; }
+        public ICommand ImportOGGCommand { get; }
+        //todo
+        public ICommand AddEmptyOGGCommand { get; } 
+
+        public ICommand DecryptDatCommand { get; }
+        public ICommand EncryptDatCommand { get; }
+        public ICommand LoadMappingCommand { get; }
+        public ICommand WriteMappingCommand { get; }
+        public ICommand DumpAllTexturesCommand { get; }
+        public ICommand DumpIconsCommand { get; }
+        public ICommand DumpGPKObjectsCommand { get; }
+        public ICommand MinimizeGpkCommand { get; }
+
+        public ICommand SetPropsCustomCommand { get; }
+        public ICommand SetFileSizeCommand { get; }
+        public ICommand SetVolumeMultipliersCommand { get; }
+        public ICommand AddNameCommand { get; }
+        public ICommand RenameObjectCommand { get; }
+        public ICommand BigBytePropImportCommand { get; }
+        public ICommand BigBytePropExportCommand { get; }
+
+        public ICommand SearchCommand { get; }
+        public ICommand SearchNextCommand { get; }
+
+        public ICommand PlayStopSoundCommand { get; }
+
+        public ICommand TryToLoadAllExportDataFromCompositeCommand { get; }
+        public ICommand LoadCompositeDataForSelectedExportCommand { get; }
+
+        #endregion
+
         public MainViewModel()
         {
             Dispatcher = Dispatcher.CurrentDispatcher;
@@ -385,7 +375,7 @@ namespace GPK_RePack_WPF
             //
             UpdateCheck.checkForUpdate(this);
             _gpkStore = new GpkStore();
-            _gpkStore.PackagesChanged += OnPackagesChanged;
+            //_gpkStore.PackagesChanged += OnPackagesChanged;
             TreeMain = new GpkTreeNode("");
             Properties = new TSObservableCollection<PropertyViewModel>();
             _searchResultNodes = new List<GpkTreeNode>();
@@ -409,8 +399,8 @@ namespace GPK_RePack_WPF
             }
 
             //commands
-            OpenCommand = new RelayCommand<string[]>(Open, checkParamType: false);
-            SaveCommand = new RelayCommand<SaveMode>(Save, checkParamType: false);
+            OpenCommand = new RelayCommand<string[]>(Open);
+            SaveCommand = new RelayCommand<SaveMode>(Save);
 
             PatchObjectMapperForSelectedPackageCommand = new RelayCommand(PatchObjectMapperForSelectedPackage);
 
@@ -452,6 +442,7 @@ namespace GPK_RePack_WPF
             SetFileSizeCommand = new RelayCommand(SetFileSize);
             SetVolumeMultipliersCommand = new RelayCommand(SetVolumeMultipliers);
             AddNameCommand = new RelayCommand(AddName);
+            RenameObjectCommand = new RelayCommand(RenameObject);
 
             BigBytePropImportCommand = new RelayCommand(BigBytePropImport);
             BigBytePropExportCommand = new RelayCommand(BigBytePropExport);
@@ -460,13 +451,30 @@ namespace GPK_RePack_WPF
             SearchNextCommand = new RelayCommand(prev => SelectNextSearchResult());
 
             PlayStopSoundCommand = new RelayCommand(PlayStopSound);
-        }
 
+            TryToLoadAllExportDataFromCompositeCommand = new RelayCommand(TryToLoadAllExportDataFromComposite);
+            LoadCompositeDataForSelectedExportCommand = new RelayCommand(LoadCompositeDataForSelectedExport);
+        }
 
         private void GotoTab(Tab tab)
         {
-            if (!IsTextureTabVisible && tab == Tab.Texture) return;
-            SelectedTabIndex = (int)tab;
+            switch (tab)
+            {
+                case Tab.Texture:
+                case Tab.Sound:
+                    if (IsSoundTabVisible)
+                    {
+                        SelectedTabIndex = (int)Tab.Sound;
+                    }
+                    else if (IsTextureTabVisible)
+                    {
+                        SelectedTabIndex = (int)Tab.Texture;
+                    }
+                    break;
+                default: 
+                    SelectedTabIndex = (int)tab; 
+                    break;
+            }
         }
 
         private void Refresh()
@@ -667,10 +675,6 @@ namespace GPK_RePack_WPF
                 StatusBarText = "Ready";
             }
         }
-        private void OnPackagesChanged()
-        {
-
-        }
         public void PostUpdateResult(bool updateAvailable)
         {
             if (updateAvailable)
@@ -684,6 +688,7 @@ namespace GPK_RePack_WPF
         }
         private void Reset()
         {
+            _selectedImport = null;
             _selectedExport = null;
             _selectedPackage = null;
             SelectedNode = null;
@@ -848,6 +853,8 @@ namespace GPK_RePack_WPF
                 if (selected is GpkImport imp)
                 {
                     InfoText = imp.ToString();
+                    _selectedImport = imp;
+                    _selectedPackage = package;
                 }
                 else if (selected is GpkExport exp)
                 {
@@ -908,8 +915,6 @@ namespace GPK_RePack_WPF
                 SoundPreviewManager.ResetOggPreview();
             }
         }
-        public TSObservableCollection<PropertyViewModel> Properties { get; }
-        public GpkTreeNode SelectedNode { get; set; }
 
 
         private void SaveSingleGpk()
@@ -1265,7 +1270,7 @@ namespace GPK_RePack_WPF
                 return;
             }
 
-            Clipboard.SetData(exportFormat.Name, _selectedExport);
+            Clipboard.SetData(_exportFormat.Name, _selectedExport);
             _logger.Info("Made a copy of {0}...", _selectedExport.UID);
         }
         private void PasteObject()
@@ -1275,7 +1280,7 @@ namespace GPK_RePack_WPF
                 _logger.Trace("no selected export");
                 return;
             }
-            var copyExport = (GpkExport)Clipboard.GetData(exportFormat.Name);
+            var copyExport = (GpkExport)Clipboard.GetData(_exportFormat.Name);
 
             if (copyExport == null)
             {
@@ -1311,7 +1316,9 @@ namespace GPK_RePack_WPF
 
             }
 
-            copyExport.GetDataSize();
+            _selectedExport.GetDataSize();
+            _selectedExport.motherPackage.CheckAllNamesInObjects();
+
             SelectNode(SelectedNode);
             _logger.Info("Pasted the {0} of {1} to {2}", option, copyExport.UID, _selectedExport.UID);
         }
@@ -1322,7 +1329,7 @@ namespace GPK_RePack_WPF
                 _logger.Trace("no selected package to insert");
                 return;
             }
-            var copyExport = (GpkExport)Clipboard.GetData(exportFormat.Name);
+            var copyExport = (GpkExport)Clipboard.GetData(_exportFormat.Name);
 
             if (copyExport == null)
             {
@@ -1331,6 +1338,7 @@ namespace GPK_RePack_WPF
             }
 
             _selectedPackage.CopyObjectFromPackage(copyExport.UID, copyExport.motherPackage, true);
+            _selectedPackage.CheckAllNamesInObjects();
 
             RedrawPackage(TreeMain.Children.FirstOrDefault(p => p.SourcePackage == _selectedPackage));
             _logger.Info("Insert done");
@@ -1440,6 +1448,35 @@ namespace GPK_RePack_WPF
             _selectedExport.GetDataSize();
 
             SelectNode(SelectedNode);
+        }
+        private void RenameObject()
+        {
+            //todo: rename directly in tree too?
+            if (_selectedExport == null && _selectedImport == null)
+            {
+                _logger.Info("Select an import or export to rename");
+            }
+
+            var input = new InputBoxWindow("New name?").ShowDialog();
+            if (input != "")
+            {
+                if (_selectedExport != null)
+                {
+                    _selectedExport.ObjectName = input;
+
+                }
+                else if (_selectedImport != null)
+                {
+                    _selectedImport.ObjectName = input;
+                }
+
+                _selectedPackage.CheckAllNamesInObjects();
+
+                //uid is not renamed to not break internal references. will be regenerated on a new load.
+                _logger.Info($"Renamed object to the new name {input}. Experimental, stuff may break.");
+            }
+
+            DrawPackages();
         }
 
         private void ImportDDS()
@@ -1604,26 +1641,24 @@ namespace GPK_RePack_WPF
             }
         }
 
-
         private void PatchObjectMapperForSelectedPackage()
         {
             if (!IsPackageSelected()) return;
 
             _gpkStore.MultiPatchObjectMapper(_selectedPackage, CoreSettings.Default.CookedPCPath);
         }
-
-
         private void PlayStopSound()
         {
             try
             {
-                if (SoundPreviewManager.PlaybackState == PlaybackState.Stopped || SoundPreviewManager.PlaybackState == PlaybackState.Paused)
+                switch (SoundPreviewManager.PlaybackState)
                 {
-                    SoundPreviewManager.PlaySound();
-                }
-                else if (SoundPreviewManager.PlaybackState == PlaybackState.Playing)
-                {
-                    SoundPreviewManager.PauseSound();
+                    case PlaybackState.Playing:
+                        SoundPreviewManager.PauseSound();
+                        break;
+                    default:
+                        SoundPreviewManager.PlaySound();
+                        break;
                 }
             }
             catch (Exception ex)
@@ -1632,8 +1667,6 @@ namespace GPK_RePack_WPF
             }
         }
 
-
-        #region composite gpk
         private void DecryptDat()
         {
             var files = MiscFuncs.GenerateOpenDialog(false);
@@ -1818,9 +1851,6 @@ namespace GPK_RePack_WPF
             _logger.Info("Parsed mappings, we have {0} composite GPKs and {1} sub-gpks!", _gpkStore.CompositeMap.Count, subCount);
         }
 
-        #endregion
-
-        #region misc
         private void SetFileSize()
         {
             if (!IsPackageSelected()) return;
@@ -1839,7 +1869,6 @@ namespace GPK_RePack_WPF
             }
 
         }
-
         private void SetPropsCustom()
         {
             if (!IsPackageSelected()) return;
@@ -1863,7 +1892,6 @@ namespace GPK_RePack_WPF
 
 
         }
-
         private void SetVolumeMultipliers()
         {
             if (!IsPackageSelected()) return;
@@ -1881,7 +1909,6 @@ namespace GPK_RePack_WPF
                 _logger.Info("Set Volumes for {0} to {1}.", _selectedPackage.Filename, num);
             }
         }
-
         private void AddName()
         {
             if (!IsPackageSelected()) return;
@@ -1892,8 +1919,6 @@ namespace GPK_RePack_WPF
             if (_selectedExport != null)
                 DrawGrid(_selectedPackage, _selectedExport);
         }
-
-
         private bool IsPackageSelected()
         {
             if (_selectedPackage != null) return true;
@@ -1901,7 +1926,12 @@ namespace GPK_RePack_WPF
             return false;
 
         }
-
+        private bool IsExportSelected()
+        {
+            if (_selectedExport != null) return true;
+            _logger.Info("Select a export!");
+            return false;
+        }
         private void DumpGPKObjects()
         {
             NLogConfig.DisableFormLogging();
@@ -1920,7 +1950,6 @@ namespace GPK_RePack_WPF
                 NLogConfig.EnableFormLogging();
             }).Start();
         }
-
         private void BigBytePropExport()
         {
             var arrayProp = CheckArrayRow();
@@ -1934,7 +1963,6 @@ namespace GPK_RePack_WPF
 
             DataTools.WriteExportDataFile(path, data);
         }
-
         private void BigBytePropImport()
         {
             var arrayProp = CheckArrayRow();
@@ -1954,7 +1982,6 @@ namespace GPK_RePack_WPF
 
             DrawGrid(_selectedPackage, _selectedExport);
         }
-
         private GpkArrayProperty CheckArrayRow()
         {
             if (_selectedExport == null) return null;
@@ -1974,10 +2001,6 @@ namespace GPK_RePack_WPF
             return (GpkArrayProperty)SelectedProperty.GetIProperty(_selectedPackage);
         }
 
-        private readonly List<GpkTreeNode> _searchResultNodes;
-        private int searchResultIndex;
-
-        #region search
         private void Search()
         {
             var input = new InputBoxWindow("String to search?").ShowDialog();
@@ -1986,7 +2009,7 @@ namespace GPK_RePack_WPF
                 return;
 
             _searchResultNodes.Clear();
-            searchResultIndex = 0;
+            _searchResultIndex = 0;
 
             foreach (var node in TreeMain.Collect())
             {
@@ -2007,25 +2030,23 @@ namespace GPK_RePack_WPF
 
 
         }
-
-
         private void SelectNextSearchResult(bool previous = false)
         {
             if (!CheckSearch()) return;
 
-            SelectNode(_searchResultNodes[searchResultIndex]);
-            _searchResultNodes[searchResultIndex].ParentsToPackage.ForEach(p => p.IsExpanded = true);
-            _searchResultNodes[searchResultIndex].IsSelected = true;
+            SelectNode(_searchResultNodes[_searchResultIndex]);
+            _searchResultNodes[_searchResultIndex].ParentsToPackage.ForEach(p => p.IsExpanded = true);
+            _searchResultNodes[_searchResultIndex].IsSelected = true;
             if (!previous)
             {
 
-                StatusBarText = $"Result {searchResultIndex + 1}/{_searchResultNodes.Count}";
-                searchResultIndex++;
+                StatusBarText = $"Result {_searchResultIndex + 1}/{_searchResultNodes.Count}";
+                _searchResultIndex++;
             }
             else
             {
-                StatusBarText = $"Result {searchResultIndex - 1}/{_searchResultNodes.Count}";
-                searchResultIndex--;
+                StatusBarText = $"Result {_searchResultIndex - 1}/{_searchResultNodes.Count}";
+                _searchResultIndex--;
             }
 
 
@@ -2035,21 +2056,21 @@ namespace GPK_RePack_WPF
                 var msg = "";
                 if (_searchResultNodes.Count == 0)
                 {
-                    searchResultIndex = 0;
+                    _searchResultIndex = 0;
                     msg = "No items found.";
                     found = false;
                 }
 
-                if (!previous && searchResultIndex >= _searchResultNodes.Count)
+                if (!previous && _searchResultIndex >= _searchResultNodes.Count)
                 {
-                    searchResultIndex = 0;
+                    _searchResultIndex = 0;
                     msg = "End reached, searching from start.";
                     found = false;
                 }
 
-                if (previous && searchResultIndex == 0)
+                if (previous && _searchResultIndex == 0)
                 {
-                    searchResultIndex = _searchResultNodes.Count - 1;
+                    _searchResultIndex = _searchResultNodes.Count - 1;
                     msg = "Start reached, searching from end.";
                     found = false;
                 }
@@ -2064,203 +2085,71 @@ namespace GPK_RePack_WPF
 
         }
 
-
-        #endregion //search
-        #endregion //misc
-
-    }
-
-    public class SoundPreviewManager : TSPropertyChanged, IDisposable
-    {
-        private VorbisWaveReader _waveReader;
-        private readonly WaveOut _waveOut;
-        private readonly Timer _timer;
-        private readonly WaveFormRenderer _renderer;
-        private Image _bmp;
-        private ImageSource _waveForm;
-        private DateTime _startTime;
-
-        public ImageSource WaveForm
+        private void TryToLoadAllExportDataFromComposite()
         {
-            get => _waveForm;
-            set
+            if (!IsPackageSelected())
             {
-                if (_waveForm == value) return;
-                _waveForm = value;
-                N();
+                return;
+            }
+
+            foreach (var export in _selectedPackage.ExportList.Values)
+            {
+                LoadCompositeDataForExport(export);
             }
         }
 
-        public double CurrentPosition
+        private void LoadCompositeDataForExport(GpkExport export)
         {
-            get
+
+            //strat. find new name in pkgmapper, find comp entry in compmapper, load composite
+            //hook adding of composite, replace all data and popoup a message
+
+            var redirectUID = _gpkStore.FindObjectMapperEntryForObjectname(export.GetNormalizedUID());
+            var compEntry = _gpkStore.FindCompositeMapEntriesForCompID(redirectUID);
+            if (compEntry == null)
+                return;
+
+            _logger.Info($"Trying to load GPK {compEntry.SubGPKName} for Object {compEntry.CompositeUID}");
+
+            var path = $"{_gpkStore.BaseSearchPath}{compEntry.SubGPKName}.gpk";
+
+            if (!File.Exists(path))
             {
-                if (_waveReader == null) return 0;
-                //if (_waveReader != null)
-                //    return _waveReader.CurrentTime.TotalMilliseconds / _waveReader.TotalTime.TotalMilliseconds;
-                return (DateTime.Now - _startTime).TotalMilliseconds*1000 / _waveReader.TotalTime.TotalMilliseconds;
-                //return 0;
+                _logger.Info("GPK to load not found");
+                return;
             }
-            set
+
+            new Task(() =>
             {
-                if (_waveReader == null) return;
-                var totalMs = _waveReader.TotalTime.TotalMilliseconds;
-                var setMs = (value/1000D) * totalMs;
-                if (setMs < totalMs)
+                var gpk = _gpkStore.loadSubGpk(path, compEntry);
+
+                var obj = gpk.GetObjectByUID(compEntry.GetObjectName());
+                if (!(obj is GpkExport))
                 {
-                    _waveOut.Pause();
-                    _waveReader.CurrentTime = TimeSpan.FromMilliseconds(setMs);
-                    _waveOut.Play();
+                    _logger.Error("Somehow found obj is not a export");
+                    return;
                 }
-                else
-                {
-                    _waveOut.Stop();
-                }
-                N();
-                N(nameof(CurrentTime));
-                _startTime = DateTime.Now - _waveReader.CurrentTime;
-            }
-        }
+                var exportObj = (GpkExport)obj;
 
-        public string CurrentTime
+                _logger.Info($"Found something! Data to import is in {exportObj.UID}");
+
+                DataTools.ReplaceAll(exportObj, export);
+
+                export.GetDataSize();
+                export.motherPackage.CheckAllNamesInObjects();
+
+                _logger.Info("Done, succesfully imported composite data!");
+            }).Start();
+        }
+        private void LoadCompositeDataForSelectedExport()
         {
-            get
+            if (!IsExportSelected())
             {
-                if (_waveReader == null) return TimeSpan.Zero.ToString(@"mm\:ss\.ff");
-                return (DateTime.Now - _startTime).ToString(@"mm\:ss\.ff");
-            }
-        }
-
-        public PlaybackState PlaybackState => _waveOut.PlaybackState;
-
-        public SoundPreviewManager()
-        {
-            Dispatcher = Dispatcher.CurrentDispatcher;
-            _waveOut = new WaveOut();
-            _waveOut.PlaybackStopped += OnPlaybackStopped;
-            _timer = new Timer { Interval = 10 };
-            _timer.Tick += OnTimerTick;
-            //https://github.com/naudio/NAudio.WaveFormRenderer
-            _renderer = new WaveFormRenderer();
-
-        }
-
-        private void OnTimerTick(object sender, EventArgs e)
-        {
-            Dispatcher.InvokeAsync(() =>
-            {
-                N(nameof(CurrentPosition));
-                N(nameof(CurrentTime));
-
-            }, DispatcherPriority.DataBind);
-            if((DateTime.Now - _startTime).TotalMilliseconds >= _waveReader.TotalTime.TotalMilliseconds) _waveOut.Stop();
-            if (PlaybackState == PlaybackState.Playing) return;
-            _timer.Stop();
-
-        }
-
-        private void OnPlaybackStopped(object sender, StoppedEventArgs e)
-        {
-            _timer.Stop();
-            _startTime = DateTime.Now;
-            N(nameof(CurrentPosition));
-            N(nameof(CurrentTime));
-
-            //ResetOggPreview();
-        }
-
-        public void Setup(byte[] soundwave)
-        {
-            ResetOggPreview();
-            _waveReader = new VorbisWaveReader(new MemoryStream(soundwave));
-            RenderWaveForm();
-            _waveOut.Init(_waveReader);
-        }
-
-        private void RenderWaveForm()
-        {
-            Task.Run(() =>
-            {
-                var col = ((System.Windows.Media.Color)App.Current.FindResource("SelectionColor")).ToDrawingColor();
-                var rendererSettings = new StandardWaveFormRendererSettings
-                {
-                    Width = 1200,
-                    TopHeight = 128,
-                    BottomHeight = 128,
-                    BackgroundColor = System.Drawing.Color.Transparent,
-                    TopPeakPen = new System.Drawing.Pen(col),
-                    BottomPeakPen = new System.Drawing.Pen(col)
-                };
-                var maxPeakProvider = new RmsPeakProvider(200);
-                this._bmp = _renderer.Render(_waveReader, maxPeakProvider, rendererSettings);
-
-                Dispatcher.InvokeAsync(() =>
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        _bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                        ms.Position = 0;
-
-                        var bi = new BitmapImage();
-                        bi.BeginInit();
-                        bi.CacheOption = BitmapCacheOption.OnLoad;
-                        bi.StreamSource = ms;
-                        bi.EndInit();
-                        WaveForm = bi;
-                    }
-                    _waveReader.Position = 0;
-                });
-
-            });
-        }
-
-        public void PlaySound()
-        {
-            if (PlaybackState == PlaybackState.Paused)
-            {
-                _startTime = DateTime.Now - _waveReader.CurrentTime;
-                _waveOut.Resume();
-            }
-            else
-            {
-                _startTime = DateTime.Now;
-                _waveReader.Position = 0;
-                _waveOut.Play();
-            }
-            _timer.Start();
-            //OggPreviewButtonText = "Stop Preview";
-        }
-
-        public void ResetOggPreview()
-        {
-            if (_waveOut != null && _waveOut.PlaybackState == PlaybackState.Playing)
-            {
-                _waveOut.Stop();
-                _waveReader?.Close();
-                _waveReader?.Dispose();
-                WaveForm = null;
+                return;
             }
 
-            _waveReader = null;
-            _bmp?.Dispose();
-            //OggPreviewButtonText = "Ogg Preview";
+            LoadCompositeDataForExport(_selectedExport);
         }
 
-        public void Dispose()
-        {
-            _waveReader?.Dispose();
-            _waveOut?.Dispose();
-            _bmp?.Dispose();
-        }
-
-        public void PauseSound()
-        {
-            if (PlaybackState == PlaybackState.Playing)
-            {
-                _waveOut?.Pause();
-                _timer.Stop();
-
-            }
-        }
     }
 }
