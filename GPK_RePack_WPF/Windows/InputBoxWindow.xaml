@@ -5,23 +5,46 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GPK_RePack_WPF.Windows"
         mc:Ignorable="d"
+        WindowStyle="SingleBorderWindow"
         ResizeMode="NoResize"
-        Title="InputBoxWindow" MinHeight="140" Width="400" SizeToContent="Height"
+        BorderThickness="1"
+        Title="Tera Helper"
+        WindowStartupLocation="CenterOwner"
+        BorderBrush="{StaticResource AccentBrush}"
+        UseLayoutRounding="True"
+        Background="{StaticResource BackgroundBrushDark}"
+        Width="400" SizeToContent="Height"
         >
-    <Grid>
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="0"
+                      GlassFrameThickness="0 0 0 0"
+                      CornerRadius="0" />
+    </WindowChrome.WindowChrome>
+
+    <Grid ShowGridLines="False">
+        
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock x:Name="Hint" Margin="20 10"/>
-        <TextBox VerticalAlignment="Center" Margin="20 0 20 0" Grid.Row="1"
+        <TextBlock x:Name="Hint" Margin="20 10" Foreground="#9fff"
+                   VerticalAlignment="Center"/>
+        <TextBox VerticalAlignment="Center" Margin="20 0 20 10" Grid.Row="1"
+                 Foreground="#9fff"
+                 BorderThickness="0"
+                 x:Name="Input"
+                 Background="{StaticResource BackgroundBrush}"
                  Text="{Binding ReturnValue, RelativeSource={RelativeSource AncestorType=local:InputBoxWindow}}"/>
-        <Button Content="Ok" Grid.Row="2"
+        <!--<Button Content="Ok" Grid.Row="2"
                 Margin="20 10"
                 Width="70"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Style="{StaticResource ButtonMainStyle}"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
-                Click="OnOkButtonClick"/>
+                Click="OnOkButtonClick"/>-->
     </Grid>
 </Window>

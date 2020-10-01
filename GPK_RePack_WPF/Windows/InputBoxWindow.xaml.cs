@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using Nostrum.Extensions;
 
@@ -14,8 +15,21 @@ namespace GPK_RePack_WPF.Windows
             InitializeComponent();
             Dispatcher.InvokeIfRequired(() =>
             {
+                if (App.Current.MainWindow != null) Owner = App.Current.MainWindow;
                 Hint.Text = msg;
+                Input.Focus();
+                Input.KeyDown += OnKeyDown;
             }, DispatcherPriority.DataBind);
+        }
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter) Close();
+            else if (e.Key == Key.Escape)
+            {
+                ReturnValue = "";
+                Close();
+            }
         }
 
         public new string ShowDialog()

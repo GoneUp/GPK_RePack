@@ -14,7 +14,7 @@
         UseLayoutRounding="True"
         Background="{StaticResource BackgroundBrush}"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="Tera Helper"
         Height="{Binding WindowHeight, Mode=TwoWay}"
         Width="{Binding WindowWidth, Mode=TwoWay}"
         WindowState="{Binding WindowState, Mode=TwoWay}"
