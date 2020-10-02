@@ -357,6 +357,8 @@ namespace GPK_RePack_WPF
         public ICommand TryToLoadAllExportDataFromCompositeCommand { get; }
         public ICommand LoadCompositeDataForSelectedExportCommand { get; }
 
+        public ICommand ShowHelpCommand{ get; }
+
         #endregion
 
         public MainViewModel()
@@ -371,7 +373,7 @@ namespace GPK_RePack_WPF
             CustomEventTarget.LogMessageWritten += _logBuffer.AppendLine;
             _logger = LogManager.GetLogger("GUI");
             _logger.Info("Startup");
-
+            ShowHelp();
             //
             UpdateCheck.checkForUpdate(this);
             _gpkStore = new GpkStore();
@@ -454,6 +456,15 @@ namespace GPK_RePack_WPF
 
             TryToLoadAllExportDataFromCompositeCommand = new RelayCommand(TryToLoadAllExportDataFromComposite);
             LoadCompositeDataForSelectedExportCommand = new RelayCommand(LoadCompositeDataForSelectedExport);
+
+            ShowHelpCommand = new RelayCommand(ShowHelp);
+        }
+
+        private void ShowHelp()
+        {
+            //todo remake and format this
+            InfoText =
+                " Quick Guide:\r\n1.Open a *.gpk file via File -> Open\r\n2.Select a Object you want to edit on the treeview\r\n3 - Editing\r\n3a) Use the buttons Export/ Replace raw data for editing any object data\r\n3b) Use the buttons Import/ Export / Empty ogg for editing audio (SoundNodeWave) files\r\n3c) Use the buttons Import/ Export DDS for editing images (Texture2D)\r\n3c) Use the buttons Copy/ Paste(or Control - C, Control - V) on any object.You can choose in the settings what the parts of the object the program should copy,\r\n4 - Saving\r\n4a) The normal way to save is Main -> Save.The program will rebuild the GPK file from scratch. \r\n4b) If the normal way is failing switch select Patch Mode in settings and try to import the data again(only over raw import / export).Save afterwards via Main - > Save patched.\r\n\r\nFor x64 modding see https://github.com/GoneUp/GPK_RePack/wiki/64-bit-Modding\r\n\r\nAbout Padding: \r\nTera accepts only files with the exact same file size as the orginal file in some cases, for example at soundfiles.You need to test it for the file you want to modify or use a patched datacenter.\r\nThe save menu offers you the option to save as-is and a option with added padding.Terahelper will fill the file up if it's too small and warn you if it is too big. \r\nIf you want to change the maximum size manually select a the package and use the Misc - > Set Filesize function.\r\n\r\nHotkeys;\r\nCTRL + F, F3, Shift + F3: Search, next result, previous result\r\nCTRL + O: Open package\r\nCTRL + S: Rebuild Save\r\nCTRL + P: Rebuild Save, with padding\r\nCTRL + SHIFT + P: Patch save\r\nCTRL + 1,CTRL + 2,CTRL + 3: Select tabs\r\nCRTL + M: Load / Show Mapping\r\n\r\nhfgl\r\n-- GoneUp\r\n\r\nSource Code is available on Github: https://github.com/GoneUp/GPK_RePack/\r\n";
         }
 
         private void GotoTab(Tab tab)
@@ -1455,6 +1466,7 @@ namespace GPK_RePack_WPF
             if (_selectedExport == null && _selectedImport == null)
             {
                 _logger.Info("Select an import or export to rename");
+                return;
             }
 
             var input = new InputBoxWindow("New name?").ShowDialog();
@@ -1470,7 +1482,7 @@ namespace GPK_RePack_WPF
                     _selectedImport.ObjectName = input;
                 }
 
-                _selectedPackage.CheckAllNamesInObjects();
+                _selectedPackage?.CheckAllNamesInObjects();
 
                 //uid is not renamed to not break internal references. will be regenerated on a new load.
                 _logger.Info($"Renamed object to the new name {input}. Experimental, stuff may break.");

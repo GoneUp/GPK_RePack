@@ -19,18 +19,30 @@
         Width="{Binding WindowWidth, Mode=TwoWay}"
         WindowState="{Binding WindowState, Mode=TwoWay}"
         d:DataContext="{d:DesignInstance wpf:MainViewModel}">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="7 3 7 7"
+                      GlassFrameThickness="0 0 0 1"
+                      CornerRadius="0" />
+    </WindowChrome.WindowChrome>
     <Window.InputBindings>
         <KeyBinding Command="{Binding OpenCommand}" Modifiers="Control" Key="O" />
-        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="S" CommandParameter="{x:Static wpf:SaveMode.Rebuild}" />
-        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="P" CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}" />
-        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control+Shift" Key="P" CommandParameter="{x:Static wpf:SaveMode.Patched}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="S"
+                    CommandParameter="{x:Static wpf:SaveMode.Rebuild}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="P"
+                    CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control+Shift" Key="P"
+                    CommandParameter="{x:Static wpf:SaveMode.Patched}" />
 
         <KeyBinding Command="{Binding RefreshCommand}" Modifiers="Control" Key="R" />
         <KeyBinding Command="{Binding ClearCommand}" Modifiers="Control" Key="N" />
 
-        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D1" CommandParameter="{x:Static wpf:Tab.Info}" />
-        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D2" CommandParameter="{x:Static wpf:Tab.Properties}" />
-        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D3" CommandParameter="{x:Static wpf:Tab.Texture}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D1"
+                    CommandParameter="{x:Static wpf:Tab.Info}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D2"
+                    CommandParameter="{x:Static wpf:Tab.Properties}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D3"
+                    CommandParameter="{x:Static wpf:Tab.Texture}" />
 
         <KeyBinding Command="{Binding LoadMappingCommand}" Modifiers="Control" Key="M" />
 
@@ -38,11 +50,12 @@
         <KeyBinding Command="{Binding SearchNextCommand}" Modifiers="Shift" Key="F3" CommandParameter="True" />
         <KeyBinding Command="{Binding SearchNextCommand}" Key="F3" CommandParameter="False" />
 
-        <KeyBinding Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}" Modifiers="Ctrl+Alt" Key="S" />
-        <KeyBinding Modifiers="Control" Key="F" Command="{Binding SearchCommand}"/>
-        <KeyBinding Key="F3" Command="{Binding SearchNextCommand}"/>
-        <KeyBinding Modifiers="Shift" Key="F3" Command="{Binding SearchNextCommand}" CommandParameter="True"/>
-
+        <KeyBinding
+            Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
+            Modifiers="Ctrl+Alt" Key="S" />
+        <KeyBinding Command="{Binding SearchCommand}" Modifiers="Control" Key="F" />
+        <KeyBinding Command="{Binding SearchNextCommand}" Key="F3" />
+        <KeyBinding Command="{Binding SearchNextCommand}" Modifiers="Shift" Key="F3" CommandParameter="True" />
     </Window.InputBindings>
     <Window.Style>
         <Style TargetType="Window">
@@ -54,7 +67,6 @@
         </Style>
     </Window.Style>
     <Window.Resources>
-
         <Style x:Key="ColumnHeaderStyle" TargetType="DataGridColumnHeader">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0 0 0 1" />
@@ -62,13 +74,12 @@
             <Setter Property="FontWeight" Value="DemiBold" />
             <Setter Property="Padding" Value="16 0" />
         </Style>
-        <Style TargetType="DataGridCell" x:Key="CellStyle">
+        <Style x:Key="CellStyle" TargetType="DataGridCell" >
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Margin" Value="0 0 -1 0" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         </Style>
-
-        <Style TargetType="Path" x:Key="TabItemIconStyle">
+        <Style x:Key="TabItemIconStyle" TargetType="Path" >
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Stretch" Value="Uniform" />
             <Setter Property="Fill" Value="#5fff" />
@@ -76,20 +87,17 @@
             <Setter Property="Width" Value="16" />
             <Setter Property="Height" Value="16" />
         </Style>
-        <Style TargetType="TextBlock" x:Key="TabItemLabelStyle">
+        <Style x:Key="TabItemLabelStyle" TargetType="TextBlock" >
             <Setter Property="Grid.Row" Value="1" />
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="Foreground" Value="#5fff" />
             <Setter Property="FontSize" Value="10" />
-
         </Style>
-
-        <Style TargetType="Separator" x:Key="SeparatorStyle">
+        <Style x:Key="SeparatorStyle" TargetType="Separator" >
             <Setter Property="Background" Value="#2fff" />
             <Setter Property="Margin" Value="0 0 10 0" />
         </Style>
-
-        <Style TargetType="TabItem" x:Key="TabItemStyle">
+        <Style x:Key="TabItemStyle" TargetType="TabItem" >
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -159,9 +167,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-
-
         <Style x:Key="TreeViewItemContainerStyle" TargetType="TreeViewItem">
             <Setter Property="Padding" Value="4 2" />
             <!-- ReSharper disable Xaml.BindingWithContextNotResolved -->
@@ -169,7 +174,6 @@
             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
             <!-- ReSharper restore Xaml.BindingWithContextNotResolved -->
         </Style>
-
         <HierarchicalDataTemplate x:Key="TreeItemTemplate" DataType="wpf:GpkTreeNode" ItemsSource="{Binding Children}">
             <Grid PreviewMouseDown="OnTreeNodeMouseButtonDown">
                 <Grid.ContextMenu>
@@ -192,8 +196,10 @@
                                   Visibility="Collapsed" />
                         <MenuItem x:Name="CopyBtn" Header="Copy" Command="{Binding MainVM.CopyObjectCommand}" />
                         <MenuItem x:Name="PasteBtn" Header="Replace" Command="{Binding MainVM.PasteObjectCommand}" />
-                        <MenuItem x:Name="LoadCompDataBtn" Header="Try to load composite data" Command="{Binding MainVM.LoadCompositeDataForSelectedExportCommand}" />
-                        <MenuItem x:Name="InsertBtn" Header="Insert as new Export" Command="{Binding MainVM.InsertObjectCommand}"
+                        <MenuItem x:Name="LoadCompDataBtn" Header="Try to load composite data"
+                                  Command="{Binding MainVM.LoadCompositeDataForSelectedExportCommand}" />
+                        <MenuItem x:Name="InsertBtn" Header="Insert as new Export"
+                                  Command="{Binding MainVM.InsertObjectCommand}"
                                   Visibility="Collapsed" />
                         <MenuItem x:Name="RemoveBtn" Header="Remove" Command="{Binding MainVM.RemoveObjectCommand}" />
                         <MenuItem x:Name="RenameBtn" Header="Rename" Command="{Binding MainVM.RenameObjectCommand}" />
@@ -275,25 +281,72 @@
             </HierarchicalDataTemplate.Triggers>
 
         </HierarchicalDataTemplate>
-
+        <Style x:Key="DataGridRowStyle" TargetType="DataGridRow" >
+            <Setter Property="Background" Value="#0fff" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1fff" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="NameCellTemplate" DataType="wpf:PropertyViewModel" >
+            <TextBlock Background="Transparent" Cursor="Arrow" Foreground="White"
+                       Text="{Binding Name}" Margin="16 0" VerticalAlignment="Center" />
+        </DataTemplate>
+        <DataTemplate x:Key="SizeCellTemplate" DataType="wpf:PropertyViewModel" >
+            <TextBlock Text="{Binding Size}" Margin="16 0" VerticalAlignment="Center"
+                       HorizontalAlignment="Right" />
+        </DataTemplate>
+        <Style x:Key="SizeColumnHeaderStyle"
+               TargetType="DataGridColumnHeader"
+               BasedOn="{StaticResource ColumnHeaderStyle}">
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+        </Style>
+        <DataTemplate x:Key="TypeCellTemplate" DataType="wpf:PropertyViewModel">
+            <ComboBox Margin="9 0" SelectedItem="{Binding PropertyType, Mode=TwoWay}"
+                      ItemsSource="{x:Static wpf:MainViewModel.PropertyTypes}" />
+        </DataTemplate>
+        <DataTemplate x:Key="InnerTypeCellTemplate" DataType="wpf:PropertyViewModel">
+            <ComboBox Margin="9 0" SelectedItem="{Binding InnerType, Mode=TwoWay}"
+                      ItemsSource="{Binding InnerTypes}" />
+        </DataTemplate>
+        <Style x:Key="ValueCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource CellStyle}">
+            <Setter Property="Margin" Value="-1 0 -1 0" />
+        </Style>
+        <wpf:ValueCellTemplateSelector x:Key="ValueCellTemplateSlector">
+            <wpf:ValueCellTemplateSelector.TextTemplate>
+                <DataTemplate DataType="wpf:PropertyViewModel">
+                    <TextBox Margin="14 0" Text="{Binding Value, Mode=TwoWay}"
+                             BorderThickness="0"
+                             VerticalAlignment="Center"
+                             MaxLines="1"
+                             Background="Transparent"
+                             Foreground="White"
+                             CaretBrush="{StaticResource AccentBrush}"
+                             ToolTip="{Binding Value}" />
+                </DataTemplate>
+            </wpf:ValueCellTemplateSelector.TextTemplate>
+            <wpf:ValueCellTemplateSelector.EnumTemplate>
+                <DataTemplate DataType="wpf:PropertyViewModel">
+                    <ComboBox Margin="9 0" SelectedItem="{Binding Value, Mode=TwoWay}"
+                              ItemsSource="{Binding InnerTypes}" />
+                </DataTemplate>
+            </wpf:ValueCellTemplateSelector.EnumTemplate>
+        </wpf:ValueCellTemplateSelector>
     </Window.Resources>
-    <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0"
-                      ResizeBorderThickness="7 3 7 7"
-                      GlassFrameThickness="0 0 0 1"
-                      CornerRadius="0" />
-    </WindowChrome.WindowChrome>
 
     <Grid x:Name="MainContent">
         <Grid.RowDefinitions>
-            <RowDefinition Height="26" />
+            <RowDefinition Height="32" />
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <!--Title bar-->
-        <Grid MouseLeftButtonDown="Drag" Background="{StaticResource BackgroundBrush}">
+        <Grid MouseLeftButtonDown="Drag"
+              Background="Transparent"
+              Margin="0 0 0 0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="26" />
+                <ColumnDefinition Width="32" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
@@ -301,15 +354,16 @@
             </Grid.ColumnDefinitions>
 
             <!--Window icon-->
-            <Path Style="{StaticResource TitleBarButtonContentStyle}"
-                  Data="{StaticResource SvgAddCircle}"
-                  Fill="{StaticResource AccentBrush}"
+            <Image Source="..\Resources\TH.ico"
                   VerticalAlignment="Center"
-                  Width="16" Height="16" />
+                  Width="20" Height="20" 
+                  Stretch="Uniform"
+                  RenderOptions.BitmapScalingMode="HighQuality"
+                  Margin="4 0 0 0"/>
             <!--Window title-->
             <TextBlock VerticalAlignment="Center"
                        Text="Tera Helper 2"
-                       Margin="10 0"
+                       Margin="5 -1 5 0"
                        Grid.Column="1" Foreground="#4fff"
                        FontSize="13" />
             <!--Minimize-->
@@ -324,19 +378,23 @@
                       Fill="{StaticResource RedBrush}" />
             </Button>
             <!--Menu-->
-            <Menu Grid.Column="2" Background="Transparent" Foreground="#8fff" VerticalAlignment="Center"
+            <Menu Grid.Column="2" Background="Transparent"
+                  Foreground="#8fff" VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
                   HorizontalAlignment="Left">
-
-                <MenuItem Header="Main">
-                    <MenuItem Header="Open" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O" />
-
+                <MenuItem Header="File">
+                    <MenuItem Header="Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O" />
+                    <!--todo: open recent-->
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header="Load/show mapping" Command="{Binding LoadMappingCommand}"
+                              InputGestureText="Ctrl+M" />
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
-                    <MenuItem Header="Save all (rebuild mode)"
+                    <MenuItem Header="Save all (rebuild mode)..."
                               Command="{Binding SaveCommand}"
                               CommandParameter="{x:Static wpf:SaveMode.Rebuild}"
                               InputGestureText="Ctrl+S" />
-                    <MenuItem Header="Save all (rebuild mode with padding)"
+                    <MenuItem Header="Save all (rebuild mode with padding)..."
                               Command="{Binding SaveCommand}"
                               CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}"
                               InputGestureText="Ctrl+P" />
@@ -347,79 +405,78 @@
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
-                    <!--<MenuItem Header="ObjectMapper.dat modification" IsEnabled="False" />-->
-                    <MenuItem Header="Patch ObjectMapper for selected package"
-                              Command="{Binding PatchObjectMapperForSelectedPackageCommand}" />
-
-                    <Separator Style="{StaticResource SeparatorStyle}" />
-
-                    <!--<MenuItem Header="CompositePackageMapper.dat modification" IsEnabled="False" />-->
                     <MenuItem Header="Save and patch original Composite (not recommended)"
                               Command="{Binding SaveCommand}"
                               CommandParameter="{x:Static wpf:SaveMode.PatchedComposite}" />
                     <MenuItem Header="Save and add new composite GPK (not recommended)"
                               Command="{Binding SaveCommand}"
                               CommandParameter="{x:Static wpf:SaveMode.AddedComposite}" />
+                    <MenuItem Header="Save mappers..." Command="{Binding WriteMappingCommand}" />
+                    <MenuItem Header="Save mappers for selected package"
+                              Command="{Binding PatchObjectMapperForSelectedPackageCommand}" />
+
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header=".dat decryption" Command="{Binding DecryptDatCommand}" />
+                    <MenuItem Header=".dat encryption" Command="{Binding EncryptDatCommand}" />
 
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
-                    <MenuItem Header="Settings"
-                              Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
-                              InputGestureText="Ctrl+Alt+S" />
-
-                    <Separator Style="{StaticResource SeparatorStyle}" />
-
-                    <MenuItem Header="Refresh view" Command="{Binding RefreshCommand}" InputGestureText="Ctrl+R" />
-                    <MenuItem Header="Clear" Command="{Binding ClearCommand}" InputGestureText="Ctrl+N" />
                     <MenuItem Header="Exit"
                               Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
                               InputGestureText="Alt+F4" />
                 </MenuItem>
 
-                <MenuItem Header="Composite GPK">
-                    <MenuItem Header=".dat decryption" Command="{Binding DecryptDatCommand}" />
-                    <MenuItem Header=".dat encryption" Command="{Binding EncryptDatCommand}" />
-                    <MenuItem Header="Load/show mapping" Command="{Binding LoadMappingCommand}"
-                              InputGestureText="Ctrl+M" />
-                    <MenuItem Header="Write mappings" Command="{Binding WriteMappingCommand}" />
-
-                    <Separator Style="{StaticResource SeparatorStyle}" />
-
+                <MenuItem Header="Edit">
+                    <MenuItem Header="Rename object" Command="{Binding RenameObjectCommand}" />
+                    <MenuItem Header="Set file size" Command="{Binding SetFileSizeCommand}" />
                     <MenuItem Header="Minimize selected GPK" Command="{Binding MinimizeGpkCommand}" />
-                    <MenuItem Header="Try to load all export data from composite" Command="{Binding TryToLoadAllExportDataFromCompositeCommand}" />
-
+                    <MenuItem Header="Add name" Command="{Binding AddNameCommand}" />
+                    <MenuItem Header="Import data from composite"
+                              Command="{Binding TryToLoadAllExportDataFromCompositeCommand}" />
                     <Separator Style="{StaticResource SeparatorStyle}" />
 
+                    <MenuItem Header="Properties">
+                        <MenuItem Header="Export big ByteProp" Command="{Binding BigBytePropExportCommand}" />
+                        <MenuItem Header="Import big ByteProp" Command="{Binding BigBytePropImportCommand}" />
+                        <MenuItem Header="Set all properties">
+                            <MenuItem Header="Custom" Command="{Binding SetPropsCustomCommand}" />
+                            <MenuItem Header="Set all volume multipliers"
+                                      Command="{Binding SetVolumeMultipliersCommand}" />
+                        </MenuItem>
+                    </MenuItem>
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+
+                    <MenuItem Header="Settings"
+                              Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
+                              InputGestureText="Ctrl+Alt+S" />
+                </MenuItem>
+
+                <MenuItem Header="View">
+                    <MenuItem Header="Find..." InputGestureText="Ctrl+F" Command="{Binding SearchCommand}" />
+                    <MenuItem Header="Previous result" InputGestureText="Shift+F3" Command="{Binding SearchCommand}"
+                              CommandParameter="true" />
+                    <MenuItem Header="Next result" InputGestureText="F3" Command="{Binding SearchNextCommand}" />
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header="Refresh view" Command="{Binding RefreshCommand}" InputGestureText="Ctrl+R" />
+                    <MenuItem Header="Clear" Command="{Binding ClearCommand}" InputGestureText="Ctrl+N" />
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header="Log to textbox" IsCheckable="True" IsChecked="{Binding LogToUI, Mode=TwoWay}" />
+                </MenuItem>
+
+                <MenuItem Header="Export">
                     <MenuItem Header="Dump composite textures" Command="{Binding DumpAllTexturesCommand}" />
                     <MenuItem Header="Dump icons" Command="{Binding DumpIconsCommand}" />
                     <MenuItem Header="Dump GPK objects" Command="{Binding DumpGPKObjectsCommand}" />
+
                 </MenuItem>
 
-                <MenuItem Header="Misc">
-                    <MenuItem Header="Set file size" Command="{Binding SetFileSizeCommand}" />
-                    <MenuItem Header="Set all properties">
-                        <MenuItem Header="Custom" Command="{Binding SetPropsCustomCommand}" />
-                        <MenuItem Header="Set all volume multipliers" Command="{Binding SetVolumeMultipliersCommand}" />
-                    </MenuItem>
-                    <MenuItem Header="Export big ByteProp" Command="{Binding BigBytePropExportCommand}" />
-                    <MenuItem Header="Import big ByteProp" Command="{Binding BigBytePropImportCommand}" />
-                    <MenuItem Header="Add name" Command="{Binding AddNameCommand}" />
-                    <MenuItem Header="Rename object" Command="{Binding RenameObjectCommand}" />
-                    <MenuItem Header="Dump GPK headers" Command="{Binding DumpGPKObjectsCommand}" />
-                    <MenuItem Header="Log to textbox" IsCheckable="True" IsChecked="{Binding LogToUI, Mode=TwoWay}" />
-
-                    <Separator Style="{StaticResource SeparatorStyle}" />
-
-                    <MenuItem Header="Search for object" InputGestureText="Ctrl+F" Command="{Binding SearchCommand}" />
-                    <MenuItem Header="Next result" InputGestureText="F3" Command="{Binding SearchNextCommand}" />
-                    <MenuItem Header="Previous result" InputGestureText="Shift+F3" Command="{Binding SearchCommand}"
-                              CommandParameter="true" />
-
+                <MenuItem Header="Help">
+                    <MenuItem Header="Show help" Command="{Binding ShowHelpCommand}" />
                 </MenuItem>
             </Menu>
         </Grid>
         <!--Window content-->
-        <Grid ShowGridLines="False" Grid.Row="2">
+        <Grid ShowGridLines="False" Grid.Row="2" Margin="0 -6 0 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="{Binding TopSize, Mode=TwoWay}" MinHeight="100" />
                 <RowDefinition Height="{Binding LogSize, Mode=TwoWay}" MinHeight="6" />
@@ -505,7 +562,9 @@
                                 <TextBlock Style="{StaticResource TabItemLabelStyle}" Text="Prop" />
                             </Grid>
                         </TabItem.Header>
+                        <TabItem.Resources>
 
+                        </TabItem.Resources>
                         <DataGrid ItemsSource="{Binding Properties}"
                                   Background="{StaticResource BackgroundBrushDark}"
                                   AutoGenerateColumns="False"
@@ -523,6 +582,7 @@
                                   BorderThickness="1"
                                   BorderBrush="{StaticResource BorderBrush}"
                                   HorizontalGridLinesBrush="#1fff"
+                                  RowStyle="{StaticResource DataGridRowStyle}"
                                   ColumnHeaderStyle="{StaticResource ColumnHeaderStyle}"
                                   CellStyle="{StaticResource CellStyle}">
                             <DataGrid.Resources>
@@ -532,89 +592,14 @@
                                                  Color="{StaticResource SelectionColor}" />
                                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
                                                  Color="White" />
-
                             </DataGrid.Resources>
-                            <DataGrid.RowStyle>
-                                <Style TargetType="DataGridRow">
-                                    <Setter Property="Background" Value="#0fff" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#1fff" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.RowStyle>
                             <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="Name" Width="Auto">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate DataType="wpf:PropertyViewModel">
-                                            <TextBlock Background="Transparent" Cursor="Arrow" Foreground="White"
-                                                       Text="{Binding Name}" Margin="16 0" VerticalAlignment="Center" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="Size" Width="Auto">
-                                    <DataGridTemplateColumn.HeaderStyle>
-                                        <Style TargetType="DataGridColumnHeader"
-                                               BasedOn="{StaticResource ColumnHeaderStyle}">
-                                            <Setter Property="HorizontalContentAlignment" Value="Right" />
-                                        </Style>
-
-                                    </DataGridTemplateColumn.HeaderStyle>
-
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate DataType="wpf:PropertyViewModel">
-                                            <TextBlock Text="{Binding Size}" Margin="16 0" VerticalAlignment="Center"
-                                                       HorizontalAlignment="Right" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="Type" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate DataType="wpf:PropertyViewModel">
-                                            <ComboBox Margin="9 0" SelectedItem="{Binding PropertyType, Mode=TwoWay}"
-                                                      ItemsSource="{x:Static wpf:MainViewModel.PropertyTypes}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="InnerType" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate DataType="wpf:PropertyViewModel">
-                                            <ComboBox Margin="9 0" SelectedItem="{Binding InnerType, Mode=TwoWay}"
-                                                      ItemsSource="{Binding InnerTypes}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="Value" Width="*">
-                                    <DataGridTemplateColumn.CellStyle>
-                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource CellStyle}">
-                                            <Setter Property="Margin" Value="-1 0 -1 0" />
-                                        </Style>
-
-                                    </DataGridTemplateColumn.CellStyle>
-                                    <DataGridTemplateColumn.CellTemplateSelector>
-                                        <wpf:ValueCellTemplateSelector>
-                                            <wpf:ValueCellTemplateSelector.TextTemplate>
-                                                <DataTemplate DataType="wpf:PropertyViewModel">
-                                                    <TextBox Margin="14 0" Text="{Binding Value, Mode=TwoWay}"
-                                                             BorderThickness="0"
-                                                             VerticalAlignment="Center"
-                                                             MaxLines="1"
-                                                             Background="Transparent"
-                                                             Foreground="White"
-                                                             CaretBrush="{StaticResource AccentBrush}"
-                                                             ToolTip="{Binding Value}" />
-                                                </DataTemplate>
-                                            </wpf:ValueCellTemplateSelector.TextTemplate>
-                                            <wpf:ValueCellTemplateSelector.EnumTemplate>
-                                                <DataTemplate DataType="wpf:PropertyViewModel">
-                                                    <ComboBox Margin="9 0" SelectedItem="{Binding Value, Mode=TwoWay}"
-                                                              ItemsSource="{Binding InnerTypes}" />
-                                                </DataTemplate>
-                                            </wpf:ValueCellTemplateSelector.EnumTemplate>
-                                        </wpf:ValueCellTemplateSelector>
-                                    </DataGridTemplateColumn.CellTemplateSelector>
-                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Name" Width="Auto" CellTemplate="{StaticResource NameCellTemplate}" />
+                                <DataGridTemplateColumn Header="Size" Width="Auto" CellTemplate="{StaticResource SizeCellTemplate}"
+                                                        HeaderStyle="{StaticResource SizeColumnHeaderStyle}" />
+                                <DataGridTemplateColumn Header="Type" Width="*" CellTemplate="{StaticResource TypeCellTemplate}" />
+                                <DataGridTemplateColumn Header="Inner type" Width="*" CellTemplate="{StaticResource InnerTypeCellTemplate}" />
+                                <DataGridTemplateColumn Header="Value" Width="*" CellTemplateSelector="{StaticResource ValueCellTemplateSlector}" CellStyle="{StaticResource ValueCellStyle}" />
                             </DataGrid.Columns>
                         </DataGrid>
                     </TabItem>
@@ -647,24 +632,25 @@
                                 <TextBlock Style="{StaticResource TabItemLabelStyle}" Text="Snd" />
                             </Grid>
                         </TabItem.Header>
-                            <!--todo: style this better-->
-                        <Grid >
+                        <!--todo: style this better-->
+                        <Grid>
                             <Border Background="{StaticResource BackgroundBrushDark}"
                                     BorderThickness="1"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     Margin="-2 0" />
                             <Grid VerticalAlignment="Top" Background="#2000">
-                            <Image  Source="{Binding SoundPreviewManager.WaveForm}" Stretch="Uniform" Margin="15 0" x:Name="waveform"/>
-                            <Slider  Margin="10 10"
-                                    Height="{Binding ElementName=waveform, Path=ActualHeight}"
-                                    Foreground="{StaticResource AccentBrush}"
-                                    Minimum="0"
-                                    FocusVisualStyle="{StaticResource EmptyFocusVisual}"
-                                    Maximum="1000"
-                                    HorizontalAlignment="Stretch" Width="Auto"
-                                    Value="{Binding SoundPreviewManager.CurrentPosition, Mode=TwoWay}"
-                                    Style="{DynamicResource SeekSliderStyle}" />
-</Grid>
+                                <Image Source="{Binding SoundPreviewManager.WaveForm}" Stretch="Uniform" Margin="15 0"
+                                       x:Name="waveform" />
+                                <Slider Margin="10 10"
+                                        Height="{Binding ElementName=waveform, Path=ActualHeight}"
+                                        Foreground="{StaticResource AccentBrush}"
+                                        Minimum="0"
+                                        FocusVisualStyle="{StaticResource EmptyFocusVisual}"
+                                        Maximum="1000"
+                                        HorizontalAlignment="Stretch" Width="Auto"
+                                        Value="{Binding SoundPreviewManager.CurrentPosition, Mode=TwoWay}"
+                                        Style="{DynamicResource SeekSliderStyle}" />
+                            </Grid>
                             <TextBlock Text="{Binding SoundPreviewManager.CurrentTime}"
                                        VerticalAlignment="Center" HorizontalAlignment="Center"
                                        Margin="0 100 0 0" />

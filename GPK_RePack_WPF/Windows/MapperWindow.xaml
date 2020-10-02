@@ -161,14 +161,14 @@
         <Grid>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="26" />
+                <RowDefinition Height="32" />
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <!--Title bar-->
             <Grid MouseLeftButtonDown="Drag" Background="{StaticResource BackgroundBrush}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="26" />
+                    <ColumnDefinition Width="32" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
@@ -176,15 +176,16 @@
                 </Grid.ColumnDefinitions>
 
                 <!--Window icon-->
-                <Path Style="{StaticResource TitleBarButtonContentStyle}"
-                      Data="{StaticResource SvgAddCircle}"
-                      Fill="{StaticResource AccentBrush}"
-                      VerticalAlignment="Center"
-                      Width="16" Height="16" />
+                <Image Source="..\Resources\TH.ico"
+                       VerticalAlignment="Center"
+                       Width="20" Height="20" 
+                       Stretch="Uniform"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       Margin="4 0 0 0"/>
                 <!--Window title-->
                 <TextBlock VerticalAlignment="Center"
                            Text="Tera Helper 2 - Mapper view"
-                           Margin="10 0"
+                           Margin="5 -1 5 0"
                            Grid.Column="1" Foreground="#4fff"
                            FontSize="13" />
                 <!--Minimize-->
