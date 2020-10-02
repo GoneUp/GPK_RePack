@@ -4,60 +4,166 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GPK_RePack_WPF.Windows"
+        xmlns:extensions="clr-namespace:Nostrum.Extensions;assembly=Nostrum"
         mc:Ignorable="d"
         BorderThickness="1"
         WindowStartupLocation="CenterScreen"
         BorderBrush="{StaticResource BorderBrush}"
         UseLayoutRounding="True"
         Background="{StaticResource BackgroundBrush}"
-
-        Title="Tera Helper 2 - Mapper view" Height="450" Width="800" d:DataContext="{d:DesignInstance local:MapperViewModel}">
+        Title="Tera Helper 2 - Mapper view" Height="700" Width="600"
+        d:DataContext="{d:DesignInstance local:MapperViewModel}">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0"
                       ResizeBorderThickness="7 3 7 7"
                       GlassFrameThickness="0 0 0 1"
                       CornerRadius="0" />
     </WindowChrome.WindowChrome>
-
     <Window.Resources>
-    <HierarchicalDataTemplate x:Key="TreeViewItemDataTemplate" ItemsSource="{Binding SubGpkList}" DataType="local:CompositeMapEntryViewModel">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Path Stretch="Uniform"
-                  x:Name="Icon"
-                  Width="12"
-                  Height="12"
-                  Margin="2 2 6 2">
-                <Path.Style>
-                    <Style TargetType="Path">
-                        <Setter Property="Data" Value="{StaticResource SvgPackage}" />
-                        <Setter Property="Fill" Value="{StaticResource RedBrush}" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsSubGpk}" Value="True">
-                                <Setter Property="Fill" Value="{StaticResource AccentBrush}" />
-                            </DataTrigger>
-                        </Style.Triggers>
+        <Style x:Key="TreeViewItemContainerStyle" TargetType="TreeViewItem">
+            <Setter Property="Padding" Value="4 2" />
+            <!-- ReSharper disable Xaml.BindingWithContextNotResolved -->
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=OneWayToSource}" />
+            <!-- ReSharper restore Xaml.BindingWithContextNotResolved -->
+        </Style>
+        <HierarchicalDataTemplate x:Key="SubGpkDataTemplate" DataType="local:CompositeMapEntryViewModel">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Path Stretch="Uniform"
+                      x:Name="Icon"
+                      Width="12"
+                      Height="12"
+                      VerticalAlignment="Top"
+                      Data="{StaticResource SvgPackage}"
+                      Fill="{StaticResource AccentBrush}"
+                      Margin="2 2 6 2" />
+                <TextBlock Foreground="#5fff"
+                           Margin="1"
+                           x:Name="EntryName"
+                           Grid.Column="1" >
+                    <Run Text="{Binding UID, Mode=OneWay}" Foreground="White"/>
+                    <Run Text="{Binding FileSize, Mode=OneWay}" />
+                    <LineBreak/>
+                    <Run Text="{Binding CompositeUID, Mode=OneWay}" />
+                    <LineBreak/>
+                    <Run Text="{Binding ParentGPK, Mode=OneWay}" />
+                </TextBlock>
 
-                    </Style>
-                </Path.Style>
-            </Path>
-            <TextBlock Text="{Binding UID}" 
-                  Foreground="White"
+            </Grid>
+            <HierarchicalDataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsFound}" Value="True">
+                    <DataTrigger.Setters>
+                        <Setter TargetName="EntryName" Property="Foreground" Value="DarkOrange" />
+                        <Setter TargetName="EntryName" Property="FontWeight" Value="DemiBold" />
+                    </DataTrigger.Setters>
+                </DataTrigger>
+            </HierarchicalDataTemplate.Triggers>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="CompositeGpkDataTemplate" DataType="local:CompositeMapEntryViewModel"
+                                  ItemsSource="{Binding SubGpkListView}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Path Stretch="Uniform"
+                      x:Name="Icon"
+                      Width="12"
+                      Height="12"
+                      Data="{StaticResource SvgPackage}"
+                      Fill="{StaticResource RedBrush}"
+                      Margin="2 2 6 2" />
+                <TextBlock Text="{Binding UID, Mode=OneWay}"
+                           Foreground="White"
+                           Grid.Column="1" />
+                <TextBlock Foreground="#5fff"
+                           Grid.Column="2"
+                           FontSize="11"
+                           Margin="5 0 0 0"
+                           Text="{Binding ContentInfo, Mode=OneWay}" />
 
-                  Grid.Column="1"/>
+            </Grid>
 
-</Grid>
-    </HierarchicalDataTemplate>
-</Window.Resources>
-        <Grid>
+        </HierarchicalDataTemplate>
+        <local:GpkTemplateSelector x:Key="GpkTemplateSelector"
+                                   SubGpkDataTemplate="{StaticResource SubGpkDataTemplate}"
+                                   CompositeGpkDataTemplate="{StaticResource CompositeGpkDataTemplate}" />
+        <HierarchicalDataTemplate x:Key="TreeViewItemDataTemplate" ItemsSource="{Binding SubGpkListView}"
+                                  DataType="local:CompositeMapEntryViewModel">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Path Stretch="Uniform"
+                      x:Name="Icon"
+                      Width="12"
+                      Height="12"
+                      Margin="2 2 6 2">
+                    <Path.Style>
+                        <Style TargetType="Path">
+                            <Setter Property="Data" Value="{StaticResource SvgPackage}" />
+                            <Setter Property="Fill" Value="{StaticResource RedBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSubGpk}" Value="True">
+                                    <Setter Property="Fill" Value="{StaticResource AccentBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+
+                        </Style>
+                    </Path.Style>
+                </Path>
+                <TextBlock
+                    Foreground="White"
+                    Grid.Column="1">
+                    <Run Text="{Binding UID, Mode=OneWay}" />
+                </TextBlock>
+                <Grid Grid.Column="2" x:Name="CountTbContainer">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Foreground="#5fff"
+                               FontSize="11"
+                               Text=" (" />
+                    <TextBlock x:Name="CountTbExpanded" Foreground="#5fff"
+                               FontSize="11"
+                               Grid.Column="1">
+                        <Run Text="{Binding LoadedSubGpkCount, Mode=OneWay}" /><Run Text="/" />
+                    </TextBlock>
+                    <TextBlock x:Name="CountTbNormal" Foreground="#5fff"
+                               FontSize="11"
+                               Grid.Column="2">
+                        <Run Text="{Binding SubGpkCount, Mode=OneWay}" /><Run Text=")" />
+                    </TextBlock>
+                </Grid>
+
+            </Grid>
+            <HierarchicalDataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsSubGpk}" Value="True">
+                    <Setter TargetName="CountTbContainer" Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSubTreeLoaded}" Value="False">
+                    <Setter TargetName="CountTbExpanded" Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </HierarchicalDataTemplate.Triggers>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
     <Grid>
+        <Grid>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="26"/>
+                <RowDefinition Height="26" />
                 <RowDefinition />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <!--Title bar-->
             <Grid MouseLeftButtonDown="Drag" Background="{StaticResource BackgroundBrush}">
@@ -71,26 +177,26 @@
 
                 <!--Window icon-->
                 <Path Style="{StaticResource TitleBarButtonContentStyle}"
-                  Data="{StaticResource SvgAddCircle}"
-                  Fill="{StaticResource AccentBrush}"
-                  VerticalAlignment="Center"
-                  Width="16" Height="16" />
+                      Data="{StaticResource SvgAddCircle}"
+                      Fill="{StaticResource AccentBrush}"
+                      VerticalAlignment="Center"
+                      Width="16" Height="16" />
                 <!--Window title-->
                 <TextBlock VerticalAlignment="Center"
-                       Text="Tera Helper 2 - Mapper view"
-                       Margin="10 0"
-                       Grid.Column="1" Foreground="#4fff"
-                       FontSize="13" />
+                           Text="Tera Helper 2 - Mapper view"
+                           Margin="10 0"
+                           Grid.Column="1" Foreground="#4fff"
+                           FontSize="13" />
                 <!--Minimize-->
                 <Button Style="{StaticResource TitleBarButtonStyle}" Grid.Column="3"
-                    Command="{Binding MinimizeCommand, RelativeSource={RelativeSource AncestorType=local:MapperWindow}}">
+                        Command="{Binding MinimizeCommand, RelativeSource={RelativeSource AncestorType=local:MapperWindow}}">
                     <Path Style="{StaticResource TitleBarButtonContentStyle}" Data="{StaticResource SvgMinimize}" />
                 </Button>
                 <!--Close-->
                 <Button Style="{StaticResource TitleBarButtonStyle}" Grid.Column="4"
-                    Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=local:MapperWindow}}">
+                        Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=local:MapperWindow}}">
                     <Path Style="{StaticResource TitleBarButtonContentStyle}" Data="{StaticResource SvgClose}"
-                      Fill="{StaticResource RedBrush}" />
+                          Fill="{StaticResource RedBrush}" />
                 </Button>
             </Grid>
             <!--Window content-->
@@ -99,9 +205,40 @@
                       Background="{StaticResource BackgroundBrushDark}"
                       BorderBrush="{StaticResource BorderBrush}"
                       FocusVisualStyle="{StaticResource EmptyFocusVisual}"
+                      ItemContainerStyle="{StaticResource TreeViewItemContainerStyle}"
+                      SelectedItemChanged="OnSelectedNodeChanged"
                       BorderThickness="1"
                       Grid.Row="1"
-                      ItemTemplate="{StaticResource TreeViewItemDataTemplate}"/>
+                      Margin="10 0 10 10 "
+                      ItemTemplateSelector="{StaticResource GpkTemplateSelector}">
+                <TreeView.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                     Color="{StaticResource SelectionColor}" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                                     Color="{StaticResource SelectionColor}" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+                                     Color="White" />
+                </TreeView.Resources>
+
+            </TreeView>
+            <Grid Grid.Row="2" Margin="10 0 10 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Search: " Foreground="#5fff" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" VerticalAlignment="Stretch" Foreground="White" VerticalContentAlignment="Center"
+                         Background="{StaticResource BackgroundBrushDark}" BorderThickness="0"
+                         Text="{Binding SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Style="{StaticResource ButtonMainStyle}" Content="Delete entry" Grid.Column="2" Margin="10 0"
+                        Padding="5" Background="{StaticResource HoverBrush}" extensions:ButtonExtensions.CornerRadius="3"
+                        Command="{Binding DeleteEntryCommand}"/>
+                <Button Style="{StaticResource ButtonMainStyle}" Content="Clear mapping" Grid.Column="3" Margin="0"
+                        Padding="5" Background="{StaticResource HoverBrush}" extensions:ButtonExtensions.CornerRadius="3"
+                        Command="{Binding ClearMappingCommand}"/>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
