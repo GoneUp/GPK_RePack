@@ -229,13 +229,13 @@ namespace GPK_RePack.Core.Model
         {
             LoadedGpkPackages.Remove(package);
 
-            PackagesChanged();
+            PackagesChanged?.Invoke();
         }
         public void clearGpkList()
         {
             LoadedGpkPackages.Clear();
 
-            PackagesChanged();
+            PackagesChanged?.Invoke();
         }
 
         public void clearCompositeMap()
