@@ -57,7 +57,7 @@ namespace GPK_RePack.Core.Model
             gpk.CompositeEntry = entry;
             LoadedGpkPackages.Add(gpk);
 
-            PackagesChanged();
+            PackagesChanged?.Invoke();
             return gpk;
         }
 
