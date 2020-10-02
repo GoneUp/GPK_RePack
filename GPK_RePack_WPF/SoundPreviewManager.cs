@@ -153,7 +153,7 @@ namespace GPK_RePack_WPF
                         bi.EndInit();
                         WaveForm = bi;
                     }
-                    _waveReader.Position = 0;
+                    if(_waveReader != null) _waveReader.Position = 0;
                 });
 
             });
