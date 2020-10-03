@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using Newtonsoft.Json;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using Size = System.Windows.Size;
 
@@ -8,22 +12,31 @@ namespace GPK_RePack.Core
 {
     public enum ViewMode
     {
+        [Description("Normal (imports/exports)")]
         Normal,
+        [Description("Per class")]
         Class,
+        [Description("Per package")]
         Package
     }
 
     public enum CopyMode
     {
+        [Description("Data and properties")]
         DataProps,
+        [Description("Data")]
         Data,
+        [Description("Properties")]
         Props,
+        [Description("Everything")]
         All
     }
 
 
     public class CoreSettings
     {
+        public event Action RecentFilesChanged;
+
         [JsonIgnore]
         public static CoreSettings Default { get; private set; }
 
@@ -54,6 +67,25 @@ namespace GPK_RePack.Core
         public Size WindowSize { get; set; } = new Size(1300, 800);
         public WindowState WindowState { get; set; } = WindowState.Normal;
         public bool LogToUI { get; set; } = true;
+        public List<string> RecentFiles { get; set; } = new List<string>();
+
+        public void AddRecentFile(string path)
+        {
+            if (RecentFiles.Count >= 10)
+            {
+                var last = RecentFiles.Last();
+                RecentFiles.Remove(last);
+            }
+
+            if (RecentFiles.Any(s => s == path))
+            {
+                RecentFiles.Remove(path);
+            }
+
+            RecentFiles.Insert(0, path);
+
+            RecentFilesChanged?.Invoke();
+        }
 
         public static void Load()
         {

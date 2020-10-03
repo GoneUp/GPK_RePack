@@ -384,7 +384,15 @@
                   HorizontalAlignment="Left">
                 <MenuItem Header="File">
                     <MenuItem Header="Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O" />
-                    <!--todo: open recent-->
+                    <MenuItem Header="Open recent" ItemsSource="{Binding RecentFiles}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="Command" Value="{Binding OpenCommand}"/>
+                                <Setter Property="Header" Value="{Binding FileName}"/>
+                                <Setter Property="ToolTip" Value="{Binding FullPath}"/>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
                     <Separator Style="{StaticResource SeparatorStyle}" />
                     <MenuItem Header="Load/show mapping" Command="{Binding LoadMappingCommand}"
                               InputGestureText="Ctrl+M" />

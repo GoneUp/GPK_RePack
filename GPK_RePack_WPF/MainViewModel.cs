@@ -74,7 +74,7 @@ namespace GPK_RePack_WPF
         private bool _dataButtonsEnabled;
         private int _progressValue;
         private Tab _selectedTab = 0;
-        
+
         private ImageSource _previewImage;
         private string _previewImageFormat;
         private string _previewImageName;
@@ -212,6 +212,7 @@ namespace GPK_RePack_WPF
             }
         }
         public TSObservableCollection<PropertyViewModel> Properties { get; }
+        public TSObservableCollection<RecentFileViewModel> RecentFiles { get; }
         public GpkTreeNode SelectedNode { get; set; }
         public ImageSource PreviewImage
         {
@@ -330,7 +331,7 @@ namespace GPK_RePack_WPF
         public ICommand ExportOGGCommand { get; }
         public ICommand ImportOGGCommand { get; }
         //todo
-        public ICommand AddEmptyOGGCommand { get; } 
+        public ICommand AddEmptyOGGCommand { get; }
 
         public ICommand DecryptDatCommand { get; }
         public ICommand EncryptDatCommand { get; }
@@ -357,7 +358,7 @@ namespace GPK_RePack_WPF
         public ICommand TryToLoadAllExportDataFromCompositeCommand { get; }
         public ICommand LoadCompositeDataForSelectedExportCommand { get; }
 
-        public ICommand ShowHelpCommand{ get; }
+        public ICommand ShowHelpCommand { get; }
 
         #endregion
 
@@ -377,9 +378,13 @@ namespace GPK_RePack_WPF
             //
             UpdateCheck.checkForUpdate(this);
             _gpkStore = new GpkStore();
-            //_gpkStore.PackagesChanged += OnPackagesChanged;
+            _gpkStore.PackagesChanged += OnPackagesChanged;
             TreeMain = new GpkTreeNode("");
             Properties = new TSObservableCollection<PropertyViewModel>();
+            RecentFiles = new TSObservableCollection<RecentFileViewModel>();
+            OnRecentFilesChanged();
+            CoreSettings.Default.RecentFilesChanged += OnRecentFilesChanged;
+
             _searchResultNodes = new List<GpkTreeNode>();
             SoundPreviewManager = new SoundPreviewManager();
             if (CoreSettings.Default.SaveDir == "")
@@ -460,6 +465,18 @@ namespace GPK_RePack_WPF
             ShowHelpCommand = new RelayCommand(ShowHelp);
         }
 
+        private void OnRecentFilesChanged()
+        {
+            RecentFiles.Clear();
+            CoreSettings.Default.RecentFiles.ForEach(s => RecentFiles.Add(new RecentFileViewModel(s)));
+        }
+
+        private void OnPackagesChanged()
+        {
+            Reset();
+            DrawPackages();
+        }
+
         private void ShowHelp()
         {
             //todo remake and format this
@@ -482,8 +499,8 @@ namespace GPK_RePack_WPF
                         SelectedTabIndex = (int)Tab.Texture;
                     }
                     break;
-                default: 
-                    SelectedTabIndex = (int)tab; 
+                default:
+                    SelectedTabIndex = (int)tab;
                     break;
             }
         }
@@ -598,6 +615,7 @@ namespace GPK_RePack_WPF
             foreach (var path in files)
             {
                 if (!File.Exists(path)) continue;
+                CoreSettings.Default.AddRecentFile(path);
                 var newTask = new Task(() =>
                 {
                     var reader = new Reader();
@@ -607,6 +625,7 @@ namespace GPK_RePack_WPF
                 runningTasks.Add(newTask);
                 newTask.Start();
             }
+            CoreSettings.Save();
 
             Task.Run(() =>
             {
@@ -2164,5 +2183,24 @@ namespace GPK_RePack_WPF
             LoadCompositeDataForExport(_selectedExport);
         }
 
+    }
+
+    public class RecentFileViewModel
+    {
+        public string FullPath { get; }
+        public string FileName { get; }
+        public ICommand OpenCommand { get; }
+
+        public RecentFileViewModel(string path)
+        {
+            FullPath = path;
+            FileName = Path.GetFileName(path);
+            OpenCommand = new RelayCommand(Open);
+        }
+
+        private void Open()
+        {
+            MainViewModel.Instance.OpenCommand.Execute(new[] { FullPath });
+        }
     }
 }
