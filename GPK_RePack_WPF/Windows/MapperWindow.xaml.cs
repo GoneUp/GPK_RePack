@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using GPK_RePack.Core;
 using NLog;
 
 namespace GPK_RePack_WPF.Windows
@@ -54,6 +55,12 @@ namespace GPK_RePack_WPF.Windows
             {
                 ((MapperViewModel)DataContext).SelectEntry(vm);
             }
+        }
+
+        private void OnSubGpkClicked(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount != 2) return;
+            ((MapperViewModel) DataContext).LoadGpk();
         }
     }
 
@@ -153,6 +160,14 @@ namespace GPK_RePack_WPF.Windows
             GpkListView.Refresh();
             SearchUpdated?.Invoke(_searchFilter);
         }
+
+        public void LoadGpk()
+        {
+            var path = $"{gpkStore.BaseSearchPath}\\{SelectedEntry.SubGPKName}.gpk";
+            CoreSettings.Default.AddRecentFile(path);
+            gpkStore.loadSubGpk(path, SelectedEntry);
+            CoreSettings.Save();
+        }
     }
 
 
@@ -215,6 +230,7 @@ namespace GPK_RePack_WPF.Windows
             get => _isExpanded;
             set
             {
+                if (IsSubGpk) return;
                 if (_isExpanded == value) return;
                 _isExpanded = value;
                 if (_isExpanded)

@@ -27,7 +27,7 @@
             <!-- ReSharper restore Xaml.BindingWithContextNotResolved -->
         </Style>
         <HierarchicalDataTemplate x:Key="SubGpkDataTemplate" DataType="local:CompositeMapEntryViewModel">
-            <Grid>
+            <Grid Background="Transparent" MouseLeftButtonDown="OnSubGpkClicked">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
@@ -164,6 +164,7 @@
                 <RowDefinition Height="32" />
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <!--Title bar-->
             <Grid MouseLeftButtonDown="Drag" Background="{StaticResource BackgroundBrush}">
@@ -240,6 +241,21 @@
                         Padding="5" Background="{StaticResource HoverBrush}" extensions:ButtonExtensions.CornerRadius="3"
                         Command="{Binding ClearMappingCommand}"/>
             </Grid>
+            <Grid Grid.Row="3" HorizontalAlignment="Center" Margin="0 -5 0 6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Path Data="{StaticResource SvgInfo}" Width="14" Height="14" 
+                      Fill="#2fff" Margin="0 0 4 0"></Path>
+                <TextBlock Foreground="#5fff" 
+                           Text="Use search to filter the list; double click on a sub-GPK to load it in main window"
+                           Grid.Column="1"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                />
+            </Grid>
+
         </Grid>
     </Grid>
 </Window>
