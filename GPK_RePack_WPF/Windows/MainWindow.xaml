@@ -603,7 +603,7 @@
                             </DataGrid.Columns>
                         </DataGrid>
                     </TabItem>
-                    <!--Texture-->
+                    <!--Texture/Sound-->
                     <TabItem Visibility="{Binding IsTextureTabVisible, Converter={StaticResource BoolToVisibility}}">
                         <TabItem.Header>
                             <Grid>
@@ -674,6 +674,11 @@
                     VerticalAlignment="Bottom" />
                 <controls:ImageToolbar
                     Visibility="{Binding ImageButtonsEnabled, Converter={StaticResource BoolToVisibility}}"
+                    Grid.Column="1" Margin="2 4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom" />
+                <controls:SoundToolbar
+                    Visibility="{Binding SoundButtonsEnabled, Converter={StaticResource BoolToVisibility}}"
                     Grid.Column="1" Margin="2 4"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom" />

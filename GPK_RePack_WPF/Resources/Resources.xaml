@@ -38,6 +38,48 @@
     <PathGeometry x:Key="SvgMusicNote">M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z</PathGeometry>
     <PathGeometry x:Key="SvgClearProperties">M14.46,15.88L15.88,14.46L18,16.59L20.12,14.46L21.54,15.88L19.41,18L21.54,20.12L20.12,21.54L18,19.41L15.88,21.54L14.46,20.12L16.59,18L14.46,15.88M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z</PathGeometry>
     <PathGeometry x:Key="SvgSaveAll">M17,7V3H7V7H17M14,17A3,3 0 0,0 17,14A3,3 0 0,0 14,11A3,3 0 0,0 11,14A3,3 0 0,0 14,17M19,1L23,5V17A2,2 0 0,1 21,19H7C5.89,19 5,18.1 5,17V3A2,2 0 0,1 7,1H19M1,7H3V21H17V23H3A2,2 0 0,1 1,21V7Z</PathGeometry>
+    <PathGeometry x:Key="SvgNoteOff">M4.27 3L3 4.27L12 13.27V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V15.27L19.73 21L21 19.73L4.27 3M14 7H18V3H12V8.18L14 10.18Z</PathGeometry>
+    <PathGeometry x:Key="SvgNoteImport">M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z M 5.8401064,3.0067454 8.668534,5.8351727 10.789854,3.7138524 V 10.784921 H 3.7187857 L 5.8401064,8.6635997 3.0116787,5.8351727 5.8401064,3.0067454</PathGeometry>
+    <PathGeometry x:Key="SvgNoteExport">M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z M 7.9614263,10.784921 5.1329987,7.9564937 3.0116787,10.077814 V 3.0067454 H 10.082747 L 7.9614263,5.1280667 10.789854,7.9564937 7.9614263,10.784921</PathGeometry>
+
+
+    <Style TargetType="{x:Type Grid}" x:Key="GlowHoverGrid">
+        <Style.Setters>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush Opacity="0">
+                        <GradientStop Color="#0ddf" />
+                        <GradientStop Color="#1ddf" Offset=".3" />
+                        <GradientStop Color="#1ddf" Offset=".7" />
+                        <GradientStop Color="#0ddf" Offset="1" />
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation From="0" To="1"
+                                             Storyboard.TargetProperty="(Grid.Background).(Brush.Opacity)"
+                                             Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation From="1" To="0"
+                                             Storyboard.TargetProperty="(Grid.Background).(Brush.Opacity)"
+                                             Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.ExitActions>
+
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 
     <Style x:Key="TitleBarButtonContentStyle" TargetType="Path">
         <Setter Property="Width" Value="14" />

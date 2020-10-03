@@ -117,6 +117,7 @@ namespace GPK_RePack_WPF
         public void Setup(byte[] soundwave)
         {
             ResetOggPreview();
+            if(soundwave.Length <= 1) return;
             _waveReader = new VorbisWaveReader(new MemoryStream(soundwave));
             RenderWaveForm();
             _waveOut.Init(_waveReader);
@@ -161,6 +162,7 @@ namespace GPK_RePack_WPF
 
         public void PlaySound()
         {
+            if (_waveReader == null) return;
             if (PlaybackState == PlaybackState.Paused)
             {
                 _startTime = DateTime.Now - _waveReader.CurrentTime;
@@ -188,6 +190,7 @@ namespace GPK_RePack_WPF
 
             _waveReader = null;
             _bmp?.Dispose();
+            this.WaveForm = null;
             //OggPreviewButtonText = "Ogg Preview";
         }
 

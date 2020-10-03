@@ -709,6 +709,7 @@ namespace GPK_RePack_WPF
             GeneralButtonsEnabled = false;
             DataButtonsEnabled = false;
             IsTextureTabVisible = false;
+            IsSoundTabVisible = false;
             N(nameof(PropertyButtonsEnabled));
             N(nameof(ImageButtonsEnabled));
             N(nameof(SoundButtonsEnabled));
