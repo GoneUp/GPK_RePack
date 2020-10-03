@@ -1,17 +1,225 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:extensions="clr-namespace:Nostrum.Extensions;assembly=Nostrum"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <DropShadowEffect x:Key="DropShadow" BlurRadius="4" ShadowDepth="2" Opacity=".4" />
 
-    <Color x:Key="BackgroundColor">#253040</Color>
+    <Color x:Key="BackgroundColor">#242b36</Color>
+    <Color x:Key="BackgroundColorDark">#16212a</Color>
+    <Color x:Key="BackgroundColorDarkDark">#06111a</Color>
     <Color x:Key="BorderColor">#506575</Color>
     <Color x:Key="AccentColor">#25A0A0</Color>
     <Color x:Key="RedColor">#FF4040</Color>
+    <Color x:Key="SelectionColor">#2FFF</Color>
+    <Color x:Key="HoverColor">#1FFF</Color>
 
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
+    <SolidColorBrush x:Key="BackgroundBrushDark" Color="{StaticResource BackgroundColorDark}" />
+    <SolidColorBrush x:Key="BackgroundBrushDarkDark" Color="{StaticResource BackgroundColorDarkDark}" />
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
     <SolidColorBrush x:Key="RedBrush" Color="{StaticResource RedColor}" />
+    <SolidColorBrush x:Key="SelectionBrush" Color="{StaticResource SelectionColor}" />
+    <SolidColorBrush x:Key="HoverBrush" Color="{StaticResource HoverColor}" />
+
+    <PathGeometry x:Key="SvgPackage">M5.12,5H18.87L17.93,4H5.93L5.12,5M20.54,5.23C20.83,5.57 21,6 21,6.5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V6.5C3,6 3.17,5.57 3.46,5.23L4.84,3.55C5.12,3.21 5.53,3 6,3H18C18.47,3 18.88,3.21 19.15,3.55L20.54,5.23M6,18H12V15H6V18Z</PathGeometry>
+    <PathGeometry x:Key="SvgImage">M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z</PathGeometry>
+    <PathGeometry x:Key="SvgCode">M12.89,3L14.85,3.4L11.11,21L9.15,20.6L12.89,3M19.59,12L16,8.41V5.58L22.42,12L16,18.41V15.58L19.59,12M1.58,12L8,5.58V8.41L4.41,12L8,15.58V18.41L1.58,12Z</PathGeometry>
+    <PathGeometry x:Key="SvgProperties">M3 5V19H20V5H3M7 7V9H5V7H7M5 13V11H7V13H5M5 15H7V17H5V15M18 17H9V15H18V17M18 13H9V11H18V13M18 9H9V7H18V9Z</PathGeometry>
+    <PathGeometry x:Key="SvgFile">M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z</PathGeometry>
+    <PathGeometry x:Key="SvgDeleteFile">M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M13,9H18.5L13,3.5V9M10,14.59L7.88,12.46L6.46,13.88L8.59,16L6.46,18.12L7.88,19.54L10,17.41L12.12,19.54L13.54,18.12L11.41,16L13.54,13.88L12.12,12.46L10,14.59Z</PathGeometry>
+    <PathGeometry x:Key="SvgImportImage">m 23.552636,3.3185417 -2.828428,2.8284271 2.121321,2.1213204 H 15.774461 V 1.1972214 l 2.12132,2.1213203 2.828427,-2.82842696 2.828428,2.82842696 M 21,11.94 V 19 c 0,1.104569 -0.895431,2 -2,2 H 5.0000002 c -1.10457,0 -2,-0.895431 -2,-2 V 5 c 0,-1.1045695 0.89543,-2 2,-2 H 12.06 C 12,3.33 12,3.67 12,4 c 0,4.418278 3.581722,8 8,8 0.33,0 0.67,0 1,-0.06 M 19,18 14.5,12 11,16.5 l -2.4999998,-3 -3.5,4.5 z</PathGeometry>
+    <PathGeometry x:Key="SvgExportImage">m 14.903806,6.767767 2.828427,-2.8284272 -2.12132,-2.1213203 7.071068,0 0,7.0710678 L 20.56066,6.767767 17.732233,9.5961941 14.903806,6.767767 M 21,11.94 V 19 c 0,1.104569 -0.895431,2 -2,2 H 5 C 3.8954305,21 3,20.104569 3,19 V 5 C 3,3.8954305 3.8954305,3 5,3 h 7.06 C 12,3.33 12,3.67 12,4 c 0,4.418278 3.581722,8 8,8 0.33,0 0.67,0 1,-0.06 M 19,18 14.5,12 11,16.5 8.5,13.5 5,18 Z</PathGeometry>
+    <PathGeometry x:Key="SvgExportFile">M6,2C4.89,2 4,2.9 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,3.5L18.5,9H13M8.93,12.22H16V19.29L13.88,17.17L11.05,20L8.22,17.17L11.05,14.35</PathGeometry>
+    <PathGeometry x:Key="SvgImportFile">M6,2C4.89,2 4,2.9 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,3.5L18.5,9H13M10.05,11.22L12.88,14.05L15,11.93V19H7.93L10.05,16.88L7.22,14.05</PathGeometry>
+    <PathGeometry x:Key="SvgPlay">M8,5.14V19.14L19,12.14L8,5.14Z</PathGeometry>
+    <PathGeometry x:Key="SvgPause">M14,19H18V5H14M6,19H10V5H6V19Z</PathGeometry>
+    <PathGeometry x:Key="SvgMusicNote">M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z</PathGeometry>
+    <PathGeometry x:Key="SvgClearProperties">M14.46,15.88L15.88,14.46L18,16.59L20.12,14.46L21.54,15.88L19.41,18L21.54,20.12L20.12,21.54L18,19.41L15.88,21.54L14.46,20.12L16.59,18L14.46,15.88M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z</PathGeometry>
+    <PathGeometry x:Key="SvgSaveAll">M17,7V3H7V7H17M14,17A3,3 0 0,0 17,14A3,3 0 0,0 14,11A3,3 0 0,0 11,14A3,3 0 0,0 14,17M19,1L23,5V17A2,2 0 0,1 21,19H7C5.89,19 5,18.1 5,17V3A2,2 0 0,1 7,1H19M1,7H3V21H17V23H3A2,2 0 0,1 1,21V7Z</PathGeometry>
+    <PathGeometry x:Key="SvgNoteOff">M4.27 3L3 4.27L12 13.27V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V15.27L19.73 21L21 19.73L4.27 3M14 7H18V3H12V8.18L14 10.18Z</PathGeometry>
+    <PathGeometry x:Key="SvgNoteImport">M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z M 5.8401064,3.0067454 8.668534,5.8351727 10.789854,3.7138524 V 10.784921 H 3.7187857 L 5.8401064,8.6635997 3.0116787,5.8351727 5.8401064,3.0067454</PathGeometry>
+    <PathGeometry x:Key="SvgNoteExport">M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z M 7.9614263,10.784921 5.1329987,7.9564937 3.0116787,10.077814 V 3.0067454 H 10.082747 L 7.9614263,5.1280667 10.789854,7.9564937 7.9614263,10.784921</PathGeometry>
+
+
+    <Style TargetType="{x:Type Grid}" x:Key="GlowHoverGrid">
+        <Style.Setters>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush Opacity="0">
+                        <GradientStop Color="#0ddf" />
+                        <GradientStop Color="#1ddf" Offset=".3" />
+                        <GradientStop Color="#1ddf" Offset=".7" />
+                        <GradientStop Color="#0ddf" Offset="1" />
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation From="0" To="1"
+                                             Storyboard.TargetProperty="(Grid.Background).(Brush.Opacity)"
+                                             Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation From="1" To="0"
+                                             Storyboard.TargetProperty="(Grid.Background).(Brush.Opacity)"
+                                             Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.ExitActions>
+
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TitleBarButtonContentStyle" TargetType="Path">
+        <Setter Property="Width" Value="14" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Fill" Value="White" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Stretch" Value="Uniform" />
+
+    </Style>
+    <Style x:Key="TitleBarButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonMainStyle}">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+
+    <!--Scrollbar Thumbs-->
+    <Style x:Key="ScrollThumbs" TargetType="{x:Type Thumb}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Grid x:Name="Grid">
+                        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto"
+                                       Height="Auto" Fill="Transparent" />
+                        <Border x:Name="Rectangle1" CornerRadius="0" HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch" Width="Auto" Height="Auto"
+                                    Background="{TemplateBinding Background}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Tag" Value="Horizontal">
+                            <Setter TargetName="Rectangle1" Property="Width" Value="Auto" />
+                            <Setter TargetName="Rectangle1" Property="Height" Value="7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">6</system:Double>
+    <system:Double x:Key="{x:Static SystemParameters.HorizontalScrollBarHeightKey}">6</system:Double>
+    <Style x:Key="{x:Type ScrollViewer}" TargetType="{x:Type ScrollViewer}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                    <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Rectangle x:Name="Corner" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Visibility="Collapsed" Grid.Row="1"/>
+                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="0" Margin="{TemplateBinding Padding}" Grid.Row="0"/>
+                        <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Grid.Row="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}"/>
+                        <ScrollBar x:Name="PART_HorizontalScrollBar" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" Grid.Column="0" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" Grid.Row="1" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportWidth}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--ScrollBars-->
+    <Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}">
+        <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
+        <Setter Property="Foreground" Value="{StaticResource SelectionBrush}" />
+        <Setter Property="Background" Value="#1fff" />
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Grid x:Name="GridRoot" Width="Auto" Background="{TemplateBinding Background}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.00001*" />
+                        </Grid.RowDefinitions>
+
+                        <Track x:Name="PART_Track" Grid.Row="0" IsDirectionReversed="true" Focusable="false">
+                            <Track.Thumb>
+                                <Thumb x:Name="Thumb" Background="{TemplateBinding Foreground}"
+                                           Style="{StaticResource ScrollThumbs}" />
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton x:Name="PageUp" Command="ScrollBar.PageDownCommand" Opacity="0"
+                                                  Focusable="false" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton x:Name="PageDown" Command="ScrollBar.PageUpCommand" Opacity="0"
+                                                  Focusable="false" />
+                            </Track.DecreaseRepeatButton>
+                        </Track>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="Thumb" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Orientation" Value="Horizontal">
+                            <Setter TargetName="GridRoot" Property="LayoutTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-90" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="PART_Track" Property="LayoutTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-90" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Width" Value="Auto" />
+                            <Setter TargetName="Thumb" Property="Tag" Value="Horizontal" />
+                            <Setter TargetName="PageDown" Property="Command" Value="ScrollBar.PageLeftCommand" />
+                            <Setter TargetName="PageUp" Property="Command" Value="ScrollBar.PageRightCommand" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxMainStyle}">
+        <Setter Property="Foreground" Value="White"></Setter>
+        <Setter Property="BorderThickness" Value="0"></Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+
+        <Setter Property="extensions:ComboBoxExtensions.DropDownBorderStyle">
+            <Setter.Value>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="{StaticResource BackgroundBrush}"></Setter>
+                    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"></Setter>
+                    <Setter Property="BorderThickness" Value="1"></Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+
 
     <Style TargetType="{x:Type ContextMenu}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -23,6 +231,7 @@
                 <ControlTemplate TargetType="{x:Type ContextMenu}">
                     <Border x:Name="Border" BorderThickness="1"
                             Background="{StaticResource BackgroundBrush}"
+                            BorderBrush="{StaticResource BorderBrush}"
                             Effect="{StaticResource DropShadow}">
                         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
                     </Border>
@@ -385,4 +594,16 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="Button" BasedOn="{StaticResource ButtonMainStyle}" x:Key="ToolbarButtonStyle">
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="Cursor" Value="Arrow" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="extensions:ButtonExtensions.CornerRadius" Value="3" />
+    </Style>
+
 </ResourceDictionary>

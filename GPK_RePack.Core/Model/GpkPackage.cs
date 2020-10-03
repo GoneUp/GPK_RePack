@@ -41,6 +41,13 @@ namespace GPK_RePack.Core.Model
         public readonly int datapuffer = 0;
         public bool x64;
 
+        private List<string> _innerTypes;
+        public List<string> InnerTypes =>
+            _innerTypes ??
+            (_innerTypes = (from pair in NameList.Values select pair.name).Append("None").ToList());
+
+
+
         //too much race conditions
         private object nameLock = new object();
         private object exportLock = new object();

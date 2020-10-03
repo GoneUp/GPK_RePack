@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="GPK_RePack_WPF.Controls.SoundToolbar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:gpkRePackWpf="clr-namespace:GPK_RePack_WPF"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance gpkRePackWpf:MainViewModel}">
+    <UniformGrid Columns="1">
+        <Button Style="{StaticResource ToolbarButtonStyle}"
+                Command="{Binding ImportOGGCommand}"
+                ToolTip="Import OGG">
+            <Path Data="{StaticResource SvgNoteImport}" Fill="White" />
+        </Button>
+        <Button Style="{StaticResource ToolbarButtonStyle}"
+                Command="{Binding ExportOGGCommand}"
+                ToolTip="Export OGG">
+            <Path Data="{StaticResource SvgNoteExport}" Fill="White" />
+        </Button>
+        <Button Style="{StaticResource ToolbarButtonStyle}"
+                Command="{Binding AddEmptyOGGCommand}"
+                ToolTip="Add silence">
+            <Path Data="{StaticResource SvgNoteOff}" Fill="White" />
+        </Button>
+    </UniformGrid>
+</UserControl>

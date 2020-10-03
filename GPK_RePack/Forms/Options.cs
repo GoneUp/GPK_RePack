@@ -21,16 +21,16 @@ namespace GPK_RePack.Forms
         {
             switch (CoreSettings.Default.CopyMode)
             {
-                case "dataprops":
+                case CopyMode.DataProps:
                     btnDataProps.Checked = true;
                     break;
-                case "data":
+                case CopyMode.Data:
                     btnData.Checked = true;
                     break;
-                case "props":
+                case CopyMode.Props:
                     btnProperties.Checked = true;
                     break;
-                case "all":
+                case CopyMode.All:
                     btnRadioAll.Checked = true;
                     break;
             }
@@ -50,13 +50,13 @@ namespace GPK_RePack.Forms
 
             switch (CoreSettings.Default.ViewMode)
             {
-                case "normal":
+                case ViewMode.Normal:
                     btnViewNormal.Checked = true;
                     break;
-                case "class":
+                case ViewMode.Class:
                     btnViewClass.Checked = true;
                     break;
-                case "package":
+                case ViewMode.Package:
                     btnViewPack.Checked = true;
                     break;
             }
@@ -92,22 +92,22 @@ namespace GPK_RePack.Forms
 
         private void btnDataProps_CheckedChanged(object sender, EventArgs e)
         {
-            CoreSettings.Default.CopyMode = "dataprops";
+            CoreSettings.Default.CopyMode = CopyMode.DataProps;
         }
 
         private void btnData_CheckedChanged(object sender, EventArgs e)
         {
-            CoreSettings.Default.CopyMode = "data";
+            CoreSettings.Default.CopyMode = CopyMode.Data;
         }
 
         private void btnProperties_CheckedChanged(object sender, EventArgs e)
         {
-            CoreSettings.Default.CopyMode = "props";
+            CoreSettings.Default.CopyMode = CopyMode.Props;
         }
 
         private void btnRadioAll_CheckedChanged(object sender, EventArgs e)
         {
-            CoreSettings.Default.CopyMode = "all";
+            CoreSettings.Default.CopyMode = CopyMode.All;
         }
 
         private void btnLogInfo_CheckedChanged(object sender, EventArgs e)
@@ -128,17 +128,17 @@ namespace GPK_RePack.Forms
 
         private void btnViewNormal_CheckedChanged(object sender, EventArgs e)
         {
-            CoreSettings.Default.ViewMode = "normal";
+            CoreSettings.Default.ViewMode = ViewMode.Normal;
         }
 
         private void btnViewClass_CheckedChanged(object sender, EventArgs e)
         {
-            CoreSettings.Default.ViewMode = "class";
+            CoreSettings.Default.ViewMode = ViewMode.Class;
         }
 
         private void btnViewPack_CheckedChanged(object sender, EventArgs e)
         {
-            CoreSettings.Default.ViewMode = "package";
+            CoreSettings.Default.ViewMode = ViewMode.Package;
         }
 
         private void boxDebug_CheckedChanged(object sender, EventArgs e)

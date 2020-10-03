@@ -151,7 +151,7 @@ namespace GPK_RePack.Core
         }
 
         [STAThread]
-        public static String[] GenerateOpenDialog(bool multiselect, Control cnt, bool useWorkingDir = true, string filter = "")
+        public static String[] GenerateOpenDialog(bool multiselect, bool useWorkingDir = true, string filter = "")
         {
             OpenFileDialog open = new OpenFileDialog();
             open.Multiselect = multiselect;

@@ -85,7 +85,6 @@ StyleCopReport.xml
 *.tlh
 *.tmp
 *.tmp_proj
-*.log
 *.vspscc
 *.vssscc
 .builds
@@ -340,3 +339,4 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 *.snk
+*.sln.DotSettings

@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="GPK_RePack_WPF.Controls.PropertiesToolbar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:extensions="clr-namespace:Nostrum.Extensions;assembly=Nostrum"
+             xmlns:gpkRePackWpf="clr-namespace:GPK_RePack_WPF"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance gpkRePackWpf:MainViewModel}">
+    <UniformGrid x:Name="PropertyButtonsGrid"
+                 Columns="1">
+        <Button Style="{StaticResource ToolbarButtonStyle}"
+                Command="{Binding SavePropertiesCommand}"
+                ToolTip="Save properties">
+            <Path Data="{StaticResource SvgSaveAll}" Fill="White" />
+        </Button>
+        <Button Style="{StaticResource ToolbarButtonStyle}"
+                Command="{Binding ClearPropertiesCommand}"
+                ToolTip="Clear properties">
+            <Path Data="{StaticResource SvgClearProperties}" Fill="White" />
+        </Button>
+        <Button Style="{StaticResource ToolbarButtonStyle}"
+                Command="{Binding ExportPropertiesToCsvCommand}"
+                ToolTip="Export to csv">
+            <Path Data="{StaticResource SvgExportFile}" Fill="White" />
+        </Button>
+    </UniformGrid>
+</UserControl>

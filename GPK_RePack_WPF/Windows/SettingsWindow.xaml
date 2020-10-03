@@ -1,0 +1,139 @@
+﻿<Window x:Class="GPK_RePack_WPF.Windows.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GPK_RePack_WPF.Windows"
+        xmlns:settings="clr-namespace:GPK_RePack_WPF.Controls.Settings"
+        xmlns:core="clr-namespace:GPK_RePack.Core;assembly=GPK_RePack.Core"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        BorderThickness="1"
+        WindowStartupLocation="CenterScreen"
+        BorderBrush="{StaticResource BorderBrush}"
+        ResizeMode="NoResize"
+        UseLayoutRounding="True"
+        Background="{StaticResource BackgroundBrush}"
+        Title="Tera Helper 2 - Mapper view" Height="Auto" Width="500"
+        SizeToContent="Height"
+        d:DataContext="{d:DesignInstance local:SettingsViewModel}">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="7 3 7 7"
+                      GlassFrameThickness="0 0 0 1"
+                      CornerRadius="0" />
+    </WindowChrome.WindowChrome>
+    <Window.Resources>
+        <Style TargetType="{x:Type settings:SelectionSetting}">
+            <Setter Property="Foreground" Value="White" ></Setter>
+            <Setter Property="ChoicesTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <ContentPresenter Content="{Binding Path=., Converter={StaticResource EnumDescriptionConverter}}"></ContentPresenter>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type settings:CheckboxSetting}">
+            <Setter Property="Foreground" Value="White" ></Setter>
+            <Setter Property="CheckBoxColor" Value="{StaticResource AccentBrush}" ></Setter>
+        </Style>
+        <Style TargetType="{x:Type settings:FieldSetting}">
+            <Setter Property="Foreground" Value="White" ></Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <!--Title bar-->
+            <Grid MouseLeftButtonDown="Drag" Background="{StaticResource BackgroundBrush}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="32" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--Window icon-->
+                <Image Source="..\Resources\TH.ico"
+                       VerticalAlignment="Center"
+                       Width="20" Height="20" 
+                       Stretch="Uniform"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       Margin="4 0 0 0"/>
+                <!--Window title-->
+                <TextBlock VerticalAlignment="Center"
+                           Text="Tera Helper 2 - Settings"
+                           Margin="5 -1 5 0"
+                           Grid.Column="1" Foreground="#4fff"
+                           FontSize="13" />
+                <!--Close-->
+                <Button Style="{StaticResource TitleBarButtonStyle}" Grid.Column="4"
+                        Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=local:SettingsWindow}}">
+                    <Path Style="{StaticResource TitleBarButtonContentStyle}" Data="{StaticResource SvgClose}"
+                          Fill="{StaticResource RedBrush}" />
+                </Button>
+            </Grid>
+            <!--Window content-->
+            <Grid Grid.Row="1" Margin="10 0 10 5">
+                <Border Background="{StaticResource BackgroundBrushDark}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"></Border>
+                <StackPanel Margin="0 0 3 0">
+                    <settings:SelectionSetting SettingName="View mode" 
+                                           Choices="{Binding ViewModes}"
+                                           ChoicesType="{x:Type core:ViewMode}"
+                                           SelectedItem="{Binding ViewMode, Mode=TwoWay}"/>
+                    <settings:SelectionSetting SettingName="Copy mode" 
+                                           Choices="{Binding CopyModes}"
+                                           ChoicesType="{x:Type core:CopyMode}"
+                                           SelectedItem="{Binding CopyMode, Mode=TwoWay}"/>
+                    <settings:SelectionSetting SettingName="Log level" 
+                                               ChoicesTemplate="{x:Null}"
+                                           Choices="{Binding LogLevels}"
+                                           ChoicesType="{x:Type sys:String}"
+                                           SelectedItem="{Binding LogLevel, Mode=TwoWay}"/>
+                    <settings:CheckboxSetting SettingName="Show imports"
+                                          IsOn="{Binding ShowImports, Mode=TwoWay}"/>
+                    <settings:CheckboxSetting SettingName="UID tree"
+                                          IsOn="{Binding UseUID, Mode=TwoWay}"/>
+                    <settings:CheckboxSetting SettingName="Patch mode"
+                                          IsOn="{Binding PatchMode, Mode=TwoWay}"/>
+                    <settings:CheckboxSetting SettingName="JIT data"
+                                          IsOn="{Binding JitData, Mode=TwoWay}"/>
+                    <settings:CheckboxSetting SettingName="Debug mode"
+                                          IsOn="{Binding DebugMode, Mode=TwoWay}"/>
+                    <settings:CheckboxSetting SettingName="Texture support"
+                                          IsOn="{Binding TextureSupport, Mode=TwoWay}"/>
+                    <settings:CheckboxSetting SettingName="Generate MipMaps"
+                                          IsOn="{Binding GenerateMipMaps, Mode=TwoWay}"/>
+                    <settings:CheckboxSetting SettingName="Load mapping on startup"
+                                          IsOn="{Binding LoadMappingOnStart, Mode=TwoWay}"/>
+                    <settings:CheckboxSetting SettingName="Enable GPK compression on save"
+                                          IsOn="{Binding EnableCompression, Mode=TwoWay}"/>
+                    <settings:FieldSetting SettingName="Save suffix"
+                                            Value="{Binding SaveFileSuffix, Mode=TwoWay}"/>
+
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="2" HorizontalAlignment="Center" Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Path Data="{StaticResource SvgInfo}" Width="14" Height="14" Fill="#2fff" Margin="0 0 4 0"></Path>
+                <TextBlock Foreground="#5fff" Text="Settings are saved when closing this window"
+                           Grid.Column="1"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       />
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

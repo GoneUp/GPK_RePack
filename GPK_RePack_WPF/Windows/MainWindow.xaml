@@ -1,0 +1,727 @@
+﻿<Window x:Class="GPK_RePack_WPF.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wpf="clr-namespace:GPK_RePack_WPF"
+        xmlns:controls="clr-namespace:GPK_RePack_WPF.Controls"
+        xmlns:windows="clr-namespace:GPK_RePack_WPF.Windows"
+        xmlns:extensions="clr-namespace:Nostrum.Extensions;assembly=Nostrum"
+        WindowStyle="SingleBorderWindow"
+        BorderThickness="1"
+        WindowStartupLocation="CenterScreen"
+        BorderBrush="{StaticResource BorderBrush}"
+        UseLayoutRounding="True"
+        Background="{StaticResource BackgroundBrush}"
+        mc:Ignorable="d"
+        Title="Tera Helper"
+        Height="{Binding WindowHeight, Mode=TwoWay}"
+        Width="{Binding WindowWidth, Mode=TwoWay}"
+        WindowState="{Binding WindowState, Mode=TwoWay}"
+        d:DataContext="{d:DesignInstance wpf:MainViewModel}">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="7 3 7 7"
+                      GlassFrameThickness="0 0 0 1"
+                      CornerRadius="0" />
+    </WindowChrome.WindowChrome>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding OpenCommand}" Modifiers="Control" Key="O" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="S"
+                    CommandParameter="{x:Static wpf:SaveMode.Rebuild}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="P"
+                    CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}" />
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control+Shift" Key="P"
+                    CommandParameter="{x:Static wpf:SaveMode.Patched}" />
+
+        <KeyBinding Command="{Binding RefreshCommand}" Modifiers="Control" Key="R" />
+        <KeyBinding Command="{Binding ClearCommand}" Modifiers="Control" Key="N" />
+
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D1"
+                    CommandParameter="{x:Static wpf:Tab.Info}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D2"
+                    CommandParameter="{x:Static wpf:Tab.Properties}" />
+        <KeyBinding Command="{Binding SwitchTabCommand}" Modifiers="Control" Key="D3"
+                    CommandParameter="{x:Static wpf:Tab.Texture}" />
+
+        <KeyBinding Command="{Binding LoadMappingCommand}" Modifiers="Control" Key="M" />
+
+        <KeyBinding Command="{Binding SearchCommand}" Modifiers="Control" Key="F" />
+        <KeyBinding Command="{Binding SearchNextCommand}" Modifiers="Shift" Key="F3" CommandParameter="True" />
+        <KeyBinding Command="{Binding SearchNextCommand}" Key="F3" CommandParameter="False" />
+
+        <KeyBinding
+            Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
+            Modifiers="Ctrl+Alt" Key="S" />
+        <KeyBinding Command="{Binding SearchCommand}" Modifiers="Control" Key="F" />
+        <KeyBinding Command="{Binding SearchNextCommand}" Key="F3" />
+        <KeyBinding Command="{Binding SearchNextCommand}" Modifiers="Shift" Key="F3" CommandParameter="True" />
+    </Window.InputBindings>
+    <Window.Style>
+        <Style TargetType="Window">
+            <Style.Triggers>
+                <Trigger Property="WindowState" Value="Maximized">
+                    <Setter Property="Padding" Value="6" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
+    <Window.Resources>
+        <Style x:Key="ColumnHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0 0 0 1" />
+            <Setter Property="BorderBrush" Value="#1fff" />
+            <Setter Property="FontWeight" Value="DemiBold" />
+            <Setter Property="Padding" Value="16 0" />
+        </Style>
+        <Style x:Key="CellStyle" TargetType="DataGridCell" >
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Margin" Value="0 0 -1 0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        </Style>
+        <Style x:Key="TabItemIconStyle" TargetType="Path" >
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Stretch" Value="Uniform" />
+            <Setter Property="Fill" Value="#5fff" />
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
+        </Style>
+        <Style x:Key="TabItemLabelStyle" TargetType="TextBlock" >
+            <Setter Property="Grid.Row" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="#5fff" />
+            <Setter Property="FontSize" Value="10" />
+        </Style>
+        <Style x:Key="SeparatorStyle" TargetType="Separator" >
+            <Setter Property="Background" Value="#2fff" />
+            <Setter Property="Margin" Value="0 0 10 0" />
+        </Style>
+        <Style x:Key="TabItemStyle" TargetType="TabItem" >
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid Name="Panel">
+                            <Grid.Background>
+                                <LinearGradientBrush Opacity="0">
+                                    <GradientStop Color="#1ddf" Offset="0" />
+                                    <GradientStop Color="#0ddf" Offset=".8" />
+                                </LinearGradientBrush>
+
+                            </Grid.Background>
+                            <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="InnerGrid"
+                                  Background="Transparent">
+                                <Border x:Name="ExpandSelector"
+                                        Background="{StaticResource BackgroundBrushDark}"
+                                        BorderThickness="0 1 1 1"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        Width="Auto"
+                                        IsHitTestVisible="False"
+                                        HorizontalAlignment="Stretch"
+                                        RenderTransformOrigin="0 .5"
+                                        Margin="-1 0 0 0"
+                                        VerticalAlignment="Stretch">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="0" />
+                                    </Border.RenderTransform>
+                                </Border>
+
+                            </Grid>
+                            <ContentPresenter x:Name="ContentSite"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"
+                                              ContentSource="Header"
+                                              Margin="5" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="InnerGrid" Property="Background" Value="#1fff" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation To="1" Duration="0:0:0.2"
+                                                             Storyboard.TargetName="ExpandSelector"
+                                                             Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                                             EasingFunction="{StaticResource QuadraticEase}" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation To="0" Duration="0:0:0.2"
+                                                             Storyboard.TargetName="ExpandSelector"
+                                                             Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                                             EasingFunction="{StaticResource QuadraticEase}" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TreeViewItemContainerStyle" TargetType="TreeViewItem">
+            <Setter Property="Padding" Value="4 2" />
+            <!-- ReSharper disable Xaml.BindingWithContextNotResolved -->
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <!-- ReSharper restore Xaml.BindingWithContextNotResolved -->
+        </Style>
+        <HierarchicalDataTemplate x:Key="TreeItemTemplate" DataType="wpf:GpkTreeNode" ItemsSource="{Binding Children}">
+            <Grid PreviewMouseDown="OnTreeNodeMouseButtonDown">
+                <Grid.ContextMenu>
+                    <ContextMenu x:Name="NodeCtxMenu">
+                        <MenuItem x:Name="SaveGpkBtn" Header="Save GPK (rebuild)"
+                                  Command="{Binding MainVM.SaveSingleGpkCommand}" Visibility="Collapsed" />
+                        <MenuItem x:Name="ExportRawBtn" Header="Export raw"
+                                  Command="{Binding MainVM.ExportRawDataCommand}" />
+                        <MenuItem x:Name="ImportRawBtn" Header="Import raw"
+                                  Command="{Binding MainVM.ImportRawDataCommand}" />
+                        <MenuItem x:Name="DeleteDataBtn" Header="Delete data"
+                                  Command="{Binding MainVM.DeleteDataCommand}" />
+                        <MenuItem x:Name="ExportOggBtn" Header="Export OGG" Command="{Binding MainVM.ExportOGGCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="ImportOggBtn" Header="Import OGG" Command="{Binding MainVM.ImportOGGCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="ExportDdsBtn" Header="Export DDS" Command="{Binding MainVM.ExportDDSCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="ImportDdsBtn" Header="Import DDS" Command="{Binding MainVM.ImportDDSCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="CopyBtn" Header="Copy" Command="{Binding MainVM.CopyObjectCommand}" />
+                        <MenuItem x:Name="PasteBtn" Header="Replace" Command="{Binding MainVM.PasteObjectCommand}" />
+                        <MenuItem x:Name="LoadCompDataBtn" Header="Try to load composite data"
+                                  Command="{Binding MainVM.LoadCompositeDataForSelectedExportCommand}" />
+                        <MenuItem x:Name="InsertBtn" Header="Insert as new Export"
+                                  Command="{Binding MainVM.InsertObjectCommand}"
+                                  Visibility="Collapsed" />
+                        <MenuItem x:Name="RemoveBtn" Header="Remove" Command="{Binding MainVM.RemoveObjectCommand}" />
+                        <MenuItem x:Name="RenameBtn" Header="Rename" Command="{Binding MainVM.RenameObjectCommand}" />
+                    </ContextMenu>
+                </Grid.ContextMenu>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Path Stretch="Uniform"
+                      x:Name="Icon"
+                      Width="12"
+                      Height="12"
+                      Margin="2 2 6 2">
+                    <Path.Style>
+                        <Style TargetType="Path">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPackage}" Value="True">
+                                    <Setter Property="Fill" Value="{StaticResource AccentBrush}" />
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Setter Property="Data" Value="{StaticResource SvgPackage}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Class}" Value="Core.Texture2D">
+                                    <Setter Property="Fill" Value="DarkOrange" />
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Setter Property="Data" Value="{StaticResource SvgImage}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Class}" Value="Core.GFxMovieInfo">
+                                    <Setter Property="Fill" Value="DarkOrange" />
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Setter Property="Data" Value="{StaticResource SvgCode}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Class}" Value="Core.SoundNodeWave">
+                                    <Setter Property="Fill" Value="DarkOrange" />
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Setter Property="Data" Value="{StaticResource SvgMusicNote}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+
+                        </Style>
+                    </Path.Style>
+                </Path>
+                <TextBlock Grid.Column="1" Foreground="White">
+                    <Run Text="{Binding Name,Mode=OneWay}" />
+                    <Run Text="{Binding KeyNoName,Mode=OneWay}" Foreground="#5fff" FontSize="10" />
+                </TextBlock>
+            </Grid>
+            <HierarchicalDataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsLeaf}" Value="false">
+                    <Setter TargetName="ImportRawBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="ExportRawBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="CopyBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="PasteBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="LoadCompDataBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="RemoveBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="RenameBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="DeleteDataBtn" Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Class}" Value="Core.Texture2D">
+                    <Setter TargetName="ExportDdsBtn" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="ImportDdsBtn" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsPackage}" Value="true">
+                    <Setter TargetName="ImportRawBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="ExportRawBtn" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="InsertBtn" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="CopyBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="PasteBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="LoadCompDataBtn" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="RemoveBtn" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="RenameBtn" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="SaveGpkBtn" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Class}" Value="Core.SoundNodeWave">
+                    <Setter TargetName="ExportOggBtn" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="ImportOggBtn" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </HierarchicalDataTemplate.Triggers>
+
+        </HierarchicalDataTemplate>
+        <Style x:Key="DataGridRowStyle" TargetType="DataGridRow" >
+            <Setter Property="Background" Value="#0fff" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1fff" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="NameCellTemplate" DataType="wpf:PropertyViewModel" >
+            <TextBlock Background="Transparent" Cursor="Arrow" Foreground="White"
+                       Text="{Binding Name}" Margin="16 0" VerticalAlignment="Center" />
+        </DataTemplate>
+        <DataTemplate x:Key="SizeCellTemplate" DataType="wpf:PropertyViewModel" >
+            <TextBlock Text="{Binding Size}" Margin="16 0" VerticalAlignment="Center"
+                       HorizontalAlignment="Right" />
+        </DataTemplate>
+        <Style x:Key="SizeColumnHeaderStyle"
+               TargetType="DataGridColumnHeader"
+               BasedOn="{StaticResource ColumnHeaderStyle}">
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+        </Style>
+        <DataTemplate x:Key="TypeCellTemplate" DataType="wpf:PropertyViewModel">
+            <ComboBox Margin="9 0" SelectedItem="{Binding PropertyType, Mode=TwoWay}"
+                      ItemsSource="{x:Static wpf:MainViewModel.PropertyTypes}" />
+        </DataTemplate>
+        <DataTemplate x:Key="InnerTypeCellTemplate" DataType="wpf:PropertyViewModel">
+            <ComboBox Margin="9 0" SelectedItem="{Binding InnerType, Mode=TwoWay}"
+                      ItemsSource="{Binding InnerTypes}" />
+        </DataTemplate>
+        <Style x:Key="ValueCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource CellStyle}">
+            <Setter Property="Margin" Value="-1 0 -1 0" />
+        </Style>
+        <wpf:ValueCellTemplateSelector x:Key="ValueCellTemplateSlector">
+            <wpf:ValueCellTemplateSelector.TextTemplate>
+                <DataTemplate DataType="wpf:PropertyViewModel">
+                    <TextBox Margin="14 0" Text="{Binding Value, Mode=TwoWay}"
+                             BorderThickness="0"
+                             VerticalAlignment="Center"
+                             MaxLines="1"
+                             Background="Transparent"
+                             Foreground="White"
+                             CaretBrush="{StaticResource AccentBrush}"
+                             ToolTip="{Binding Value}" />
+                </DataTemplate>
+            </wpf:ValueCellTemplateSelector.TextTemplate>
+            <wpf:ValueCellTemplateSelector.EnumTemplate>
+                <DataTemplate DataType="wpf:PropertyViewModel">
+                    <ComboBox Margin="9 0" SelectedItem="{Binding Value, Mode=TwoWay}"
+                              ItemsSource="{Binding InnerTypes}" />
+                </DataTemplate>
+            </wpf:ValueCellTemplateSelector.EnumTemplate>
+        </wpf:ValueCellTemplateSelector>
+    </Window.Resources>
+
+    <Grid x:Name="MainContent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <!--Title bar-->
+        <Grid MouseLeftButtonDown="Drag"
+              Background="Transparent"
+              Margin="0 0 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--Window icon-->
+            <Image Source="..\Resources\TH.ico"
+                  VerticalAlignment="Center"
+                  Width="20" Height="20" 
+                  Stretch="Uniform"
+                  RenderOptions.BitmapScalingMode="HighQuality"
+                  Margin="4 0 0 0"/>
+            <!--Window title-->
+            <TextBlock VerticalAlignment="Center"
+                       Text="Tera Helper 2"
+                       Margin="5 -1 5 0"
+                       Grid.Column="1" Foreground="#4fff"
+                       FontSize="13" />
+            <!--Minimize-->
+            <Button Style="{StaticResource TitleBarButtonStyle}" Grid.Column="3"
+                    Command="{Binding MinimizeCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}">
+                <Path Style="{StaticResource TitleBarButtonContentStyle}" Data="{StaticResource SvgMinimize}" />
+            </Button>
+            <!--Close-->
+            <Button Style="{StaticResource TitleBarButtonStyle}" Grid.Column="4"
+                    Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}">
+                <Path Style="{StaticResource TitleBarButtonContentStyle}" Data="{StaticResource SvgClose}"
+                      Fill="{StaticResource RedBrush}" />
+            </Button>
+            <!--Menu-->
+            <Menu Grid.Column="2" Background="Transparent"
+                  Foreground="#8fff" VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  HorizontalAlignment="Left">
+                <MenuItem Header="File">
+                    <MenuItem Header="Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O" />
+                    <MenuItem Header="Open recent" ItemsSource="{Binding RecentFiles}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="Command" Value="{Binding OpenCommand}"/>
+                                <Setter Property="Header" Value="{Binding FileName}"/>
+                                <Setter Property="ToolTip" Value="{Binding FullPath}"/>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header="Load/show mapping" Command="{Binding LoadMappingCommand}"
+                              InputGestureText="Ctrl+M" />
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+
+                    <MenuItem Header="Save all (rebuild mode)..."
+                              Command="{Binding SaveCommand}"
+                              CommandParameter="{x:Static wpf:SaveMode.Rebuild}"
+                              InputGestureText="Ctrl+S" />
+                    <MenuItem Header="Save all (rebuild mode with padding)..."
+                              Command="{Binding SaveCommand}"
+                              CommandParameter="{x:Static wpf:SaveMode.RebuildPadding}"
+                              InputGestureText="Ctrl+P" />
+                    <MenuItem Header="Save all (patched, not recommended)"
+                              Command="{Binding SaveCommand}"
+                              CommandParameter="{x:Static wpf:SaveMode.Patched}"
+                              InputGestureText="Ctrl+Shift+P" />
+
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+
+                    <MenuItem Header="Save and patch original Composite (not recommended)"
+                              Command="{Binding SaveCommand}"
+                              CommandParameter="{x:Static wpf:SaveMode.PatchedComposite}" />
+                    <MenuItem Header="Save and add new composite GPK (not recommended)"
+                              Command="{Binding SaveCommand}"
+                              CommandParameter="{x:Static wpf:SaveMode.AddedComposite}" />
+                    <MenuItem Header="Save mappers..." Command="{Binding WriteMappingCommand}" />
+                    <MenuItem Header="Save mappers for selected package"
+                              Command="{Binding PatchObjectMapperForSelectedPackageCommand}" />
+
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header=".dat decryption" Command="{Binding DecryptDatCommand}" />
+                    <MenuItem Header=".dat encryption" Command="{Binding EncryptDatCommand}" />
+
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+
+                    <MenuItem Header="Exit"
+                              Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
+                              InputGestureText="Alt+F4" />
+                </MenuItem>
+
+                <MenuItem Header="Edit">
+                    <MenuItem Header="Rename object" Command="{Binding RenameObjectCommand}" />
+                    <MenuItem Header="Set file size" Command="{Binding SetFileSizeCommand}" />
+                    <MenuItem Header="Minimize selected GPK" Command="{Binding MinimizeGpkCommand}" />
+                    <MenuItem Header="Add name" Command="{Binding AddNameCommand}" />
+                    <MenuItem Header="Import data from composite"
+                              Command="{Binding TryToLoadAllExportDataFromCompositeCommand}" />
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+
+                    <MenuItem Header="Properties">
+                        <MenuItem Header="Export big ByteProp" Command="{Binding BigBytePropExportCommand}" />
+                        <MenuItem Header="Import big ByteProp" Command="{Binding BigBytePropImportCommand}" />
+                        <MenuItem Header="Set all properties">
+                            <MenuItem Header="Custom" Command="{Binding SetPropsCustomCommand}" />
+                            <MenuItem Header="Set all volume multipliers"
+                                      Command="{Binding SetVolumeMultipliersCommand}" />
+                        </MenuItem>
+                    </MenuItem>
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+
+                    <MenuItem Header="Settings"
+                              Command="{Binding OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=windows:MainWindow}}"
+                              InputGestureText="Ctrl+Alt+S" />
+                </MenuItem>
+
+                <MenuItem Header="View">
+                    <MenuItem Header="Find..." InputGestureText="Ctrl+F" Command="{Binding SearchCommand}" />
+                    <MenuItem Header="Previous result" InputGestureText="Shift+F3" Command="{Binding SearchCommand}"
+                              CommandParameter="true" />
+                    <MenuItem Header="Next result" InputGestureText="F3" Command="{Binding SearchNextCommand}" />
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header="Refresh view" Command="{Binding RefreshCommand}" InputGestureText="Ctrl+R" />
+                    <MenuItem Header="Clear" Command="{Binding ClearCommand}" InputGestureText="Ctrl+N" />
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header="Log to textbox" IsCheckable="True" IsChecked="{Binding LogToUI, Mode=TwoWay}" />
+                </MenuItem>
+
+                <MenuItem Header="Export">
+                    <MenuItem Header="Dump composite textures" Command="{Binding DumpAllTexturesCommand}" />
+                    <MenuItem Header="Dump icons" Command="{Binding DumpIconsCommand}" />
+                    <MenuItem Header="Dump GPK objects" Command="{Binding DumpGPKObjectsCommand}" />
+
+                </MenuItem>
+
+                <MenuItem Header="Help">
+                    <MenuItem Header="Show help" Command="{Binding ShowHelpCommand}" />
+                </MenuItem>
+            </Menu>
+        </Grid>
+        <!--Window content-->
+        <Grid ShowGridLines="False" Grid.Row="2" Margin="0 -6 0 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding TopSize, Mode=TwoWay}" MinHeight="100" />
+                <RowDefinition Height="{Binding LogSize, Mode=TwoWay}" MinHeight="6" />
+                <RowDefinition Height="26" />
+            </Grid.RowDefinitions>
+
+            <!--Tree + Details-->
+            <Grid ShowGridLines="False" Margin="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition MinWidth="100" Width="{Binding TreeViewSize, Mode=TwoWay}" />
+                    <ColumnDefinition MinWidth="100" Width="{Binding PropViewSize, Mode=TwoWay}" />
+                </Grid.ColumnDefinitions>
+                <!--Tree-->
+                <!--todo: style TreeView arrows-->
+                <TreeView x:Name="TreeView"
+                          ItemsSource="{Binding TreeMain.Children}"
+                          AllowDrop="True"
+                          Margin="3 5 6 5"
+                          HorizontalAlignment="Stretch"
+                          Background="{StaticResource BackgroundBrushDark}"
+                          BorderBrush="{StaticResource BorderBrush}"
+                          ItemContainerStyle="{StaticResource TreeViewItemContainerStyle}"
+                          ItemTemplate="{StaticResource TreeItemTemplate}"
+                          Drop="OnTreeViewDrop"
+                          SelectedItemChanged="OnSelectedNodeChanged">
+                    <TreeView.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                         Color="{StaticResource SelectionColor}" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                                         Color="{StaticResource SelectionColor}" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+                                         Color="White" />
+                    </TreeView.Resources>
+
+                </TreeView>
+
+                <GridSplitter Width="2" Height="30"
+                              Background="{StaticResource SelectionBrush}"
+                              ResizeDirection="Columns"
+                              Margin="0 20 -1 20" />
+
+                <!--Details-->
+                <TabControl Background="Transparent"
+                            SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
+                            BorderThickness="0" Grid.Column="1"
+                            Margin="6 3 3 3"
+                            x:Name="MainTabControl"
+                            TabStripPlacement="Right"
+                            ItemContainerStyle="{StaticResource TabItemStyle}">
+                    <!--Info-->
+                    <TabItem>
+                        <TabItem.Header>
+                            <Grid ToolTip="Info">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Path Style="{StaticResource TabItemIconStyle}" Data="{StaticResource SvgInfo}" />
+                                <TextBlock Style="{StaticResource TabItemLabelStyle}" Text="Info" />
+                            </Grid>
+                        </TabItem.Header>
+                        <TextBox Text="{Binding InfoText, Mode=OneWay}"
+                                 Margin="-2 0"
+                                 Foreground="#9fff"
+                                 Background="{StaticResource BackgroundBrushDark}"
+                                 BorderBrush="{StaticResource BorderBrush}"
+                                 SelectionBrush="{StaticResource AccentBrush}"
+                                 IsReadOnly="True"
+                                 BorderThickness="1"
+                                 VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Auto" />
+
+                    </TabItem>
+                    <!--Properties-->
+                    <TabItem>
+                        <TabItem.Header>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Path Style="{StaticResource TabItemIconStyle}" Data="{StaticResource SvgProperties}" />
+                                <TextBlock Style="{StaticResource TabItemLabelStyle}" Text="Prop" />
+                            </Grid>
+                        </TabItem.Header>
+                        <TabItem.Resources>
+
+                        </TabItem.Resources>
+                        <DataGrid ItemsSource="{Binding Properties}"
+                                  Background="{StaticResource BackgroundBrushDark}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  CanUserReorderColumns="False"
+                                  CanUserSortColumns="False"
+                                  ColumnHeaderHeight="36"
+                                  Foreground="White"
+                                  RowHeaderWidth="0"
+                                  RowHeight="32"
+                                  Margin="-2 0"
+                                  SelectedItem="{Binding SelectedProperty, Mode=OneWayToSource}"
+                                  VerticalGridLinesBrush="Transparent"
+                                  BorderThickness="1"
+                                  BorderBrush="{StaticResource BorderBrush}"
+                                  HorizontalGridLinesBrush="#1fff"
+                                  RowStyle="{StaticResource DataGridRowStyle}"
+                                  ColumnHeaderStyle="{StaticResource ColumnHeaderStyle}"
+                                  CellStyle="{StaticResource CellStyle}">
+                            <DataGrid.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                                 Color="{StaticResource SelectionColor}" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                                                 Color="{StaticResource SelectionColor}" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+                                                 Color="White" />
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="Name" Width="Auto" CellTemplate="{StaticResource NameCellTemplate}" />
+                                <DataGridTemplateColumn Header="Size" Width="Auto" CellTemplate="{StaticResource SizeCellTemplate}"
+                                                        HeaderStyle="{StaticResource SizeColumnHeaderStyle}" />
+                                <DataGridTemplateColumn Header="Type" Width="*" CellTemplate="{StaticResource TypeCellTemplate}" />
+                                <DataGridTemplateColumn Header="Inner type" Width="*" CellTemplate="{StaticResource InnerTypeCellTemplate}" />
+                                <DataGridTemplateColumn Header="Value" Width="*" CellTemplateSelector="{StaticResource ValueCellTemplateSlector}" CellStyle="{StaticResource ValueCellStyle}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <!--Texture/Sound-->
+                    <TabItem Visibility="{Binding IsTextureTabVisible, Converter={StaticResource BoolToVisibility}}">
+                        <TabItem.Header>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Path Style="{StaticResource TabItemIconStyle}" Data="{StaticResource SvgImage}"
+                                      Fill="DarkOrange" />
+                                <TextBlock Style="{StaticResource TabItemLabelStyle}" Text="Img" />
+                            </Grid>
+                        </TabItem.Header>
+                        <controls:ImagePreview Image="{Binding PreviewImage}"
+                                               ImageFormat="{Binding PreviewImageFormat}"
+                                               ImageName="{Binding PreviewImageName}" />
+                    </TabItem>
+                    <TabItem Visibility="{Binding IsSoundTabVisible, Converter={StaticResource BoolToVisibility}}">
+                        <TabItem.Header>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Path Style="{StaticResource TabItemIconStyle}" Data="{StaticResource SvgMusicNote}"
+                                      Fill="DarkOrange" />
+                                <TextBlock Style="{StaticResource TabItemLabelStyle}" Text="Snd" />
+                            </Grid>
+                        </TabItem.Header>
+                        <!--todo: style this better-->
+                        <Grid>
+                            <Border Background="{StaticResource BackgroundBrushDark}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    Margin="-2 0" />
+                            <Grid VerticalAlignment="Top" Background="#2000">
+                                <Image Source="{Binding SoundPreviewManager.WaveForm}" Stretch="Uniform" Margin="15 0"
+                                       x:Name="waveform" />
+                                <Slider Margin="10 10"
+                                        Height="{Binding ElementName=waveform, Path=ActualHeight}"
+                                        Foreground="{StaticResource AccentBrush}"
+                                        Minimum="0"
+                                        FocusVisualStyle="{StaticResource EmptyFocusVisual}"
+                                        Maximum="1000"
+                                        HorizontalAlignment="Stretch" Width="Auto"
+                                        Value="{Binding SoundPreviewManager.CurrentPosition, Mode=TwoWay}"
+                                        Style="{DynamicResource SeekSliderStyle}" />
+                            </Grid>
+                            <TextBlock Text="{Binding SoundPreviewManager.CurrentTime}"
+                                       VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       Margin="0 100 0 0" />
+                            <TextBlock Text="{Binding SelectedNode.Name}"
+                                       VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       Margin="0 60 0 0" />
+                            <Button Style="{StaticResource ToolbarButtonStyle}"
+                                    Margin="0 20"
+                                    Command="{Binding PlayStopSoundCommand}"
+                                    VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                                <Path Data="{StaticResource SvgPlay}" />
+                            </Button>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+
+                <controls:PropertiesToolbar
+                    Visibility="{Binding PropertyButtonsEnabled, Converter={StaticResource BoolToVisibility}}"
+                    Grid.Column="1" Margin="2 4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom" />
+                <controls:ImageToolbar
+                    Visibility="{Binding ImageButtonsEnabled, Converter={StaticResource BoolToVisibility}}"
+                    Grid.Column="1" Margin="2 4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom" />
+                <controls:SoundToolbar
+                    Visibility="{Binding SoundButtonsEnabled, Converter={StaticResource BoolToVisibility}}"
+                    Grid.Column="1" Margin="2 4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom" />
+            </Grid>
+
+
+            <GridSplitter Height="2" Width="30" Grid.Row="0" VerticalAlignment="Bottom" Margin="20 0 20 0"
+                          HorizontalAlignment="Stretch" Background="{StaticResource SelectionBrush}"
+                          ResizeDirection="Rows" />
+
+            <!--Log-->
+            <TextBox x:Name="Log" Grid.Row="1" Margin="6"
+                     FontSize="12" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     Text="{Binding LogText, Mode=OneWay}"
+                     Foreground="#fff"
+                     Padding="2"
+                     extensions:TextBoxExtensions.AutoScrollEnabled="true"
+                     BorderBrush="{StaticResource BorderBrush}"
+                     Background="{StaticResource BackgroundBrushDark}"
+                     IsReadOnly="True" />
+
+            <!--Status bar-->
+            <Grid Background="{StaticResource BackgroundBrushDark}"
+                  Grid.Row="2">
+                <ProgressBar Value="{Binding ProgressValue, Mode=OneWay}" VerticalAlignment="Bottom" Height="2"
+                             Foreground="{StaticResource AccentBrush}"
+                             Background="Transparent" BorderThickness="0" />
+                <TextBlock Foreground="#2fff" Text="{Binding StatusBarText, Mode=OneWay}"
+
+                           HorizontalAlignment="Left"
+                           Margin="8 0"
+                           VerticalAlignment="Center" />
+            </Grid>
+
+        </Grid>
+
+    </Grid>
+</Window>

@@ -57,7 +57,7 @@ namespace GPK_RePack.Core.Model
             gpk.CompositeEntry = entry;
             LoadedGpkPackages.Add(gpk);
 
-            PackagesChanged();
+            PackagesChanged?.Invoke();
             return gpk;
         }
 
@@ -229,13 +229,13 @@ namespace GPK_RePack.Core.Model
         {
             LoadedGpkPackages.Remove(package);
 
-            PackagesChanged();
+            PackagesChanged?.Invoke();
         }
         public void clearGpkList()
         {
             LoadedGpkPackages.Clear();
 
-            PackagesChanged();
+            PackagesChanged?.Invoke();
         }
 
         public void clearCompositeMap()

@@ -53,6 +53,7 @@
       <HintPath>..\packages\NVorbis.0.10.1\lib\net45\NVorbis.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
@@ -134,10 +135,15 @@
     <Compile Include="Model\Prop\GpkObjectProperty.cs" />
     <Compile Include="Model\Prop\GpkStringProperty.cs" />
     <Compile Include="Model\Prop\GpkStructProperty.cs" />
+    <Compile Include="Updater\IUpdaterCheckCallback.cs" />
+    <Compile Include="Updater\UpdateCheck.cs" />
     <Compile Include="NLogConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceExtractor.cs" />
     <Compile Include="CoreSettings.cs" />
+    <Compile Include="WpfRichTextBoxRowColoringRule.cs" />
+    <Compile Include="WpfRichTextBoxTarget.cs" />
+    <Compile Include="WpfRichTextBoxWordColoringRule.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\lzo64\Lzo64.csproj">

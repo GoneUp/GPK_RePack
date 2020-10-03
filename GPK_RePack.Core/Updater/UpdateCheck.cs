@@ -1,17 +1,16 @@
-﻿using GPK_RePack.Core;
-using NLog;
-using System;
+﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using NLog;
 
-namespace GPK_RePack.Updater
+namespace GPK_RePack.Core.Updater
 {
-    class UpdateCheck
+    public class UpdateCheck
     {
         //bump version on new release
         private static Logger logger;
 
-        public static void checkForUpdate(UpdaterCheckCallback callback)
+        public static void checkForUpdate(IUpdaterCheckCallback callback)
         {           
 
             logger = LogManager.GetLogger("Updater");
@@ -35,7 +34,7 @@ namespace GPK_RePack.Updater
                 logger.Debug("Online Versioncode {0}, Appversion {1}", onlineVersionCode, Constants.APP_VERSION);
                 if (callback != null)
                 {
-                    callback.postUpdateResult(onlineVersionCode > Constants.APP_VERSION);
+                    callback.PostUpdateResult(onlineVersionCode > Constants.APP_VERSION);
                 }
             });
             newTask.Start();
